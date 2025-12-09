@@ -888,6 +888,26 @@ export class ClaudianView extends ItemView {
   private async renderContent(el: HTMLElement, markdown: string) {
     el.empty();
     await MarkdownRenderer.renderMarkdown(markdown, el, '', this);
+
+    // Add clickable language label to code blocks
+    el.querySelectorAll('pre > code[class*="language-"]').forEach((code) => {
+      const pre = code.parentElement;
+      if (pre) {
+        const match = code.className.match(/language-(\w+)/);
+        if (match) {
+          pre.classList.add('has-language');
+          const label = pre.createEl('span', {
+            cls: 'claudian-code-lang-label',
+            text: match[1],
+          });
+          label.addEventListener('click', async () => {
+            await navigator.clipboard.writeText(code.textContent || '');
+            label.setText('copied!');
+            setTimeout(() => label.setText(match[1]), 1500);
+          });
+        }
+      }
+    });
   }
 
   // ============================================
