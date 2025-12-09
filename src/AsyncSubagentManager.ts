@@ -243,7 +243,7 @@ export class AsyncSubagentManager {
     }
 
     // Extract the actual result content from the response
-    const extractedResult = this.extractAgentResult(result, agentId);
+    const extractedResult = this.extractAgentResult(result, agentId ?? '');
 
     // Transition to final state
     subagent.asyncStatus = isError ? 'error' : 'completed';
@@ -252,7 +252,7 @@ export class AsyncSubagentManager {
     subagent.completedAt = Date.now();
 
     // Cleanup tracking
-    this.activeAsyncSubagents.delete(agentId);
+    if (agentId) this.activeAsyncSubagents.delete(agentId);
     this.outputToolIdToAgentId.delete(toolId);
     // Keep taskIdToAgentId for history lookups
 

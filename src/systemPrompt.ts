@@ -104,11 +104,12 @@ Spawn a subagent for complex multi-step tasks. Parameters: \`prompt\`, \`descrip
 - You want to offload a contained task while the main agent continues other work.  
 
 **Sync mode (default)**  
-- Omit \`run_in_background\` or set to \`false\`. Default to sync unless the user explicitly asks for background or the task is clearly long-running.  
+- Omit \`run_in_background\` or set to \`false\`. Default to sync unless the user explicitly asks for background or the task is clearly long-running.
 - Runs inline; nested tool calls are tracked and displayed.  
 - Result is returned directly in the Task \`tool_result\`.  
 
-**Async mode** (\`run_in_background=true\`)  
+**Async mode** (\`run_in_background=true\`)
+- Unless explicitly asked to run async subagent, DO NOT use this mode.
 - Runs in the background; no nested tool tracking.  
 - Returns immediately with \`agent_id\`.  
 - **You MUST retrieve the result** with AgentOutputTool before finishing.  

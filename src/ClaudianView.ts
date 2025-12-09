@@ -142,13 +142,13 @@ export class ClaudianView extends ItemView {
     // Create SVG logo using DOM API (avoid innerHTML per Obsidian guidelines)
     const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     svg.setAttribute('viewBox', '0 0 100 100');
-    svg.setAttribute('width', '16');
-    svg.setAttribute('height', '16');
+    svg.setAttribute('width', '18');
+    svg.setAttribute('height', '18');
     const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
     g.setAttribute('fill', '#D97757');
     for (let i = 0; i < 12; i++) {
       const angle = (i * 30 - 90) * Math.PI / 180;
-      const cx = 53, cy = 50;
+      const cx = 60, cy = 58;
       const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
       line.setAttribute('x1', String(cx + 15 * Math.cos(angle)));
       line.setAttribute('y1', String(cy + 15 * Math.sin(angle)));

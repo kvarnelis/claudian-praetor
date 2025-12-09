@@ -14,6 +14,7 @@ const TOOL_ICONS: Record<string, string> = {
   'LS': 'list',
   'TodoWrite': 'list-checks',
   'WebSearch': 'globe',
+  'WebFetch': 'download',
 };
 
 /**
@@ -52,6 +53,10 @@ export function getToolLabel(name: string, input: Record<string, unknown>): stri
     case 'WebSearch': {
       const query = (input.query as string) || 'search';
       return `WebSearch: ${query.length > 40 ? query.substring(0, 40) + '...' : query}`;
+    }
+    case 'WebFetch': {
+      const url = (input.url as string) || 'url';
+      return `WebFetch: ${url.length > 40 ? url.substring(0, 40) + '...' : url}`;
     }
     case 'LS':
       return `LS: ${shortenPath(input.path as string) || '.'}`;
@@ -94,6 +99,8 @@ export function formatToolInput(name: string, input: Record<string, unknown>): s
       return (input.pattern as string) || JSON.stringify(input, null, 2);
     case 'WebSearch':
       return (input.query as string) || JSON.stringify(input, null, 2);
+    case 'WebFetch':
+      return (input.url as string) || JSON.stringify(input, null, 2);
     default:
       return JSON.stringify(input, null, 2);
   }
