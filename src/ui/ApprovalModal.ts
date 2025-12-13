@@ -9,7 +9,6 @@ export type ApprovalDecision = 'allow' | 'allow-always' | 'deny';
 /** Modal dialog for approving tool actions in Safe mode. */
 export class ApprovalModal extends Modal {
   private toolName: string;
-  private input: Record<string, unknown>;
   private description: string;
   private resolve: (value: ApprovalDecision) => void;
   private resolved = false;
@@ -17,13 +16,12 @@ export class ApprovalModal extends Modal {
   constructor(
     app: import('obsidian').App,
     toolName: string,
-    input: Record<string, unknown>,
+    _input: Record<string, unknown>,
     description: string,
     resolve: (value: ApprovalDecision) => void
   ) {
     super(app);
     this.toolName = toolName;
-    this.input = input;
     this.description = description;
     this.resolve = resolve;
   }
@@ -43,11 +41,6 @@ export class ApprovalModal extends Modal {
 
     const descEl = contentEl.createDiv({ cls: 'claudian-approval-desc' });
     descEl.setText(this.description);
-
-    const detailsEl = contentEl.createEl('details', { cls: 'claudian-approval-details' });
-    detailsEl.createEl('summary', { text: 'Show details' });
-    const codeEl = detailsEl.createEl('pre', { cls: 'claudian-approval-code' });
-    codeEl.setText(JSON.stringify(this.input, null, 2));
 
     const buttonsEl = contentEl.createDiv({ cls: 'claudian-approval-buttons' });
 

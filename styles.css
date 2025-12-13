@@ -1099,32 +1099,6 @@
   margin-bottom: 12px;
 }
 
-.claudian-approval-details {
-  margin-bottom: 16px;
-}
-
-.claudian-approval-details summary {
-  cursor: pointer;
-  color: var(--text-muted);
-  font-size: 12px;
-  padding: 4px 0;
-}
-
-.claudian-approval-details summary:hover {
-  color: var(--text-normal);
-}
-
-.claudian-approval-code {
-  margin-top: 8px;
-  padding: 12px;
-  background: var(--background-secondary);
-  border-radius: 4px;
-  font-size: 11px;
-  max-height: 200px;
-  overflow-y: auto;
-  white-space: pre-wrap;
-  word-break: break-all;
-}
 
 .claudian-approval-buttons {
   display: flex;

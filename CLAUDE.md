@@ -696,8 +696,6 @@ Permanently approved actions are stored and can be managed in Settings → Appro
 - `.claudian-approval-info` - Tool info section
 - `.claudian-approval-tool` - Tool name with icon
 - `.claudian-approval-desc` - Action description
-- `.claudian-approval-details` - Collapsible details section
-- `.claudian-approval-code` - JSON input display
 - `.claudian-approval-buttons` - Button container
 - `.claudian-approval-btn` - Base button class
 - `.claudian-deny-btn` - Deny button

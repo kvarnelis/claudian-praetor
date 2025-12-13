@@ -179,7 +179,6 @@ src/
 - [x] Diff view in chat panel
 - [x] Cursor position awareness in inline edit
 - [ ] `#` to saved in customization prompt
-- [ ] Enhance robustness of permissions setting 
 - [ ] Skills, Hooks, MCP and other advanced features
 
 ## License
