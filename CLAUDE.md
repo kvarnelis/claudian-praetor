@@ -12,11 +12,11 @@ src/
 ├── ClaudianView.ts      # Sidebar chat UI (ItemView)
 ├── ClaudianService.ts   # Claude Agent SDK wrapper
 ├── ClaudianSettings.ts  # Settings tab
-├── systemPrompt.ts      # System prompt and image handling
 ├── utils.ts             # Vault, env, session utilities
 ├── AsyncSubagentManager.ts # Async subagent state machine
 ├── InlineEditService.ts # Inline text editing service
 ├── InstructionRefineService.ts # # instruction refinement
+├── system-prompt/       # System prompts for different agents
 ├── sdk/                 # SDK message transformation
 ├── hooks/               # PreToolUse/PostToolUse hooks
 ├── security/            # Approval, blocklist, path validation
@@ -28,6 +28,7 @@ src/
 
 | Folder | Purpose |
 |--------|---------|
+| `system-prompt/` | System prompts (main agent, inline edit, instruction refine) |
 | `sdk/` | SDK message transformation |
 | `hooks/` | Security and diff tracking hooks |
 | `security/` | Approval, blocklist, path validation |

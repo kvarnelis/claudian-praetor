@@ -172,12 +172,15 @@ src/
 ├── ClaudianView.ts      # Sidebar chat UI, orchestrates components
 ├── ClaudianService.ts   # Claude Agent SDK wrapper (includes session & diff management)
 ├── ClaudianSettings.ts  # Settings tab
-├── systemPrompt.ts      # System prompt
 ├── types.ts             # Type definitions (re-exports from types/)
 ├── utils.ts             # Utilities (vault, env, context files, session recovery)
 ├── InlineEditService.ts # Lightweight Claude service for inline editing
 ├── InstructionRefineService.ts # Lightweight Claude service for refining # instructions
 ├── AsyncSubagentManager.ts # Async subagent state machine
+├── system-prompt/       # System prompts for different agents
+│   ├── mainAgent.ts          # Main chat system prompt
+│   ├── inlineEdit.ts         # Inline edit system prompt
+│   └── instructionRefine.ts  # Instruction refinement system prompt
 ├── sdk/                 # SDK integration
 │   └── MessageTransformer.ts # SDK message transformation
 ├── hooks/               # SDK PreToolUse/PostToolUse hooks

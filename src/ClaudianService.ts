@@ -24,7 +24,7 @@ import {
   ApprovalManager,
   getActionDescription,
 } from './security';
-import { buildSystemPrompt } from './systemPrompt';
+import { buildSystemPrompt } from './system-prompt/mainAgent';
 import type {
   ApprovedAction,
   ChatMessage,

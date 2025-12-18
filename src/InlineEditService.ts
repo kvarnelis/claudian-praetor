@@ -9,7 +9,7 @@ import type { HookCallbackMatcher, Options } from '@anthropic-ai/claude-agent-sd
 import { query as agentQuery } from '@anthropic-ai/claude-agent-sdk';
 
 import type ClaudianPlugin from './main';
-import { getInlineEditSystemPrompt } from './systemPrompt';
+import { getInlineEditSystemPrompt } from './system-prompt/inlineEdit';
 import { getPathFromToolInput } from './tools/toolInput';
 import {
   isReadOnlyTool,
