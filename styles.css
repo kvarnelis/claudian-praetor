@@ -1389,8 +1389,8 @@
 
 /* Env Snippet Modal */
 .claudian-env-snippet-modal .modal-content {
-  max-width: 500px;
-  width: auto;
+  max-width: 550px;
+  width: 550px;
   padding: 16px;
 }
 
@@ -1405,6 +1405,29 @@
 
 .claudian-env-snippet-modal .setting-item-info {
   margin-bottom: 4px;
+}
+
+/* Full-width env vars textarea setting */
+.claudian-env-snippet-setting {
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.claudian-env-snippet-setting .setting-item-info {
+  width: 100%;
+  margin-bottom: 8px;
+}
+
+.claudian-env-snippet-control {
+  width: 100%;
+}
+
+.claudian-env-snippet-control textarea {
+  width: 100%;
+  min-width: 100%;
+  font-family: var(--font-monospace);
+  font-size: 12px;
+  resize: vertical;
 }
 
 .claudian-snippet-preview {

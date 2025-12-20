@@ -24,7 +24,7 @@ An Obsidian plugin that embeds Claude Agent (using Claude Agent SDK) as a sideba
 
 - [Claude Code CLI](https://docs.anthropic.com/en/docs/claude-code) installed (the SDK uses it internally)
 - Obsidian v1.8.9+
-- Claude subscription/API or Custom model provider that supports anthropic API format (Kimi, GLM, DeepSeek, etc.)
+- Claude subscription/API or Custom model provider that supports anthropic API format (Openrouter, Kimi, GLM, DeepSeek, etc.)
 - Desktop only (support macOS, not tested on Linux or Windows)
 
 ## Installation
@@ -50,7 +50,7 @@ An Obsidian plugin that embeds Claude Agent (using Claude Agent SDK) as a sideba
 ### Development
 
 ```bash
-# Watch mode (auto-rebuild on changes)
+# Watch mode
 npm run dev
 
 # Production build
@@ -69,7 +69,6 @@ Use it like Claude Code, ask it to read, write, edit, search, etc. to help you w
 
 - **Auto-attach**: New conversations auto-attach the currently focused note
 - **@ mention**: Type `@` anywhere to search and attach files from your vault
-- **Remove**: Click `×` on a file chip to remove it
 - **Excluded tags**: Notes with tags listed in Settings → Excluded tags won't auto-attach (but can still be manually attached via `@`)
 - Files are sent as context with your message; Claude will read them to understand your question
 
@@ -99,8 +98,6 @@ Define commands in Settings → Claudian → Slash Commands, then type `/` in th
 - **Placeholders**: `$ARGUMENTS`, `$1`, `$2`, ... (basic quoted args supported)
 - **File references**: `@path/to/file.md`, `@"path with spaces.md"`, `@'path with spaces.md'`
 - **Inline bash**: `` !`command` `` substitutes with command output (see safety notes below)
-
-The UI displays the original `/command ...`, while the expanded prompt is what gets sent and stored in history.
 
 ### Instruction Mode (`#`)
 

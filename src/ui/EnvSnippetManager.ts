@@ -32,30 +32,35 @@ export class EnvSnippetModal extends Modal {
 
     let nameEl: HTMLInputElement;
     let descEl: HTMLInputElement;
+    let envVarsEl: HTMLTextAreaElement;
 
-    // Add keyboard shortcuts
+    // Add keyboard shortcuts for name/description fields
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Enter') {
         e.preventDefault();
-        const name = nameEl.value.trim();
-        if (!name) {
-          new Notice('Please enter a name for the snippet');
-          return;
-        }
-
-        const snippet: EnvSnippet = {
-          id: this.snippet?.id || `snippet-${Date.now()}`,
-          name,
-          description: descEl.value.trim(),
-          envVars: this.plugin.settings.environmentVariables,
-        };
-
-        this.onSave(snippet);
-        this.close();
+        saveSnippet();
       } else if (e.key === 'Escape') {
         e.preventDefault();
         this.close();
       }
+    };
+
+    const saveSnippet = () => {
+      const name = nameEl.value.trim();
+      if (!name) {
+        new Notice('Please enter a name for the snippet');
+        return;
+      }
+
+      const snippet: EnvSnippet = {
+        id: this.snippet?.id || `snippet-${Date.now()}`,
+        name,
+        description: descEl.value.trim(),
+        envVars: envVarsEl.value,
+      };
+
+      this.onSave(snippet);
+      this.close();
     };
 
     new Setting(contentEl)
@@ -76,11 +81,19 @@ export class EnvSnippetModal extends Modal {
                 text.inputEl.addEventListener('keydown', handleKeyDown);
       });
 
-    // Show preview of current environment variables
-    const previewEl = contentEl.createDiv({ cls: 'claudian-snippet-preview' });
-
-    const envPreview = previewEl.createEl('pre', { cls: 'claudian-env-preview' });
-    envPreview.setText(this.plugin.settings.environmentVariables || '(No environment variables set)');
+    // Editable environment variables - full width layout
+    const envVarsSetting = new Setting(contentEl)
+      .setName('Environment variables')
+      .setDesc('KEY=VALUE format, one per line')
+      .addTextArea((text) => {
+        envVarsEl = text.inputEl;
+        const envVarsToShow = this.snippet?.envVars ?? this.plugin.settings.environmentVariables;
+        text.setValue(envVarsToShow);
+        text.inputEl.rows = 8;
+      });
+    // Make textarea full width under the label
+    envVarsSetting.settingEl.addClass('claudian-env-snippet-setting');
+    envVarsSetting.controlEl.addClass('claudian-env-snippet-control');
 
     // Compact button container
     const buttonContainer = contentEl.createDiv({ cls: 'claudian-snippet-buttons' });
@@ -95,23 +108,7 @@ export class EnvSnippetModal extends Modal {
       text: this.snippet ? 'Update' : 'Save',
       cls: 'claudian-save-btn'
     });
-    saveBtn.addEventListener('click', () => {
-      const name = nameEl.value.trim();
-      if (!name) {
-        new Notice('Please enter a name for the snippet');
-        return;
-      }
-
-      const snippet: EnvSnippet = {
-        id: this.snippet?.id || `snippet-${Date.now()}`,
-        name,
-        description: descEl.value.trim(),
-        envVars: this.plugin.settings.environmentVariables,
-      };
-
-      this.onSave(snippet);
-      this.close();
-    });
+    saveBtn.addEventListener('click', () => saveSnippet());
   }
 
   onClose() {
