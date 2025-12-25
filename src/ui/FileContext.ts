@@ -7,6 +7,7 @@
 import { createHash } from 'crypto';
 import type { App, EventRef } from 'obsidian';
 import { setIcon, TFile } from 'obsidian';
+import * as path from 'path';
 
 import { isEditTool } from '../tools/toolNames';
 import { getVaultPath } from '../utils';
@@ -349,7 +350,7 @@ export class FileContextManager {
       }
     }
 
-    return unixPath.replace(/^\/+/, '');
+    return unixPath;
   }
 
   private updateFileIndicator() {
@@ -407,14 +408,69 @@ export class FileContextManager {
     });
   }
 
-  private async openFileFromChip(path: string) {
-    const normalizedPath = this.normalizePathForVault(path);
+  private async openFileFromChip(filePath: string) {
+    const normalizedPath = this.normalizePathForVault(filePath);
     if (!normalizedPath) return;
 
     const file = this.app.vault.getAbstractFileByPath(normalizedPath);
     if (file instanceof TFile) {
-      await this.app.workspace.getLeaf('tab').openFile(file);
+      try {
+        await this.app.workspace.getLeaf('tab').openFile(file);
+        return;
+      } catch {
+        const vaultPath = getVaultPath(this.app);
+        const absolutePath = vaultPath ? path.join(vaultPath, file.path) : file.path;
+        const opened = await this.openWithDefaultApp(absolutePath);
+        if (opened) {
+          this.dismissEditedFile(filePath);
+        }
+        return;
+      }
     }
+
+    if (path.isAbsolute(normalizedPath)) {
+      const opened = await this.openWithDefaultApp(normalizedPath);
+      if (opened) {
+        this.dismissEditedFile(filePath);
+      }
+    }
+  }
+
+  private async openWithDefaultApp(filePath: string): Promise<boolean> {
+    if (!filePath) return false;
+
+    const appAny = this.app as any;
+    if (typeof appAny.openWithDefaultApp === 'function') {
+      try {
+        await appAny.openWithDefaultApp(filePath);
+        return true;
+      } catch (err) {
+        console.error('Failed to open file in default app:', err);
+        return false;
+      }
+    }
+
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { shell } = require('electron');
+      if (shell?.openPath) {
+        const result = await shell.openPath(filePath);
+        if (result) {
+          console.error('Failed to open file in default app:', result);
+          return false;
+        }
+        return true;
+      }
+      if (shell?.openExternal) {
+        const target = filePath.startsWith('file://') ? filePath : `file://${filePath}`;
+        await shell.openExternal(target);
+        return true;
+      }
+    } catch (err) {
+      console.error('Failed to open file in default app:', err);
+    }
+
+    return false;
   }
 
   private clearEditedFiles() {

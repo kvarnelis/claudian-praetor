@@ -417,6 +417,7 @@ describe('FileContextManager - File Chip Click Handlers', () => {
     mockPlugin.app.workspace.getLeaf = jest.fn().mockReturnValue({
       openFile: mockOpenFile,
     });
+    mockPlugin.app.openWithDefaultApp = jest.fn().mockResolvedValue(undefined);
     fileContextManager = createFileContextManager(mockPlugin);
   });
 
@@ -444,6 +445,48 @@ describe('FileContextManager - File Chip Click Handlers', () => {
 
       expect(mockPlugin.app.vault.getAbstractFileByPath).toHaveBeenCalledWith(filePath);
       expect(mockOpenFile).not.toHaveBeenCalled();
+      expect(mockPlugin.app.openWithDefaultApp).not.toHaveBeenCalled();
+    });
+
+    it('should open vault file in Obsidian even if non-markdown', async () => {
+      const filePath = 'assets/image.png';
+      const mockFile = createTFile(filePath);
+
+      mockPlugin.app.vault.getAbstractFileByPath.mockReturnValue(mockFile);
+
+      await (fileContextManager as any).openFileFromChip(filePath);
+
+      expect(mockOpenFile).toHaveBeenCalledWith(mockFile);
+      expect(mockPlugin.app.openWithDefaultApp).not.toHaveBeenCalled();
+    });
+
+    it('should open external absolute path with default app and dismiss chip', async () => {
+      const filePath = '/external/file.pdf';
+
+      mockPlugin.app.vault.getAbstractFileByPath.mockReturnValue(null);
+      (fileContextManager as any).editedFilesThisSession.add(filePath);
+
+      await (fileContextManager as any).openFileFromChip(filePath);
+
+      expect(mockPlugin.app.openWithDefaultApp).toHaveBeenCalledWith(filePath);
+      expect(mockOpenFile).not.toHaveBeenCalled();
+      expect((fileContextManager as any).editedFilesThisSession.has(filePath)).toBe(false);
+    });
+
+    it('should fall back to default app when openFile fails', async () => {
+      const filePath = 'assets/image.png';
+      const mockFile = createTFile(filePath);
+
+      mockPlugin.app.vault.getAbstractFileByPath.mockReturnValue(mockFile);
+      mockPlugin.app.workspace.getLeaf = jest.fn().mockReturnValue({
+        openFile: jest.fn().mockRejectedValue(new Error('open failed')),
+      });
+      (fileContextManager as any).editedFilesThisSession.add(filePath);
+
+      await (fileContextManager as any).openFileFromChip(filePath);
+
+      expect(mockPlugin.app.openWithDefaultApp).toHaveBeenCalledWith('/test/vault/assets/image.png');
+      expect((fileContextManager as any).editedFilesThisSession.has(filePath)).toBe(false);
     });
   });
 
