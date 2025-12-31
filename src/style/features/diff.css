@@ -2,6 +2,13 @@
 .claudian-write-edit-block {
   margin: 4px 0;
   background: transparent;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.claudian-write-edit-block::-webkit-scrollbar {
+  width: 0;
+  height: 0;
 }
 
 .claudian-text-block+.claudian-write-edit-block {
@@ -92,6 +99,13 @@
 .claudian-write-edit-content {
   padding: 0;
   background: transparent;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.claudian-write-edit-content::-webkit-scrollbar {
+  width: 0;
+  height: 0;
 }
 
 .claudian-write-edit-diff-row {
@@ -107,6 +121,13 @@
   max-height: 300px;
   overflow-y: auto;
   overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.claudian-write-edit-diff::-webkit-scrollbar {
+  width: 0;
+  height: 0;
 }
 
 .claudian-write-edit-loading,
