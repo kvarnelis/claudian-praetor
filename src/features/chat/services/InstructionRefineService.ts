@@ -12,7 +12,7 @@ import { buildRefineSystemPrompt } from '../../../core/prompts/instructionRefine
 import { TOOL_GLOB, TOOL_GREP, TOOL_READ } from '../../../core/tools/toolNames';
 import { type InstructionRefineResult, THINKING_BUDGETS } from '../../../core/types';
 import type ClaudianPlugin from '../../../main';
-import { parseEnvironmentVariables } from '../../../utils/env';
+import { getEnhancedPath, parseEnvironmentVariables } from '../../../utils/env';
 import { findClaudeCLIPath, getVaultPath, isPathWithinVault as isPathWithinVaultUtil } from '../../../utils/path';
 
 const READ_ONLY_TOOLS = [TOOL_READ, TOOL_GREP, TOOL_GLOB] as const;
@@ -103,6 +103,7 @@ export class InstructionRefineService {
       env: {
         ...process.env,
         ...customEnv,
+        PATH: getEnhancedPath(customEnv.PATH),
       },
       allowedTools: [...READ_ONLY_TOOLS],
       permissionMode: 'bypassPermissions',

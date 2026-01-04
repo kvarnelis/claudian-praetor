@@ -10,7 +10,7 @@ import { query as agentQuery } from '@anthropic-ai/claude-agent-sdk';
 
 import { TITLE_GENERATION_SYSTEM_PROMPT } from '../../../core/prompts/titleGeneration';
 import type ClaudianPlugin from '../../../main';
-import { parseEnvironmentVariables } from '../../../utils/env';
+import { getEnhancedPath, parseEnvironmentVariables } from '../../../utils/env';
 import { findClaudeCLIPath, getVaultPath } from '../../../utils/path';
 
 /** Result of title generation (discriminated union). */
@@ -120,6 +120,7 @@ Generate a title for this conversation:`;
       env: {
         ...process.env,
         ...customEnv,
+        PATH: getEnhancedPath(customEnv.PATH),
       },
       allowedTools: [], // No tools needed for title generation
       permissionMode: 'bypassPermissions',

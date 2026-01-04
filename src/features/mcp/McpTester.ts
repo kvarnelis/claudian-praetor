@@ -10,6 +10,7 @@ import * as https from 'https';
 
 import type { ClaudianMcpServer } from '../../core/types';
 import { getMcpServerType } from '../../core/types';
+import { getEnhancedPath } from '../../utils/env';
 import {
   consumeSseStream,
   parseCommand,
@@ -98,19 +99,10 @@ async function testStdioServer(server: ClaudianMcpServer): Promise<McpTestResult
       }
 
       // Use direct spawn with command + args
-      // Add common binary paths since GUI apps have minimal PATH
-      const extraPaths = [
-        '/usr/local/bin',
-        '/opt/homebrew/bin',
-        '/usr/bin',
-        '/bin',
-        process.env.HOME + '/.local/bin',
-        process.env.HOME + '/.docker/bin',
-      ].join(':');
-      const enhancedPath = `${extraPaths}:${process.env.PATH || ''}`;
-
+      // Enhance PATH for GUI apps (Obsidian has minimal PATH)
+      // Server-specified PATH from config takes priority
       child = spawn(cmd, args, {
-        env: { ...process.env, ...config.env, PATH: enhancedPath },
+        env: { ...process.env, ...config.env, PATH: getEnhancedPath(config.env?.PATH) },
         stdio: ['pipe', 'pipe', 'pipe'],
       });
 

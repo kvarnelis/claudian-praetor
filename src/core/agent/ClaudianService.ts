@@ -13,7 +13,7 @@ import * as path from 'path';
 
 import type ClaudianPlugin from '../../main';
 import { stripCurrentNotePrefix } from '../../utils/context';
-import { parseEnvironmentVariables } from '../../utils/env';
+import { getEnhancedPath, parseEnvironmentVariables } from '../../utils/env';
 import {
   expandHomePath,
   findClaudeCLIPath,
@@ -429,6 +429,10 @@ export class ClaudianService {
     // Parse custom environment variables from settings
     const customEnv = parseEnvironmentVariables(this.plugin.getActiveEnvironmentVariables());
 
+    // Enhance PATH for GUI apps (Obsidian has minimal PATH)
+    // User-specified PATH from settings takes priority
+    const enhancedPath = getEnhancedPath(customEnv.PATH);
+
     // Build the prompt - either a string or content blocks with images
     const queryPrompt = this.buildPromptWithImages(prompt, images);
 
@@ -456,6 +460,7 @@ export class ClaudianService {
       env: {
         ...process.env,
         ...customEnv,
+        PATH: enhancedPath,
       },
     };
 

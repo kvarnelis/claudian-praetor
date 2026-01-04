@@ -9,6 +9,7 @@ import { exec } from 'child_process';
 import type { App} from 'obsidian';
 import { TFile } from 'obsidian';
 
+import { getEnhancedPath } from '../../utils/env';
 import { parseSlashCommandContent } from '../../utils/slashCommand';
 import type { ClaudeModel,SlashCommand } from '../types';
 
@@ -302,6 +303,8 @@ function defaultBashRunner(command: string, cwd: string): Promise<string> {
         cwd,
         timeout: 10000,
         maxBuffer: 1024 * 1024,
+        // Enhance PATH for GUI apps (Obsidian has minimal PATH)
+        env: { ...process.env, PATH: getEnhancedPath() },
       },
       (error, stdout, stderr) => {
         if (error) {

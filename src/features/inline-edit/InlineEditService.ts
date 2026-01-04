@@ -22,7 +22,7 @@ import { THINKING_BUDGETS } from '../../core/types';
 import type ClaudianPlugin from '../../main';
 import { prependContextFiles } from '../../utils/context';
 import { type CursorContext } from '../../utils/editor';
-import { parseEnvironmentVariables } from '../../utils/env';
+import { getEnhancedPath, parseEnvironmentVariables } from '../../utils/env';
 import { findClaudeCLIPath, getVaultPath, isPathWithinVault as isPathWithinVaultUtil } from '../../utils/path';
 
 export type InlineEditMode = 'selection' | 'cursor';
@@ -123,6 +123,7 @@ export class InlineEditService {
       env: {
         ...process.env,
         ...customEnv,
+        PATH: getEnhancedPath(customEnv.PATH),
       },
       allowedTools: [...READ_ONLY_TOOLS],
       permissionMode: 'bypassPermissions',

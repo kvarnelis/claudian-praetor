@@ -1,8 +1,120 @@
 /**
  * Claudian - Environment Utilities
  *
- * Environment variable parsing and model configuration.
+ * Environment variable parsing, model configuration, and PATH enhancement for GUI apps.
  */
+
+import * as path from 'path';
+
+const isWindows = process.platform === 'win32';
+const PATH_SEPARATOR = isWindows ? ';' : ':';
+
+/**
+ * Get the user's home directory, handling both Unix and Windows.
+ */
+function getHomeDir(): string {
+  return process.env.HOME || process.env.USERPROFILE || '';
+}
+
+/**
+ * Get platform-specific extra binary paths for GUI apps.
+ * GUI apps like Obsidian have minimal PATH, so we add common locations.
+ */
+function getExtraBinaryPaths(): string[] {
+  const home = getHomeDir();
+
+  if (isWindows) {
+    const paths: string[] = [];
+    const localAppData = process.env.LOCALAPPDATA;
+    const appData = process.env.APPDATA;
+    const programFiles = process.env.ProgramFiles || 'C:\\Program Files';
+    const programFilesX86 = process.env['ProgramFiles(x86)'] || 'C:\\Program Files (x86)';
+
+    // Node.js / npm locations
+    if (appData) {
+      paths.push(path.join(appData, 'npm'));
+      paths.push(path.join(appData, 'nvm'));
+    }
+    if (localAppData) {
+      paths.push(path.join(localAppData, 'Programs', 'node'));
+    }
+
+    // Common program locations
+    paths.push(path.join(programFiles, 'nodejs'));
+    paths.push(path.join(programFilesX86, 'nodejs'));
+
+    // Docker
+    paths.push(path.join(programFiles, 'Docker', 'Docker', 'resources', 'bin'));
+
+    // User bin (if exists)
+    if (home) {
+      paths.push(path.join(home, '.local', 'bin'));
+    }
+
+    return paths;
+  } else {
+    // Unix paths
+    const paths = [
+      '/usr/local/bin',
+      '/opt/homebrew/bin',  // macOS ARM Homebrew
+      '/usr/bin',
+      '/bin',
+    ];
+
+    if (home) {
+      paths.push(path.join(home, '.local', 'bin'));
+      paths.push(path.join(home, '.docker', 'bin'));
+
+      // NVM: use NVM_BIN if set, otherwise skip (NVM_BIN points to actual bin)
+      const nvmBin = process.env.NVM_BIN;
+      if (nvmBin) {
+        paths.push(nvmBin);
+      }
+    }
+
+    return paths;
+  }
+}
+
+/**
+ * Returns an enhanced PATH that includes common binary locations.
+ * GUI apps like Obsidian have minimal PATH, so we need to add standard locations
+ * where binaries like node, python, etc. are typically installed.
+ *
+ * @param additionalPaths - Optional additional PATH entries to include (from user config).
+ *                          These take priority and are prepended.
+ */
+export function getEnhancedPath(additionalPaths?: string): string {
+  const extraPaths = getExtraBinaryPaths().filter(p => p); // Filter out empty
+  const currentPath = process.env.PATH || '';
+
+  // Build path segments: additional (user config) > extra paths > current PATH
+  const segments: string[] = [];
+
+  // Add user-specified paths first (highest priority)
+  if (additionalPaths) {
+    segments.push(...additionalPaths.split(PATH_SEPARATOR).filter(p => p));
+  }
+
+  // Add our extra paths
+  segments.push(...extraPaths);
+
+  // Add current PATH
+  if (currentPath) {
+    segments.push(...currentPath.split(PATH_SEPARATOR).filter(p => p));
+  }
+
+  // Deduplicate while preserving order
+  const seen = new Set<string>();
+  const unique = segments.filter(p => {
+    const normalized = isWindows ? p.toLowerCase() : p;
+    if (seen.has(normalized)) return false;
+    seen.add(normalized);
+    return true;
+  });
+
+  return unique.join(PATH_SEPARATOR);
+}
 
 /** Parses KEY=VALUE environment variables from text. Supports comments (#) and empty lines. */
 export function parseEnvironmentVariables(input: string): Record<string, string> {
