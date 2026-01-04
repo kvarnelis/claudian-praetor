@@ -14,6 +14,7 @@ import {
   DEFAULT_CLAUDE_MODELS,
   THINKING_BUDGETS
 } from '../../core/types';
+import { MCP_ICON_SVG } from '../../features/chat/constants';
 import type { McpService } from '../../features/mcp/McpService';
 import { findConflictingPath } from '../../utils/contextPath';
 import { getModelsFromEnvironment, parseEnvironmentVariables } from '../../utils/env';
@@ -565,7 +566,7 @@ export class McpServerSelector {
     const iconWrapper = this.container.createDiv({ cls: 'claudian-mcp-selector-icon-wrapper' });
 
     this.iconEl = iconWrapper.createDiv({ cls: 'claudian-mcp-selector-icon' });
-    setIcon(this.iconEl, 'plug');
+    this.iconEl.innerHTML = MCP_ICON_SVG;
 
     this.badgeEl = iconWrapper.createDiv({ cls: 'claudian-mcp-selector-badge' });
 

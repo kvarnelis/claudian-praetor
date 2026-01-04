@@ -6,8 +6,9 @@
 
 import { setIcon } from 'obsidian';
 
-import { getToolIcon } from '../../core/tools/toolIcons';
+import { getToolIcon, MCP_ICON_MARKER } from '../../core/tools/toolIcons';
 import type { ToolCallInfo } from '../../core/types';
+import { MCP_ICON_SVG } from '../../features/chat/constants';
 import { setupCollapsible } from '../utils/collapsible';
 
 // Note: getToolIcon is now exported from src/tools/index.ts
@@ -15,7 +16,12 @@ import { setupCollapsible } from '../utils/collapsible';
 
 /** Set the tool icon on an element. */
 export function setToolIcon(el: HTMLElement, name: string) {
-  setIcon(el, getToolIcon(name));
+  const icon = getToolIcon(name);
+  if (icon === MCP_ICON_MARKER) {
+    el.innerHTML = MCP_ICON_SVG;
+  } else {
+    setIcon(el, icon);
+  }
 }
 
 /** Generate a human-readable label for a tool call. */

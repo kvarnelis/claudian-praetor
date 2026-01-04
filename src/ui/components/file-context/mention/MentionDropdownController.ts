@@ -5,6 +5,7 @@
 import type { TFile } from 'obsidian';
 import { setIcon } from 'obsidian';
 
+import { MCP_ICON_SVG } from '../../../../features/chat/constants';
 import type { McpService } from '../../../../features/mcp/McpService';
 import { getFolderName, normalizePathForComparison } from '../../../../utils/contextPath';
 import { type ContextPathFile, contextPathScanner } from '../../../../utils/contextPathScanner';
@@ -353,7 +354,7 @@ export class MentionDropdownController {
       renderItem: (item, itemEl) => {
         const iconEl = itemEl.createSpan({ cls: 'claudian-mention-icon' });
         if (item.type === 'mcp-server') {
-          setIcon(iconEl, 'plug');
+          iconEl.innerHTML = MCP_ICON_SVG;
         } else if (item.type === 'context-file') {
           setIcon(iconEl, 'folder-open');
         } else if (item.type === 'context-folder') {

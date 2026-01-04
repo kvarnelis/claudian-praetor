@@ -50,6 +50,13 @@ const TOOL_ICONS: Record<string, string> = {
   [TOOL_SKILL]: 'zap',
 };
 
+/** Special marker for MCP tools - signals to use custom SVG. */
+export const MCP_ICON_MARKER = '__mcp_icon__';
+
 export function getToolIcon(toolName: string): string {
+  // MCP tools start with "mcp__" prefix
+  if (toolName.startsWith('mcp__')) {
+    return MCP_ICON_MARKER;
+  }
   return TOOL_ICONS[toolName] || 'wrench';
 }
