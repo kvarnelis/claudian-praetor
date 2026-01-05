@@ -464,9 +464,13 @@ export class ClaudianSettingTab extends PluginSettingTab {
     // Advanced section
     new Setting(containerEl).setName('Advanced').setHeading();
 
+    const cliPathDescription = process.platform === 'win32'
+      ? 'Custom path to Claude Code CLI. Leave empty for auto-detection. For the native installer, use claude.exe. For npm/pnpm/yarn or other package manager installs, use the cli.js path (not claude.cmd).'
+      : 'Custom path to Claude Code CLI. Leave empty for auto-detection. Paste the output of "which claude" — works for both native and npm/pnpm/yarn installs.';
+
     const cliPathSetting = new Setting(containerEl)
       .setName('Claude CLI path')
-      .setDesc('Custom path to Claude Code CLI. Leave empty for auto-detection. Use cli.js path on Windows for npm installations.');
+      .setDesc(cliPathDescription);
 
     // Create validation message element
     const validationEl = containerEl.createDiv({ cls: 'claudian-cli-path-validation' });

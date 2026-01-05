@@ -141,22 +141,27 @@ If you encounter errors like `spawn claude ENOENT` or `Claude CLI not found`, th
 **macOS/Linux:**
 ```bash
 which claude
-# Example output: /Users/you/.volta/bin/claude
+# Example: /Users/you/.volta/bin/claude
+```
+Use this path directly — works for both native and npm installs.
+
+**Windows (native installer):**
+```powershell
+where.exe claude
+# Example output: C:\Users\you\AppData\Local\Claude\claude.exe
 ```
 
-**Windows (npm install):**
+**Windows (npm/pnpm/yarn/others):**
 ```powershell
-# Find the npm global modules directory
 npm root -g
 # Example: C:\Users\you\AppData\Roaming\npm\node_modules
-
 # The CLI path is:
 # {npm root -g}\@anthropic-ai\claude-code\cli.js
 ```
 
-> **Note**: `where.exe claude` returns `.cmd` wrapper files (e.g., `claude.cmd`). Don't use these — use the `cli.js` path instead.
+> **Note**: `where.exe claude` may return `.cmd` wrapper files (e.g., `claude.cmd`). Do not use these. Use `claude.exe` (native installer) or `cli.js` (npm/pnpm/yarn).
 
-Copy the `cli.js` path and paste it into **Settings → Advanced → Claude CLI path**.
+Copy the path and paste it into **Settings → Advanced → Claude CLI path**.
 
 **Alternative**: Add your Node.js bin directory to the PATH environment variable in **Settings → Environment → Custom variables**:
 ```
