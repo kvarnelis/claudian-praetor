@@ -40,6 +40,10 @@ export function parseSlashCommandContent(content: string): ParsedSlashCommandCon
   const lines = yamlContent.split(/\r?\n/);
   let arrayKey: string | null = null;
   let arrayItems: string[] = [];
+  let blockScalarKey: string | null = null;
+  let blockScalarStyle: 'literal' | 'folded' | null = null;
+  let blockScalarLines: string[] = [];
+  let blockScalarIndent: number | null = null;
 
   const flushArray = () => {
     if (arrayKey === 'allowed-tools') {
@@ -49,9 +53,79 @@ export function parseSlashCommandContent(content: string): ParsedSlashCommandCon
     arrayItems = [];
   };
 
-  for (const line of lines) {
+  const flushBlockScalar = () => {
+    if (!blockScalarKey) return;
+
+    let value: string;
+    if (blockScalarStyle === 'literal') {
+      // Literal (|): preserve line breaks
+      value = blockScalarLines.join('\n');
+    } else {
+      // Folded (>): join lines with spaces, but preserve double line breaks as paragraphs
+      // Use lookbehind + lookahead to only replace isolated newlines (not preceded or followed by \n)
+      value = blockScalarLines.join('\n').replace(/(?<!\n)\n(?!\n)/g, ' ').trim();
+    }
+
+    switch (blockScalarKey) {
+      case 'description':
+        result.description = value;
+        break;
+      case 'argument-hint':
+        result.argumentHint = value;
+        break;
+      case 'model':
+        result.model = value;
+        break;
+    }
+
+    blockScalarKey = null;
+    blockScalarStyle = null;
+    blockScalarLines = [];
+    blockScalarIndent = null;
+  };
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
     const trimmedLine = line.trim();
 
+    // Handle block scalar content
+    if (blockScalarKey) {
+      // Empty line: preserve it
+      if (trimmedLine === '') {
+        blockScalarLines.push('');
+        continue;
+      }
+
+      // Compute leading spaces once
+      const leadingSpaces = line.match(/^(\s*)/)?.[1].length ?? 0;
+
+      // Detect indentation of first content line
+      if (blockScalarIndent === null) {
+        // Block scalar content MUST be indented (at least 1 space)
+        if (leadingSpaces === 0) {
+          // This line is not block scalar content - flush empty block scalar and process normally
+          flushBlockScalar();
+          // Fall through to process this line as a key-value pair
+        } else {
+          blockScalarIndent = leadingSpaces;
+          // Remove the base indentation and add content
+          const content = line.slice(blockScalarIndent);
+          blockScalarLines.push(content);
+          continue;
+        }
+      } else if (leadingSpaces >= blockScalarIndent) {
+        // Remove the base indentation
+        const content = line.slice(blockScalarIndent);
+        blockScalarLines.push(content);
+        continue;
+      } else {
+        // This line is not indented enough, so the block scalar has ended
+        flushBlockScalar();
+        // Fall through to process this line normally
+      }
+    }
+
+    // Handle array items
     if (arrayKey) {
       if (trimmedLine.startsWith('- ')) {
         arrayItems.push(unquoteYamlString(trimmedLine.slice(2).trim()));
@@ -72,6 +146,18 @@ export function parseSlashCommandContent(content: string): ParsedSlashCommandCon
 
     const key = line.slice(0, colonIndex).trim();
     const value = line.slice(colonIndex + 1).trim();
+
+    // Check for block scalar indicators (| or >) with optional modifiers (-, +)
+    // Only enable for supported keys to avoid silently discarding content
+    const blockScalarMatch = value.match(/^([|>])([+-])?$/);
+    if (blockScalarMatch && (key === 'description' || key === 'argument-hint' || key === 'model')) {
+      blockScalarKey = key;
+      blockScalarStyle = blockScalarMatch[1] === '|' ? 'literal' : 'folded';
+      // Note: chomping indicator (blockScalarMatch[2]) is currently ignored
+      blockScalarLines = [];
+      blockScalarIndent = null;
+      continue;
+    }
 
     switch (key) {
       case 'description':
@@ -104,6 +190,10 @@ export function parseSlashCommandContent(content: string): ParsedSlashCommandCon
     }
   }
 
+  // Flush any remaining block scalar or array
+  if (blockScalarKey) {
+    flushBlockScalar();
+  }
   if (arrayKey) {
     flushArray();
   }

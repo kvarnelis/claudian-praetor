@@ -361,6 +361,8 @@ Prompt`;
       expect(parsed.description).toBe('Value with: colon');
       expect(parsed.argumentHint).toBe('Single quoted');
     });
+
+    // Block scalar tests moved to tests/unit/utils/slashCommand.test.ts
   });
 
   describe('serializeCommand', () => {
