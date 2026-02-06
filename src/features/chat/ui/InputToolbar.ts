@@ -39,6 +39,8 @@ export class ModelSelector {
   private dropdownEl: HTMLElement | null = null;
   private callbacks: ToolbarCallbacks;
   private isReady = false;
+  private isOpen = false;
+  private documentClickHandler: ((e: MouseEvent) => void) | null = null;
 
   constructor(parentEl: HTMLElement, callbacks: ToolbarCallbacks) {
     this.callbacks = callbacks;
@@ -81,6 +83,11 @@ export class ModelSelector {
     this.setReady(this.isReady);
     this.updateDisplay();
 
+    this.buttonEl.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.toggleDropdown();
+    });
+
     this.dropdownEl = this.container.createDiv({ cls: 'claudian-model-dropdown' });
     this.renderOptions();
   }
@@ -97,11 +104,42 @@ export class ModelSelector {
 
     const labelEl = this.buttonEl.createSpan({ cls: 'claudian-model-label' });
     labelEl.setText(displayModel?.label || 'Unknown');
+
+    const chevronEl = this.buttonEl.createDiv({ cls: 'claudian-model-chevron' });
+    setIcon(chevronEl, 'chevron-up');
   }
 
   setReady(ready: boolean) {
     this.isReady = ready;
     this.buttonEl?.toggleClass('ready', ready);
+  }
+
+  private toggleDropdown() {
+    if (this.isOpen) {
+      this.closeDropdown();
+    } else {
+      this.isOpen = true;
+      this.container.toggleClass('open', true);
+      this.documentClickHandler = (e: MouseEvent) => {
+        if (!this.container.contains(e.target as Node)) {
+          this.closeDropdown();
+        }
+      };
+      document.addEventListener('mousedown', this.documentClickHandler);
+    }
+  }
+
+  closeDropdown() {
+    this.isOpen = false;
+    this.container.toggleClass('open', false);
+    this.removeDocumentListener();
+  }
+
+  private removeDocumentListener() {
+    if (this.documentClickHandler) {
+      document.removeEventListener('mousedown', this.documentClickHandler);
+      this.documentClickHandler = null;
+    }
   }
 
   renderOptions() {
@@ -117,18 +155,29 @@ export class ModelSelector {
         option.addClass('selected');
       }
 
-      option.createSpan({ text: model.label });
+      const labelRow = option.createDiv({ cls: 'claudian-model-option-label' });
+      const checkEl = labelRow.createDiv({ cls: 'claudian-model-option-check' });
+      if (model.value === currentModel) {
+        checkEl.innerHTML = CHECK_ICON_SVG;
+      }
+      labelRow.createSpan({ text: model.label });
+
       if (model.description) {
-        option.setAttribute('title', model.description);
+        option.createSpan({ cls: 'claudian-model-option-desc', text: model.description });
       }
 
       option.addEventListener('click', async (e) => {
         e.stopPropagation();
         await this.callbacks.onModelChange(model.value);
+        this.closeDropdown();
         this.updateDisplay();
         this.renderOptions();
       });
     }
+  }
+
+  destroy() {
+    this.removeDocumentListener();
   }
 }
 

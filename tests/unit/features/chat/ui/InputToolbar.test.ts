@@ -85,27 +85,122 @@ describe('ModelSelector', () => {
     // DEFAULT_CLAUDE_MODELS is [haiku, sonnet, opus] -> reversed is [opus, sonnet, haiku]
     const options = dropdown?.children || [];
     expect(options.length).toBe(3);
-    // Text is in child span, check first child's textContent
-    expect(options[0]?.children[0]?.textContent).toBe('Opus');
-    expect(options[1]?.children[0]?.textContent).toBe('Sonnet');
-    expect(options[2]?.children[0]?.textContent).toBe('Haiku');
+    // Label text is inside .claudian-model-option-label wrapper span
+    const getLabel = (opt: any) => opt.querySelector('.claudian-model-option-label')?.children[1]?.textContent;
+    expect(getLabel(options[0])).toBe('Opus');
+    expect(getLabel(options[1])).toBe('Sonnet');
+    expect(getLabel(options[2])).toBe('Haiku');
   });
 
   it('should mark current model as selected', () => {
     const dropdown = parentEl.querySelector('.claudian-model-dropdown');
     const options = dropdown?.children || [];
+    const getLabel = (opt: any) => opt.querySelector('.claudian-model-option-label')?.children[1]?.textContent;
     // Sonnet is current (index 1 in reversed order)
-    const sonnetOption = options.find((o: any) => o.children[0]?.textContent === 'Sonnet');
+    const sonnetOption = options.find((o: any) => getLabel(o) === 'Sonnet');
     expect(sonnetOption?.hasClass('selected')).toBe(true);
   });
 
   it('should call onModelChange when option clicked', async () => {
     const dropdown = parentEl.querySelector('.claudian-model-dropdown');
     const options = dropdown?.children || [];
-    const opusOption = options.find((o: any) => o.children[0]?.textContent === 'Opus');
+    const getLabel = (opt: any) => opt.querySelector('.claudian-model-option-label')?.children[1]?.textContent;
+    const opusOption = options.find((o: any) => getLabel(o) === 'Opus');
 
     await opusOption?.dispatchEvent('click', { stopPropagation: () => {} });
     expect(callbacks.onModelChange).toHaveBeenCalledWith('opus');
+  });
+
+  it('should render chevron in button', () => {
+    const chevron = parentEl.querySelector('.claudian-model-chevron');
+    expect(chevron).not.toBeNull();
+  });
+
+  it('should toggle open class on button click', () => {
+    // Mock document for outside-click listener
+    const originalDocument = globalThis.document;
+    globalThis.document = { addEventListener: jest.fn(), removeEventListener: jest.fn() } as any;
+
+    const container = parentEl.querySelector('.claudian-model-selector');
+    const btn = parentEl.querySelector('.claudian-model-btn');
+    expect(container?.hasClass('open')).toBe(false);
+
+    btn?.dispatchEvent('click', { stopPropagation: () => {} });
+    expect(container?.hasClass('open')).toBe(true);
+
+    btn?.dispatchEvent('click', { stopPropagation: () => {} });
+    expect(container?.hasClass('open')).toBe(false);
+
+    globalThis.document = originalDocument;
+  });
+
+  it('should close dropdown after selecting an option', async () => {
+    const originalDocument = globalThis.document;
+    globalThis.document = { addEventListener: jest.fn(), removeEventListener: jest.fn() } as any;
+
+    const container = parentEl.querySelector('.claudian-model-selector');
+    const btn = parentEl.querySelector('.claudian-model-btn');
+
+    // Open dropdown
+    btn?.dispatchEvent('click', { stopPropagation: () => {} });
+    expect(container?.hasClass('open')).toBe(true);
+
+    // Click an option
+    const dropdown = parentEl.querySelector('.claudian-model-dropdown');
+    const options = dropdown?.children || [];
+    await options[0]?.dispatchEvent('click', { stopPropagation: () => {} });
+    expect(container?.hasClass('open')).toBe(false);
+
+    globalThis.document = originalDocument;
+  });
+
+  it('should show checkmark on selected model only', () => {
+    const dropdown = parentEl.querySelector('.claudian-model-dropdown');
+    const options = dropdown?.children || [];
+    const getLabel = (opt: any) => opt.querySelector('.claudian-model-option-label')?.children[1]?.textContent;
+
+    // Sonnet is the current model and should have a checkmark
+    const sonnetOption = options.find((o: any) => getLabel(o) === 'Sonnet');
+    const sonnetCheck = sonnetOption?.querySelector('.claudian-model-option-check');
+    expect(sonnetCheck).not.toBeNull();
+    expect(sonnetCheck?.innerHTML).toBeTruthy();
+
+    // Non-selected models should have empty check divs
+    const opusOption = options.find((o: any) => getLabel(o) === 'Opus');
+    const opusCheck = opusOption?.querySelector('.claudian-model-option-check');
+    expect(opusCheck).not.toBeNull();
+    expect(opusCheck?.innerHTML).toBe('');
+
+    const haikuOption = options.find((o: any) => getLabel(o) === 'Haiku');
+    const haikuCheck = haikuOption?.querySelector('.claudian-model-option-check');
+    expect(haikuCheck).not.toBeNull();
+    expect(haikuCheck?.innerHTML).toBe('');
+  });
+
+  it('should render descriptions inline', () => {
+    const dropdown = parentEl.querySelector('.claudian-model-dropdown');
+    const options = dropdown?.children || [];
+    const getLabel = (opt: any) => opt.querySelector('.claudian-model-option-label')?.children[1]?.textContent;
+    const opusOption = options.find((o: any) => getLabel(o) === 'Opus');
+    const desc = opusOption?.querySelector('.claudian-model-option-desc');
+    expect(desc).not.toBeNull();
+    expect(desc?.textContent).toBe('Most capable');
+  });
+
+  it('should clean up document listener on destroy', () => {
+    const originalDocument = globalThis.document;
+    const mockRemove = jest.fn();
+    globalThis.document = { addEventListener: jest.fn(), removeEventListener: mockRemove } as any;
+
+    const btn = parentEl.querySelector('.claudian-model-btn');
+
+    // Open to register listener
+    btn?.dispatchEvent('click', { stopPropagation: () => {} });
+
+    selector.destroy();
+    expect(mockRemove).toHaveBeenCalledWith('mousedown', expect.any(Function));
+
+    globalThis.document = originalDocument;
   });
 
   it('should update display when setReady is called', () => {

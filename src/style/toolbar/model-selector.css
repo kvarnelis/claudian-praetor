@@ -26,11 +26,16 @@
 .claudian-model-chevron {
   display: flex;
   align-items: center;
+  transition: transform 0.15s ease;
 }
 
 .claudian-model-chevron svg {
   width: 12px;
   height: 12px;
+}
+
+.claudian-model-selector.open .claudian-model-chevron {
+  transform: rotate(180deg);
 }
 
 .claudian-model-dropdown {
@@ -46,6 +51,7 @@
   border-radius: 4px;
   box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.15);
   z-index: 1000;
+  min-width: 160px;
   width: max-content;
   padding: 4px;
   opacity: 0;
@@ -53,13 +59,13 @@
   transition: opacity 0.15s ease, visibility 0.15s ease;
 }
 
-.claudian-model-selector:hover .claudian-model-dropdown {
+.claudian-model-selector.open .claudian-model-dropdown {
   opacity: 1;
   visibility: visible;
 }
 
 .claudian-model-option {
-  padding: 4px 8px;
+  padding: 6px 8px;
   cursor: pointer;
   font-size: 12px;
   color: var(--text-muted);
@@ -77,4 +83,28 @@
   background: rgba(var(--claudian-brand-rgb), 0.15);
   color: var(--claudian-brand);
   font-weight: 500;
+}
+
+.claudian-model-option-label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.claudian-model-option-check {
+  width: 12px;
+  height: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--claudian-brand);
+}
+
+.claudian-model-option-desc {
+  display: block;
+  font-size: 10px;
+  color: var(--text-faint);
+  margin-left: 16px;
+  margin-top: 1px;
 }
