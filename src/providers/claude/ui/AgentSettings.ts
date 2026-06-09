@@ -14,6 +14,7 @@ const MODEL_OPTIONS = [
   { value: 'inherit', label: 'Inherit' },
   { value: 'sonnet', label: 'Sonnet' },
   { value: 'opus', label: 'Opus' },
+  { value: 'claude-fable-5', label: 'Fable 5' },
   { value: 'haiku', label: 'Haiku' },
 ] as const;
 
