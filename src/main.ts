@@ -1,11 +1,5 @@
-// Must run before any SDK imports to patch Electron/Node.js realm incompatibility
-import { patchSetMaxListenersForElectron } from './utils/electronCompat';
-patchSetMaxListenersForElectron();
-
-import './providers';
-
 import type { Editor, WorkspaceLeaf } from 'obsidian';
-import { MarkdownView, Notice, Plugin } from 'obsidian';
+import { MarkdownView, Notice, Platform, Plugin } from 'obsidian';
 
 import { DEFAULT_CLAUDIAN_SETTINGS } from './app/settings/defaultSettings';
 import { SharedStorageService } from './app/storage/SharedStorageService';
@@ -53,6 +47,18 @@ export default class ClaudianPlugin extends Plugin {
   private lastKnownTabManagerState: AppTabManagerState | null = null;
 
   async onload() {
+    // Provider registration is platform-gated: the local provider graph pulls
+    // Node APIs at module-init time, so it must never load on mobile. Dynamic
+    // imports keep those module initializers from running off-desktop.
+    if (Platform.isDesktopApp) {
+      const { patchSetMaxListenersForElectron } = await import('./utils/electronCompat');
+      patchSetMaxListenersForElectron();
+      await import('./providers');
+    } else {
+      const { registerRemoteProviders } = await import('./remote/registration');
+      registerRemoteProviders(this);
+    }
+
     await this.loadSettings();
     await ProviderWorkspaceRegistry.initializeAll(this);
 

@@ -1,5 +1,7 @@
+import { Platform } from 'obsidian';
+
 import type ClaudianPlugin from '../../main';
-import { HomeFileAdapter } from '../storage/HomeFileAdapter';
+import type { HomeFileAdapter } from '../storage/HomeFileAdapter';
 import type { ProviderCommandCatalog } from './commands/ProviderCommandCatalog';
 import type {
   AgentMentionProvider,
@@ -42,7 +44,10 @@ export class ProviderWorkspaceRegistry {
     const providerIds = Object.keys(this.registrations);
     const storage = plugin.storage;
     const vaultAdapter = storage.getAdapter();
-    const homeAdapter = new HomeFileAdapter();
+    // HomeFileAdapter requires Node fs/os; never instantiate it on mobile.
+    const homeAdapter: HomeFileAdapter | null = Platform.isDesktopApp
+      ? new (await import('../storage/HomeFileAdapter')).HomeFileAdapter()
+      : null;
 
     for (const providerId of providerIds) {
       this.services[providerId] = await this.getWorkspaceRegistration(providerId).initialize({

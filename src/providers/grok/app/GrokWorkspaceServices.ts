@@ -13,8 +13,9 @@ import {
   GrokTaskResultInterpreter,
   GrokTitleGenerationService,
 } from '../auxiliary/GrokAuxiliaryServices';
+import { GROK_PROVIDER_CAPABILITIES } from '../capabilities';
 import { GrokConversationHistoryService } from '../history/GrokConversationHistoryService';
-import { GROK_PROVIDER_CAPABILITIES, GrokChatRuntime } from '../runtime/GrokChatRuntime';
+import { GrokChatRuntime } from '../runtime/GrokChatRuntime';
 import { GrokCliResolver } from '../runtime/GrokCliResolver';
 import { getGrokProviderSettings } from '../settings';
 import { grokChatUIConfig } from '../ui/GrokChatUIConfig';

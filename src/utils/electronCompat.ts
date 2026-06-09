@@ -27,8 +27,13 @@ type EventsModule = {
  * See: #143, #239, #284, #339, #342, #370, #374, #387
  */
 export function patchSetMaxListenersForElectron(): void {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports -- Patch the shared CommonJS events module before SDK imports run.
-  const events = require('events') as EventsModule;
+  let events: EventsModule;
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports -- Patch the shared CommonJS events module before SDK imports run.
+    events = require('events') as EventsModule;
+  } catch {
+    return; // no Node runtime (mobile webview)
+  }
 
   if (events.setMaxListeners.__electronPatched) return;
 

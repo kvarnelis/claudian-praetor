@@ -49,23 +49,11 @@ import {
   type AcpWriteTextFileRequest,
 } from '../../acp';
 import { encodeCodexTurn } from '../../codex/prompt/encodeCodexTurn';
+import { GROK_PROVIDER_CAPABILITIES } from '../capabilities';
 import type { GrokProviderState } from '../types';
 import { buildGrokEnv, buildGrokSystemPrompt, buildGrokTurnPrompt } from './GrokHeadlessRunner';
 
-export const GROK_PROVIDER_CAPABILITIES: Readonly<ProviderCapabilities> = Object.freeze({
-  providerId: 'grok',
-  supportsPersistentRuntime: true,
-  supportsNativeHistory: true,
-  supportsPlanMode: true,
-  supportsRewind: false,
-  supportsFork: false,
-  supportsProviderCommands: false,
-  supportsImageAttachments: false,
-  supportsInstructionMode: true,
-  supportsMcpTools: false,
-  supportsTurnSteer: false,
-  reasoningControl: 'effort',
-});
+export { GROK_PROVIDER_CAPABILITIES };
 
 function buildGrokAcpPromptText(
   systemPrompt: string,

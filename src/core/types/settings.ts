@@ -93,6 +93,8 @@ export type ProviderConfigMap = Partial<Record<string, Record<string, unknown>>>
  * narrower types.
  */
 export interface ClaudianSettings {
+  /** Praetor remote daemon connection used by mobile remote runtimes. */
+  remoteDaemon?: { url: string; token: string };
   // User preferences
   userName: string;
 

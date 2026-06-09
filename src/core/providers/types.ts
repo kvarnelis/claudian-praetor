@@ -384,7 +384,8 @@ export interface ProviderWorkspaceInitContext {
   plugin: ClaudianPlugin;
   storage: SharedAppStorage;
   vaultAdapter: VaultFileAdapter;
-  homeAdapter: HomeFileAdapter;
+  /** Null on mobile, where Node home-directory access is unavailable. */
+  homeAdapter: HomeFileAdapter | null;
 }
 
 export interface ProviderWorkspaceRegistration<

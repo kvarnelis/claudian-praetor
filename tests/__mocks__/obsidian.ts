@@ -95,6 +95,10 @@ export class Scope {
 
 export const Platform = {
   isMacOS: true,
+  isDesktopApp: true,
+  isMobile: false,
+  isMobileApp: false,
+  isIosApp: false,
 };
 
 export class App {
