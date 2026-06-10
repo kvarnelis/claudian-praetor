@@ -1,8 +1,13 @@
-import * as fs from 'fs';
-import * as nodePath from 'path';
+import type * as fsType from 'fs';
+import type * as pathType from 'path';
 
 import type { ExitPlanModeDecision } from '../../../core/types/tools';
+import { requireNodeModule } from '../../../utils/nodeCompat';
 import type { RenderContentFn } from './MessageRenderer';
+
+// Lazy so this module can load on mobile (no Node); see nodeCompat.ts.
+const fs = requireNodeModule<typeof fsType>('fs');
+const nodePath = requireNodeModule<typeof pathType>('path');
 
 const HINTS_TEXT = 'Arrow keys to navigate \u00B7 Enter to select \u00B7 Esc to cancel';
 

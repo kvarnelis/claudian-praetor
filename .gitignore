@@ -86,6 +86,9 @@ test-results/
 # Development files
 sandbox/
 dev
+# ...but keep committed dev tooling (mobile load simulation gate)
+!dev/
+!dev/mobile-load-harness.mjs
 
 # Lock files (uncomment based on package manager)
 # yarn.lock

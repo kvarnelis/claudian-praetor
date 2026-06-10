@@ -1,12 +1,28 @@
-import * as fs from 'fs';
-import * as os from 'os';
-import * as path from 'path';
+import type * as fsType from 'fs';
+import type * as osType from 'os';
+import type * as pathType from 'path';
 
+import { requireNodeModule } from './nodeCompat';
 import { parsePathEntries, resolveNvmDefaultBin } from './path';
 
-const isWindows = process.platform === 'win32';
-const PATH_SEPARATOR = isWindows ? ';' : ':';
-const NODE_EXECUTABLE = isWindows ? 'node.exe' : 'node';
+// Lazy so this module can load on mobile (no Node); see nodeCompat.ts.
+const fs = requireNodeModule<typeof fsType>('fs');
+const os = requireNodeModule<typeof osType>('os');
+const path = requireNodeModule<typeof pathType>('path');
+
+// Evaluated lazily: `process` is not defined in the mobile webview, so these
+// must not run at module scope (this module is on the mobile import graph).
+function isWindows(): boolean {
+  return typeof process !== 'undefined' && process.platform === 'win32';
+}
+
+function pathSeparator(): string {
+  return isWindows() ? ';' : ':';
+}
+
+function nodeExecutableName(): string {
+  return isWindows() ? 'node.exe' : 'node';
+}
 const DEVICE_SETTINGS_STORAGE_KEY = 'claudian.deviceSettingsKey';
 let cachedDeviceSettingsKey: string | null = null;
 
@@ -36,7 +52,7 @@ function getAppProvidedCliPaths(): string[] {
 function getExtraBinaryPaths(): string[] {
   const home = getHomeDir();
 
-  if (isWindows) {
+  if (isWindows()) {
     const paths: string[] = [];
     const localAppData = process.env.LOCALAPPDATA;
     const appData = process.env.APPDATA;
@@ -195,7 +211,7 @@ export function findNodeDirectory(additionalPaths?: string): string | null {
   for (const dir of allPaths) {
     if (!dir) continue;
     try {
-      const nodePath = path.join(dir, NODE_EXECUTABLE);
+      const nodePath = path.join(dir, nodeExecutableName());
       if (fs.existsSync(nodePath)) {
         const stat = fs.statSync(nodePath);
         if (stat.isFile()) {
@@ -213,7 +229,7 @@ export function findNodeDirectory(additionalPaths?: string): string | null {
 export function findNodeExecutable(additionalPaths?: string): string | null {
   const nodeDir = findNodeDirectory(additionalPaths);
   if (nodeDir) {
-    return path.join(nodeDir, NODE_EXECUTABLE);
+    return path.join(nodeDir, nodeExecutableName());
   }
   return null;
 }
@@ -285,7 +301,7 @@ export function getEnhancedPath(additionalPaths?: string, cliPath?: string): str
   if (cliPath) {
     try {
       const cliDir = path.dirname(cliPath);
-      const nodeInCliDir = path.join(cliDir, NODE_EXECUTABLE);
+      const nodeInCliDir = path.join(cliDir, nodeExecutableName());
       if (fs.existsSync(nodeInCliDir)) {
         const stat = fs.statSync(nodeInCliDir);
         if (stat.isFile()) {
@@ -313,13 +329,13 @@ export function getEnhancedPath(additionalPaths?: string, cliPath?: string): str
 
   const seen = new Set<string>();
   const unique = segments.filter(p => {
-    const normalized = isWindows ? p.toLowerCase() : p;
+    const normalized = isWindows() ? p.toLowerCase() : p;
     if (seen.has(normalized)) return false;
     seen.add(normalized);
     return true;
   });
 
-  return unique.join(PATH_SEPARATOR);
+  return unique.join(pathSeparator());
 }
 
 export function parseEnvironmentVariables(input: string): Record<string, string> {

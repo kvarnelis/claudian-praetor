@@ -34,8 +34,8 @@ import { CODEX_PROVIDER_CAPABILITIES } from '../providers/codex/capabilities';
 import { codexSettingsReconciler } from '../providers/codex/env/CodexSettingsReconciler';
 import { getCodexProviderSettings } from '../providers/codex/settings';
 import { codexChatUIConfig } from '../providers/codex/ui/CodexChatUIConfig';
-import { grokSettingsReconciler } from '../providers/grok/app/GrokWorkspaceServices';
 import { GROK_PROVIDER_CAPABILITIES } from '../providers/grok/capabilities';
+import { grokSettingsReconciler } from '../providers/grok/env/GrokSettingsReconciler';
 import { getGrokProviderSettings } from '../providers/grok/settings';
 import { grokChatUIConfig } from '../providers/grok/ui/GrokChatUIConfig';
 import {

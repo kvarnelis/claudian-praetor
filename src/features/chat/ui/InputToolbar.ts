@@ -1,6 +1,6 @@
 import { Notice, setIcon } from 'obsidian';
-import * as os from 'os';
-import * as path from 'path';
+import type * as osType from 'os';
+import type * as pathType from 'path';
 
 import type { McpServerManager } from '../../../core/mcp/McpServerManager';
 import type {
@@ -18,7 +18,12 @@ import type {
 } from '../../../core/types';
 import { appendCheckIcon, appendMcpIcon, createProviderIconSvg } from '../../../shared/icons';
 import { filterValidPaths, findConflictingPath, isDuplicatePath, isValidDirectoryPath, validateDirectoryPath } from '../../../utils/externalContext';
+import { requireNodeModule } from '../../../utils/nodeCompat';
 import { expandHomePath, normalizePathForFilesystem } from '../../../utils/path';
+
+// Lazy so this module can load on mobile (no Node); see nodeCompat.ts.
+const os = requireNodeModule<typeof osType>('os');
+const path = requireNodeModule<typeof pathType>('path');
 
 interface ElectronOpenDialogResult {
   canceled: boolean;

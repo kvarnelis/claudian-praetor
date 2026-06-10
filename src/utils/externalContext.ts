@@ -4,9 +4,13 @@
  * Utilities for external context validation, normalization, and conflict detection.
  */
 
-import * as fs from 'fs';
+import type * as fsType from 'fs';
 
+import { requireNodeModule } from './nodeCompat';
 import { normalizePathForComparison as normalizePathForComparisonImpl } from './path';
+
+// Lazy so this module can load on mobile (no Node); see nodeCompat.ts.
+const fs = requireNodeModule<typeof fsType>('fs');
 
 export interface PathConflict {
   path: string;

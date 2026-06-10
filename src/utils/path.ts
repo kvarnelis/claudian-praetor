@@ -1,7 +1,14 @@
-import * as fs from 'fs';
+import type * as fsType from 'fs';
 import type { App } from 'obsidian';
-import * as os from 'os';
-import * as path from 'path';
+import type * as osType from 'os';
+import type * as pathType from 'path';
+
+import { requireNodeModule } from './nodeCompat';
+
+// Lazy so this module can load on mobile (no Node); see nodeCompat.ts.
+const fs = requireNodeModule<typeof fsType>('fs');
+const os = requireNodeModule<typeof osType>('os');
+const path = requireNodeModule<typeof pathType>('path');
 
 export function getVaultPath(app: App): string | null {
   const basePath = (app.vault.adapter as { basePath?: unknown } | undefined)?.basePath;
@@ -179,7 +186,7 @@ export function resolveNvmDefaultBin(home: string): string | null {
 // Best-effort realpath: if the full path doesn't exist, resolve the nearest
 // existing ancestor and re-append the remaining segments.
 function resolveRealPath(p: string): string {
-  const realpathFn = (fs.realpathSync.native ?? fs.realpathSync) as (path: fs.PathLike) => string;
+  const realpathFn = (fs.realpathSync.native ?? fs.realpathSync) as (path: fsType.PathLike) => string;
 
   try {
     return realpathFn(p);

@@ -1,6 +1,6 @@
-import { existsSync, readFileSync, realpathSync } from 'fs';
-import { tmpdir } from 'os';
-import { isAbsolute, sep } from 'path';
+import type * as fsType from 'fs';
+import type * as osType from 'os';
+import type * as pathType from 'path';
 
 import { ProviderRegistry } from '../../../core/providers/ProviderRegistry';
 import type { ProviderTaskResultInterpreter } from '../../../core/providers/types';
@@ -10,6 +10,7 @@ import type {
   SubagentInfo,
   ToolCallInfo,
 } from '../../../core/types';
+import { requireNodeModule } from '../../../utils/nodeCompat';
 import { extractFinalResultFromSubagentJsonl } from '../../../utils/subagentJsonl';
 import {
   addSubagentToolCall,
@@ -24,6 +25,11 @@ import {
   updateSubagentToolResult,
 } from '../rendering/SubagentRenderer';
 import type { PendingToolCall } from '../state/types';
+
+// Lazy so this module can load on mobile (no Node); see nodeCompat.ts.
+const fs = requireNodeModule<typeof fsType>('fs');
+const os = requireNodeModule<typeof osType>('os');
+const path = requireNodeModule<typeof pathType>('path');
 
 export type SubagentStateChangeCallback = (subagent: SubagentInfo) => void;
 
@@ -61,7 +67,9 @@ function parseJsonValue(value: string): unknown {
 
 export class SubagentManager {
   private static readonly TRUSTED_OUTPUT_EXT = '.output';
-  private static readonly TRUSTED_TMP_ROOTS = SubagentManager.resolveTrustedTmpRoots();
+  // Resolved on first use, not at class-definition time: the resolver touches
+  // Node's os/fs, which are unavailable when this module loads on mobile.
+  private static trustedTmpRoots: string[] | null = null;
 
   private syncSubagents: Map<string, SubagentState> = new Map();
   private pendingTasks: Map<string, PendingToolCall> = new Map();
@@ -1054,11 +1062,11 @@ export class SubagentManager {
         return null;
       }
 
-      if (!existsSync(fullOutputPath)) {
+      if (!fs.existsSync(fullOutputPath)) {
         return null;
       }
 
-      const fileContent = readFileSync(fullOutputPath, 'utf-8');
+      const fileContent = fs.readFileSync(fullOutputPath, 'utf-8');
       const trimmed = fileContent.trim();
       return trimmed.length > 0 ? trimmed : null;
     } catch {
@@ -1073,10 +1081,16 @@ export class SubagentManager {
 
   private static resolveTrustedTmpRoots(): string[] {
     const roots = new Set<string>();
-    const candidates = [tmpdir(), '/tmp', '/private/tmp'];
+    const candidates: string[] = [];
+    try {
+      candidates.push(os.tmpdir());
+    } catch {
+      // os is unavailable on mobile; fall back to the static candidates.
+    }
+    candidates.push('/tmp', '/private/tmp');
     for (const candidate of candidates) {
       try {
-        roots.add(realpathSync(candidate));
+        roots.add(fs.realpathSync(candidate));
       } catch {
         // Ignore unavailable temp roots.
       }
@@ -1084,8 +1098,15 @@ export class SubagentManager {
     return Array.from(roots);
   }
 
+  private static getTrustedTmpRoots(): string[] {
+    if (!SubagentManager.trustedTmpRoots) {
+      SubagentManager.trustedTmpRoots = SubagentManager.resolveTrustedTmpRoots();
+    }
+    return SubagentManager.trustedTmpRoots;
+  }
+
   private isTrustedOutputPath(fullOutputPath: string): boolean {
-    if (!isAbsolute(fullOutputPath)) {
+    if (!path.isAbsolute(fullOutputPath)) {
       return false;
     }
 
@@ -1095,13 +1116,13 @@ export class SubagentManager {
 
     let resolvedPath: string;
     try {
-      resolvedPath = realpathSync(fullOutputPath);
+      resolvedPath = fs.realpathSync(fullOutputPath);
     } catch {
       return false;
     }
 
-    return SubagentManager.TRUSTED_TMP_ROOTS.some((root) =>
-      resolvedPath === root || resolvedPath.startsWith(`${root}${sep}`)
+    return SubagentManager.getTrustedTmpRoots().some((root) =>
+      resolvedPath === root || resolvedPath.startsWith(`${root}${path.sep}`)
     );
   }
 }

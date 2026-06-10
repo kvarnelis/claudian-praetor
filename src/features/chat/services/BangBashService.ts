@@ -1,4 +1,9 @@
-import { exec } from 'child_process';
+import type * as childProcessType from 'child_process';
+
+import { requireNodeModule } from '../../../utils/nodeCompat';
+
+// Lazy so this module can load on mobile (no Node); see nodeCompat.ts.
+const childProcess = requireNodeModule<typeof childProcessType>('child_process');
 
 export interface BangBashResult {
   command: string;
@@ -22,7 +27,7 @@ export class BangBashService {
 
   execute(command: string): Promise<BangBashResult> {
     return new Promise((resolve) => {
-      exec(command, {
+      childProcess.exec(command, {
         cwd: this.cwd,
         env: { ...process.env, PATH: this.enhancedPath },
         timeout: TIMEOUT_MS,

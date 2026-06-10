@@ -5,10 +5,15 @@
  * Features: recursive scanning, caching, and error handling.
  */
 
-import * as fs from 'fs';
-import * as path from 'path';
+import type * as fsType from 'fs';
+import type * as pathType from 'path';
 
+import { requireNodeModule } from './nodeCompat';
 import { normalizePathForFilesystem } from './path';
+
+// Lazy so this module can load on mobile (no Node); see nodeCompat.ts.
+const fs = requireNodeModule<typeof fsType>('fs');
+const path = requireNodeModule<typeof pathType>('path');
 
 export interface ExternalContextFile {
   path: string;

@@ -1,7 +1,11 @@
 import { Notice } from 'obsidian';
-import * as path from 'path';
+import type * as pathType from 'path';
 
 import type { ImageAttachment, ImageMediaType } from '../../../core/types';
+import { requireNodeModule } from '../../../utils/nodeCompat';
+
+// Lazy so this module can load on mobile (no Node); see nodeCompat.ts.
+const path = requireNodeModule<typeof pathType>('path');
 
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
 
