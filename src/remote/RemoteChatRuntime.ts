@@ -200,7 +200,13 @@ export class RemoteChatRuntime implements ChatRuntime {
     conversationHistory?: ChatMessage[],
     queryOptions?: ChatRuntimeQueryOptions,
   ): AsyncGenerator<StreamChunk> {
-    const runtimeId = await this.ensureRuntime();
+    let runtimeId: string;
+    try {
+      runtimeId = await this.ensureRuntime();
+    } catch (e) {
+      yield { type: 'error', content: e instanceof Error ? e.message : String(e) };
+      return;
+    }
 
     const queue = new AsyncEventQueue();
     this.activeQueue = queue;
@@ -252,6 +258,8 @@ export class RemoteChatRuntime implements ChatRuntime {
             break;
         }
       }
+    } catch (e) {
+      yield { type: 'error', content: e instanceof Error ? e.message : String(e) };
     } finally {
       this.queryActive = false;
       if (this.activeQueue === queue) {

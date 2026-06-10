@@ -42,6 +42,11 @@ interface PendingRpc {
 const RECONNECT_BASE_MS = 800;
 const RECONNECT_MAX_MS = 15_000;
 const RPC_TIMEOUT_MS = 120_000;
+// How long a caller waits for the socket to come up before failing with a
+// clear "can't reach the daemon" error instead of hanging forever (the silent
+// hang that looks like "endlessly gathering thoughts" when Tailscale is off or
+// the Mac daemon isn't running).
+const CONNECT_TIMEOUT_MS = 12_000;
 
 export class RemoteClient {
   readonly clientId = generateId('client');
@@ -122,7 +127,16 @@ export class RemoteClient {
     }
 
     await new Promise<void>((resolve, reject) => {
-      this.connectWaiters.push({ resolve, reject });
+      const waiter = { resolve, reject };
+      const timeout = setTimeout(() => {
+        this.connectWaiters = this.connectWaiters.filter((w) => w !== waiter);
+        reject(new Error(
+          `Can't reach the daemon at ${this.config?.url}. Check that Tailscale is connected on this device and that the Praetor daemon is running on your Mac.`,
+        ));
+      }, CONNECT_TIMEOUT_MS);
+      waiter.resolve = () => { clearTimeout(timeout); resolve(); };
+      waiter.reject = (e: Error) => { clearTimeout(timeout); reject(e); };
+      this.connectWaiters.push(waiter);
     });
   }
 

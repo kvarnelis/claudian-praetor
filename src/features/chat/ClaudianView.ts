@@ -285,7 +285,7 @@ export class ClaudianView extends ItemView {
         void this.handleTabClose(tabId);
       },
       onNewTab: () => {
-        void this.createNewTab().catch(() => new Notice('Failed to create tab'));
+        void this.createNewTab().catch((e) => new Notice(`Failed to create tab: ${e instanceof Error ? e.message : String(e)}`, 10_000));
       },
     });
     fragment.appendChild(this.tabBarContainerEl);
@@ -299,7 +299,7 @@ export class ClaudianView extends ItemView {
     setIcon(this.newTabButtonEl, 'square-plus');
     this.newTabButtonEl.setAttribute('aria-label', 'New tab');
     this.newTabButtonEl.addEventListener('click', () => {
-      void this.createNewTab().catch(() => new Notice('Failed to create tab'));
+      void this.createNewTab().catch((e) => new Notice(`Failed to create tab: ${e instanceof Error ? e.message : String(e)}`, 10_000));
     });
 
     // New conversation button (square-pen icon - new conversation in current tab)
@@ -401,7 +401,7 @@ export class ClaudianView extends ItemView {
   private handleTabClick(tabId: TabId): void {
     const switched = this.tabManager?.switchToTab(tabId);
     if (switched) {
-      void switched.catch(() => new Notice('Failed to switch tab'));
+      void switched.catch((e) => new Notice(`Failed to switch tab: ${e instanceof Error ? e.message : String(e)}`, 10_000));
     }
   }
 
