@@ -241,6 +241,20 @@ export class ClaudianSettingTab extends PluginSettingTab {
           });
       });
 
+    if (Platform.isDesktopApp) {
+      new Setting(container)
+        .setName('Auto-start daemon on this computer')
+        .setDesc('Launch the bundled praetord daemon when Obsidian starts here, bound to this machine\'s Tailscale IP. Keeps the daemon alive for your mobile devices. Takes effect on next reload.')
+        .addToggle((toggle) => {
+          toggle
+            .setValue(this.plugin.settings.daemonAutoStart ?? false)
+            .onChange(async (value) => {
+              this.plugin.settings.daemonAutoStart = value;
+              await this.plugin.saveSettings();
+            });
+        });
+    }
+
     // --- Display ---
 
     new Setting(container).setName(t('settings.display')).setHeading();

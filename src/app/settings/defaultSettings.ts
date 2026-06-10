@@ -49,6 +49,7 @@ export const DEFAULT_CLAUDIAN_SETTINGS: ClaudianSettings = {
   enableAutoScroll: true,
   deferMathRenderingDuringStreaming: true,
   chatViewPlacement: 'right-sidebar',
+  daemonAutoStart: false,
 
   hiddenProviderCommands: getDefaultHiddenProviderCommands(),
 };

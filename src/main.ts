@@ -24,6 +24,7 @@ import {
   VIEW_TYPE_CLAUDIAN,
 } from './core/types';
 import type { ChatViewPlacement, EnvironmentScope } from './core/types/settings';
+import type { DaemonSupervisor } from './desktop/daemonSupervisor';
 import { ClaudianView } from './features/chat/ClaudianView';
 import { MobileDock } from './features/chat/ui/mobileDock';
 import { type InlineEditContext, InlineEditModal } from './features/inline-edit/ui/InlineEditModal';
@@ -47,6 +48,7 @@ export default class ClaudianPlugin extends Plugin {
   private conversations: Conversation[] = [];
   private lastKnownTabManagerState: AppTabManagerState | null = null;
   private mobileDock!: MobileDock;
+  private daemonSupervisor: DaemonSupervisor | null = null;
   /** True when providers are remote-backed (mobile); false for local (desktop). */
   remoteMode = false;
 
@@ -66,6 +68,17 @@ export default class ClaudianPlugin extends Plugin {
 
     await this.loadSettings();
     await ProviderWorkspaceRegistry.initializeAll(this);
+
+    // Desktop auto-start: keep the daemon alive for mobile clients by spawning
+    // it on load (opt-in). Dynamic import so the Node-only module never loads
+    // on mobile; fully guarded so it can't break desktop plugin load.
+    if (Platform.isDesktopApp && this.settings.daemonAutoStart) {
+      void (async (): Promise<void> => {
+        const { DaemonSupervisor } = await import('./desktop/daemonSupervisor');
+        this.daemonSupervisor = new DaemonSupervisor(this);
+        await this.daemonSupervisor.start();
+      })().catch(() => undefined);
+    }
 
     this.mobileDock = new MobileDock(this);
     // Obsidian rewrites drawer styles on open/close, so re-apply the iPad dock

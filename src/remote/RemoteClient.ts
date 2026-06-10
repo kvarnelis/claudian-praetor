@@ -128,14 +128,14 @@ export class RemoteClient {
 
     await new Promise<void>((resolve, reject) => {
       const waiter = { resolve, reject };
-      const timeout = setTimeout(() => {
+      const timeout = window.setTimeout(() => {
         this.connectWaiters = this.connectWaiters.filter((w) => w !== waiter);
         reject(new Error(
           `Can't reach the daemon at ${this.config?.url}. Check that Tailscale is connected on this device and that the Praetor daemon is running on your Mac.`,
         ));
       }, CONNECT_TIMEOUT_MS);
-      waiter.resolve = () => { clearTimeout(timeout); resolve(); };
-      waiter.reject = (e: Error) => { clearTimeout(timeout); reject(e); };
+      waiter.resolve = () => { window.clearTimeout(timeout); resolve(); };
+      waiter.reject = (e: Error) => { window.clearTimeout(timeout); reject(e); };
       this.connectWaiters.push(waiter);
     });
   }
