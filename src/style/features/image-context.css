@@ -178,6 +178,13 @@
   display: block;
 }
 
+/* The context row is display:none until it has content, which hides the mobile
+   attach button living inside it. Keep the row visible on mobile so the
+   paperclip is always reachable. */
+body.is-mobile .claudian-context-row {
+  display: flex !important;
+}
+
 /* Mobile-only attach button: opens the native photo/file picker since touch
    devices have no clipboard-image paste or drag-drop into the input. */
 .claudian-image-attach-btn {

@@ -19,7 +19,12 @@ const ROOT_CLASS = 'claudian-dock-root';
  * names) and re-apply on layout changes, because Obsidian rewrites drawer styles
  * whenever it opens or closes a leaf.
  */
+const DOCK_WIDTH_KEY = 'claudian-dock-width';
+const MIN_DOCK_PX = 280;
+
 export class MobileDock {
+  private handleEl: HTMLElement | null = null;
+
   constructor(private readonly plugin: ClaudianPlugin) {}
 
   private get enabledForLayout(): boolean {
@@ -38,6 +43,8 @@ export class MobileDock {
 
   clear(): void {
     if (typeof document === 'undefined') return;
+    this.handleEl?.remove();
+    this.handleEl = null;
     document.body.classList.remove(BODY_CLASS);
     for (const el of Array.from(document.querySelectorAll(`.${DRAWER_CLASS}`))) {
       el.classList.remove(DRAWER_CLASS);
@@ -64,6 +71,49 @@ export class MobileDock {
     document.body.classList.add(BODY_CLASS);
     drawer.classList.add(DRAWER_CLASS);
     root.classList.add(ROOT_CLASS);
+    this.restorePersistedWidth();
+    this.ensureHandle();
+  }
+
+  private restorePersistedWidth(): void {
+    try {
+      const saved = window.localStorage?.getItem(DOCK_WIDTH_KEY);
+      if (saved) document.body.style.setProperty('--claudian-dock-width', saved);
+    } catch {
+      // localStorage may be unavailable; fall back to the CSS default.
+    }
+  }
+
+  private ensureHandle(): void {
+    if (this.handleEl?.isConnected) return;
+    const handle = document.body.createDiv({ cls: 'claudian-dock-handle' });
+    this.handleEl = handle;
+
+    let dragging = false;
+    handle.addEventListener('pointerdown', (e) => {
+      dragging = true;
+      handle.setPointerCapture(e.pointerId);
+      e.preventDefault();
+    });
+    handle.addEventListener('pointermove', (e) => {
+      if (!dragging) return;
+      const fromRight = window.innerWidth - e.clientX;
+      const width = Math.max(MIN_DOCK_PX, Math.min(window.innerWidth * 0.75, fromRight));
+      document.body.style.setProperty('--claudian-dock-width', `${Math.round(width)}px`);
+    });
+    const end = (e: PointerEvent): void => {
+      if (!dragging) return;
+      dragging = false;
+      try {
+        handle.releasePointerCapture(e.pointerId);
+        const value = document.body.style.getPropertyValue('--claudian-dock-width');
+        if (value) window.localStorage?.setItem(DOCK_WIDTH_KEY, value);
+      } catch {
+        // ignore capture/storage errors
+      }
+    };
+    handle.addEventListener('pointerup', end);
+    handle.addEventListener('pointercancel', end);
   }
 
   private getRootEl(): Element | null {

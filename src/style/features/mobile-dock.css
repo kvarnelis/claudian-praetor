@@ -10,7 +10,9 @@ body.claudian-ipad-docked {
   --claudian-dock-width: 46vw;
 }
 
-/* Dock the right drawer: stop the slide-over transform, fix it to a column. */
+/* Dock the right drawer: stop the slide-over transform, fix it to a flush
+   column (no rounded corners / shadow / inset — those are the leftover
+   "floating popup" look). */
 body.claudian-ipad-docked.is-tablet .claudian-dock-drawer {
   transform: none !important;
   width: var(--claudian-dock-width) !important;
@@ -18,8 +20,44 @@ body.claudian-ipad-docked.is-tablet .claudian-dock-drawer {
   max-width: var(--claudian-dock-width) !important;
   left: auto !important;
   right: 0 !important;
+  margin: 0 !important;
+  border-radius: 0 !important;
   box-shadow: none !important;
   border-left: 1px solid var(--background-modifier-border);
+}
+
+/* Flatten any rounded/elevated inner container Obsidian gives the mobile drawer. */
+body.claudian-ipad-docked.is-tablet .claudian-dock-drawer > * {
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+/* Draggable divider between editor and dock; positioned at the boundary. */
+.claudian-dock-handle {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  right: var(--claudian-dock-width, 46vw);
+  width: 18px;
+  transform: translateX(50%);
+  z-index: 30;
+  cursor: col-resize;
+  touch-action: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.claudian-dock-handle::before {
+  content: '';
+  width: 4px;
+  height: 52px;
+  border-radius: 2px;
+  background: var(--background-modifier-border);
+}
+
+.claudian-dock-handle:active::before {
+  background: var(--interactive-accent);
 }
 
 /* Make room: shrink the editor area to the remaining width (handles both
