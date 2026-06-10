@@ -223,6 +223,11 @@ export default class ClaudianPlugin extends Plugin {
     switch (placement) {
       case 'main-tab':
         return workspace.getLeaf('tab');
+      case 'main-split-right':
+        // Side-by-side with the editor in the main area (vertical divider).
+        // The right sidebar only slides over on mobile, so this is how the
+        // chat sits beside the note on iPad.
+        return workspace.getLeaf('split', 'vertical');
       case 'left-sidebar':
         return workspace.getLeftLeaf(false);
       case 'right-sidebar':

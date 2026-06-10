@@ -177,3 +177,31 @@
   object-fit: cover;
   display: block;
 }
+
+/* Mobile-only attach button: opens the native photo/file picker since touch
+   devices have no clipboard-image paste or drag-drop into the input. */
+.claudian-image-attach-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  margin: 4px 6px 4px 0;
+  padding: 0;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 8px;
+  background: var(--background-secondary);
+  color: var(--text-muted);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.claudian-image-attach-btn:active {
+  background: var(--background-modifier-hover);
+  color: var(--text-normal);
+}
+
+.claudian-image-attach-btn svg {
+  width: 18px;
+  height: 18px;
+}

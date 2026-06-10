@@ -60,6 +60,7 @@ export const CHAT_VIEW_PLACEMENTS = [
   'right-sidebar',
   'left-sidebar',
   'main-tab',
+  'main-split-right',
 ] as const;
 
 /** Workspace location used when opening the Claudian chat view. */

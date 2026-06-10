@@ -1,13 +1,15 @@
-import { Notice } from 'obsidian';
-import type * as pathType from 'path';
+import { Notice, Platform, setIcon } from 'obsidian';
 
 import type { ImageAttachment, ImageMediaType } from '../../../core/types';
-import { requireNodeModule } from '../../../utils/nodeCompat';
-
-// Lazy so this module can load on mobile (no Node); see nodeCompat.ts.
-const path = requireNodeModule<typeof pathType>('path');
 
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
+
+/** Filename extension (with dot) without relying on Node's `path` on mobile. */
+function fileExtension(filename: string): string {
+  if (!filename) return '';
+  const dot = filename.lastIndexOf('.');
+  return dot >= 0 ? filename.slice(dot) : '';
+}
 
 const IMAGE_EXTENSIONS: Record<string, ImageMediaType> = {
   '.jpg': 'image/jpeg',
@@ -51,6 +53,7 @@ export class ImageContextManager {
 
     this.setupDragAndDrop();
     this.setupPasteHandler();
+    this.setupAttachButton();
   }
 
   setEnabled(enabled: boolean): void {
@@ -174,6 +177,44 @@ export class ImageContextManager {
     }
   }
 
+  private setupAttachButton() {
+    // Touch devices have no clipboard-image paste or file drag-drop into the
+    // input, so the only way to attach an image is an explicit button that
+    // opens the native photo/file picker.
+    if (!Platform?.isMobile) return;
+
+    const button = this.previewContainerEl.createEl('button', {
+      cls: 'claudian-image-attach-btn',
+      attr: { type: 'button', 'aria-label': 'Attach image' },
+    });
+    setIcon(button, 'paperclip');
+    this.previewContainerEl.insertBefore(button, this.imagePreviewEl);
+
+    const fileInput = this.previewContainerEl.createEl('input', {
+      cls: 'claudian-hidden',
+      attr: { type: 'file', accept: 'image/*', multiple: '' },
+    });
+
+    button.addEventListener('click', () => {
+      if (!this.enabled) {
+        new Notice('Image attachments are not supported by this provider.');
+        return;
+      }
+      fileInput.value = '';
+      fileInput.click();
+    });
+
+    fileInput.addEventListener('change', () => {
+      void (async (): Promise<void> => {
+        const files = fileInput.files;
+        if (!files) return;
+        for (let i = 0; i < files.length; i++) {
+          await this.addImageFromFile(files[i], 'file');
+        }
+      })();
+    });
+  }
+
   private setupPasteHandler() {
     this.inputEl.addEventListener('paste', (e) => {
       void (async (): Promise<void> => {
@@ -200,11 +241,11 @@ export class ImageContextManager {
   }
 
   private getMediaType(filename: string): ImageMediaType | null {
-    const ext = path.extname(filename).toLowerCase();
+    const ext = fileExtension(filename).toLowerCase();
     return IMAGE_EXTENSIONS[ext] || null;
   }
 
-  private async addImageFromFile(file: File, source: 'paste' | 'drop'): Promise<boolean> {
+  private async addImageFromFile(file: File, source: ImageAttachment['source']): Promise<boolean> {
     if (!this.enabled) {
       new Notice('Image attachments are not supported by this provider.');
       return false;
@@ -243,10 +284,31 @@ export class ImageContextManager {
     }
   }
 
-  private async fileToBase64(file: File): Promise<string> {
-    const arrayBuffer = await file.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
-    return buffer.toString('base64');
+  private fileToBase64(file: File): Promise<string> {
+    // FileReader works on both desktop Electron and the iOS webview; Node's
+    // Buffer is unavailable on mobile. Fall back to arrayBuffer+btoa only where
+    // FileReader is absent (the Node test environment).
+    if (typeof FileReader !== 'undefined') {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          const result = typeof reader.result === 'string' ? reader.result : '';
+          const comma = result.indexOf(',');
+          resolve(comma >= 0 ? result.slice(comma + 1) : '');
+        };
+        reader.onerror = () => reject(reader.error ?? new Error('Failed to read image'));
+        reader.readAsDataURL(file);
+      });
+    }
+
+    return file.arrayBuffer().then((arrayBuffer) => {
+      const bytes = new Uint8Array(arrayBuffer);
+      let binary = '';
+      for (let i = 0; i < bytes.length; i++) {
+        binary += String.fromCharCode(bytes[i]);
+      }
+      return btoa(binary);
+    });
   }
 
   // ============================================
@@ -344,7 +406,7 @@ export class ImageContextManager {
 
   private truncateName(name: string, maxLen: number): string {
     if (name.length <= maxLen) return name;
-    const ext = path.extname(name);
+    const ext = fileExtension(name);
     const base = name.slice(0, name.length - ext.length);
     const truncatedBase = base.slice(0, maxLen - ext.length - 3);
     return `${truncatedBase}...${ext}`;

@@ -300,6 +300,7 @@ export class ClaudianSettingTab extends PluginSettingTab {
           .addOption('right-sidebar', t('settings.chatViewPlacement.rightSidebar'))
           .addOption('left-sidebar', t('settings.chatViewPlacement.leftSidebar'))
           .addOption('main-tab', t('settings.chatViewPlacement.mainTab'))
+          .addOption('main-split-right', 'Beside editor (split)')
           .setValue(this.plugin.settings.chatViewPlacement)
           .onChange(async (value) => {
             this.plugin.settings.chatViewPlacement = value as ChatViewPlacement;
