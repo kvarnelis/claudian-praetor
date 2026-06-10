@@ -203,6 +203,44 @@ export class ClaudianSettingTab extends PluginSettingTab {
           });
       });
 
+    // --- Remote daemon (Claudian Praetor) ---
+    // Connects mobile to praetord on your desktop. Stored in plugin data.json
+    // so Obsidian Sync carries it between devices; set it here on the Mac and
+    // it appears on the iPad, or paste it directly on the iPad.
+
+    new Setting(container).setName('Remote daemon').setHeading();
+
+    const saveRemoteDaemonField = async (patch: { url?: string; token?: string }): Promise<void> => {
+      const current = this.plugin.settings.remoteDaemon ?? { url: '', token: '' };
+      const next = { url: current.url, token: current.token, ...patch };
+      await this.plugin.saveRemoteDaemonConfig(next.url || next.token ? next : null);
+    };
+
+    new Setting(container)
+      .setName('Daemon URL')
+      .setDesc('WebSocket URL of praetord on your desktop, e.g. ws://100.x.y.z:8423 (the Mac\'s Tailscale IP). Used by Claudian Praetor on mobile.')
+      .addText((text) => {
+        text
+          .setPlaceholder('ws://100.0.0.0:8423')
+          .setValue(this.plugin.settings.remoteDaemon?.url ?? '')
+          .onChange(async (value) => {
+            await saveRemoteDaemonField({ url: value.trim() });
+          });
+      });
+
+    new Setting(container)
+      .setName('Daemon token')
+      .setDesc('Auth token from ~/.config/claudian-praetor/daemon.json on your desktop.')
+      .addText((text) => {
+        text.inputEl.type = 'password';
+        text
+          .setPlaceholder('paste token')
+          .setValue(this.plugin.settings.remoteDaemon?.token ?? '')
+          .onChange(async (value) => {
+            await saveRemoteDaemonField({ token: value.trim() });
+          });
+      });
+
     // --- Display ---
 
     new Setting(container).setName(t('settings.display')).setHeading();

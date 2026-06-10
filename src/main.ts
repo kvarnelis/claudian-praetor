@@ -288,6 +288,13 @@ export default class ClaudianPlugin extends Plugin {
       ...claudian,
     };
 
+    // Remote daemon config lives in plugin data.json (Sync-carried), not the
+    // hidden .claudian/ vault folder; it takes precedence over any vault copy.
+    const remoteDaemon = await this.storage.getRemoteDaemonConfig();
+    if (remoteDaemon) {
+      this.settings.remoteDaemon = remoteDaemon;
+    }
+
     // Plan mode is ephemeral — normalize back to normal on load so the app
     // doesn't start stuck in plan mode after a restart (prePlanPermissionMode is lost)
     if (this.settings.permissionMode === 'plan') {
@@ -387,6 +394,16 @@ export default class ClaudianPlugin extends Plugin {
     return ProviderSettingsCoordinator.normalizeAllModelVariants(
       this.settings,
     );
+  }
+
+  /** Persist the remote daemon connection to Sync-carried plugin data. */
+  async saveRemoteDaemonConfig(config: { url: string; token: string } | null): Promise<void> {
+    await this.storage.setRemoteDaemonConfig(config);
+    this.settings.remoteDaemon = config ?? undefined;
+    if (Platform.isMobile && config) {
+      const { getRemoteClient } = await import('./remote/registration');
+      getRemoteClient().configure(config);
+    }
   }
 
   async saveSettings() {

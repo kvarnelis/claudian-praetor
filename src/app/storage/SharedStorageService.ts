@@ -59,6 +59,37 @@ export class SharedStorageService implements SharedAppStorage {
     }
   }
 
+  async setRemoteDaemonConfig(config: { url: string; token: string } | null): Promise<void> {
+    try {
+      const loaded: unknown = await this.plugin.loadData();
+      const data = isRecord(loaded) ? loaded : {};
+      if (config) {
+        data.remoteDaemon = config;
+      } else {
+        delete data.remoteDaemon;
+      }
+      await this.plugin.saveData(data);
+    } catch {
+      new Notice('Failed to save remote daemon settings');
+    }
+  }
+
+  async getRemoteDaemonConfig(): Promise<{ url: string; token: string } | null> {
+    try {
+      const data: unknown = await this.plugin.loadData();
+      if (!isRecord(data) || !isRecord(data.remoteDaemon)) {
+        return null;
+      }
+      const { url, token } = data.remoteDaemon;
+      if (typeof url !== 'string' || typeof token !== 'string') {
+        return null;
+      }
+      return { url, token };
+    } catch {
+      return null;
+    }
+  }
+
   getAdapter(): VaultFileAdapter {
     return this.adapter;
   }
