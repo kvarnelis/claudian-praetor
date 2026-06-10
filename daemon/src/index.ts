@@ -3,6 +3,8 @@
  * the real providers, and serve the wire protocol.
  */
 
+import './globalsPolyfill';
+
 import { ProviderWorkspaceRegistry } from '../../src/core/providers/ProviderWorkspaceRegistry';
 import { registerBuiltInProviders } from '../../src/providers';
 import { loadConfig, parseCliArgs, printUsage } from './config';

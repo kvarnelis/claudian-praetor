@@ -1,0 +1,34 @@
+/*
+ * Touch ergonomics for the inline ask/plan/exit-plan cards on mobile. Rows are
+ * already tappable on every card (they share .claudian-ask-item); this hides
+ * the keyboard-only hint line, makes rows finger-sized (44px Apple HIG
+ * minimum), and gives them visible borders so they read as buttons rather
+ * than a keyboard-navigated list.
+ */
+body.is-mobile .claudian-ask-hints {
+  display: none;
+}
+
+body.is-mobile .claudian-ask-item {
+  min-height: 44px;
+  align-items: center;
+  padding: 8px 12px;
+  margin-bottom: 6px;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 8px;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body.is-mobile .claudian-ask-item:active {
+  background: var(--background-modifier-hover);
+}
+
+/* The '›' keyboard cursor is meaningless on touch; reclaim its gutter. */
+body.is-mobile .claudian-ask-cursor {
+  display: none;
+}
+
+body.is-mobile .claudian-ask-custom-text {
+  min-height: 36px;
+  font-size: var(--font-ui-medium);
+}

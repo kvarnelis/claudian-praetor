@@ -1,4 +1,4 @@
-import { TFile } from 'obsidian';
+import { Platform, TFile } from 'obsidian';
 
 import { ProviderSettingsCoordinator } from '../../../core/providers/ProviderSettingsCoordinator';
 import {
@@ -1382,7 +1382,10 @@ export class StreamController {
           return;
         }
         const elapsedSeconds = Math.floor((performance.now() - state.responseStartTime) / 1000);
-        timerSpan.setText(` (esc to interrupt · ${formatDurationMmSs(elapsedSeconds)})`);
+        // 'esc' is meaningless on a touchscreen; show just the timer there.
+        timerSpan.setText(Platform?.isMobile
+          ? ` (${formatDurationMmSs(elapsedSeconds)})`
+          : ` (esc to interrupt · ${formatDurationMmSs(elapsedSeconds)})`);
       };
       updateTimer(); // Initial update
 

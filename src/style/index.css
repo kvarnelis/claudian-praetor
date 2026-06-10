@@ -34,6 +34,7 @@
 @import "./features/file-link.css";
 @import "./features/image-context.css";
 @import "./features/mobile-dock.css";
+@import "./features/mobile-touch.css";
 @import "./features/image-embed.css";
 @import "./features/image-modal.css";
 @import "./features/inline-edit.css";
