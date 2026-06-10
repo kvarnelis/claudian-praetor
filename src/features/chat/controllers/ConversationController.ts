@@ -591,7 +591,10 @@ export class ConversationController {
       });
 
       if (!isCurrent) {
-        content.addEventListener('click', (e) => {
+        // Open on a tap anywhere in the row (except the action buttons, which
+        // stopPropagation). The inner content area alone is too small a touch
+        // target on mobile, where the rename/delete buttons are always visible.
+        item.addEventListener('click', (e) => {
           e.stopPropagation();
           if (this.isHistoryNewTabModifierClick(e) && options.onOpenConversationInNewTab) {
             e.preventDefault();
@@ -615,7 +618,7 @@ export class ConversationController {
         });
 
         if (options.onOpenConversationInNewTab) {
-          content.addEventListener('auxclick', (e) => {
+          item.addEventListener('auxclick', (e) => {
             if (e.button !== 1) return;
             e.preventDefault();
             e.stopPropagation();
