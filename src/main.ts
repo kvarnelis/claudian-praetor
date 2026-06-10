@@ -47,6 +47,8 @@ export default class ClaudianPlugin extends Plugin {
   private conversations: Conversation[] = [];
   private lastKnownTabManagerState: AppTabManagerState | null = null;
   private mobileDock!: MobileDock;
+  /** True when providers are remote-backed (mobile); false for local (desktop). */
+  remoteMode = false;
 
   async onload() {
     // Provider registration is platform-gated: the local provider graph pulls
@@ -59,6 +61,7 @@ export default class ClaudianPlugin extends Plugin {
     } else {
       const { registerRemoteProviders } = await import('./remote/registration');
       registerRemoteProviders(this);
+      this.remoteMode = true;
     }
 
     await this.loadSettings();

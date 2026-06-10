@@ -647,13 +647,14 @@ async function runPass(platformKind) {
       result.probeFailures.push(`ProviderRegistry probe failed (create/delete conversation): ${err?.message ?? err}`);
     }
 
-    // Probe (mobile): the remote registration path actually executed. With no
-    // remoteDaemon settings it emits the "not configured" notice.
-    if (platformKind === 'mobile') {
-      const sawRemoteNotice = spies.notices.some((n) => n.includes('remote daemon is not configured'));
-      if (!sawRemoteNotice) {
-        result.probeFailures.push('remote registration notice not observed — did the mobile branch run?');
-      }
+    // Probe (mobile): the platform gate took the REMOTE branch, which sets
+    // plugin.remoteMode (desktop leaves it false). This confirms the local
+    // provider graph was never imported on mobile.
+    if (platformKind === 'mobile' && plugin.remoteMode !== true) {
+      result.probeFailures.push('plugin.remoteMode was not set — the mobile remote-provider branch did not run');
+    }
+    if (platformKind === 'desktop' && plugin.remoteMode !== false) {
+      result.probeFailures.push('plugin.remoteMode should be false on desktop');
     }
   } catch (err) {
     result.fatalError = err;

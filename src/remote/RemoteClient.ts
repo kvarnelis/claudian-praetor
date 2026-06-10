@@ -113,7 +113,7 @@ export class RemoteClient {
   async ensureConnected(): Promise<void> {
     if (this.state === 'connected' && this.helloDone) return;
     if (!this.config?.url || !this.config?.token) {
-      throw new Error('Remote daemon is not configured. Set remoteDaemon.url and remoteDaemon.token in Claudian settings.');
+      throw new Error('Remote daemon is not configured. Set the daemon URL and token under "Remote daemon" in Claudian Praetor settings.');
     }
 
     this.closedByUser = false;

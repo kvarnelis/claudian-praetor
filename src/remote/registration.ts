@@ -6,7 +6,6 @@
  * Every import here must stay free of Node usage — this module loads on iOS.
  */
 
-import { Notice } from 'obsidian';
 
 import { ProviderRegistry } from '../core/providers/ProviderRegistry';
 import { ProviderWorkspaceRegistry } from '../core/providers/ProviderWorkspaceRegistry';
@@ -303,12 +302,11 @@ let remoteProvidersRegistered = false;
 export function registerRemoteProviders(plugin: ClaudianPlugin): void {
   if (remoteProvidersRegistered) return;
 
-  const config = readRemoteConfig(plugin);
-  if (config) {
-    sharedClient.configure(config);
-  } else {
-    new Notice('Claudian Praetor: remote daemon is not configured. Set remoteDaemon.url and remoteDaemon.token in .claudian/claudian-settings.json on any synced device.', 10_000);
-  }
+  // Registration runs before loadSettings(), so the daemon config isn't readable
+  // yet. The client is configured lazily when the first runtime is created
+  // (createRemoteRuntime) and whenever the settings field changes
+  // (saveRemoteDaemonConfig) — both after settings load. A genuinely missing
+  // config surfaces at connect time via RemoteClient.ensureConnected().
 
   for (const spec of REMOTE_PROVIDER_SPECS) {
     const registration: ProviderRegistration = {
