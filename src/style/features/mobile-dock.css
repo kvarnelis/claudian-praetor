@@ -1,0 +1,39 @@
+/*
+ * iPad side-by-side dock — see features/chat/ui/mobileDock.ts.
+ *
+ * Tablet only. Obsidian's right sidebar slides over the editor on mobile and
+ * never pins; here we override the *actual* drawer + root elements (marked by
+ * MobileDock) so the drawer becomes a fixed-width right column and the editor
+ * shrinks to sit beside it. Width is tunable via --claudian-dock-width.
+ */
+body.claudian-ipad-docked {
+  --claudian-dock-width: 46vw;
+}
+
+/* Dock the right drawer: stop the slide-over transform, fix it to a column. */
+body.claudian-ipad-docked.is-tablet .claudian-dock-drawer {
+  transform: none !important;
+  width: var(--claudian-dock-width) !important;
+  min-width: var(--claudian-dock-width) !important;
+  max-width: var(--claudian-dock-width) !important;
+  left: auto !important;
+  right: 0 !important;
+  box-shadow: none !important;
+  border-left: 1px solid var(--background-modifier-border);
+}
+
+/* Make room: shrink the editor area to the remaining width (handles both
+   flex-child and positioned layouts). */
+body.claudian-ipad-docked.is-tablet .claudian-dock-root {
+  flex: 1 1 calc(100vw - var(--claudian-dock-width)) !important;
+  width: calc(100vw - var(--claudian-dock-width)) !important;
+  max-width: calc(100vw - var(--claudian-dock-width)) !important;
+  left: 0 !important;
+  right: auto !important;
+}
+
+/* Kill the dimming scrim so the editor stays interactive beside the chat. */
+body.claudian-ipad-docked.is-tablet .workspace-drawer-backdrop {
+  opacity: 0 !important;
+  pointer-events: none !important;
+}

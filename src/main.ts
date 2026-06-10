@@ -25,6 +25,7 @@ import {
 } from './core/types';
 import type { ChatViewPlacement, EnvironmentScope } from './core/types/settings';
 import { ClaudianView } from './features/chat/ClaudianView';
+import { MobileDock } from './features/chat/ui/mobileDock';
 import { type InlineEditContext, InlineEditModal } from './features/inline-edit/ui/InlineEditModal';
 import { ClaudianSettingTab } from './features/settings/ClaudianSettings';
 import { setLocale } from './i18n/i18n';
@@ -45,6 +46,7 @@ export default class ClaudianPlugin extends Plugin {
   storage!: SharedAppStorage;
   private conversations: Conversation[] = [];
   private lastKnownTabManagerState: AppTabManagerState | null = null;
+  private mobileDock!: MobileDock;
 
   async onload() {
     // Provider registration is platform-gated: the local provider graph pulls
@@ -61,6 +63,11 @@ export default class ClaudianPlugin extends Plugin {
 
     await this.loadSettings();
     await ProviderWorkspaceRegistry.initializeAll(this);
+
+    this.mobileDock = new MobileDock(this);
+    // Obsidian rewrites drawer styles on open/close, so re-apply the iPad dock
+    // whenever the layout changes (also clears it when the view closes).
+    this.registerEvent(this.app.workspace.on('layout-change', () => this.mobileDock.sync()));
 
     this.registerView(
       VIEW_TYPE_CLAUDIAN,
@@ -184,6 +191,7 @@ export default class ClaudianPlugin extends Plugin {
   }
 
   onunload(): void {
+    this.mobileDock?.clear();
     void this.persistOpenTabStates();
   }
 
@@ -216,6 +224,8 @@ export default class ClaudianPlugin extends Plugin {
     if (leaf) {
       await revealWorkspaceLeaf(workspace, leaf);
     }
+
+    this.mobileDock?.sync();
   }
 
   private getLeafForPlacement(placement: ChatViewPlacement): WorkspaceLeaf | null {
@@ -224,10 +234,12 @@ export default class ClaudianPlugin extends Plugin {
       case 'main-tab':
         return workspace.getLeaf('tab');
       case 'main-split-right':
-        // Side-by-side with the editor in the main area (vertical divider).
-        // The right sidebar only slides over on mobile, so this is how the
-        // chat sits beside the note on iPad.
-        return workspace.getLeaf('split', 'vertical');
+        // Desktop gets a real main-area split. Mobile can't split the main
+        // area, so use the right drawer and dock it beside the editor via
+        // MobileDock CSS instead.
+        return Platform.isMobile
+          ? workspace.getRightLeaf(false)
+          : workspace.getLeaf('split', 'vertical');
       case 'left-sidebar':
         return workspace.getLeftLeaf(false);
       case 'right-sidebar':

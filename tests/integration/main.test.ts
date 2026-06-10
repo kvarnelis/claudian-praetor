@@ -58,6 +58,8 @@ describe('ClaudianPlugin', () => {
         }),
         setActiveLeaf: jest.fn(),
         revealLeaf: jest.fn(),
+        on: jest.fn().mockReturnValue({}),
+        rootSplit: { containerEl: null },
       },
     };
 
