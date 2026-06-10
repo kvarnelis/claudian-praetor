@@ -719,8 +719,7 @@ describe('ConversationController', () => {
         const list = dropdown.children[1];
         // conv-2 is the non-current one (sorted second by lastResponseAt)
         const otherItem = list.children[1];
-        const content = otherItem.querySelector('.claudian-history-item-content');
-        const listeners = content?._eventListeners?.get('click');
+        const listeners = otherItem._eventListeners?.get('click');
         expect(listeners).toBeDefined();
         expect(listeners!.length).toBe(1);
       });
@@ -780,8 +779,7 @@ describe('ConversationController', () => {
 
         const list = container.children[1];
         const otherItem = list.children[1];
-        const content = otherItem.querySelector('.claudian-history-item-content');
-        const clickHandlers = content?._eventListeners?.get('click');
+        const clickHandlers = otherItem._eventListeners?.get('click');
         expect(clickHandlers).toBeDefined();
 
         await clickHandlers![0]({
@@ -816,8 +814,7 @@ describe('ConversationController', () => {
 
         const list = container.children[1];
         const otherItem = list.children[1];
-        const content = otherItem.querySelector('.claudian-history-item-content');
-        const auxClickHandlers = content?._eventListeners?.get('auxclick');
+        const auxClickHandlers = otherItem._eventListeners?.get('auxclick');
         expect(auxClickHandlers).toBeDefined();
 
         await auxClickHandlers![0]({
@@ -915,8 +912,7 @@ describe('ConversationController', () => {
 
       const list = dropdown.children[1];
       const otherItem = list.children[1];
-      const content = otherItem.querySelector('.claudian-history-item-content');
-      const clickHandlers = content?._eventListeners?.get('click');
+      const clickHandlers = otherItem._eventListeners?.get('click');
       expect(clickHandlers).toBeDefined();
 
       await clickHandlers![0]({ stopPropagation: jest.fn() });
