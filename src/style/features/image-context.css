@@ -180,9 +180,19 @@
 
 /* The context row is display:none until it has content, which hides the mobile
    attach button living inside it. Keep the row visible on mobile so the
-   paperclip is always reachable. */
-body.is-mobile .claudian-context-row {
+   paperclip is always reachable. Obsidian sets `is-tablet` (not `is-mobile`) on
+   iPad, so match all three mobile body classes. */
+body.claudian-mobile .claudian-context-row,
+body.is-mobile .claudian-context-row,
+body.is-tablet .claudian-context-row,
+body.is-phone .claudian-context-row {
   display: flex !important;
+}
+
+/* The attach button now ships on every platform; keep its row open even when
+   it holds no chips so the button stays reachable (desktop included). */
+.claudian-context-row.claudian-has-attach-button {
+  display: flex;
 }
 
 /* Mobile-only attach button: opens the native photo/file picker since touch
@@ -211,4 +221,19 @@ body.is-mobile .claudian-context-row {
 .claudian-image-attach-btn svg {
   width: 18px;
   height: 18px;
+}
+
+/* The attach button lives in the context row above the textarea, which is easy
+   to overlook on a phone/tablet. Make it a prominent accent button on mobile. */
+body.claudian-mobile .claudian-image-attach-btn {
+  width: 40px;
+  height: 40px;
+  color: var(--text-on-accent);
+  background: var(--interactive-accent);
+  border-color: var(--interactive-accent);
+}
+
+body.claudian-mobile .claudian-image-attach-btn svg {
+  width: 22px;
+  height: 22px;
 }

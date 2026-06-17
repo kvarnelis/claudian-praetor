@@ -4,12 +4,20 @@
  * the keyboard-only hint line, makes rows finger-sized (44px Apple HIG
  * minimum), and gives them visible borders so they read as buttons rather
  * than a keyboard-navigated list.
+ *
+ * Obsidian sets `is-tablet` on iPad (not `is-mobile`), so every rule matches
+ * all three mobile body classes — keying on `is-mobile` alone silently skips
+ * the iPad, which is the primary target here.
  */
-body.is-mobile .claudian-ask-hints {
+body.is-mobile .claudian-ask-hints,
+body.is-tablet .claudian-ask-hints,
+body.is-phone .claudian-ask-hints {
   display: none;
 }
 
-body.is-mobile .claudian-ask-item {
+body.is-mobile .claudian-ask-item,
+body.is-tablet .claudian-ask-item,
+body.is-phone .claudian-ask-item {
   min-height: 44px;
   align-items: center;
   padding: 8px 12px;
@@ -19,16 +27,22 @@ body.is-mobile .claudian-ask-item {
   -webkit-tap-highlight-color: transparent;
 }
 
-body.is-mobile .claudian-ask-item:active {
+body.is-mobile .claudian-ask-item:active,
+body.is-tablet .claudian-ask-item:active,
+body.is-phone .claudian-ask-item:active {
   background: var(--background-modifier-hover);
 }
 
 /* The '›' keyboard cursor is meaningless on touch; reclaim its gutter. */
-body.is-mobile .claudian-ask-cursor {
+body.is-mobile .claudian-ask-cursor,
+body.is-tablet .claudian-ask-cursor,
+body.is-phone .claudian-ask-cursor {
   display: none;
 }
 
-body.is-mobile .claudian-ask-custom-text {
+body.is-mobile .claudian-ask-custom-text,
+body.is-tablet .claudian-ask-custom-text,
+body.is-phone .claudian-ask-custom-text {
   min-height: 36px;
   font-size: var(--font-ui-medium);
 }

@@ -244,7 +244,7 @@ export class ClaudianSettingTab extends PluginSettingTab {
     if (Platform.isDesktopApp) {
       new Setting(container)
         .setName('Auto-start daemon on this computer')
-        .setDesc('Launch the bundled praetord daemon when Obsidian starts here, bound to this machine\'s Tailscale IP. Keeps the daemon alive for your mobile devices. Takes effect on next reload.')
+        .setDesc('When Tailscale is connected here, launch the bundled praetord daemon (bound to this machine\'s tailnet IP) so your mobile devices have something to reach. Best-effort and silent: if Tailscale isn\'t up, or another daemon already serves this tailnet, it quietly does nothing. Takes effect on next reload.')
         .addToggle((toggle) => {
           toggle
             .setValue(this.plugin.settings.daemonAutoStart ?? false)

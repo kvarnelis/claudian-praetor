@@ -1,4 +1,4 @@
-import { Notice, Platform } from 'obsidian';
+import { Notice } from 'obsidian';
 
 import type { ImageAttachment, ImageMediaType } from '../../../core/types';
 
@@ -178,19 +178,19 @@ export class ImageContextManager {
   }
 
   private setupAttachButton() {
-    // Touch devices have no clipboard-image paste or file drag-drop into the
-    // input, so the only way to attach an image is an explicit button that
-    // opens the native photo/file picker.
-    if (!Platform?.isMobile) return;
-
+    // An explicit attach button on every platform: on touch it's the only way
+    // to attach an image (no clipboard paste or drag-drop into the input); on
+    // desktop it sits alongside paste and drag-drop as a discoverable option.
     const button = this.previewContainerEl.createEl('button', {
       cls: 'claudian-image-attach-btn',
       attr: { type: 'button', 'aria-label': 'Attach image' },
     });
-    // Hand-built SVG (like the drop overlay above): setIcon rendered an empty
-    // square on iOS for this dynamically-inserted button.
+    // Inline SVG rather than setIcon: on iOS, Obsidian's icon lookup paints an
+    // empty button for some names / dynamically-created elements, so an inline
+    // path is the only reliable option. This is Lucide's "paperclip" glyph.
     const ownerDocument = button.ownerDocument ?? window.document;
-    const svg = ownerDocument.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    const svgNs = 'http://www.w3.org/2000/svg';
+    const svg = ownerDocument.createElementNS(svgNs, 'svg');
     svg.setAttribute('viewBox', '0 0 24 24');
     svg.setAttribute('width', '18');
     svg.setAttribute('height', '18');
@@ -199,11 +199,14 @@ export class ImageContextManager {
     svg.setAttribute('stroke-width', '2');
     svg.setAttribute('stroke-linecap', 'round');
     svg.setAttribute('stroke-linejoin', 'round');
-    const clipPath = ownerDocument.createElementNS('http://www.w3.org/2000/svg', 'path');
+    const clipPath = ownerDocument.createElementNS(svgNs, 'path');
     clipPath.setAttribute('d', 'm21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48');
     svg.appendChild(clipPath);
     button.appendChild(svg);
     this.previewContainerEl.insertBefore(button, this.imagePreviewEl);
+    // Keep the context row visible even when it has no chips, so the button is
+    // always reachable (the row is otherwise collapsed until it has content).
+    this.previewContainerEl.addClass('claudian-has-attach-button');
 
     const fileInput = this.previewContainerEl.createEl('input', {
       cls: 'claudian-hidden',

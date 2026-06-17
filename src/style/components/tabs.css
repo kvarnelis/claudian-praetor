@@ -31,6 +31,37 @@
   color: var(--text-normal);
 }
 
+/* Per-tab close control. Hidden on desktop (right-click closes); shown on touch
+   where there is no right-click. Badge grows to a pill to fit number + ×. */
+.claudian-tab-badge-close {
+  display: none;
+}
+
+body.claudian-mobile .claudian-tab-badge {
+  width: auto;
+  min-width: 24px;
+  padding: 0 4px;
+  gap: 3px;
+}
+
+body.claudian-mobile .claudian-tab-badge-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  font-size: 18px;
+  line-height: 1;
+  color: var(--text-muted);
+  background: var(--background-modifier-border);
+}
+
+body.claudian-mobile .claudian-tab-badge-close:active {
+  background: var(--background-modifier-error);
+  color: var(--text-on-accent);
+}
+
 .claudian-tab-badge-active {
   border-color: var(--interactive-accent);
   color: var(--text-normal);

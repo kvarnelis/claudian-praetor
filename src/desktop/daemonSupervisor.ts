@@ -61,57 +61,68 @@ function isPortListening(host: string, port: number): Promise<boolean> {
 
 export class DaemonSupervisor {
   private child: ChildProcess | null = null;
+  private disposed = false;
 
   constructor(private readonly plugin: ClaudianPlugin) {}
 
-  /** Spawn the daemon if it isn't already running. Safe to call repeatedly. */
+  /**
+   * Spawn the daemon if it isn't already running. Safe to call repeatedly.
+   *
+   * Tailscale usually connects a few seconds after Obsidian launches, so retry
+   * briefly, then give up SILENTLY. Auto-start is opt-in and best-effort — no
+   * tailnet is an expected, fine state (Tailscale off, or this just isn't the
+   * host machine), not an error worth interrupting the user about.
+   */
   async start(): Promise<void> {
     if (!Platform.isDesktopApp) return;
 
-    try {
-      const host = findTailnetIp();
-      if (!host) {
-        new Notice(
-          'Claudian Praetor: daemon auto-start skipped — no Tailscale IP found. Is Tailscale connected on this Mac?',
-          8000,
-        );
-        return;
+    for (let attempt = 0; attempt < 6 && !this.disposed; attempt++) {
+      try {
+        const host = findTailnetIp();
+        if (host) {
+          await this.spawnOnHost(host);
+          return;
+        }
+      } catch {
+        return; // best-effort; never break plugin load
       }
-
-      const port = DEFAULT_DAEMON_PORT;
-      if (await isPortListening(host, port)) {
-        return; // already running (this session, a prior run, or launchd)
-      }
-
-      const vaultPath = this.vaultPath();
-      if (!vaultPath) return;
-
-      const node = findNodeExecutable() ?? 'node';
-      const scriptPath = this.daemonScriptPath();
-      const logFd = this.openLogFile();
-
-      const child = spawn(
-        node,
-        [scriptPath, '--vault', vaultPath, '--host', host, '--port', String(port)],
-        {
-          env: { ...process.env, PATH: getEnhancedPath() },
-          detached: true,
-          stdio: logFd !== null ? ['ignore', logFd, logFd] : 'ignore',
-          windowsHide: true,
-        },
-      );
-      child.on('error', () => {
-        new Notice('Claudian Praetor: failed to launch the daemon — check the daemon log.', 8000);
-      });
-      child.unref();
-      this.child = child;
-    } catch {
-      // Auto-start is best-effort; never let it break plugin load.
+      await new Promise<void>((resolve) => window.setTimeout(resolve, 5000));
     }
+  }
+
+  private async spawnOnHost(host: string): Promise<void> {
+    const port = DEFAULT_DAEMON_PORT;
+    if (await isPortListening(host, port)) {
+      return; // already running (this session, a prior run, or launchd)
+    }
+
+    const vaultPath = this.vaultPath();
+    if (!vaultPath) return;
+
+    const node = findNodeExecutable() ?? 'node';
+    const scriptPath = this.daemonScriptPath();
+    const logFd = this.openLogFile();
+
+    const child = spawn(
+      node,
+      [scriptPath, '--vault', vaultPath, '--host', host, '--port', String(port)],
+      {
+        env: { ...process.env, PATH: getEnhancedPath() },
+        detached: true,
+        stdio: logFd !== null ? ['ignore', logFd, logFd] : 'ignore',
+        windowsHide: true,
+      },
+    );
+    child.on('error', () => {
+      new Notice('Claudian Praetor: failed to launch the daemon — check the daemon log.', 8000);
+    });
+    child.unref();
+    this.child = child;
   }
 
   /** Stop the daemon we spawned (only used if the user disables auto-start). */
   stop(): void {
+    this.disposed = true;
     if (this.child && !this.child.killed) {
       try {
         this.child.kill('SIGTERM');

@@ -53,6 +53,26 @@ export default class ClaudianPlugin extends Plugin {
   remoteMode = false;
 
   async onload() {
+    // The iOS webview has no Node `process` global, but shared UI utils
+    // (InputToolbar.shortenPath, utils/path, cliBinaryLocator, …) read
+    // process.platform/process.env unguarded. Without this shim the first such
+    // read throws "Can't find variable: process" and aborts tab creation on
+    // mobile (which also kills the image-attach button built later in tab init).
+    // Desktop keeps the real Node process. Must run before any view/tab is built.
+    if (!Platform.isDesktopApp && typeof process === 'undefined') {
+      (globalThis as { process?: unknown }).process = {
+        platform: 'ios',
+        env: {},
+        cwd: () => '/',
+        argv: [] as string[],
+        version: '',
+        versions: {} as Record<string, string>,
+        nextTick: (fn: (...a: unknown[]) => void, ...args: unknown[]) => {
+          window.setTimeout(() => fn(...args), 0);
+        },
+      };
+    }
+
     // Provider registration is platform-gated: the local provider graph pulls
     // Node APIs at module-init time, so it must never load on mobile. Dynamic
     // imports keep those module initializers from running off-desktop.
@@ -64,6 +84,9 @@ export default class ClaudianPlugin extends Plugin {
       const { registerRemoteProviders } = await import('./remote/registration');
       registerRemoteProviders(this);
       this.remoteMode = true;
+      // A class we own, so mobile CSS never has to guess between Obsidian's
+      // is-mobile / is-tablet / is-phone body classes (iPad uses is-tablet).
+      if (typeof document !== 'undefined') document.body.addClass('claudian-mobile');
     }
 
     await this.loadSettings();
@@ -208,6 +231,7 @@ export default class ClaudianPlugin extends Plugin {
 
   onunload(): void {
     this.mobileDock?.clear();
+    if (typeof document !== 'undefined') document.body.removeClass('claudian-mobile');
     void this.persistOpenTabStates();
   }
 
