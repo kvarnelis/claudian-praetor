@@ -5,6 +5,7 @@ import { Notice, Platform } from 'obsidian';
 import * as os from 'os';
 import * as path from 'path';
 
+import { DEFAULT_CONFIG_PATH, loadConfig } from '../../daemon/src/config';
 import type ClaudianPlugin from '../main';
 import { DEFAULT_DAEMON_PORT } from '../remote/protocol';
 import { findNodeExecutable, getEnhancedPath } from '../utils/env';
@@ -12,12 +13,10 @@ import { findNodeExecutable, getEnhancedPath } from '../utils/env';
 /**
  * Desktop-only auto-start for the Praetor daemon (the Claude-Anywhere model).
  *
- * When enabled, the desktop plugin spawns praetord (bundled alongside the
- * plugin) on load so the iPad always has something to reach — without a
- * separate process tied to anything fragile. The daemon is detached so it
- * survives an Obsidian reload/close; a port probe prevents double-spawning, so
- * relaunching Obsidian just reuses an already-running daemon. Everything is
- * guarded: a failure here must never break desktop plugin load.
+ * When enabled on this specific machine, the desktop plugin spawns praetord
+ * (bundled alongside the plugin) so mobile clients have something to reach.
+ * The enablement flag is intentionally local-only; the generated URL/token is
+ * published separately to plugin data.json so Obsidian Sync can carry it to iOS.
  *
  * This module is dynamically imported only on desktop — it pulls Node APIs.
  */
@@ -26,8 +25,23 @@ const CGNAT_FIRST_OCTET = 100;
 const CGNAT_SECOND_MIN = 64;
 const CGNAT_SECOND_MAX = 127;
 
+export type DaemonStartResult =
+  | {
+      status: 'started' | 'already-running';
+      url: string;
+      token: string;
+      host: string;
+      port: number;
+      configPath: string;
+    }
+  | {
+      status: 'no-tailnet' | 'missing-vault' | 'error';
+      message: string;
+      configPath?: string;
+    };
+
 /** This machine's Tailscale IP (CGNAT 100.64.0.0/10), or null if not on a tailnet. */
-function findTailnetIp(): string | null {
+export function findTailnetIp(): string | null {
   const interfaces = os.networkInterfaces();
   for (const addresses of Object.values(interfaces)) {
     for (const addr of addresses ?? []) {
@@ -59,6 +73,10 @@ function isPortListening(host: string, port: number): Promise<boolean> {
   });
 }
 
+function errorMessage(error: unknown): string {
+  return error instanceof Error ? error.message : String(error);
+}
+
 export class DaemonSupervisor {
   private child: ChildProcess | null = null;
   private disposed = false;
@@ -68,36 +86,67 @@ export class DaemonSupervisor {
   /**
    * Spawn the daemon if it isn't already running. Safe to call repeatedly.
    *
-   * Tailscale usually connects a few seconds after Obsidian launches, so retry
-   * briefly, then give up SILENTLY. Auto-start is opt-in and best-effort — no
-   * tailnet is an expected, fine state (Tailscale off, or this just isn't the
-   * host machine), not an error worth interrupting the user about.
+   * Startup from plugin load retries briefly because Tailscale can connect a few
+   * seconds after Obsidian opens. Manual settings toggles pass `retry: false` so
+   * the UI can report missing Tailscale immediately.
    */
-  async start(): Promise<void> {
-    if (!Platform.isDesktopApp) return;
+  async start(options: { retry?: boolean } = {}): Promise<DaemonStartResult> {
+    if (!Platform.isDesktopApp) {
+      return { status: 'error', message: 'The Praetor daemon can only run in the desktop app.' };
+    }
 
-    for (let attempt = 0; attempt < 6 && !this.disposed; attempt++) {
+    const attempts = options.retry === false ? 1 : 6;
+    for (let attempt = 0; attempt < attempts && !this.disposed; attempt++) {
       try {
         const host = findTailnetIp();
         if (host) {
-          await this.spawnOnHost(host);
-          return;
+          return await this.spawnOnHost(host);
         }
-      } catch {
-        return; // best-effort; never break plugin load
+      } catch (error) {
+        return {
+          status: 'error',
+          message: `Failed to launch the Praetor daemon: ${errorMessage(error)}`,
+          configPath: DEFAULT_CONFIG_PATH,
+        };
       }
-      await new Promise<void>((resolve) => window.setTimeout(resolve, 5000));
+      if (attempt < attempts - 1) {
+        await new Promise<void>((resolve) => window.setTimeout(resolve, 5000));
+      }
     }
+
+    return {
+      status: 'no-tailnet',
+      message: 'Tailscale is not connected on this Mac. Turn on Tailscale before hosting the mobile daemon.',
+      configPath: DEFAULT_CONFIG_PATH,
+    };
   }
 
-  private async spawnOnHost(host: string): Promise<void> {
+  private async spawnOnHost(host: string): Promise<DaemonStartResult> {
     const port = DEFAULT_DAEMON_PORT;
-    if (await isPortListening(host, port)) {
-      return; // already running (this session, a prior run, or launchd)
+    const vaultPath = this.vaultPath();
+    if (!vaultPath) {
+      return { status: 'missing-vault', message: 'Could not determine this Obsidian vault path.' };
     }
 
-    const vaultPath = this.vaultPath();
-    if (!vaultPath) return;
+    const { config, configPath } = loadConfig({
+      vault: vaultPath,
+      host,
+      port,
+      printConfig: false,
+    });
+    const url = `ws://${config.host}:${config.port}`;
+    await this.plugin.saveRemoteDaemonConfig({ url, token: config.token });
+
+    if (await isPortListening(config.host, config.port)) {
+      return {
+        status: 'already-running',
+        url,
+        token: config.token,
+        host: config.host,
+        port: config.port,
+        configPath,
+      };
+    }
 
     const node = findNodeExecutable() ?? 'node';
     const scriptPath = this.daemonScriptPath();
@@ -105,7 +154,7 @@ export class DaemonSupervisor {
 
     const child = spawn(
       node,
-      [scriptPath, '--vault', vaultPath, '--host', host, '--port', String(port)],
+      [scriptPath, '--vault', vaultPath, '--host', config.host, '--port', String(config.port)],
       {
         env: { ...process.env, PATH: getEnhancedPath() },
         detached: true,
@@ -118,9 +167,18 @@ export class DaemonSupervisor {
     });
     child.unref();
     this.child = child;
+
+    return {
+      status: 'started',
+      url,
+      token: config.token,
+      host: config.host,
+      port: config.port,
+      configPath,
+    };
   }
 
-  /** Stop the daemon we spawned (only used if the user disables auto-start). */
+  /** Stop the daemon we spawned (only used if the user disables local hosting). */
   stop(): void {
     this.disposed = true;
     if (this.child && !this.child.killed) {

@@ -75,6 +75,8 @@ const LEGACY_STRIPPED_SETTING_FIELDS = [
   'allowedExportPaths',
   'enableBlocklist',
   'blockedCommands',
+  'daemonAutoStart',
+  'legacyDaemonAutoStart',
   ...LEGACY_TOP_LEVEL_PROVIDER_FIELDS,
   'openInMainTab',
 ] as const;
@@ -282,6 +284,7 @@ export class ClaudianSettingsStorage {
 
     const content = await this.adapter.read(settingsPath);
     const stored = JSON.parse(content) as Record<string, unknown>;
+    const legacyDaemonAutoStart = stored.daemonAutoStart === true;
     const hiddenProviderCommands = mergeLegacyClaudeHiddenCommands(
       normalizeHiddenProviderCommands(stored.hiddenProviderCommands),
       stored.hiddenSlashCommands,
@@ -315,6 +318,7 @@ export class ClaudianSettingsStorage {
     const merged = {
       ...this.getDefaults(),
       ...legacyNormalized,
+      ...(legacyDaemonAutoStart ? { legacyDaemonAutoStart: true } : {}),
     };
 
     updateClaudeProviderSettings(
@@ -350,6 +354,7 @@ export class ClaudianSettingsStorage {
       || 'allowedExportPaths' in stored
       || 'enableBlocklist' in stored
       || 'blockedCommands' in stored
+      || 'daemonAutoStart' in stored
       || shouldPersistChatViewPlacementMigration(stored, chatViewPlacement)
       || JSON.stringify(envSnippets) !== JSON.stringify(stored.envSnippets ?? [])
       || (

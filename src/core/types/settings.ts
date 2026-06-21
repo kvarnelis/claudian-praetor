@@ -96,8 +96,8 @@ export type ProviderConfigMap = Partial<Record<string, Record<string, unknown>>>
 export interface ClaudianSettings {
   /** Praetor remote daemon connection used by mobile remote runtimes. */
   remoteDaemon?: { url: string; token: string };
-  /** Desktop-only: auto-start the bundled Praetor daemon on plugin load. */
-  daemonAutoStart?: boolean;
+  /** Internal one-load migration flag for the pre-2.0.42 synced daemon host toggle. */
+  legacyDaemonAutoStart?: boolean;
   // User preferences
   userName: string;
 

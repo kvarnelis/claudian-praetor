@@ -1,6 +1,7 @@
 
 import { TOOL_SUBAGENT } from '@/core/tools/toolNames';
 import { VIEW_TYPE_CLAUDIAN } from '@/core/types';
+import { LOCAL_DAEMON_HOST_ENABLED_KEY } from '@/desktop/localDaemonSettings';
 import * as sdkSession from '@/providers/claude/history/ClaudeHistoryStore';
 import { DEFAULT_SETTINGS } from '@/providers/claude/types/settings';
 
@@ -68,6 +69,8 @@ describe('ClaudianPlugin', () => {
       name: 'Claudian',
       version: '0.1.0',
     };
+
+    window.localStorage.clear();
 
     // Create plugin instance with mocked app
     plugin = new ClaudianPlugin(mockApp, mockManifest);
@@ -266,6 +269,49 @@ describe('ClaudianPlugin', () => {
       expect(content).not.toHaveProperty('blockedCommands');
     });
 
+    it('persists remote daemon connection to plugin data instead of shared settings', async () => {
+      await plugin.loadSettings();
+
+      const config = { url: 'ws://100.64.1.2:8423', token: 'test-token' };
+      await plugin.saveRemoteDaemonConfig(config);
+
+      expect(plugin.settings.remoteDaemon).toEqual(config);
+      expect(plugin.saveData).toHaveBeenCalledWith({ remoteDaemon: config });
+
+      const settingsWrites = (mockApp.vault.adapter.write as jest.Mock).mock.calls
+        .filter(([path]) => path === '.claudian/claudian-settings.json');
+      for (const [, content] of settingsWrites) {
+        expect(JSON.parse(content)).not.toHaveProperty('remoteDaemon');
+      }
+    });
+
+    it('migrates legacy synced daemon auto-start to local storage and strips it from shared settings', async () => {
+      mockApp.vault.adapter.exists.mockImplementation(async (path: string) => {
+        return path === '.claudian/claudian-settings.json';
+      });
+      mockApp.vault.adapter.read.mockImplementation(async (path: string) => {
+        if (path === '.claudian/claudian-settings.json') {
+          return JSON.stringify({ daemonAutoStart: true });
+        }
+        return '';
+      });
+
+      await plugin.loadSettings();
+
+      expect(plugin.isLocalDaemonHostEnabled()).toBe(true);
+      expect(window.localStorage.getItem(LOCAL_DAEMON_HOST_ENABLED_KEY)).toBe('true');
+      expect(plugin.settings).not.toHaveProperty('daemonAutoStart');
+      expect(plugin.settings).not.toHaveProperty('legacyDaemonAutoStart');
+
+      const writeCall = (mockApp.vault.adapter.write as jest.Mock).mock.calls.find(
+        ([path]) => path === '.claudian/claudian-settings.json',
+      );
+      expect(writeCall).toBeDefined();
+      const content = JSON.parse(writeCall[1]);
+      expect(content).not.toHaveProperty('daemonAutoStart');
+      expect(content).not.toHaveProperty('legacyDaemonAutoStart');
+    });
+
     it('should use defaults when no saved data', async () => {
       // No settings file exists
       mockApp.vault.adapter.exists.mockResolvedValue(false);
@@ -356,6 +402,8 @@ describe('ClaudianPlugin', () => {
       expect(content).toHaveProperty('lastCustomModel');
       expect(content).not.toHaveProperty('enableBlocklist');
       expect(content).not.toHaveProperty('blockedCommands');
+      expect(content).not.toHaveProperty('daemonAutoStart');
+      expect(content).not.toHaveProperty('legacyDaemonAutoStart');
       // Permissions are now in .claude/settings.json (CC format), not claudian-settings.json
       expect(content).not.toHaveProperty('permissions');
     });

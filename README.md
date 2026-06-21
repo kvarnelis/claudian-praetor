@@ -1,187 +1,103 @@
-# Claudian
+# Claudian Praetor
 
-![GitHub stars](https://img.shields.io/github/stars/YishenTu/claudian?style=social)
-![GitHub release](https://img.shields.io/github/v/release/YishenTu/claudian)
-![License](https://img.shields.io/github/license/YishenTu/claudian)
+![GitHub release](https://img.shields.io/github/v/release/kvarnelis/claudian-praetor)
+![License](https://img.shields.io/github/license/kvarnelis/claudian-praetor)
 
-![Preview](Preview.png)
+Claudian Praetor is a fork of Claudian that embeds AI coding agents in Obsidian and adds a Praetor remote mode for iPhone and iPad. On desktop it runs providers locally against your vault. On mobile it can connect over Tailscale to a daemon hosted by your Mac, so the mobile UI drives the same Claude Code, Codex, Grok, and other provider runtimes that already work on desktop.
 
-An Obsidian plugin that embeds AI coding agents (Claude Code, Codex, Opencode, Pi, and more to come) in your vault. Your vault becomes the agent's working directory — file read/write, search, bash, and multi-step workflows all work out of the box.
+## Features
 
-## Features & Usage
-
-Open the chat sidebar from the ribbon icon or command palette. Select text and use the hotkey for inline edit. Everything works like your familiar coding agent, Claude Code, Codex, Opencode, and Pi — talk to the agent, and it reads, writes, edits, and searches files in your vault.
-
-**Inline Edit** — Select text or start at the cursor position + hotkey to edit directly in notes with word-level diff preview.
-
-**Slash Commands & Skills** — Type `/` or `$` for reusable prompt templates or Skills from user- and vault-level scopes.
-
-**`@mention`** - Type `@` to mention anything you want the agent to work with, vault files, subagents, MCP servers, or files in external directories.
-
-**Plan Mode** — Toggle via `Shift+Tab`. The agent explores and designs before implementing, then presents a plan for approval.
-
-**Instruction Mode (`#`)** — Refined custom instructions added from the chat input.
-
-**MCP Servers** — Connect external tools via Model Context Protocol (stdio, SSE, HTTP). Claude manages vault MCP in-app; Codex uses its own CLI-managed MCP configuration.
-
-**Multi-Tab & Conversations** — Multiple chat tabs, conversation history, fork, resume, and compact.
+- **Desktop agent chat** — Claude Code, Codex, Grok, Opencode, Pi, and related providers can read, search, and edit your vault.
+- **Mobile remote mode** — iPhone/iPad clients connect to `praetord` on your Mac over WebSocket.
+- **Machine-local daemon hosting** — the “Host mobile daemon on this Mac” setting is stored only on that Mac, so other synced Macs do not accidentally start hosting.
+- **Synced mobile connection** — the Mac publishes the daemon URL/token to plugin data so Obsidian Sync can carry it to mobile devices.
+- **Inline edit, slash commands, skills, MCP, multi-tab conversations, and plan mode** — inherited from Claudian/Praetor.
 
 ## Requirements
 
-- **Claude provider**: [Claude Code CLI](https://code.claude.com/docs/en/overview) installed (native install recommended). Claude subscription/API or compatible provider ([Openrouter](https://openrouter.ai/docs/guides/guides/claude-code-integration), [Kimi](https://platform.moonshot.ai/docs/guide/agent-support), etc.).
-- **Optional providers**: [Codex CLI](https://github.com/openai/codex), [Opencode](https://opencode.ai/), [Pi](https://github.com/earendil-works/pi).
 - Obsidian v1.7.2+
-- Desktop only (macOS, Linux, Windows)
+- Desktop Mac for local provider runtimes and optional mobile daemon hosting
+- For mobile remote mode: [Tailscale](https://tailscale.com/download) on the Mac and the iPhone/iPad
+- Provider CLIs or accounts as needed: [Claude Code](https://code.claude.com/docs/en/overview), [Codex CLI](https://github.com/openai/codex), [Opencode](https://opencode.ai/), Grok Build, or Pi
 
-## Installation
+## Installation via BRAT or GitHub Release
 
-### From Obsidian Community Plugins (recommended)
+This fork is released through GitHub/BRAT, not the Obsidian Community Plugin directory.
 
-1. Open Obsidian → Settings → Community plugins → Browse
-2. Search for "Claudian" and click Install
-3. Enable the plugin
+### BRAT
 
-Or install directly from the [community plugin page](https://community.obsidian.md/plugins/realclaudian).
+1. Install the Obsidian BRAT plugin.
+2. Add beta plugin repository `kvarnelis/claudian-praetor`.
+3. Enable **Claudian Praetor** in Community plugins.
 
-### From GitHub Release
+### Manual GitHub release install
 
-1. Download `main.js`, `manifest.json`, and `styles.css` from the [latest release](https://github.com/YishenTu/claudian/releases/latest)
-2. Create a folder called `claudian` in your vault's plugins folder:
+1. Download `main.js`, `manifest.json`, `styles.css`, and `praetord.cjs` from the latest release.
+2. Create this folder in your vault:
+   ```text
+   /path/to/vault/.obsidian/plugins/claudian-praetor/
    ```
-   /path/to/vault/.obsidian/plugins/claudian/
-   ```
-3. Copy the downloaded files into the `claudian` folder
-4. Enable the plugin in Obsidian:
-   - Settings → Community plugins → Enable "Claudian"
+3. Copy all four files into that folder.
+4. Enable **Claudian Praetor** in Obsidian.
 
-### From source (development)
+## Desktop Setup
 
-1. Clone this repository into your vault's plugins folder:
-   ```bash
-   cd /path/to/vault/.obsidian/plugins
-   git clone https://github.com/YishenTu/claudian.git
-   cd claudian
-   ```
+Open the Claudian Praetor settings tab and configure the providers you want to use. Desktop Obsidian uses local provider runtimes directly; it does not need the remote daemon unless you want mobile devices to connect to this Mac.
 
-2. Install dependencies and build:
-   ```bash
-   npm install
-   npm run build
-   ```
+For mobile hosting:
 
-3. Enable the plugin in Obsidian:
-   - Settings → Community plugins → Enable "Claudian"
+1. Install and connect [Tailscale](https://tailscale.com/download) on the Mac.
+2. In Claudian Praetor settings, open **Mobile daemon**.
+3. Enable **Host mobile daemon on this Mac**.
+4. Praetor detects the Mac’s Tailscale IP, creates or updates `~/.config/claudian-praetor/daemon.json`, starts `praetord`, and publishes the mobile URL/token through plugin data.
 
-### Development
+The host checkbox is local to this Mac. It does not sync to other desktop machines.
+
+## Mobile Setup
+
+1. Install Claudian Praetor in Obsidian mobile via BRAT.
+2. Install and connect [Tailscale](https://tailscale.com/download) on the mobile device.
+3. Let Obsidian Sync bring over the plugin data from the host Mac, or paste the URL/token manually in **Remote Mac daemon** settings.
+4. Open Claudian Praetor and choose a remote-backed provider.
+
+If the mobile client cannot connect, confirm that Tailscale is on, the Mac is awake, and the Mac setting **Host mobile daemon on this Mac** is enabled.
+
+## Development
 
 ```bash
-# Watch mode
-npm run dev
-
-# Production build
+npm install
 npm run build
+npm run build:daemon
 ```
+
+Set `OBSIDIAN_VAULT=/path/to/vault` while building to copy the built plugin files into the folder matching `manifest.id`.
+
+## Release Assets
+
+Every release must include:
+
+- `main.js`
+- `manifest.json`
+- `styles.css`
+- `praetord.cjs`
 
 ## Privacy & Data Use
 
-- **Sent to API**: Your input, attached files, images, and tool call outputs. Default: Anthropic (Claude), OpenAI (Codex), or the provider configured in Opencode/Pi; configurable via provider settings and environment variables.
-- **Local storage**: Claudian settings and session metadata in `vault/.claudian/`; Claude provider files in `vault/.claude/`; transcripts in `~/.claude/projects/` (Claude), `~/.codex/sessions/` (Codex), and `.pi/agent/sessions/` or `~/.pi/agent/sessions/` (Pi).
-- **Environment variables**: Provider subprocesses inherit the Obsidian process environment plus any variables you configure in Claudian. This is needed for CLI authentication, proxies, certificates, and PATH resolution.
-- **Device-specific paths**: Per-device CLI paths use an opaque local key stored in browser local storage, not your system hostname.
-- **Background activity**: Claudian does not run telemetry beacons. UI polling timers read local Obsidian/editor selection state only. Network activity is limited to explicit provider runtime work, configured MCP endpoints, and provider SDK/CLI calls needed to answer your requests.
+- Provider requests send your prompt, selected files/images, and tool outputs to the configured provider.
+- Local settings and sessions live in the vault and plugin storage.
+- The Praetor daemon listens on the Mac’s Tailscale address when explicitly enabled on that Mac.
+- The daemon token is stored in `~/.config/claudian-praetor/daemon.json` and copied to plugin data only so mobile devices can authenticate.
 
 ## Troubleshooting
 
-### Claude CLI not found
+### Tailscale is not detected
 
-If you encounter `spawn claude ENOENT` or `Claude CLI not found`, the plugin can't auto-detect your Claude installation. Common with Node version managers (nvm, fnm, volta).
+Turn on Tailscale on the Mac and confirm it has a `100.x.y.z` tailnet IP. The daemon host setting will not publish a new mobile URL until that address is available.
 
-**Solution**: Leave the setting empty first so Claudian can auto-detect Claude Code. If auto-detection fails, find your CLI path and set it in Settings → Advanced → Claude CLI path.
+### Mobile says it cannot reach the daemon
 
-| Platform | Command | Example Path |
-|----------|---------|--------------|
-| macOS/Linux | `which claude` | `/Users/you/.volta/bin/claude` |
-| Windows (native) | `where.exe claude` | `C:\Users\you\AppData\Local\Claude\claude.exe` |
-| Windows (npm) | `npm root -g` | `{root}\@anthropic-ai\claude-code\cli-wrapper.cjs` |
+Check that Tailscale is connected on both devices, the Mac is awake, Obsidian has loaded the plugin, and `praetord` is running. The daemon log is written to `~/.config/claudian-praetor/praetord.log` when possible.
 
-> **Note**: On Windows, avoid `.cmd` and `.ps1` wrappers. Use `claude.exe` for native installs, or `cli-wrapper.cjs` for package-manager installs. `cli.js` is only a legacy fallback for older Claude Code npm packages.
+### Provider CLI not found
 
-**Alternative**: Add your Node.js bin directory to PATH in Settings → Environment → Custom variables.
-
-### npm CLI and Node.js not in same directory
-
-If using npm-installed CLI, check if `claude` and `node` are in the same directory:
-```bash
-dirname $(which claude)
-dirname $(which node)
-```
-
-If different, GUI apps like Obsidian may not find Node.js.
-
-**Solutions**:
-1. Install native binary (recommended)
-2. Add Node.js path to Settings → Environment: `PATH=/path/to/node/bin`
-
-### Other providers
-
-Codex, Opencode, and Pi support are live but features might be incomplete, and still need more testing across platforms and installation methods. If you have feature request or run into any bugs, please [submit a GitHub issue](https://github.com/YishenTu/claudian/issues).
-
-## Architecture
-
-```
-src/
-├── main.ts                      # Plugin entry point
-├── app/                         # Shared defaults and plugin-level storage
-├── core/                        # Provider-neutral runtime, registry, and type contracts
-│   ├── runtime/                 # ChatRuntime interface and approval types
-│   ├── providers/               # Provider registry and workspace services
-│   ├── auxiliary/               # Shared provider auxiliary services
-│   ├── bootstrap/               # Plugin bootstrap wiring
-│   ├── security/                # Approval utilities
-│   └── ...                      # commands, mcp, prompt, storage, tools, types
-├── providers/
-│   ├── claude/                  # Claude SDK adaptor, prompt encoding, storage, MCP, plugins
-│   ├── codex/                   # Codex app-server adaptor, JSON-RPC transport, JSONL history
-│   ├── opencode/                # Opencode adaptor
-│   ├── pi/                      # Pi RPC adaptor, model discovery, JSONL history
-│   └── acp/                     # Agent Client Protocol shared transport
-├── features/
-│   ├── chat/                    # Sidebar chat: tabs, controllers, renderers
-│   ├── inline-edit/             # Inline edit modal and provider-backed edit services
-│   └── settings/                # Settings shell with provider tabs
-├── shared/                      # Reusable UI components and modals
-├── i18n/                        # Internationalization (10 locales)
-├── types/                       # Shared ambient types
-├── utils/                       # Cross-cutting utilities
-└── style/                       # Modular CSS
-```
-
-## Roadmap
-
-- [x] 1M Opus and Sonnet models
-- [x] Codex provider integration
-- [x] Opencode support
-- [x] Pi provider support
-- [ ] More to come!
-
-## License
-
-Licensed under the [MIT License](LICENSE).
-
-## Star History
-
-<a href="https://www.star-history.com/?repos=YishenTu%2Fclaudian&type=date&legend=top-left">
- <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/image?repos=YishenTu/claudian&type=date&theme=dark&legend=top-left" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/image?repos=YishenTu/claudian&type=date&legend=top-left" />
-   <img alt="Star History Chart" src="https://api.star-history.com/image?repos=YishenTu/claudian&type=date&legend=top-left" />
- </picture>
-</a>
-
-## Acknowledgments
-
-- [Obsidian](https://obsidian.md) for the plugin API
-- [Anthropic](https://anthropic.com) for Claude and the [Claude Agent SDK](https://platform.claude.com/docs/en/agent-sdk/overview)
-- [OpenAI](https://openai.com) for [Codex](https://github.com/openai/codex)
-- [Opencode](https://opencode.ai/) 
-- [Pi](https://github.com/earendil-works/pi)
+Leave CLI path fields empty first so Claudian Praetor can auto-detect from PATH. If auto-detection fails, set the provider-specific CLI path in settings for this device.

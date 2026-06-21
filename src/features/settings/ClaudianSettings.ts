@@ -203,54 +203,93 @@ export class ClaudianSettingTab extends PluginSettingTab {
           });
       });
 
-    // --- Remote daemon (Claudian Praetor) ---
-    // Connects mobile to praetord on your desktop. Stored in plugin data.json
-    // so Obsidian Sync carries it between devices; set it here on the Mac and
-    // it appears on the iPad, or paste it directly on the iPad.
-
-    new Setting(container).setName('Remote daemon').setHeading();
-
-    const saveRemoteDaemonField = async (patch: { url?: string; token?: string }): Promise<void> => {
-      const current = this.plugin.settings.remoteDaemon ?? { url: '', token: '' };
-      const next = { url: current.url, token: current.token, ...patch };
-      await this.plugin.saveRemoteDaemonConfig(next.url || next.token ? next : null);
-    };
-
-    new Setting(container)
-      .setName('Daemon URL')
-      .setDesc('WebSocket URL of praetord on your desktop, e.g. ws://100.x.y.z:8423 (the Mac\'s Tailscale IP). Used by Claudian Praetor on mobile.')
-      .addText((text) => {
-        text
-          .setPlaceholder('ws://100.0.0.0:8423')
-          .setValue(this.plugin.settings.remoteDaemon?.url ?? '')
-          .onChange(async (value) => {
-            await saveRemoteDaemonField({ url: value.trim() });
-          });
-      });
-
-    new Setting(container)
-      .setName('Daemon token')
-      .setDesc('Auth token from ~/.config/claudian-praetor/daemon.json on your desktop.')
-      .addText((text) => {
-        text.inputEl.type = 'password';
-        text
-          .setPlaceholder('paste token')
-          .setValue(this.plugin.settings.remoteDaemon?.token ?? '')
-          .onChange(async (value) => {
-            await saveRemoteDaemonField({ token: value.trim() });
-          });
-      });
+    // --- Mobile daemon (Claudian Praetor) ---
+    // The Mac host toggle is local-only so it cannot confuse other synced Macs.
+    // The URL/token remain in plugin data.json so Obsidian Sync carries them to
+    // mobile devices that need to connect to this Mac over Tailscale.
 
     if (Platform.isDesktopApp) {
+      new Setting(container).setName('Mobile daemon').setHeading();
+
+      const daemonNotice = container.createDiv({ cls: 'claudian-sp-settings-desc' });
+      const daemonDesc = daemonNotice.createEl('p', { cls: 'setting-item-description' });
+      daemonDesc.appendText('Host a local Praetor daemon on this Mac for iPhone and iPad. This checkbox is stored only on this machine and does not sync to other Macs. Mobile devices receive the URL and token through Obsidian Sync. ');
+      daemonDesc.createEl('a', { text: 'Install Tailscale', href: 'https://tailscale.com/download' });
+      const daemonStatus = daemonNotice.createEl('p', { cls: 'setting-item-description' });
+      daemonStatus.setText('Tailscale status: checking...');
+
+      void import('../../desktop/daemonSupervisor')
+        .then(({ findTailnetIp }) => {
+          const ip = findTailnetIp();
+          daemonStatus.setText(ip
+            ? `Tailscale status: connected as ${ip}.`
+            : 'Tailscale status: not connected. Turn on Tailscale before hosting this Mac.');
+        })
+        .catch(() => {
+          daemonStatus.setText('Tailscale status: unavailable.');
+        });
+
       new Setting(container)
-        .setName('Auto-start daemon on this computer')
-        .setDesc('When Tailscale is connected here, launch the bundled praetord daemon (bound to this machine\'s tailnet IP) so your mobile devices have something to reach. Best-effort and silent: if Tailscale isn\'t up, or another daemon already serves this tailnet, it quietly does nothing. Takes effect on next reload.')
+        .setName('Host mobile daemon on this Mac')
+        .setDesc('Starts the bundled praetord daemon on this Mac and publishes its Tailscale URL/token for synced mobile devices. The checkbox itself is local-only.')
         .addToggle((toggle) => {
           toggle
-            .setValue(this.plugin.settings.daemonAutoStart ?? false)
+            .setValue(this.plugin.isLocalDaemonHostEnabled())
             .onChange(async (value) => {
-              this.plugin.settings.daemonAutoStart = value;
-              await this.plugin.saveSettings();
+              toggle.setDisabled(true);
+              const result = await this.plugin.setLocalDaemonHostEnabled(value);
+              toggle.setDisabled(false);
+
+              if (!value) {
+                daemonStatus.setText('Hosting disabled on this Mac.');
+                return;
+              }
+
+              if (result?.status === 'started') {
+                daemonStatus.setText(`Hosting enabled. Mobile URL: ${result.url}`);
+              } else if (result?.status === 'already-running') {
+                daemonStatus.setText(`Daemon already running. Mobile URL: ${result.url}`);
+              } else if (result && 'message' in result) {
+                daemonStatus.setText(result.message);
+              }
+            });
+        });
+    } else {
+      new Setting(container).setName('Remote Mac daemon').setHeading();
+
+      const daemonNotice = container.createDiv({ cls: 'claudian-sp-settings-desc' });
+      const daemonDesc = daemonNotice.createEl('p', { cls: 'setting-item-description' });
+      daemonDesc.appendText('Connect this mobile device to the Praetor daemon hosted by your Mac. Turn on Tailscale before starting a remote session. ');
+      daemonDesc.createEl('a', { text: 'Install Tailscale', href: 'https://tailscale.com/download' });
+
+      const saveRemoteDaemonField = async (patch: { url?: string; token?: string }): Promise<void> => {
+        const current = this.plugin.settings.remoteDaemon ?? { url: '', token: '' };
+        const next = { url: current.url, token: current.token, ...patch };
+        await this.plugin.saveRemoteDaemonConfig(next.url || next.token ? next : null);
+      };
+
+      new Setting(container)
+        .setName('Daemon URL')
+        .setDesc('WebSocket URL of praetord on your Mac, e.g. ws://100.x.y.z:8423.')
+        .addText((text) => {
+          text
+            .setPlaceholder('ws://100.0.0.0:8423')
+            .setValue(this.plugin.settings.remoteDaemon?.url ?? '')
+            .onChange(async (value) => {
+              await saveRemoteDaemonField({ url: value.trim() });
+            });
+        });
+
+      new Setting(container)
+        .setName('Daemon token')
+        .setDesc('Auth token from ~/.config/claudian-praetor/daemon.json on your Mac.')
+        .addText((text) => {
+          text.inputEl.type = 'password';
+          text
+            .setPlaceholder('paste token')
+            .setValue(this.plugin.settings.remoteDaemon?.token ?? '')
+            .onChange(async (value) => {
+              await saveRemoteDaemonField({ token: value.trim() });
             });
         });
     }

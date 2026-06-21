@@ -24,7 +24,8 @@ import {
   VIEW_TYPE_CLAUDIAN,
 } from './core/types';
 import type { ChatViewPlacement, EnvironmentScope } from './core/types/settings';
-import type { DaemonSupervisor } from './desktop/daemonSupervisor';
+import type { DaemonStartResult, DaemonSupervisor } from './desktop/daemonSupervisor';
+import { isLocalDaemonHostEnabled, setLocalDaemonHostEnabled } from './desktop/localDaemonSettings';
 import { ClaudianView } from './features/chat/ClaudianView';
 import { MobileDock } from './features/chat/ui/mobileDock';
 import { type InlineEditContext, InlineEditModal } from './features/inline-edit/ui/InlineEditModal';
@@ -95,12 +96,8 @@ export default class ClaudianPlugin extends Plugin {
     // Desktop auto-start: keep the daemon alive for mobile clients by spawning
     // it on load (opt-in). Dynamic import so the Node-only module never loads
     // on mobile; fully guarded so it can't break desktop plugin load.
-    if (Platform.isDesktopApp && this.settings.daemonAutoStart) {
-      void (async (): Promise<void> => {
-        const { DaemonSupervisor } = await import('./desktop/daemonSupervisor');
-        this.daemonSupervisor = new DaemonSupervisor(this);
-        await this.daemonSupervisor.start();
-      })().catch(() => undefined);
+    if (Platform.isDesktopApp && this.isLocalDaemonHostEnabled()) {
+      void this.startMobileDaemonHost({ retry: true }).catch(() => undefined);
     }
 
     this.mobileDock = new MobileDock(this);
@@ -352,6 +349,12 @@ export default class ClaudianPlugin extends Plugin {
       this.settings.remoteDaemon = remoteDaemon;
     }
 
+    const didMigrateLegacyDaemonAutoStart = this.settings.legacyDaemonAutoStart === true;
+    delete this.settings.legacyDaemonAutoStart;
+    if (Platform.isDesktopApp && didMigrateLegacyDaemonAutoStart && !isLocalDaemonHostEnabled()) {
+      setLocalDaemonHostEnabled(true);
+    }
+
     // Plan mode is ephemeral — normalize back to normal on load so the app
     // doesn't start stuck in plan mode after a restart (prePlanPermissionMode is lost)
     if (this.settings.permissionMode === 'plan') {
@@ -417,7 +420,7 @@ export default class ClaudianPlugin extends Plugin {
       this.settings,
     );
 
-    if (changed || didNormalizeModelVariants || didNormalizeProviderSelection) {
+    if (changed || didNormalizeModelVariants || didNormalizeProviderSelection || didMigrateLegacyDaemonAutoStart) {
       await this.saveSettings();
     }
 
@@ -461,6 +464,44 @@ export default class ClaudianPlugin extends Plugin {
       const { getRemoteClient } = await import('./remote/registration');
       getRemoteClient().configure(config);
     }
+  }
+
+  isLocalDaemonHostEnabled(): boolean {
+    return Platform.isDesktopApp && isLocalDaemonHostEnabled();
+  }
+
+  async setLocalDaemonHostEnabled(enabled: boolean): Promise<DaemonStartResult | null> {
+    if (!Platform.isDesktopApp) return null;
+
+    setLocalDaemonHostEnabled(enabled);
+    if (!enabled) {
+      this.daemonSupervisor?.stop();
+      this.daemonSupervisor = null;
+      return null;
+    }
+
+    return this.startMobileDaemonHost({ retry: false, notify: true });
+  }
+
+  async startMobileDaemonHost(options: { retry?: boolean; notify?: boolean } = {}): Promise<DaemonStartResult | null> {
+    if (!Platform.isDesktopApp) return null;
+
+    const { DaemonSupervisor } = await import('./desktop/daemonSupervisor');
+    if (!this.daemonSupervisor) {
+      this.daemonSupervisor = new DaemonSupervisor(this);
+    }
+
+    const result = await this.daemonSupervisor.start({ retry: options.retry });
+    if (options.notify) {
+      if (result.status === 'started') {
+        new Notice(`Claudian Praetor: mobile daemon started at ${result.url}.`, 8000);
+      } else if (result.status === 'already-running') {
+        new Notice(`Claudian Praetor: mobile daemon already running at ${result.url}.`, 8000);
+      } else if ('message' in result) {
+        new Notice(`Claudian Praetor: ${result.message}`, 8000);
+      }
+    }
+    return result;
   }
 
   async saveSettings() {
