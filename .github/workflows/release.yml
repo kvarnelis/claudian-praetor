@@ -32,6 +32,9 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Build daemon
+        run: npm run build:daemon
+
       - name: Generate artifact attestations
         uses: actions/attest@v4
         with:
@@ -39,6 +42,7 @@ jobs:
             main.js
             manifest.json
             styles.css
+            daemon/dist/praetord.cjs
 
       - name: Get previous tag
         id: prev_tag
@@ -71,3 +75,4 @@ jobs:
             main.js
             manifest.json
             styles.css
+            daemon/dist/praetord.cjs

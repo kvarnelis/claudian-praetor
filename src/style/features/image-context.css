@@ -201,12 +201,12 @@ body.is-phone .claudian-context-row {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 34px;
-  height: 34px;
-  margin: 4px 6px 4px 0;
+  width: 24px;
+  height: 24px;
+  margin: 0 6px 0 0;
   padding: 0;
   border: 1px solid var(--background-modifier-border);
-  border-radius: 8px;
+  border-radius: 12px;
   background: var(--background-secondary);
   color: var(--text-muted);
   cursor: pointer;
@@ -219,8 +219,8 @@ body.is-phone .claudian-context-row {
 }
 
 .claudian-image-attach-btn svg {
-  width: 18px;
-  height: 18px;
+  width: 14px;
+  height: 14px;
 }
 
 /* The attach button lives in the context row above the textarea, which is easy

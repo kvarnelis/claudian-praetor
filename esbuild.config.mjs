@@ -125,9 +125,14 @@ const patchRendererUnsafeUnref = {
 };
 
 // Obsidian plugin folder path (set via OBSIDIAN_VAULT env var or .env.local)
+const manifest = JSON.parse(readFileSync(path.join(process.cwd(), 'manifest.json'), 'utf-8'));
+const OBSIDIAN_PLUGIN_ID = process.env.OBSIDIAN_PLUGIN_ID
+  || manifest.id
+  || 'claudian';
+
 const OBSIDIAN_VAULT = process.env.OBSIDIAN_VAULT;
 const OBSIDIAN_PLUGIN_PATH = OBSIDIAN_VAULT && existsSync(OBSIDIAN_VAULT)
-  ? path.join(OBSIDIAN_VAULT, '.obsidian', 'plugins', 'claudian')
+  ? path.join(OBSIDIAN_VAULT, '.obsidian', 'plugins', OBSIDIAN_PLUGIN_ID)
   : null;
 
 // Plugin to copy built files to Obsidian plugin folder
@@ -144,10 +149,15 @@ const copyToObsidian = {
         mkdirSync(OBSIDIAN_PLUGIN_PATH, { recursive: true });
       }
 
-      const files = ['main.js', 'manifest.json', 'styles.css'];
-      for (const file of files) {
-        if (existsSync(file)) {
-          copyFileSync(file, path.join(OBSIDIAN_PLUGIN_PATH, file));
+      const files = [
+        ['main.js', 'main.js'],
+        ['manifest.json', 'manifest.json'],
+        ['styles.css', 'styles.css'],
+        ['daemon/dist/praetord.cjs', 'praetord.cjs'],
+      ];
+      for (const [source, file] of files) {
+        if (existsSync(source)) {
+          copyFileSync(source, path.join(OBSIDIAN_PLUGIN_PATH, file));
           console.log(`Copied ${file} to Obsidian plugin folder`);
         }
       }
