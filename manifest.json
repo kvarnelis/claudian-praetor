@@ -3,7 +3,7 @@
   "name": "Claudian Praetor",
   "version": "2.0.42",
   "minAppVersion": "1.7.2",
-  "description": "Praetor fork of Claudian (adds Fable 5 and Grok providers; remote/iPad seam in progress). Embeds Claude Code, Codex, and other coding agents as AI collaborators in your vault.",
+  "description": "Praetor fork of Claudian (adds Grok provider support and mobile remote mode). Embeds Claude Code, Codex, and other coding agents as AI collaborators in your vault.",
   "author": "Yishen Tu",
   "authorUrl": "https://github.com/YishenTu",
   "isDesktopOnly": false

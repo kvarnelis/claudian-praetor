@@ -45,9 +45,9 @@ export const DEFAULT_CLAUDIAN_SETTINGS: ClaudianSettings = {
   lastCustomModel: '',
 
   maxTabs: 3,
-  tabBarPosition: 'input',
   enableAutoScroll: true,
   deferMathRenderingDuringStreaming: true,
+  expandFileEditsByDefault: false,
   chatViewPlacement: 'right-sidebar',
 
   hiddenProviderCommands: getDefaultHiddenProviderCommands(),

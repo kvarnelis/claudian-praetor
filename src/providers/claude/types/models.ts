@@ -2,6 +2,8 @@
  * Model type definitions and constants.
  */
 
+import { toClaudeRuntimeModelId } from '../modelSelection';
+
 /** Model identifier (string to support custom models via environment variables). */
 export type ClaudeModel = string;
 
@@ -11,7 +13,6 @@ export const DEFAULT_CLAUDE_MODELS: { value: ClaudeModel; label: string; descrip
   { value: 'sonnet[1m]', label: 'Sonnet 1M', description: 'Balanced performance (1M context window)' },
   { value: 'opus', label: 'Opus', description: 'Most capable' },
   { value: 'opus[1m]', label: 'Opus 1M', description: 'Most capable (1M context window)' },
-  { value: 'claude-fable-5', label: 'Fable 5', description: 'Highest capability (1M context window)' },
 ];
 
 /** Effort levels for adaptive thinking models. */
@@ -32,14 +33,13 @@ export const DEFAULT_EFFORT_LEVEL: Record<string, EffortLevel> = {
   'sonnet[1m]': 'high',
   'opus': 'high',
   'opus[1m]': 'high',
-  'claude-fable-5': 'high',
 };
 
 const ONE_M_SUFFIX = '[1m]';
 const DEFAULT_MODEL_VALUES = new Set(DEFAULT_CLAUDE_MODELS.map(m => m.value.toLowerCase()));
 
 function normalizeModelId(model: string): string {
-  return model.trim().toLowerCase();
+  return toClaudeRuntimeModelId(model).trim().toLowerCase();
 }
 
 function has1MContextSuffix(model: string): boolean {
@@ -160,7 +160,7 @@ export function getContextWindowSize(
     return customLimit;
   }
 
-  if (normalizeModelId(model) === 'claude-fable-5' || has1MContextSuffix(model)) {
+  if (has1MContextSuffix(model)) {
     return CONTEXT_WINDOW_1M;
   }
 

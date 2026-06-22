@@ -62,6 +62,10 @@ describe('types.ts', () => {
     it('should have lastCustomModel as empty string by default', () => {
       expect(DEFAULT_SETTINGS.lastCustomModel).toBe('');
     });
+
+    it('should collapse file edits by default', () => {
+      expect(DEFAULT_SETTINGS.expandFileEditsByDefault).toBe(false);
+    });
   });
 
   describe('ClaudianSettings type', () => {
@@ -97,9 +101,9 @@ describe('types.ts', () => {
         enableBangBash: false,
         enableOpus1M: false,
         enableSonnet1M: false,
-        tabBarPosition: 'input',
         enableAutoScroll: true,
         deferMathRenderingDuringStreaming: true,
+        expandFileEditsByDefault: false,
         chatViewPlacement: 'right-sidebar',
         hiddenProviderCommands: {
           claude: [],
@@ -151,9 +155,9 @@ describe('types.ts', () => {
         enableBangBash: false,
         enableOpus1M: false,
         enableSonnet1M: false,
-        tabBarPosition: 'input',
         enableAutoScroll: true,
         deferMathRenderingDuringStreaming: true,
+        expandFileEditsByDefault: false,
         chatViewPlacement: 'right-sidebar',
         hiddenProviderCommands: {
           claude: [],
@@ -206,9 +210,9 @@ describe('types.ts', () => {
         enableBangBash: false,
         enableOpus1M: false,
         enableSonnet1M: false,
-        tabBarPosition: 'header',
         enableAutoScroll: false,
         deferMathRenderingDuringStreaming: true,
+        expandFileEditsByDefault: true,
         chatViewPlacement: 'right-sidebar',
         hiddenProviderCommands: {
           claude: [],
@@ -647,22 +651,22 @@ describe('types.ts', () => {
     describe('filterVisibleModelOptions', () => {
       it('should hide 1M variants when toggles are disabled', () => {
         const models = filterVisibleModelOptions(DEFAULT_CLAUDE_MODELS, false, false).map((model) => model.value);
-        expect(models).toEqual(['haiku', 'sonnet', 'opus', 'claude-fable-5']);
+        expect(models).toEqual(['haiku', 'sonnet', 'opus']);
       });
 
       it('should swap in 1M variants when toggles are enabled', () => {
         const models = filterVisibleModelOptions(DEFAULT_CLAUDE_MODELS, true, true).map((model) => model.value);
-        expect(models).toEqual(['haiku', 'sonnet[1m]', 'opus[1m]', 'claude-fable-5']);
+        expect(models).toEqual(['haiku', 'sonnet[1m]', 'opus[1m]']);
       });
 
       it('should swap only opus when enableOpus1M is true and enableSonnet1M is false', () => {
         const models = filterVisibleModelOptions(DEFAULT_CLAUDE_MODELS, true, false).map((model) => model.value);
-        expect(models).toEqual(['haiku', 'sonnet', 'opus[1m]', 'claude-fable-5']);
+        expect(models).toEqual(['haiku', 'sonnet', 'opus[1m]']);
       });
 
       it('should swap only sonnet when enableSonnet1M is true and enableOpus1M is false', () => {
         const models = filterVisibleModelOptions(DEFAULT_CLAUDE_MODELS, false, true).map((model) => model.value);
-        expect(models).toEqual(['haiku', 'sonnet[1m]', 'opus', 'claude-fable-5']);
+        expect(models).toEqual(['haiku', 'sonnet[1m]', 'opus']);
       });
     });
 

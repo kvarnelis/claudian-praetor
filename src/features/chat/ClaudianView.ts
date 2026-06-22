@@ -13,7 +13,7 @@ import {
   scheduleAnimationFrame,
   type ScheduledAnimationFrame,
 } from '../../utils/animationFrame';
-import type { HistoryConversationOpenState } from './controllers/ConversationController';
+import type { HistoryConversationStatus } from './controllers/ConversationController';
 import {
   getTabProviderId,
   onProviderAvailabilityChanged,
@@ -39,15 +39,14 @@ export class ClaudianView extends ItemView {
   private tabBarContainerEl: HTMLElement | null = null;
   private tabContentEl: HTMLElement | null = null;
   private navRowContent: HTMLElement | null = null;
+  private inputFooterEl: HTMLElement | null = null;
+  private inputNavRowHostEl: HTMLElement | null = null;
+  private activeInputSlotEl: HTMLElement | null = null;
+  private activeInputTabId: TabId | null = null;
 
   // DOM Elements
   private viewContainerEl: HTMLElement | null = null;
-  private headerEl: HTMLElement | null = null;
-  private titleSlotEl: HTMLElement | null = null;
   private logoEl: HTMLElement | null = null;
-  private titleTextEl: HTMLElement | null = null;
-  private headerActionsEl: HTMLElement | null = null;
-  private headerActionsContent: HTMLElement | null = null;
   private newTabButtonEl: HTMLElement | null = null;
 
   // Header elements
@@ -179,6 +178,7 @@ export class ClaudianView extends ItemView {
 
     this.navRowContent = this.buildNavRowContent();
     this.tabContentEl = this.viewContainerEl.createDiv({ cls: 'claudian-tab-content-container' });
+    this.buildInputFooter();
 
     this.tabManager = new TabManager(
       this.plugin,
@@ -187,26 +187,39 @@ export class ClaudianView extends ItemView {
       {
         onTabCreated: () => {
           this.updateTabBar();
-          this.updateNavRowLocation();
+          this.updateHistoryDropdown();
+          this.updateInputLocation();
           this.persistTabState();
+          this.syncProviderBrandColor();
+        },
+        onActiveTabChanged: () => {
+          this.updateTabBar();
+          this.updateHistoryDropdown();
+          this.updateInputLocation();
           this.syncProviderBrandColor();
         },
         onTabSwitched: () => {
           this.updateTabBar();
           this.updateHistoryDropdown();
-          this.updateNavRowLocation();
+          this.updateInputLocation();
           this.persistTabState();
           this.syncProviderBrandColor();
         },
         onTabClosed: () => {
           this.updateTabBar();
+          this.updateHistoryDropdown();
+          this.updateInputLocation();
           this.persistTabState();
         },
-        onTabStreamingChanged: () => this.updateTabBar(),
+        onTabStreamingChanged: () => {
+          this.updateTabBar();
+          this.updateHistoryDropdown();
+        },
         onTabTitleChanged: () => this.updateTabBar(),
         onTabAttentionChanged: () => this.updateTabBar(),
         onTabConversationChanged: () => {
           this.updateTabBar();
+          this.updateHistoryDropdown();
           this.persistTabState();
           this.syncProviderBrandColor();
         },
@@ -220,7 +233,9 @@ export class ClaudianView extends ItemView {
     this.wireEventHandlers();
     await this.restoreOrCreateTabs();
     this.syncProviderBrandColor();
-    this.updateLayoutForPosition();
+    this.attachNavRowContentToInputFooter();
+    this.updateInputLocation();
+    this.updateTabBarVisibility();
     this.tabManager?.primeProviderRuntime();
   }
 
@@ -237,6 +252,7 @@ export class ClaudianView extends ItemView {
 
     await this.persistTabStateImmediate();
 
+    this.restoreActiveInputToTabContent();
     await this.tabManager?.destroy();
     this.tabManager = null;
 
@@ -249,34 +265,24 @@ export class ClaudianView extends ItemView {
   // UI Building
   // ============================================
 
-  private buildHeader(header: HTMLElement) {
-    this.headerEl = header;
+  private buildHeader(header: HTMLElement): void {
+    const titleEl = header.createDiv({ cls: 'claudian-title' });
 
-    // Title slot container (logo + title or tabs)
-    this.titleSlotEl = header.createDiv({ cls: 'claudian-title-slot' });
-
-    // Logo (hidden when 2+ tabs) — populated by syncHeaderLogo()
-    this.logoEl = this.titleSlotEl.createSpan({ cls: 'claudian-logo' });
+    this.logoEl = titleEl.createSpan({ cls: 'claudian-logo' });
     this.syncHeaderLogo(DEFAULT_CHAT_PROVIDER_ID);
 
-    // Title text (hidden in header mode when 2+ tabs)
-    this.titleTextEl = this.titleSlotEl.createEl('h4', { text: 'Claudian', cls: 'claudian-title-text' });
-
-    // Header actions container (for header mode - initially hidden)
-    this.headerActionsEl = header.createDiv({ cls: 'claudian-header-actions claudian-header-actions-slot claudian-hidden' });
+    titleEl.createEl('h4', { text: 'Claudian', cls: 'claudian-title-text' });
   }
 
   /**
-   * Builds the nav row content (tab badges + header actions).
-   * This is called once and the content is moved between locations.
+   * Builds the active tab nav row content.
+   * The wrapper is moved to the active tab's nav row on tab switches.
    */
   private buildNavRowContent(): HTMLElement {
     const activeDocument = this.containerEl.ownerDocument;
 
-    // Create a fragment to hold nav row content
     const fragment = activeDocument.createDocumentFragment();
 
-    // Tab badges (left side in nav row, or in title slot for header mode)
     this.tabBarContainerEl = activeDocument.createElement('div');
     this.tabBarContainerEl.className = 'claudian-tab-bar-container';
     this.tabBar = new TabBar(this.tabBarContainerEl, {
@@ -290,20 +296,17 @@ export class ClaudianView extends ItemView {
     });
     fragment.appendChild(this.tabBarContainerEl);
 
-    // Header actions (right side)
-    this.headerActionsContent = activeDocument.createElement('div');
-    this.headerActionsContent.className = 'claudian-header-actions';
+    const navActionsEl = activeDocument.createElement('div');
+    navActionsEl.className = 'claudian-input-nav-actions';
 
-    // New tab button (plus icon)
-    this.newTabButtonEl = this.headerActionsContent.createDiv({ cls: 'claudian-header-btn claudian-new-tab-btn' });
+    this.newTabButtonEl = navActionsEl.createDiv({ cls: 'claudian-input-nav-btn claudian-new-tab-btn' });
     setIcon(this.newTabButtonEl, 'square-plus');
     this.newTabButtonEl.setAttribute('aria-label', 'New tab');
     this.newTabButtonEl.addEventListener('click', () => {
       void this.createNewTab().catch((e) => new Notice(`Failed to create tab: ${e instanceof Error ? e.message : String(e)}`, 10_000));
     });
 
-    // New conversation button (square-pen icon - new conversation in current tab)
-    const newBtn = this.headerActionsContent.createDiv({ cls: 'claudian-header-btn' });
+    const newBtn = navActionsEl.createDiv({ cls: 'claudian-input-nav-btn' });
     setIcon(newBtn, 'square-pen');
     newBtn.setAttribute('aria-label', 'New conversation');
     newBtn.addEventListener('click', () => {
@@ -314,8 +317,8 @@ export class ClaudianView extends ItemView {
     });
 
     // History dropdown
-    const historyContainer = this.headerActionsContent.createDiv({ cls: 'claudian-history-container' });
-    const historyBtn = historyContainer.createDiv({ cls: 'claudian-header-btn' });
+    const historyContainer = navActionsEl.createDiv({ cls: 'claudian-history-container' });
+    const historyBtn = historyContainer.createDiv({ cls: 'claudian-input-nav-btn' });
     setIcon(historyBtn, 'history');
     historyBtn.setAttribute('aria-label', 'Chat history');
 
@@ -326,67 +329,70 @@ export class ClaudianView extends ItemView {
       this.toggleHistoryDropdown();
     });
 
-    fragment.appendChild(this.headerActionsContent);
+    fragment.appendChild(navActionsEl);
 
-    // Create a wrapper div to hold the fragment (for input mode nav row)
     const wrapper = activeDocument.createElement('div');
     wrapper.className = 'claudian-input-nav-content';
     wrapper.appendChild(fragment);
     return wrapper;
   }
 
-  /**
-   * Moves nav row content based on tabBarPosition setting.
-   * - 'input' mode: Both tab badges and actions go to active tab's navRowEl
-   * - 'header' mode: Tab badges go to title slot (after logo), actions go to header right side
-   */
-  private updateNavRowLocation(): void {
-    if (!this.tabBarContainerEl || !this.headerActionsContent) return;
-
-    const isHeaderMode = this.plugin.settings.tabBarPosition === 'header';
-
-    if (isHeaderMode) {
-      // Header mode: Tab badges go to title slot, actions go to header right side
-      if (this.titleSlotEl) {
-        this.titleSlotEl.appendChild(this.tabBarContainerEl);
-      }
-      if (this.headerActionsEl) {
-        this.headerActionsEl.appendChild(this.headerActionsContent);
-        this.headerActionsEl.removeClass('claudian-hidden');
-      }
-    } else {
-      // Input mode: Both go to active tab's navRowEl via the wrapper
-      const activeTab = this.tabManager?.getActiveTab();
-      if (activeTab && this.navRowContent) {
-        // Re-assemble the nav row content wrapper
-        this.navRowContent.appendChild(this.tabBarContainerEl);
-        this.navRowContent.appendChild(this.headerActionsContent);
-        activeTab.dom.navRowEl.appendChild(this.navRowContent);
-      }
-      // Hide header actions slot when in input mode
-      if (this.headerActionsEl) {
-        this.headerActionsEl.addClass('claudian-hidden');
-      }
-    }
-  }
-
-  /**
-   * Updates layout when tabBarPosition setting changes.
-   * Called from settings when user changes the tab bar position.
-   */
-  updateLayoutForPosition(): void {
+  private buildInputFooter(): void {
     if (!this.viewContainerEl) return;
 
-    const isHeaderMode = this.plugin.settings.tabBarPosition === 'header';
+    this.inputFooterEl = this.viewContainerEl.createDiv({ cls: 'claudian-input-footer' });
+    this.inputNavRowHostEl = this.inputFooterEl.createDiv({
+      cls: 'claudian-input-nav-row claudian-view-input-nav-row',
+    });
+    this.activeInputSlotEl = this.inputFooterEl.createDiv({ cls: 'claudian-active-input-slot' });
+  }
 
-    // Update container class for CSS styling
-    this.viewContainerEl.toggleClass('claudian-container--header-mode', isHeaderMode);
+  private attachNavRowContentToInputFooter(): void {
+    if (!this.inputNavRowHostEl || !this.navRowContent) return;
 
-    // Move nav content to appropriate location
-    this.updateNavRowLocation();
+    this.tabBar?.captureScrollPosition();
+    this.inputNavRowHostEl.appendChild(this.navRowContent);
+    this.tabBar?.restoreScrollPosition();
+  }
 
-    // Update tab bar and title visibility
-    this.updateTabBarVisibility();
+  private updateInputLocation(): void {
+    const activeTab = this.tabManager?.getActiveTab();
+    if (!this.activeInputSlotEl) return;
+
+    if (!activeTab) {
+      this.activeInputSlotEl.empty();
+      this.activeInputTabId = null;
+      return;
+    }
+
+    if (this.activeInputTabId && this.activeInputTabId !== activeTab.id) {
+      const previousTab = this.tabManager?.getTab(this.activeInputTabId);
+      if (previousTab) {
+        previousTab.dom.contentEl.appendChild(previousTab.dom.inputComposerEl);
+      }
+    }
+
+    if (this.activeInputTabId === activeTab.id) {
+      if (activeTab.dom.inputComposerEl.parentElement !== this.activeInputSlotEl) {
+        this.activeInputSlotEl.appendChild(activeTab.dom.inputComposerEl);
+      }
+      return;
+    }
+
+    this.activeInputSlotEl.empty();
+    this.activeInputSlotEl.appendChild(activeTab.dom.inputComposerEl);
+    this.activeInputTabId = activeTab.id;
+  }
+
+  private restoreActiveInputToTabContent(): void {
+    if (!this.activeInputTabId) return;
+
+    const activeInputTab = this.tabManager?.getTab(this.activeInputTabId);
+    if (activeInputTab) {
+      activeInputTab.dom.contentEl.appendChild(activeInputTab.dom.inputComposerEl);
+    }
+    this.activeInputSlotEl?.empty();
+    this.activeInputTabId = null;
   }
 
   /** Refreshes tab controls after settings that affect tab availability change. */
@@ -451,20 +457,8 @@ export class ClaudianView extends ItemView {
 
     const tabCount = this.tabManager.getTabCount();
     const showTabBar = tabCount >= 2;
-    const isHeaderMode = this.plugin.settings.tabBarPosition === 'header';
 
-    // Hide tab badges when only 1 tab, show when 2+
     this.tabBarContainerEl.toggleClass('claudian-hidden', !showTabBar);
-
-    // In header mode, badges replace logo/title in the same location
-    // In input mode, keep logo/title visible (badges are in nav row)
-    const hideBranding = showTabBar && isHeaderMode;
-    if (this.logoEl) {
-      this.logoEl.toggleClass('claudian-hidden', hideBranding);
-    }
-    if (this.titleTextEl) {
-      this.titleTextEl.toggleClass('claudian-hidden', hideBranding);
-    }
 
     this.updateNewTabButtonVisibility();
   }
@@ -538,7 +532,7 @@ export class ClaudianView extends ItemView {
         onSelectConversation: (id) => this.openHistoryConversation(id),
         onOpenConversationInNewTab: (id, activate) =>
           this.openHistoryConversationInNewTab(id, activate),
-        getConversationOpenState: (id) => this.getHistoryConversationOpenState(id),
+        getConversationStatus: (id) => this.getHistoryConversationStatus(id),
       });
     }
   }
@@ -559,27 +553,52 @@ export class ClaudianView extends ItemView {
     this.historyDropdown?.removeClass('visible');
   }
 
-  private getHistoryConversationOpenState(conversationId: string): HistoryConversationOpenState {
+  private getHistoryConversationStatus(conversationId: string): HistoryConversationStatus {
     const activeTab = this.tabManager?.getActiveTab();
     if (activeTab?.conversationId === conversationId) {
-      return 'current';
+      return {
+        openState: 'current',
+        isRunning: activeTab.state.isStreaming,
+        location: 'current-view',
+        tabIndex: this.getHistoryTabIndex(activeTab),
+      };
     }
 
-    if (this.findTabWithConversation(conversationId)) {
-      return 'open';
+    const localTab = this.findTabWithConversation(conversationId);
+    if (localTab) {
+      return {
+        openState: 'open',
+        isRunning: localTab.state.isStreaming,
+        location: 'current-view',
+        tabIndex: this.getHistoryTabIndex(localTab),
+      };
     }
 
     const crossViewResult = this.plugin.findConversationAcrossViews(conversationId);
     if (crossViewResult && crossViewResult.view !== this) {
-      return 'open';
+      const crossViewTab = crossViewResult.view.getTabManager()?.getTab(crossViewResult.tabId);
+      return {
+        openState: 'open',
+        isRunning: crossViewTab?.state.isStreaming ?? false,
+        location: 'other-view',
+      };
     }
 
-    return 'closed';
+    return {
+      openState: 'closed',
+      isRunning: false,
+      location: 'current-view',
+    };
   }
 
   private findTabWithConversation(conversationId: string): TabData | null {
     const tabs = this.tabManager?.getAllTabs() ?? [];
     return tabs.find(tab => tab.conversationId === conversationId) ?? null;
+  }
+
+  private getHistoryTabIndex(tab: TabData): number | undefined {
+    const index = this.tabManager?.getAllTabs().findIndex(candidate => candidate.id === tab.id) ?? -1;
+    return index >= 0 ? index + 1 : undefined;
   }
 
   // ============================================
@@ -732,5 +751,12 @@ export class ClaudianView extends ItemView {
   /** Gets the tab manager. */
   getTabManager(): TabManager | null {
     return this.tabManager;
+  }
+
+  /** Gets shared view controls that should preserve active tab selection context. */
+  getSharedSelectionFocusScopeEls(): HTMLElement[] {
+    return [
+      this.inputNavRowHostEl,
+    ].filter((el): el is HTMLElement => el !== null);
   }
 }

@@ -427,8 +427,8 @@ export function migrateLegacyHostnameKeyedMap<T extends string>(
     return entries;
   }
 
-  const hasCurrentEntry = Object.prototype.hasOwnProperty.call(entries, currentKey);
-  const hasLegacyEntry = Object.prototype.hasOwnProperty.call(entries, legacyHostnameKey);
+  const hasCurrentEntry = hasOwnEntry(entries, currentKey);
+  const hasLegacyEntry = hasOwnEntry(entries, legacyHostnameKey);
   if (!hasLegacyEntry) {
     return entries;
   }
@@ -439,6 +439,10 @@ export function migrateLegacyHostnameKeyedMap<T extends string>(
   }
   delete migrated[legacyHostnameKey];
   return migrated;
+}
+
+function hasOwnEntry<T>(entries: Record<string, T>, key: string): boolean {
+  return Object.prototype.hasOwnProperty.call(entries, key) === true;
 }
 
 export const MIN_CONTEXT_LIMIT = 1_000;

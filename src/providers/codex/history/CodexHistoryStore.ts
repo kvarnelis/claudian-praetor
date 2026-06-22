@@ -3,6 +3,7 @@ import * as os from 'os';
 import * as path from 'path';
 
 import type { ChatMessage, ContentBlock, ToolCallInfo } from '../../../core/types';
+import { extractUserDisplayContent } from '../../../utils/context';
 import {
   isCodexToolOutputError,
   normalizeCodexMcpToolInput,
@@ -388,27 +389,66 @@ function parseSessionRecord(line: string): ParsedSessionRecord | null {
 
 const CODEX_SYSTEM_MESSAGE_PREFIXES = [
   '# AGENTS.md instructions',
-  '<environment_context>',
-  '<subagent_notification>',
-  '<skill>',
 ];
 
-const CODEX_BRACKET_CONTEXT_PATTERN = /\n\[(?:Current note|Editor selection from|Browser selection from|Canvas selection from)\b/;
+const CODEX_CONTROL_BLOCK_TAGS = [
+  'system_instruction',
+  'environment_context',
+  'turn_aborted',
+  'user-preferences',
+  'subagent_notification',
+  'skill',
+];
 
-function isCodexSystemMessage(text: string): boolean {
-  const trimmed = text.trimStart();
-  return CODEX_SYSTEM_MESSAGE_PREFIXES.some(prefix => trimmed.startsWith(prefix));
-}
-
-function extractCodexDisplayContent(text: string): string | undefined {
-  if (!text) return undefined;
-
-  const bracketMatch = text.match(CODEX_BRACKET_CONTEXT_PATTERN);
-  if (bracketMatch?.index !== undefined) {
-    return text.substring(0, bracketMatch.index).trim();
+function stripLeadingTaggedBlock(text: string, tagName: string): string | null {
+  const openTag = `<${tagName}>`;
+  if (!text.startsWith(openTag)) {
+    return null;
   }
 
-  return undefined;
+  const closeTag = `</${tagName}>`;
+  const closeIndex = text.indexOf(closeTag, openTag.length);
+  if (closeIndex === -1) {
+    return '';
+  }
+
+  return text.slice(closeIndex + closeTag.length);
+}
+
+function stripLeadingCodexControlBlocks(text: string): string {
+  let remaining = text.trimStart();
+  let stripped = true;
+
+  while (stripped) {
+    stripped = false;
+
+    for (const tagName of CODEX_CONTROL_BLOCK_TAGS) {
+      const next = stripLeadingTaggedBlock(remaining, tagName);
+      if (next === null) {
+        continue;
+      }
+
+      remaining = next.trimStart();
+      stripped = true;
+      break;
+    }
+  }
+
+  return remaining;
+}
+
+function extractCodexUserVisibleText(text: string): string | null {
+  const trimmed = text.trimStart();
+  if (!trimmed) {
+    return null;
+  }
+
+  if (CODEX_SYSTEM_MESSAGE_PREFIXES.some(prefix => trimmed.startsWith(prefix))) {
+    return null;
+  }
+
+  const visible = stripLeadingCodexControlBlocks(trimmed).trim();
+  return visible ? visible : null;
 }
 
 function extractMessageText(content: PersistedMessagePart[] | undefined): string {
@@ -866,7 +906,8 @@ function processPersistedPayload(
       const text = extractMessageText(messagePayload.content);
 
       if (messagePayload.role === 'user') {
-        if (isCodexSystemMessage(text)) break;
+        const visibleText = extractCodexUserVisibleText(text);
+        if (visibleText === null) break;
 
         // Close any active bubble in the current turn before starting user content
         if (ctx.currentTurnId) {
@@ -878,9 +919,7 @@ function processPersistedPayload(
         ctx.currentTurnId = null;
         const turn = ensureTurn(ctx.turns, ctx.turnOrder, nextTurnId(ctx), null, timestamp);
         ctx.currentTurnId = turn.id;
-        if (text) {
-          appendUserChunk(turn, text, timestamp);
-        }
+        appendUserChunk(turn, visibleText, timestamp);
       } else if (messagePayload.role === 'assistant') {
         const turn = ensureTurn(ctx.turns, ctx.turnOrder, nextTurnId(ctx), ctx.currentTurnId, timestamp);
         const bubble = ensureAssistantBubble(turn, timestamp);
@@ -1018,8 +1057,11 @@ function processEventMsg(
     case 'user_message': {
       const turn = ensureTurn(ctx.turns, ctx.turnOrder, nextTurnId(ctx), ctx.currentTurnId, timestamp);
       const msg = payload.message;
-      if (typeof msg === 'string' && msg.trim()) {
-        appendUserChunk(turn, msg, timestamp);
+      if (typeof msg === 'string') {
+        const visibleText = extractCodexUserVisibleText(msg);
+        if (visibleText !== null) {
+          appendUserChunk(turn, visibleText, timestamp);
+        }
       }
       break;
     }
@@ -1076,13 +1118,13 @@ function flushBubbleTurnMessages(
 ): { messages: ChatMessage[]; nextMsgIndex: number } {
   const messages: ChatMessage[] = [];
 
-  const userText = turn.userChunks.join('\n').trim();
-  if (userText && !isCodexSystemMessage(userText)) {
-    const displayContent = extractCodexDisplayContent(userText);
+  const visibleUserText = extractCodexUserVisibleText(turn.userChunks.join('\n'));
+  if (visibleUserText) {
+    const displayContent = extractUserDisplayContent(visibleUserText);
     messages.push({
       id: `codex-msg-${msgIndex}`,
       role: 'user',
-      content: userText,
+      content: visibleUserText,
       ...(displayContent !== undefined ? { displayContent } : {}),
       ...(turn.serverTurnId ? { userMessageId: turn.serverTurnId } : {}),
       timestamp: turn.userTimestamp || turn.startedAt || Date.now(),
