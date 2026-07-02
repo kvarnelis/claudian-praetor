@@ -3,101 +3,127 @@
 ![GitHub release](https://img.shields.io/github/v/release/kvarnelis/claudian-praetor)
 ![License](https://img.shields.io/github/license/kvarnelis/claudian-praetor)
 
-Claudian Praetor is a fork of Claudian that embeds AI coding agents in Obsidian and adds a Praetor remote mode for iPhone and iPad. On desktop it runs providers locally against your vault. On mobile it can connect over Tailscale to a daemon hosted by your Mac, so the mobile UI drives the same Claude Code, Codex, Grok, and other provider runtimes that already work on desktop.
+Chat with AI coding agents in your Obsidian sidebar — they read, search, and edit the notes in your vault while you work. Claudian Praetor extends [Claudian](https://github.com/YishenTu/claudian) with more providers and a remote mode that lets an iPhone or iPad drive the agents running on your Mac.
 
-## Features
+![Claudian Praetor running beside a note in Obsidian](assets/Preview.png)
 
-- **Desktop agent chat** — Claude Code, Codex, Grok, Opencode, Pi, and related providers can read, search, and edit your vault.
-- **Mobile remote mode** — iPhone/iPad clients connect to `praetord` on your Mac over WebSocket.
-- **Machine-local daemon hosting** — the “Host mobile daemon on this Mac” setting is stored only on that Mac, so other synced Macs do not accidentally start hosting.
-- **Synced mobile connection** — the Mac publishes the daemon URL/token to plugin data so Obsidian Sync can carry it to mobile devices.
-- **Inline edit, slash commands, skills, MCP, multi-tab conversations, and plan mode** — inherited from Claudian/Praetor.
+> **A fork, standing on Claudian's shoulders.** The entire core chat experience comes from [Claudian](https://github.com/YishenTu/claudian) by [Yishen Tu](https://github.com/YishenTu). This fork adds extra providers and the Praetor mobile remote mode. If you don't need those, use upstream Claudian.
+
+## What it does
+
+Open the chat in a sidebar and talk to an agent that has your vault as its working directory. It can:
+
+- **Read and search** across your notes to answer questions with real context.
+- **Write and edit files**, shown as inline diffs you approve before they land.
+- **Run shell commands** and multi-step workflows to get real work done.
+- **Call MCP tools**, use skills, and spawn subagents for parallel work.
+- **Work across multiple tabs**, fork a conversation, or rewind to an earlier point.
+
+### Driving the chat
+
+The input box understands a few prefixes and modes:
+
+| Input | Does |
+|-------|------|
+| `@` | Mention a note to add it to the agent's context |
+| `/` | Run a slash command (built-in or from `.claude/commands`) |
+| `#` | Instruction mode — refine the agent's standing instructions |
+| `$` | Invoke a skill |
+| `!` | Run a shell command directly, bypassing the agent |
+| `Shift+Tab` | Toggle **plan mode** — the agent proposes a plan before touching anything |
+
+Model, thinking/effort level, and the permission mode (including a **Yolo** auto-approve toggle) are all set from the toolbar under the input box.
+
+> ⚠️ **These agents act on your machine.** They can run shell commands and create, edit, and delete files in your vault. Review changes before approving them, keep your vault in version control, and understand that **Yolo mode approves every action automatically**. Turn it on only when you trust the task.
+
+## Providers
+
+- **Claude Code** — the primary, full-featured provider.
+- **Codex** — broadly supported (streaming, resume, fork, plan mode, images, inline edit, skills, subagents).
+- **Grok, OpenCode, Pi, and ACP-compatible agents** — additional providers with varying levels of support.
+
+You supply the provider's CLI or account; Claudian Praetor drives it.
 
 ## Requirements
 
-- Obsidian v1.7.2+
-- Desktop Mac for local provider runtimes and optional mobile daemon hosting
-- For mobile remote mode: [Tailscale](https://tailscale.com/download) on the Mac and the iPhone/iPad
-- Provider CLIs or accounts as needed: [Claude Code](https://code.claude.com/docs/en/overview), [Codex CLI](https://github.com/openai/codex), [Opencode](https://opencode.ai/), Grok Build, or Pi
+- Obsidian **v1.7.2+**
+- **Desktop** (macOS, Windows, or Linux) to run providers locally against your vault
+- The provider CLIs or accounts you plan to use, for example: [Claude Code](https://code.claude.com/docs/en/overview), [Codex CLI](https://github.com/openai/codex), [OpenCode](https://opencode.ai/), Grok, or Pi
+- **For mobile remote mode only:** a **Mac** to host the daemon, plus [Tailscale](https://tailscale.com/download) on both the Mac and the mobile device
 
-## Installation via BRAT or GitHub Release
+## Installation
 
-This fork is released through GitHub/BRAT, not the Obsidian Community Plugin directory.
+This fork is distributed through GitHub/BRAT, not the Obsidian Community Plugin directory.
 
-### BRAT
+### BRAT (recommended)
 
-1. Install the Obsidian BRAT plugin.
-2. Add beta plugin repository `kvarnelis/claudian-praetor`.
-3. Enable **Claudian Praetor** in Community plugins.
+1. Install the [BRAT](https://github.com/TfTHacker/obsidian42-brat) plugin.
+2. Add the beta plugin repository `kvarnelis/claudian-praetor`.
+3. Enable **Claudian Praetor** under Community plugins.
 
-### Manual GitHub release install
+### Manual
 
-1. Download `main.js`, `manifest.json`, `styles.css`, and `praetord.cjs` from the latest release.
-2. Create this folder in your vault:
-   ```text
-   /path/to/vault/.obsidian/plugins/claudian-praetor/
-   ```
-3. Copy all four files into that folder.
-4. Enable **Claudian Praetor** in Obsidian.
+1. Download `main.js`, `manifest.json`, `styles.css`, and `praetord.cjs` from the [latest release](https://github.com/kvarnelis/claudian-praetor/releases/latest).
+2. Create `<vault>/.obsidian/plugins/claudian-praetor/` and copy all four files into it.
+3. Enable **Claudian Praetor** in Obsidian.
 
-## Desktop Setup
+## Setup
 
-Open the Claudian Praetor settings tab and configure the providers you want to use. Desktop Obsidian uses local provider runtimes directly; it does not need the remote daemon unless you want mobile devices to connect to this Mac.
+Open the **Claudian Praetor** settings tab and configure the providers you want. Leave the CLI path fields empty first so the plugin can auto-detect each CLI from your `PATH`; set a path manually only if auto-detection fails on a given device.
 
-For mobile hosting:
+That's all desktop use needs — local runtimes talk to your vault directly. The remote daemon below is only for connecting mobile devices.
+
+## Mobile remote mode (Praetor)
+
+Praetor mode lets Obsidian on an iPhone or iPad drive the agents running on your Mac. The mobile UI connects over [Tailscale](https://tailscale.com/download) to a small daemon (`praetord`) hosted by the Mac, so it uses the same provider runtimes that already work on your desktop.
+
+### Host the daemon on your Mac
 
 1. Install and connect [Tailscale](https://tailscale.com/download) on the Mac.
-2. In Claudian Praetor settings, open **Mobile daemon**.
-3. Enable **Host mobile daemon on this Mac**.
-4. Praetor detects the Mac’s Tailscale IP, creates or updates `~/.config/claudian-praetor/daemon.json`, starts `praetord`, and publishes the mobile URL/token through plugin data.
+2. In Claudian Praetor settings, open **Mobile daemon** and enable **Host mobile daemon on this Mac**.
+3. Praetor detects the Mac's Tailscale IP, writes `~/.config/claudian-praetor/daemon.json`, starts `praetord`, and publishes the mobile URL/token into plugin data.
 
-The host checkbox is local to this Mac. It does not sync to other desktop machines.
+The host toggle is stored **only on that Mac** — it never syncs to your other desktop machines, so they won't accidentally start hosting.
 
-## Mobile Setup
+### Connect from mobile
 
-1. Install Claudian Praetor in Obsidian mobile via BRAT.
-2. Install and connect [Tailscale](https://tailscale.com/download) on the mobile device.
-3. Let Obsidian Sync bring over the plugin data from the host Mac, or paste the URL/token manually in **Remote Mac daemon** settings.
-4. Open Claudian Praetor and choose a remote-backed provider.
-
-If the mobile client cannot connect, confirm that Tailscale is on, the Mac is awake, and the Mac setting **Host mobile daemon on this Mac** is enabled.
+1. Install Claudian Praetor on Obsidian mobile via BRAT.
+2. Install and connect [Tailscale](https://tailscale.com/download) on the device.
+3. Let Obsidian Sync carry the daemon URL/token over from the Mac, or paste them manually under **Remote Mac daemon**.
+4. Open Claudian Praetor and pick a remote-backed provider.
 
 ## Development
 
 ```bash
-npm install
-npm run build
-npm run build:daemon
+npm install          # install dependencies (Node 24)
+npm run dev          # watch build for local development
+npm run build        # production build (main.js + styles.css)
+npm run build:daemon # build praetord.cjs for mobile hosting
+
+npm run typecheck    # tsc --noEmit
+npm run lint         # eslint
+npm run test         # jest (unit + integration)
 ```
 
-Set `OBSIDIAN_VAULT=/path/to/vault` while building to copy the built plugin files into the folder matching `manifest.id`.
+Set `OBSIDIAN_VAULT=/path/to/vault` while building to copy the built plugin files straight into the vault's plugin folder.
 
-## Release Assets
+Every release ships four assets: `main.js`, `manifest.json`, `styles.css`, and `praetord.cjs`.
 
-Every release must include:
+## Privacy & data use
 
-- `main.js`
-- `manifest.json`
-- `styles.css`
-- `praetord.cjs`
-
-## Privacy & Data Use
-
-- Provider requests send your prompt, selected files/images, and tool outputs to the configured provider.
-- Local settings and sessions live in the vault and plugin storage.
-- The Praetor daemon listens on the Mac’s Tailscale address when explicitly enabled on that Mac.
-- The daemon token is stored in `~/.config/claudian-praetor/daemon.json` and copied to plugin data only so mobile devices can authenticate.
+- Provider requests send your prompt, the files/images you attach, and tool outputs to whichever provider you configured.
+- Agents can run shell commands and read, write, and delete files in your vault — see the safety note above.
+- Settings and sessions live in your vault and local plugin storage.
+- The Praetor daemon listens on the Mac's Tailscale address only when you explicitly enable hosting on that Mac. Its token lives in `~/.config/claudian-praetor/daemon.json` and is copied into plugin data solely so mobile devices can authenticate.
 
 ## Troubleshooting
 
-### Tailscale is not detected
+**Provider CLI not found.** Clear the CLI path field so the plugin can auto-detect from `PATH`. If that fails, set the provider-specific CLI path in settings for that device.
 
-Turn on Tailscale on the Mac and confirm it has a `100.x.y.z` tailnet IP. The daemon host setting will not publish a new mobile URL until that address is available.
+**Tailscale not detected.** Turn Tailscale on and confirm the Mac has a `100.x.y.z` tailnet IP — the daemon won't publish a mobile URL until that address exists.
 
-### Mobile says it cannot reach the daemon
+**Mobile can't reach the daemon.** Check that Tailscale is connected on both devices, the Mac is awake with the plugin loaded, and **Host mobile daemon on this Mac** is enabled. The daemon log is at `~/.config/claudian-praetor/praetord.log`.
 
-Check that Tailscale is connected on both devices, the Mac is awake, Obsidian has loaded the plugin, and `praetord` is running. The daemon log is written to `~/.config/claudian-praetor/praetord.log` when possible.
+## License & credits
 
-### Provider CLI not found
-
-Leave CLI path fields empty first so Claudian Praetor can auto-detect from PATH. If auto-detection fails, set the provider-specific CLI path in settings for this device.
+MIT. Built on [Claudian](https://github.com/YishenTu/claudian) by [Yishen Tu](https://github.com/YishenTu) — please support the upstream project.
