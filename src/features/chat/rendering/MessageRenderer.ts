@@ -20,6 +20,7 @@ import { processFileLinks, registerFileLinkHandler } from '../../../utils/fileLi
 import { replaceImageEmbedsWithHtml } from '../../../utils/imageEmbed';
 import { escapeMathDelimitersForStreaming } from '../../../utils/markdownMath';
 import { findRewindContext } from '../rewind';
+import { formatConversationDirectoryTitle } from '../utils/conversationDirectoryTitle';
 import { resolveSubagentLifecycleAdapter } from './subagentLifecycleResolution';
 import {
   renderStoredAsyncSubagent,
@@ -105,6 +106,15 @@ export class MessageRenderer {
     return msg.displayContent ?? extractUserDisplayContent(msg.content) ?? msg.content;
   }
 
+  private applyTocTitle(msgEl: HTMLElement, text: string): void {
+    const tocTitle = formatConversationDirectoryTitle(text);
+    if (tocTitle) {
+      msgEl.setAttribute('data-toc-title', tocTitle);
+    } else {
+      msgEl.removeAttribute('data-toc-title');
+    }
+  }
+
   // ============================================
   // Streaming Message Rendering
   // ============================================
@@ -145,6 +155,7 @@ export class MessageRenderer {
         const textEl = contentEl.createDiv({ cls: 'claudian-text-block' });
         void this.renderContent(textEl, textToShow);
         this.addUserCopyButton(msgEl, textToShow);
+        this.applyTocTitle(msgEl, textToShow);
       }
       if (this.rewindCallback || this.forkCallback) {
         this.liveMessageEls.set(msg.id, msgEl);
@@ -177,6 +188,9 @@ export class MessageRenderer {
     if (textToShow) {
       const textEl = contentEl.createDiv({ cls: 'claudian-text-block' });
       void this.renderContent(textEl, textToShow);
+      this.applyTocTitle(msgEl, textToShow);
+    } else {
+      msgEl.removeAttribute('data-toc-title');
     }
 
     const toolbar = msgEl.querySelector<HTMLElement>('.claudian-user-msg-actions');
@@ -276,12 +290,13 @@ export class MessageRenderer {
         const textEl = contentEl.createDiv({ cls: 'claudian-text-block' });
         void this.renderContent(textEl, textToShow);
         this.addUserCopyButton(msgEl, textToShow);
+        this.applyTocTitle(msgEl, textToShow);
       }
-      if (msg.userMessageId && this.isRewindEligible(allMessages, index)) {
-        if (this.rewindCallback) {
+      if (msg.userMessageId) {
+        if (this.rewindCallback && this.isRewindEligible(allMessages, index)) {
           this.addRewindButton(msgEl, msg.id);
         }
-        if (this.forkCallback) {
+        if (this.forkCallback && this.isForkEligible(allMessages, index)) {
           this.addForkButton(msgEl, msg.id);
         }
       }
@@ -312,6 +327,12 @@ export class MessageRenderer {
   }
 
   private isRewindEligible(allMessages?: ChatMessage[], index?: number): boolean {
+    if (!allMessages || index === undefined) return false;
+    const ctx = findRewindContext(allMessages, index);
+    return ctx.hasResponse;
+  }
+
+  private isForkEligible(allMessages?: ChatMessage[], index?: number): boolean {
     if (!allMessages || index === undefined) return false;
     const ctx = findRewindContext(allMessages, index);
     return !!ctx.prevAssistantUuid && ctx.hasResponse;
@@ -767,22 +788,32 @@ export class MessageRenderer {
 
   refreshActionButtons(msg: ChatMessage, allMessages?: ChatMessage[], index?: number): void {
     if (!msg.userMessageId) return;
-    if (!this.isRewindEligible(allMessages, index)) return;
+    const canRewind = this.isRewindEligible(allMessages, index);
+    const canFork = this.isForkEligible(allMessages, index);
+    if (!canRewind && !canFork) return;
     const msgEl = this.liveMessageEls.get(msg.id);
     if (!msgEl) return;
 
-    if (this.rewindCallback && !msgEl.querySelector('.claudian-message-rewind-btn')) {
+    if (canRewind && this.rewindCallback && !msgEl.querySelector('.claudian-message-rewind-btn')) {
       this.addRewindButton(msgEl, msg.id);
     }
-    if (this.forkCallback && !msgEl.querySelector('.claudian-message-fork-btn')) {
+    if (canFork && this.forkCallback && !msgEl.querySelector('.claudian-message-fork-btn')) {
       this.addForkButton(msgEl, msg.id);
     }
-    this.cleanupLiveMessageEl(msg.id, msgEl);
+    this.cleanupLiveMessageEl(msg.id, msgEl, { canRewind, canFork });
   }
 
-  private cleanupLiveMessageEl(msgId: string, msgEl: HTMLElement): void {
-    const needsRewind = this.rewindCallback && !msgEl.querySelector('.claudian-message-rewind-btn');
-    const needsFork = this.forkCallback && !msgEl.querySelector('.claudian-message-fork-btn');
+  private cleanupLiveMessageEl(
+    msgId: string,
+    msgEl: HTMLElement,
+    expectedActions: { canRewind: boolean; canFork: boolean },
+  ): void {
+    const needsRewind = expectedActions.canRewind
+      && this.rewindCallback
+      && !msgEl.querySelector('.claudian-message-rewind-btn');
+    const needsFork = expectedActions.canFork
+      && this.forkCallback
+      && !msgEl.querySelector('.claudian-message-fork-btn');
     if (!needsRewind && !needsFork) {
       this.liveMessageEls.delete(msgId);
     }

@@ -1767,7 +1767,7 @@ export class ClaudianService implements ChatRuntime {
 
   async rewind(
     userMessageId: string,
-    assistantMessageId: string,
+    assistantMessageId: string | undefined,
     mode: ChatRewindMode = 'code-and-conversation',
   ): Promise<ChatRewindResult> {
     return executeClaudeRewind(userMessageId, {
@@ -1778,6 +1778,7 @@ export class ClaudianService implements ChatRuntime {
       setPendingResumeAt: (resumeAt) => {
         this.pendingResumeAt = resumeAt;
       },
+      resetSession: () => this.resetSession(),
       vaultPath: this.vaultPath,
     });
   }
