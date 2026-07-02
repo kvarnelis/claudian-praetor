@@ -7,7 +7,13 @@ const localStorageFile = path.join(os.tmpdir(), 'claudian-localstorage');
 
 const result = spawnSync(
   process.execPath,
-  [`--localstorage-file=${localStorageFile}`, jestPath, ...process.argv.slice(2)],
+  [
+    // Web Storage is flag-gated on Node 24 (the engines range); default-on from Node 25
+    '--experimental-webstorage',
+    `--localstorage-file=${localStorageFile}`,
+    jestPath,
+    ...process.argv.slice(2),
+  ],
   { stdio: 'inherit' }
 );
 
