@@ -13,6 +13,7 @@
 
 import type {
   CanUseTool,
+  ModelInfo,
   Options,
   PermissionMode as SDKPermissionMode,
   Query,
@@ -69,6 +70,7 @@ import {
 import { CLAUDE_PROVIDER_CAPABILITIES } from '../capabilities';
 import { loadSubagentFinalResult, loadSubagentToolCalls } from '../history/ClaudeHistoryStore';
 import { createStopSubagentHook, type SubagentHookState } from '../hooks/SubagentHooks';
+import { setCliModelCatalog } from '../modelCatalog';
 import { toClaudeRuntimeModelId } from '../modelSelection';
 import { encodeClaudeTurn } from '../prompt/ClaudeTurnEncoder';
 import { isContextWindowEvent, isSessionInitEvent, isStreamChunk } from '../sdk/typeGuards';
@@ -868,6 +870,7 @@ export class ClaudianService implements ChatRuntime {
         // Pass the current query instance so late completions from a dead query
         // cannot overwrite the active cache after a restart or shutdown.
         void this.fetchAndCacheCommands(this.persistentQuery);
+        void this.fetchAndCacheModels(this.persistentQuery);
       } else if (isContextWindowEvent(event)) {
         const usageChunk = this.updateBufferedUsageContextWindow(event.contextWindow);
         if (!usageChunk) {
@@ -1691,6 +1694,27 @@ export class ClaudianService implements ChatRuntime {
       return this.cachedSdkCommands;
     } catch {
       return [];
+    }
+  }
+
+  /**
+   * Fetches the CLI-reported model list and publishes it to the shared model
+   * catalog. Called fire-and-forget on system/init, mirroring
+   * fetchAndCacheCommands(). Errors and empty lists keep the previous catalog
+   * (or the static defaults) so the selector never goes blank.
+   */
+  private async fetchAndCacheModels(query: Query | null): Promise<void> {
+    if (!query) return;
+    try {
+      const models: ModelInfo[] = await query.supportedModels();
+      if (this.persistentQuery !== query) {
+        return;
+      }
+      if (models.length > 0) {
+        setCliModelCatalog(models);
+      }
+    } catch {
+      // Non-critical: the selector falls back to DEFAULT_CLAUDE_MODELS
     }
   }
 

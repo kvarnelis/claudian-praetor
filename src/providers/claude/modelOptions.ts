@@ -1,6 +1,7 @@
 import { getRuntimeEnvironmentVariables } from '../../core/providers/providerEnvironment';
 import type { ProviderUIOption } from '../../core/providers/types';
 import { getModelsFromEnvironment } from './env/claudeModelEnv';
+import { getCliModelOptions } from './modelCatalog';
 import { formatCustomModelLabel } from './modelLabels';
 import { encodeClaudeModelSelectionId, toClaudeRuntimeModelId } from './modelSelection';
 import { getClaudeProviderSettings } from './settings';
@@ -58,7 +59,7 @@ export function getClaudeModelOptions(settings: Record<string, unknown>): Provid
 
   const claudeSettings = getClaudeProviderSettings(settings);
   const models = filterVisibleModelOptions(
-    [...DEFAULT_CLAUDE_MODELS],
+    getCliModelOptions() ?? [...DEFAULT_CLAUDE_MODELS],
     claudeSettings.enableOpus1M,
     claudeSettings.enableSonnet1M,
   );

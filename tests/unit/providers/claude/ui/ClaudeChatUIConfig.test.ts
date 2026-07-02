@@ -1,6 +1,73 @@
+import { clearCliModelCatalog, setCliModelCatalog } from '@/providers/claude/modelCatalog';
 import { claudeChatUIConfig } from '@/providers/claude/ui/ClaudeChatUIConfig';
 
 describe('claudeChatUIConfig', () => {
+  afterEach(() => {
+    clearCliModelCatalog();
+  });
+
+  describe('CLI model catalog integration', () => {
+    const CLI_MODELS = [
+      { value: 'opus', displayName: 'Opus', description: 'Opus 4.8 · Best for everyday, complex tasks', supportsEffort: true, supportedEffortLevels: ['low', 'medium', 'high', 'xhigh', 'max'] as ('low' | 'medium' | 'high' | 'xhigh' | 'max')[] },
+      { value: 'claude-fable-5[1m]', displayName: 'Fable', description: 'Fable 5 · Most capable', supportsEffort: true, supportedEffortLevels: ['low', 'medium', 'high', 'xhigh', 'max'] as ('low' | 'medium' | 'high' | 'xhigh' | 'max')[] },
+      { value: 'sonnet', displayName: 'Sonnet', description: 'Sonnet 4.6 · Efficient', supportsEffort: true, supportedEffortLevels: ['low', 'medium', 'high', 'xhigh', 'max'] as ('low' | 'medium' | 'high' | 'xhigh' | 'max')[] },
+      { value: 'haiku', displayName: 'Haiku', description: 'Haiku 4.5 · Fastest' },
+    ];
+
+    it('uses catalog-reported models instead of the static defaults once set', () => {
+      setCliModelCatalog(CLI_MODELS);
+      const options = claudeChatUIConfig.getModelOptions({ providerConfigs: {} });
+      expect(options.map((o) => o.value)).toEqual([
+        'haiku',
+        'sonnet',
+        'claude-fable-5[1m]',
+        'opus',
+      ]);
+      expect(options.find((o) => o.value === 'opus')?.description).toBe('Opus 4.8 · Best for everyday, complex tasks');
+    });
+
+    it('applies 1M variant toggles to catalog-backed options', () => {
+      setCliModelCatalog(CLI_MODELS);
+      const options = claudeChatUIConfig.getModelOptions({
+        providerConfigs: { claude: { enableOpus1M: true, enableSonnet1M: true } },
+      });
+      expect(options.map((o) => o.value)).toEqual([
+        'haiku',
+        'sonnet[1m]',
+        'claude-fable-5[1m]',
+        'opus[1m]',
+      ]);
+    });
+
+    it('keeps env-defined custom models taking precedence over the catalog', () => {
+      setCliModelCatalog(CLI_MODELS);
+      const options = claudeChatUIConfig.getModelOptions({
+        providerConfigs: {
+          claude: { environmentVariables: 'ANTHROPIC_MODEL=my-proxy-model' },
+        },
+      });
+      expect(options).toHaveLength(1);
+      expect(options[0].value).toContain('my-proxy-model');
+    });
+
+    it('falls back to the static defaults when the catalog is not set', () => {
+      const options = claudeChatUIConfig.getModelOptions({ providerConfigs: {} });
+      expect(options.map((o) => o.value)).toEqual([
+        'haiku',
+        'sonnet',
+        'opus',
+        'claude-fable-5[1m]',
+      ]);
+    });
+
+    it('lets catalog effort levels override the static xhigh heuristic', () => {
+      // Catalog says sonnet supports xhigh — static heuristic says it does not
+      setCliModelCatalog(CLI_MODELS);
+      const levels = claudeChatUIConfig.getReasoningOptions('sonnet', {}).map((o) => o.value);
+      expect(levels).toContain('xhigh');
+    });
+  });
+
   describe('getModelOptions', () => {
     it('appends settings-defined custom models after the built-in options', () => {
       const options = claudeChatUIConfig.getModelOptions({
@@ -15,6 +82,7 @@ describe('claudeChatUIConfig', () => {
         'haiku',
         'sonnet',
         'opus',
+        'claude-fable-5[1m]',
         'claude-code/claude-opus-4-6',
         'claude-code/claude-opus-4-6[1m]',
       ]);
@@ -45,6 +113,7 @@ describe('claudeChatUIConfig', () => {
         'haiku',
         'sonnet',
         'opus',
+        'claude-fable-5[1m]',
         'claude-code/claude-opus-4-6',
       ]);
     });

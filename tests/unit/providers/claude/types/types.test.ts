@@ -15,8 +15,10 @@ import {
   CONTEXT_WINDOW_1M,
   CONTEXT_WINDOW_STANDARD,
   DEFAULT_CLAUDE_MODELS,
+  DEFAULT_EFFORT_LEVEL,
   filterVisibleModelOptions,
   getContextWindowSize,
+  isDefaultClaudeModel,
   normalizeEffortLevel,
   normalizeVisibleModelVariant,
   supportsXHighEffort,
@@ -651,22 +653,22 @@ describe('types.ts', () => {
     describe('filterVisibleModelOptions', () => {
       it('should hide 1M variants when toggles are disabled', () => {
         const models = filterVisibleModelOptions(DEFAULT_CLAUDE_MODELS, false, false).map((model) => model.value);
-        expect(models).toEqual(['haiku', 'sonnet', 'opus']);
+        expect(models).toEqual(['haiku', 'sonnet', 'opus', 'claude-fable-5[1m]']);
       });
 
       it('should swap in 1M variants when toggles are enabled', () => {
         const models = filterVisibleModelOptions(DEFAULT_CLAUDE_MODELS, true, true).map((model) => model.value);
-        expect(models).toEqual(['haiku', 'sonnet[1m]', 'opus[1m]']);
+        expect(models).toEqual(['haiku', 'sonnet[1m]', 'opus[1m]', 'claude-fable-5[1m]']);
       });
 
       it('should swap only opus when enableOpus1M is true and enableSonnet1M is false', () => {
         const models = filterVisibleModelOptions(DEFAULT_CLAUDE_MODELS, true, false).map((model) => model.value);
-        expect(models).toEqual(['haiku', 'sonnet', 'opus[1m]']);
+        expect(models).toEqual(['haiku', 'sonnet', 'opus[1m]', 'claude-fable-5[1m]']);
       });
 
       it('should swap only sonnet when enableSonnet1M is true and enableOpus1M is false', () => {
         const models = filterVisibleModelOptions(DEFAULT_CLAUDE_MODELS, false, true).map((model) => model.value);
-        expect(models).toEqual(['haiku', 'sonnet[1m]', 'opus']);
+        expect(models).toEqual(['haiku', 'sonnet[1m]', 'opus', 'claude-fable-5[1m]']);
       });
     });
 
@@ -704,6 +706,51 @@ describe('types.ts', () => {
       expect(supportsXHighEffort('sonnet')).toBe(false);
       expect(supportsXHighEffort('claude-sonnet-4-5')).toBe(false);
       expect(supportsXHighEffort('claude-opus-4-6')).toBe(false);
+    });
+
+    it('returns true for Fable', () => {
+      expect(supportsXHighEffort('claude-fable-5[1m]')).toBe(true);
+      expect(supportsXHighEffort('claude-fable-5')).toBe(true);
+    });
+  });
+
+  describe('Fable model support', () => {
+    it('includes Fable in DEFAULT_CLAUDE_MODELS with the CLI-reported value', () => {
+      const fable = DEFAULT_CLAUDE_MODELS.find((m) => m.label === 'Fable');
+      expect(fable).toBeDefined();
+      expect(fable?.value).toBe('claude-fable-5[1m]');
+    });
+
+    it('has a default effort level for every default model', () => {
+      for (const model of DEFAULT_CLAUDE_MODELS) {
+        expect(DEFAULT_EFFORT_LEVEL[model.value]).toBeDefined();
+      }
+    });
+
+    it('treats Fable as a default model', () => {
+      expect(isDefaultClaudeModel('claude-fable-5[1m]')).toBe(true);
+    });
+
+    it('reports a 1M context window for Fable', () => {
+      expect(getContextWindowSize('claude-fable-5[1m]')).toBe(CONTEXT_WINDOW_1M);
+    });
+
+    it('keeps Fable visible regardless of the 1M variant toggles', () => {
+      for (const opus1M of [false, true]) {
+        for (const sonnet1M of [false, true]) {
+          const models = filterVisibleModelOptions(DEFAULT_CLAUDE_MODELS, opus1M, sonnet1M).map((m) => m.value);
+          expect(models).toContain('claude-fable-5[1m]');
+        }
+      }
+    });
+
+    it('leaves Fable unchanged by visible-variant normalization', () => {
+      expect(normalizeVisibleModelVariant('claude-fable-5[1m]', true, true)).toBe('claude-fable-5[1m]');
+      expect(normalizeVisibleModelVariant('claude-fable-5[1m]', false, false)).toBe('claude-fable-5[1m]');
+    });
+
+    it('preserves xhigh effort for Fable', () => {
+      expect(normalizeEffortLevel('claude-fable-5[1m]', 'xhigh')).toBe('xhigh');
     });
   });
 

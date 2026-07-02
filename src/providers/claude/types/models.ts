@@ -2,6 +2,7 @@
  * Model type definitions and constants.
  */
 
+import { getCliEffortLevels } from '../modelCatalog';
 import { toClaudeRuntimeModelId } from '../modelSelection';
 
 /** Model identifier (string to support custom models via environment variables). */
@@ -11,8 +12,10 @@ export const DEFAULT_CLAUDE_MODELS: { value: ClaudeModel; label: string; descrip
   { value: 'haiku', label: 'Haiku', description: 'Fast and efficient' },
   { value: 'sonnet', label: 'Sonnet', description: 'Balanced performance' },
   { value: 'sonnet[1m]', label: 'Sonnet 1M', description: 'Balanced performance (1M context window)' },
-  { value: 'opus', label: 'Opus', description: 'Most capable' },
-  { value: 'opus[1m]', label: 'Opus 1M', description: 'Most capable (1M context window)' },
+  { value: 'opus', label: 'Opus', description: 'Best for complex tasks' },
+  { value: 'opus[1m]', label: 'Opus 1M', description: 'Best for complex tasks (1M context window)' },
+  // Value as reported by the CLI's supportedModels(); Fable ships with 1M context built in
+  { value: 'claude-fable-5[1m]', label: 'Fable', description: 'Most capable' },
 ];
 
 /** Effort levels for adaptive thinking models. */
@@ -33,6 +36,7 @@ export const DEFAULT_EFFORT_LEVEL: Record<string, EffortLevel> = {
   'sonnet[1m]': 'high',
   'opus': 'high',
   'opus[1m]': 'high',
+  'claude-fable-5[1m]': 'high',
 };
 
 const ONE_M_SUFFIX = '[1m]';
@@ -81,12 +85,18 @@ export function isDefaultClaudeModel(model: string): boolean {
 }
 
 /**
- * Whether the model supports the `xhigh` effort level. Opus 4.7+ only — the SDK
- * silently falls back to `high` on other models.
+ * Whether the model supports the `xhigh` effort level. The CLI-reported effort
+ * levels win when available; the static heuristic (Opus 4.7+ and Fable) covers
+ * the pre-init fallback. The SDK silently falls back to `high` on other models.
  */
 export function supportsXHighEffort(model: string): boolean {
   const normalized = normalizeModelId(model);
+  const cliLevels = getCliEffortLevels(normalized);
+  if (cliLevels) {
+    return cliLevels.includes('xhigh');
+  }
   if (isBuiltInFamilyVariant(normalized, 'opus')) return true;
+  if (normalized.includes('claude-fable')) return true;
   return /claude-opus-(4-[7-9]|[5-9])/.test(normalized);
 }
 

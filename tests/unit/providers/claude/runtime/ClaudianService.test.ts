@@ -5,6 +5,11 @@ import { Notice } from 'obsidian';
 
 import type { McpServerManager } from '@/core/mcp/McpServerManager';
 import type ClaudianPlugin from '@/main';
+import {
+  clearCliModelCatalog,
+  getCliModelOptions,
+  setCliModelCatalog,
+} from '@/providers/claude/modelCatalog';
 import { ClaudianService } from '@/providers/claude/runtime/ClaudeChatRuntime';
 import { MessageChannel } from '@/providers/claude/runtime/ClaudeMessageChannel';
 import { createResponseHandler } from '@/providers/claude/runtime/types';
@@ -783,6 +788,89 @@ describe('ClaudianService', () => {
       }]);
       expect(staleCommands).toEqual(activeCommands);
       expect((service as any).cachedSdkCommands).toEqual(activeCommands);
+    });
+  });
+
+  describe('CLI Model Catalog (Supported Models)', () => {
+    afterEach(() => {
+      clearCliModelCatalog();
+    });
+
+    it('should populate the CLI model catalog from the SDK', async () => {
+      const mockModels = [
+        { value: 'opus', displayName: 'Opus', description: 'Opus 4.8 · Best for everyday, complex tasks' },
+        { value: 'claude-fable-5[1m]', displayName: 'Fable', description: 'Fable 5 · Most capable' },
+      ];
+      const mockQuery = {
+        supportedModels: jest.fn().mockResolvedValue(mockModels),
+      };
+      (service as any).persistentQuery = mockQuery;
+
+      await (service as any).fetchAndCacheModels(mockQuery);
+
+      expect(mockQuery.supportedModels).toHaveBeenCalled();
+      expect(getCliModelOptions()?.map((o) => o.value)).toEqual([
+        'claude-fable-5[1m]',
+        'opus',
+        'opus[1m]',
+      ]);
+    });
+
+    it('should keep the previous catalog on SDK error', async () => {
+      setCliModelCatalog([
+        { value: 'opus', displayName: 'Opus', description: 'Opus 4.8' },
+      ]);
+      const mockQuery = {
+        supportedModels: jest.fn().mockRejectedValue(new Error('SDK error')),
+      };
+      (service as any).persistentQuery = mockQuery;
+
+      await (service as any).fetchAndCacheModels(mockQuery);
+
+      expect(getCliModelOptions()?.map((o) => o.value)).toEqual(['opus', 'opus[1m]']);
+    });
+
+    it('should keep the previous catalog when the SDK reports no models', async () => {
+      setCliModelCatalog([
+        { value: 'opus', displayName: 'Opus', description: 'Opus 4.8' },
+      ]);
+      const mockQuery = {
+        supportedModels: jest.fn().mockResolvedValue([]),
+      };
+      (service as any).persistentQuery = mockQuery;
+
+      await (service as any).fetchAndCacheModels(mockQuery);
+
+      expect(getCliModelOptions()?.map((o) => o.value)).toEqual(['opus', 'opus[1m]']);
+    });
+
+    it('should ignore late supportedModels results from a stale query', async () => {
+      let resolveStaleModels!: (models: Array<{ value: string; displayName: string; description: string }>) => void;
+      const staleModelsPromise = new Promise<Array<{ value: string; displayName: string; description: string }>>((resolve) => {
+        resolveStaleModels = resolve;
+      });
+
+      const staleQuery = {
+        supportedModels: jest.fn().mockReturnValue(staleModelsPromise),
+      };
+      const activeQuery = {
+        supportedModels: jest.fn().mockResolvedValue([
+          { value: 'sonnet', displayName: 'Sonnet', description: 'Sonnet 4.6' },
+        ]),
+      };
+
+      (service as any).persistentQuery = staleQuery;
+      const staleFetch = (service as any).fetchAndCacheModels(staleQuery);
+
+      (service as any).persistentQuery = activeQuery;
+      await (service as any).fetchAndCacheModels(activeQuery);
+
+      resolveStaleModels([
+        { value: 'haiku', displayName: 'Haiku', description: 'Haiku 4.5' },
+      ]);
+      await staleFetch;
+
+      expect(getCliModelOptions()?.map((o) => o.value)).toEqual(['sonnet', 'sonnet[1m]']);
     });
   });
 
