@@ -32,24 +32,39 @@ Download `main.js`, `manifest.json`, `styles.css`, and `praetord.cjs` from the [
 
 ## Mobile remote mode
 
-Runs the agents on your Mac and lets you drive them from a phone or iPad over Tailscale — peer-to-peer, no cloud. Available remotely for **Claude, Codex, and Grok**.
+Runs the agents on your Mac and lets you drive them from a phone or iPad. There's **no cloud service** in the loop — it's peer-to-peer over [Tailscale](https://tailscale.com/download) (a private WireGuard mesh), so your vault and prompts never touch a third-party relay. Available remotely for **Claude, Codex, and Grok**.
+
+### How it works
+
+- Your Mac runs a small WebSocket daemon, `praetord`, listening on `ws://<your-Mac's-tailscale-IP>:8423`.
+- It **binds only to the Tailscale interface** (the `100.x.y.z` CGNAT address) — not `0.0.0.0` — so it's invisible to your LAN and the public internet.
+- Auth is a random **token** seeded in `~/.config/claudian-praetor/daemon.json` on first run and checked via SHA-256.
+- The transport is plaintext `ws://`, which is fine here because **Tailscale/WireGuard already encrypts the whole tunnel end to end**, and only devices signed into your tailnet can reach it.
 
 ### On the Mac (host)
 
-1. Install and connect [Tailscale](https://tailscale.com/download) — this gives the Mac a `100.x.y.z` tailnet address.
-2. Open **Claudian Praetor settings → Mobile daemon** and enable **Host mobile daemon on this Mac**. That detects the Tailscale IP, writes `~/.config/claudian-praetor/daemon.json` (with a random auth token), starts the `praetord` daemon on port `8423`, and publishes the URL/token into plugin data.
+1. Install and connect [Tailscale](https://tailscale.com/download), signed into your account. Confirm it has a `100.x.y.z` IP.
+2. Open **Claudian Praetor settings → Mobile daemon** and enable **Host mobile daemon on this Mac**.
+3. That one toggle does everything: detects the Tailscale IP, writes `~/.config/claudian-praetor/daemon.json` (with the token), starts `praetord` on port `8423`, and **publishes the `ws://` URL + token into plugin data**.
 
-The host toggle is stored only on that Mac and never syncs to your other desktops.
+The host toggle is stored only on that Mac, so your other synced desktops won't start hosting.
 
 ### On the phone/iPad (client)
 
-1. Install Claudian Praetor via BRAT, and connect [Tailscale](https://tailscale.com/download) on the same account as the Mac.
-2. Let Obsidian Sync carry the URL/token over automatically, or paste them manually under **Remote Mac daemon** — the URL is `ws://100.x.y.z:8423` and the token is the `token` value from `daemon.json` on your Mac.
-3. Open the chat and pick a remote provider.
+1. Install Claudian Praetor via BRAT, and install/connect [Tailscale](https://tailscale.com/download) on the device, signed into the **same account** as the Mac.
+2. Get the connection details one of two ways:
+   - **Automatic** — let Obsidian Sync carry the published URL/token over from the Mac; nothing to type.
+   - **Manual** — Settings → **Remote Mac daemon**, paste the URL (`ws://100.x.y.z:8423`) and the `token` value from `~/.config/claudian-praetor/daemon.json` on your Mac.
+3. Open the chat and pick a remote provider — Claude, Codex, or Grok.
 
-The daemon binds only to the Tailscale interface (not your LAN or the public internet), and the tunnel is encrypted by Tailscale/WireGuard end to end. The Mac must be awake with Obsidian open — the agents run on it, not in a cloud.
+### If it won't connect
 
-**If it won't connect:** confirm Tailscale is on and connected on both devices, the Mac is awake with the plugin loaded, and hosting is enabled. The daemon log is at `~/.config/claudian-praetor/praetord.log`.
+Confirm Tailscale is on and connected on **both** devices, the Mac is awake with Obsidian loaded, and hosting is enabled. The daemon only publishes and works once the Mac has its `100.x` Tailscale IP. The daemon log is at `~/.config/claudian-praetor/praetord.log`.
+
+Two things worth knowing:
+
+- The Mac must be **awake and running Obsidian** — there's no always-on cloud instance; the agents literally run on your Mac.
+- If you wanted *cloud* hosting (a public URL reachable without Tailscale), that isn't a feature — and you shouldn't expose `praetord` publicly, since it's plaintext `ws://` with a shared token, safe only because Tailscale wraps it. Tailscale is what makes your Mac reachable from anywhere, securely.
 
 ## Credits
 
