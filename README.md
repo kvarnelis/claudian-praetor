@@ -40,7 +40,9 @@ Model, thinking/effort level, and the permission mode (including a **Yolo** auto
 
 - **Claude Code** — the primary, full-featured provider.
 - **Codex** — broadly supported (streaming, resume, fork, plan mode, images, inline edit, skills, subagents).
-- **Grok, OpenCode, Pi, and ACP-compatible agents** — additional providers with varying levels of support.
+- **Grok, OpenCode, and Pi** — additional providers with varying levels of support.
+
+All providers run on desktop. [Mobile remote mode](#mobile-remote-mode-praetor) currently supports **Claude, Codex, and Grok**.
 
 You supply the provider's CLI or account; Claudian Praetor drives it.
 
@@ -75,7 +77,7 @@ That's all desktop use needs — local runtimes talk to your vault directly. The
 
 ## Mobile remote mode (Praetor)
 
-Praetor mode lets Obsidian on an iPhone or iPad drive the agents running on your Mac. The mobile UI connects over [Tailscale](https://tailscale.com/download) to a small daemon (`praetord`) hosted by the Mac, so it uses the same provider runtimes that already work on your desktop.
+Praetor mode lets Obsidian on an iPhone or iPad drive the agents running on your Mac. The mobile UI connects over [Tailscale](https://tailscale.com/download) to a small daemon (`praetord`) hosted by the Mac, which runs the provider on your desktop and streams it to the device. **Claude, Codex, and Grok** are available remotely.
 
 ### Host the daemon on your Mac
 
@@ -90,24 +92,7 @@ The host toggle is stored **only on that Mac** — it never syncs to your other 
 1. Install Claudian Praetor on Obsidian mobile via BRAT.
 2. Install and connect [Tailscale](https://tailscale.com/download) on the device.
 3. Let Obsidian Sync carry the daemon URL/token over from the Mac, or paste them manually under **Remote Mac daemon**.
-4. Open Claudian Praetor and pick a remote-backed provider.
-
-## Development
-
-```bash
-npm install          # install dependencies (Node 24)
-npm run dev          # watch build for local development
-npm run build        # production build (main.js + styles.css)
-npm run build:daemon # build praetord.cjs for mobile hosting
-
-npm run typecheck    # tsc --noEmit
-npm run lint         # eslint
-npm run test         # jest (unit + integration)
-```
-
-Set `OBSIDIAN_VAULT=/path/to/vault` while building to copy the built plugin files straight into the vault's plugin folder.
-
-Every release ships four assets: `main.js`, `manifest.json`, `styles.css`, and `praetord.cjs`.
+4. Open Claudian Praetor and pick a remote-backed provider (Claude, Codex, or Grok).
 
 ## Privacy & data use
 
