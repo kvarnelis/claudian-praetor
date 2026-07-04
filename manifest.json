@@ -1,7 +1,7 @@
 {
   "id": "claudian-praetor",
   "name": "Claudian Praetor",
-  "version": "2026.7.1",
+  "version": "2026.7.2",
   "minAppVersion": "1.7.2",
   "description": "Praetor fork of Claudian (adds Grok provider support and mobile remote mode). Embeds Claude Code, Codex, and other coding agents as AI collaborators in your vault.",
   "author": "Yishen Tu",

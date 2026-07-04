@@ -29,6 +29,7 @@ import { readFileSync } from 'node:fs';
 import { builtinModules, createRequire } from 'node:module';
 import os from 'node:os';
 import path from 'node:path';
+import nodeProcess from 'node:process';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
@@ -743,4 +744,4 @@ console.log(
     : 'PARTIAL: desktop simulated load (mock depth — verify in the real app)',
 );
 
-process.exit(mobileOk ? 0 : 1);
+nodeProcess.exit(mobileOk ? 0 : 1);

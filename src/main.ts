@@ -88,7 +88,7 @@ export default class ClaudianPlugin extends Plugin {
       this.remoteMode = true;
       // A class we own, so mobile CSS never has to guess between Obsidian's
       // is-mobile / is-tablet / is-phone body classes (iPad uses is-tablet).
-      if (typeof document !== 'undefined') document.body.addClass('claudian-mobile');
+      if (typeof document !== 'undefined') document.body?.classList?.add('claudian-mobile');
     }
 
     await this.loadSettings();
@@ -229,7 +229,7 @@ export default class ClaudianPlugin extends Plugin {
 
   onunload(): void {
     this.mobileDock?.clear();
-    if (typeof document !== 'undefined') document.body.removeClass('claudian-mobile');
+    if (typeof document !== 'undefined') document.body?.classList?.remove('claudian-mobile');
     void this.persistOpenTabStates();
   }
 
