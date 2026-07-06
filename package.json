@@ -1,6 +1,6 @@
 {
   "name": "claudian",
-  "version": "2026.7.2",
+  "version": "2026.7.3",
   "description": "Claudian - Claude Code embedded in Obsidian sidebar",
   "main": "main.js",
   "engines": {
