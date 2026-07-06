@@ -12,10 +12,9 @@ export const DEFAULT_CLAUDE_MODELS: { value: ClaudeModel; label: string; descrip
   { value: 'haiku', label: 'Haiku', description: 'Fast and efficient' },
   { value: 'sonnet', label: 'Sonnet', description: 'Balanced performance' },
   { value: 'sonnet[1m]', label: 'Sonnet 1M', description: 'Balanced performance (1M context window)' },
-  { value: 'opus', label: 'Opus', description: 'Best for complex tasks' },
-  { value: 'opus[1m]', label: 'Opus 1M', description: 'Best for complex tasks (1M context window)' },
-  // Value as reported by the CLI's supportedModels(); Fable ships with 1M context built in
-  { value: 'claude-fable-5[1m]', label: 'Fable', description: 'Most capable' },
+  { value: 'opus', label: 'Opus', description: 'Most capable' },
+  { value: 'opus[1m]', label: 'Opus 1M', description: 'Most capable (1M context window)' },
+  { value: 'claude-fable-5', label: 'Fable 5 ($$$)', description: "Anthropic's most capable model — premium pricing above Opus" },
 ];
 
 /** Effort levels for adaptive thinking models. */
@@ -36,7 +35,7 @@ export const DEFAULT_EFFORT_LEVEL: Record<string, EffortLevel> = {
   'sonnet[1m]': 'high',
   'opus': 'high',
   'opus[1m]': 'high',
-  'claude-fable-5[1m]': 'high',
+  'claude-fable-5': 'high',
 };
 
 const ONE_M_SUFFIX = '[1m]';
@@ -53,6 +52,11 @@ function has1MContextSuffix(model: string): boolean {
 function isBuiltInFamilyVariant(model: string, family: 'sonnet' | 'opus'): boolean {
   const normalized = normalizeModelId(model);
   return normalized === family || normalized === `${family}${ONE_M_SUFFIX}`;
+}
+
+/** Fable is a standalone tier (not a haiku/sonnet/opus version bump) — always 1M context, no [1m] toggle. */
+function isFableModel(model: string): boolean {
+  return /claude-fable-\d+/.test(normalizeModelId(model));
 }
 
 function isValidContextLimit(limit: unknown): limit is number {
@@ -85,9 +89,9 @@ export function isDefaultClaudeModel(model: string): boolean {
 }
 
 /**
- * Whether the model supports the `xhigh` effort level. The CLI-reported effort
- * levels win when available; the static heuristic (Opus 4.7+ and Fable) covers
- * the pre-init fallback. The SDK silently falls back to `high` on other models.
+ * Whether the model supports the `xhigh` effort level. CLI-reported effort
+ * levels win when available; the static fallback covers Opus 4.7+, Sonnet 5+,
+ * and Fable. The SDK silently falls back to `high` on other models.
  */
 export function supportsXHighEffort(model: string): boolean {
   const normalized = normalizeModelId(model);
@@ -96,8 +100,12 @@ export function supportsXHighEffort(model: string): boolean {
     return cliLevels.includes('xhigh');
   }
   if (isBuiltInFamilyVariant(normalized, 'opus')) return true;
-  if (normalized.includes('claude-fable')) return true;
-  return /claude-opus-(4-[7-9]|[5-9])/.test(normalized);
+  if (isBuiltInFamilyVariant(normalized, 'sonnet')) return true;
+  if (isFableModel(normalized)) return true;
+  return (
+    /claude-opus-(4-[7-9]|[5-9])/.test(normalized) ||
+    /claude-sonnet-(?:[5-9]|\d{2,})(?:-\d{8})?(?:-|$)/.test(normalized)
+  );
 }
 
 /** Clamp stored effort values to what the selected model actually supports. */
@@ -170,7 +178,7 @@ export function getContextWindowSize(
     return customLimit;
   }
 
-  if (has1MContextSuffix(model)) {
+  if (has1MContextSuffix(model) || isFableModel(model)) {
     return CONTEXT_WINDOW_1M;
   }
 
