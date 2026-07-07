@@ -46,11 +46,11 @@ async function main(): Promise<void> {
     vaultPath: config.vaultPath,
     host: config.host,
     port: config.port,
-    token: config.token,
+    configPath,
     log,
   });
   await server.start();
-  log(`[praetord] connect clients to ws://${config.host}:${config.port} (token in ${configPath})`);
+  log(`[praetord] connect clients to ws://${config.host}:${config.port} (pair devices from Claudian settings)`);
 
   const shutdown = (): void => {
     log('[praetord] shutting down');

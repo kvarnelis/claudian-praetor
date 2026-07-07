@@ -38,24 +38,25 @@ Runs the agents on your Mac and lets you drive them from a phone or iPad. There'
 
 - Your Mac runs a small WebSocket daemon, `praetord`, listening on `ws://<your-Mac's-tailscale-IP>:8423`.
 - It **binds only to the Tailscale interface** (the `100.x.y.z` CGNAT address) — not `0.0.0.0` — so it's invisible to your LAN and the public internet.
-- Auth is a random **token** seeded in `~/.config/claudian-praetor/daemon.json` on first run and checked via SHA-256.
-- The transport is plaintext `ws://`, which is fine here because **Tailscale/WireGuard already encrypts the whole tunnel end to end**, and only devices signed into your tailnet can reach it.
+- Mobile devices pair with the Mac during a short pairing window. Pairing is stored locally in `~/.config/claudian-praetor/daemon.json`; no bearer token is synced through Obsidian.
+- The transport is plaintext `ws://`, which is fine here because **Tailscale/WireGuard already encrypts the whole tunnel end to end**, and only devices signed into your tailnet can reach it. Keep Tailscale connected on both devices whenever you use mobile remote mode, even at home.
 
 ### On the Mac (host)
 
 1. Install and connect [Tailscale](https://tailscale.com/download), signed into your account. Confirm it has a `100.x.y.z` IP.
 2. Open **Claudian Praetor settings → Mobile daemon** and enable **Host mobile daemon on this Mac**.
-3. That one toggle does everything: detects the Tailscale IP, writes `~/.config/claudian-praetor/daemon.json` (with the token), starts `praetord` on port `8423`, and **publishes the `ws://` URL + token into plugin data**.
+3. That one toggle does everything: detects the Tailscale IP, writes `~/.config/claudian-praetor/daemon.json`, starts `praetord` on port `8423`, and publishes the `ws://` URL into plugin data for Obsidian Sync.
+4. When adding a phone or iPad, click **Pair iPhone or iPad**. Pairing stays open for five minutes.
 
-The host toggle is stored only on that Mac, so your other synced desktops won't start hosting.
+The host toggle and paired-device list are stored only on that Mac, so your other synced desktops won't start hosting and paired devices are not copied between Macs.
 
 ### On the phone/iPad (client)
 
 1. Install Claudian Praetor via BRAT, and install/connect [Tailscale](https://tailscale.com/download) on the device, signed into the **same account** as the Mac.
-2. Get the connection details one of two ways:
-   - **Automatic** — let Obsidian Sync carry the published URL/token over from the Mac; nothing to type.
-   - **Manual** — Settings → **Remote Mac daemon**, paste the URL (`ws://100.x.y.z:8423`) and the `token` value from `~/.config/claudian-praetor/daemon.json` on your Mac.
-3. Open the chat and pick a remote provider — Claude, Codex, or Grok.
+2. Keep Tailscale connected. This is what makes the Mac reachable away from home, and the daemon is intentionally bound to the Tailscale address.
+3. Let Obsidian Sync carry the published URL from the Mac, or paste it in **Remote Mac daemon** settings (`ws://100.x.y.z:8423`).
+4. While the Mac's pairing window is open, open Claudian Praetor on mobile. The device pairs automatically on first connection.
+5. Open the chat and pick a remote provider — Claude, Codex, or Grok.
 
 ### If it won't connect
 
@@ -64,7 +65,7 @@ Confirm Tailscale is on and connected on **both** devices, the Mac is awake with
 Two things worth knowing:
 
 - The Mac must be **awake and running Obsidian** — there's no always-on cloud instance; the agents literally run on your Mac.
-- If you wanted *cloud* hosting (a public URL reachable without Tailscale), that isn't a feature — and you shouldn't expose `praetord` publicly, since it's plaintext `ws://` with a shared token, safe only because Tailscale wraps it. Tailscale is what makes your Mac reachable from anywhere, securely.
+- If you wanted *cloud* hosting (a public URL reachable without Tailscale), that isn't a feature — and you shouldn't expose `praetord` publicly, since it's plaintext `ws://` and relies on Tailscale for encryption and reachability.
 
 ## Credits
 

@@ -59,14 +59,14 @@ export function getRemoteClient(): RemoteClient {
   return sharedClient;
 }
 
-function readRemoteConfig(plugin: ClaudianPlugin): { url: string; token: string } | null {
+function readRemoteConfig(plugin: ClaudianPlugin): { url: string } | null {
   // Registration runs before loadSettings(); settings may not exist yet.
   const settings = plugin.settings as unknown as Record<string, unknown> | undefined;
   const raw = settings?.remoteDaemon;
   if (!raw || typeof raw !== 'object') return null;
-  const { url, token } = raw as { url?: unknown; token?: unknown };
-  if (typeof url !== 'string' || !url.trim() || typeof token !== 'string') return null;
-  return { url: url.trim(), token };
+  const { url } = raw as { url?: unknown };
+  if (typeof url !== 'string' || !url.trim()) return null;
+  return { url: url.trim() };
 }
 
 function createRemoteRuntime(plugin: ClaudianPlugin, providerId: ProviderId, capabilities: ProviderCapabilities): RemoteChatRuntime {

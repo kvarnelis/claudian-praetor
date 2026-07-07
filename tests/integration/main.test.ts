@@ -1,4 +1,6 @@
 
+import { Notice, Platform } from 'obsidian';
+
 import { TOOL_SUBAGENT } from '@/core/tools/toolNames';
 import { VIEW_TYPE_CLAUDIAN } from '@/core/types';
 import { LOCAL_DAEMON_HOST_ENABLED_KEY } from '@/desktop/localDaemonSettings';
@@ -70,6 +72,10 @@ describe('ClaudianPlugin', () => {
       version: '0.1.0',
     };
 
+    Platform.isDesktopApp = true;
+    Platform.isMobile = false;
+    Platform.isMobileApp = false;
+    Platform.isIosApp = false;
     window.localStorage.clear();
 
     // Create plugin instance with mocked app
@@ -84,6 +90,23 @@ describe('ClaudianPlugin', () => {
       expect(plugin.settings).toBeDefined();
       expect(plugin.settings.permissionMode).toBe(DEFAULT_SETTINGS.permissionMode);
       expect(plugin.settings.hiddenProviderCommands).toEqual(DEFAULT_SETTINGS.hiddenProviderCommands);
+    });
+
+    it('shows mobile remote setup guidance once per local install', () => {
+      Platform.isDesktopApp = false;
+      Platform.isMobile = true;
+
+      (plugin as unknown as { showMobileRemoteOnboardingNotice: () => void }).showMobileRemoteOnboardingNotice();
+
+      expect(Notice).toHaveBeenCalledWith(
+        expect.stringContaining('Tailscale'),
+        15_000,
+      );
+
+      (Notice as jest.Mock).mockClear();
+      (plugin as unknown as { showMobileRemoteOnboardingNotice: () => void }).showMobileRemoteOnboardingNotice();
+
+      expect(Notice).not.toHaveBeenCalled();
     });
 
     // Note: With multi-tab, agentService is per-tab via TabManager, not on plugin
@@ -272,7 +295,7 @@ describe('ClaudianPlugin', () => {
     it('persists remote daemon connection to plugin data instead of shared settings', async () => {
       await plugin.loadSettings();
 
-      const config = { url: 'ws://100.64.1.2:8423', token: 'test-token' };
+      const config = { url: 'ws://100.64.1.2:8423' };
       await plugin.saveRemoteDaemonConfig(config);
 
       expect(plugin.settings.remoteDaemon).toEqual(config);
@@ -283,6 +306,30 @@ describe('ClaudianPlugin', () => {
       for (const [, content] of settingsWrites) {
         expect(JSON.parse(content)).not.toHaveProperty('remoteDaemon');
       }
+    });
+
+    it('strips legacy remote daemon tokens from plugin data on load', async () => {
+      (plugin.loadData as jest.Mock).mockResolvedValue({
+        remoteDaemon: {
+          url: 'ws://100.64.1.2:8423',
+          token: 'legacy-token',
+        },
+        tabManagerState: {
+          openTabs: [],
+          activeTabId: null,
+        },
+      });
+
+      await plugin.loadSettings();
+
+      expect(plugin.settings.remoteDaemon).toEqual({ url: 'ws://100.64.1.2:8423' });
+      expect(plugin.saveData).toHaveBeenCalledWith({
+        remoteDaemon: { url: 'ws://100.64.1.2:8423' },
+        tabManagerState: {
+          openTabs: [],
+          activeTabId: null,
+        },
+      });
     });
 
     it('migrates legacy synced daemon auto-start to local storage and strips it from shared settings', async () => {

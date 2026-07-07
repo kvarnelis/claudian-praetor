@@ -2,7 +2,7 @@
 /**
  * Minimal praetord protocol client for end-to-end testing.
  *
- *   node daemon/test-client.mjs --url ws://127.0.0.1:18423 --token <token> \
+ *   node daemon/test-client.mjs --url ws://127.0.0.1:8423 \
  *     [--provider claude] [--model haiku] [--prompt "Reply with exactly: PRAETOR-OK"]
  */
 
@@ -10,13 +10,12 @@ const args = {};
 for (let i = 2; i < process.argv.length; i += 2) {
   args[process.argv[i].replace(/^--/, '')] = process.argv[i + 1];
 }
-const url = args.url ?? 'ws://127.0.0.1:18423';
-const token = args.token;
+const url = args.url ?? 'ws://127.0.0.1:8423';
 const provider = args.provider ?? 'claude';
 const model = args.model ?? 'haiku';
 const prompt = args.prompt ?? 'Reply with exactly: PRAETOR-OK';
-if (!token) {
-  console.error('usage: test-client.mjs --url ws://host:port --token <token> [--provider claude] [--model haiku] [--prompt ...]');
+if (!url) {
+  console.error('usage: test-client.mjs --url ws://host:port [--provider claude] [--model haiku] [--prompt ...]');
   process.exit(2);
 }
 
@@ -45,7 +44,7 @@ function rpc(method, params) {
 }
 
 ws.onopen = () => {
-  send({ t: 'hello', proto: 1, token, clientId: 'test-client' });
+  send({ t: 'hello', proto: 1, clientId: 'test-client', clientInfo: 'daemon/test-client' });
 };
 
 ws.onmessage = async (event) => {

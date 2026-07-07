@@ -24,7 +24,7 @@ import {
   VIEW_TYPE_CLAUDIAN,
 } from './core/types';
 import type { ChatViewPlacement, EnvironmentScope } from './core/types/settings';
-import type { DaemonStartResult, DaemonSupervisor } from './desktop/daemonSupervisor';
+import type { DaemonPairingResult, DaemonStartResult, DaemonSupervisor } from './desktop/daemonSupervisor';
 import { isLocalDaemonHostEnabled, setLocalDaemonHostEnabled } from './desktop/localDaemonSettings';
 import { ClaudianView } from './features/chat/ClaudianView';
 import { MobileDock } from './features/chat/ui/mobileDock';
@@ -37,6 +37,8 @@ import { extractUserDisplayContent } from './utils/context';
 import { buildCursorContext } from './utils/editor';
 import { revealWorkspaceLeaf } from './utils/obsidianCompat';
 import { getVaultPath } from './utils/path';
+
+const MOBILE_REMOTE_ONBOARDING_SEEN_KEY = 'claudian-praetor.mobileRemoteOnboardingSeen';
 
 function isClaudianView(value: unknown): value is ClaudianView {
   return !!value
@@ -92,6 +94,7 @@ export default class ClaudianPlugin extends Plugin {
     }
 
     await this.loadSettings();
+    this.showMobileRemoteOnboardingNotice();
     await ProviderWorkspaceRegistry.initializeAll(this);
 
     // Desktop auto-start: keep the daemon alive for mobile clients by spawning
@@ -457,8 +460,8 @@ export default class ClaudianPlugin extends Plugin {
     );
   }
 
-  /** Persist the remote daemon connection to Sync-carried plugin data. */
-  async saveRemoteDaemonConfig(config: { url: string; token: string } | null): Promise<void> {
+  /** Persist the remote daemon URL to Sync-carried plugin data. Pairing stays local to the Mac. */
+  async saveRemoteDaemonConfig(config: { url: string } | null): Promise<void> {
     await this.storage.setRemoteDaemonConfig(config);
     this.settings.remoteDaemon = config ?? undefined;
     if (Platform.isMobile && config) {
@@ -503,6 +506,40 @@ export default class ClaudianPlugin extends Plugin {
       }
     }
     return result;
+  }
+
+  async openMobileDaemonPairing(): Promise<DaemonPairingResult | null> {
+    if (!Platform.isDesktopApp) return null;
+    if (!this.daemonSupervisor) {
+      const { DaemonSupervisor } = await import('./desktop/daemonSupervisor');
+      this.daemonSupervisor = new DaemonSupervisor(this);
+    }
+    const startResult = await this.startMobileDaemonHost({ retry: false });
+    if (!startResult) return null;
+    if (
+      startResult.status === 'no-tailnet'
+      || startResult.status === 'missing-vault'
+      || startResult.status === 'error'
+    ) {
+      return startResult;
+    }
+    return this.daemonSupervisor.openPairing();
+  }
+
+  private showMobileRemoteOnboardingNotice(): void {
+    if (!Platform.isMobile) return;
+
+    try {
+      if (window.localStorage.getItem(MOBILE_REMOTE_ONBOARDING_SEEN_KEY) === 'true') return;
+      window.localStorage.setItem(MOBILE_REMOTE_ONBOARDING_SEEN_KEY, 'true');
+    } catch {
+      // Local storage can be unavailable in constrained webviews; the notice is harmless.
+    }
+
+    new Notice(
+      'Claudian mobile uses your Mac over Tailscale. Connect Tailscale on both devices, then on the Mac enable Mobile daemon and choose Pair iPhone or iPad.',
+      15_000,
+    );
   }
 
   async saveSettings() {

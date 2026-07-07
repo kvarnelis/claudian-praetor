@@ -59,12 +59,12 @@ export class SharedStorageService implements SharedAppStorage {
     }
   }
 
-  async setRemoteDaemonConfig(config: { url: string; token: string } | null): Promise<void> {
+  async setRemoteDaemonConfig(config: { url: string } | null): Promise<void> {
     try {
       const loaded: unknown = await this.plugin.loadData();
       const data = isRecord(loaded) ? loaded : {};
       if (config) {
-        data.remoteDaemon = config;
+        data.remoteDaemon = { url: config.url };
       } else {
         delete data.remoteDaemon;
       }
@@ -74,17 +74,22 @@ export class SharedStorageService implements SharedAppStorage {
     }
   }
 
-  async getRemoteDaemonConfig(): Promise<{ url: string; token: string } | null> {
+  async getRemoteDaemonConfig(): Promise<{ url: string } | null> {
     try {
       const data: unknown = await this.plugin.loadData();
       if (!isRecord(data) || !isRecord(data.remoteDaemon)) {
         return null;
       }
-      const { url, token } = data.remoteDaemon;
-      if (typeof url !== 'string' || typeof token !== 'string') {
+      const remoteDaemon = data.remoteDaemon;
+      const { url } = remoteDaemon;
+      if (typeof url !== 'string') {
         return null;
       }
-      return { url, token };
+      if (Object.keys(remoteDaemon).some((key) => key !== 'url')) {
+        data.remoteDaemon = { url };
+        await this.plugin.saveData(data);
+      }
+      return { url };
     } catch {
       return null;
     }

@@ -8,11 +8,11 @@
  * a grace period.
  */
 
-import * as crypto from 'crypto';
 import * as path from 'path';
 import type { Server } from 'http';
 import { type WebSocket, WebSocketServer } from 'ws';
 
+import { authorizeClient } from './config';
 import { ProviderRegistry } from '../../src/core/providers/ProviderRegistry';
 import type { ProviderId } from '../../src/core/providers/types';
 import type { ChatRuntime } from '../../src/core/runtime/ChatRuntime';
@@ -71,7 +71,7 @@ export interface PraetorServerOptions {
   vaultPath: string;
   host: string;
   port: number;
-  token: string;
+  configPath: string;
   log: (message: string) => void;
 }
 
@@ -161,11 +161,23 @@ export class PraetorServer {
           return;
         }
         clearTimeout(handshakeTimer);
-        if (!this.checkToken(msg.token) || msg.proto !== PRAETOR_PROTOCOL_VERSION) {
-          this.send(socket, { t: 'hello.err', error: msg.proto !== PRAETOR_PROTOCOL_VERSION ? 'protocol version mismatch' : 'invalid token' });
+        if (msg.proto !== PRAETOR_PROTOCOL_VERSION) {
+          this.send(socket, { t: 'hello.err', error: 'protocol version mismatch' });
           socket.close();
           return;
         }
+
+        const authorization = authorizeClient(this.options.configPath, {
+          clientId: msg.clientId,
+          clientInfo: msg.clientInfo,
+          remoteAddress: this.getRemoteAddress(socket),
+        });
+        if (!authorization.ok) {
+          this.send(socket, { t: 'hello.err', error: authorization.reason ?? 'device not paired' });
+          socket.close();
+          return;
+        }
+
         meta.authed = true;
         this.send(socket, {
           t: 'hello.ok',
@@ -177,7 +189,7 @@ export class PraetorServer {
             this.options.settings as unknown as Record<string, unknown>,
           ),
         });
-        log('[praetord] client connected');
+        log(authorization.paired ? '[praetord] paired and connected client' : '[praetord] client connected');
         return;
       }
 
@@ -555,18 +567,16 @@ export class PraetorServer {
     }
   }
 
-  private checkToken(candidate: string): boolean {
-    const expected = crypto.createHash('sha256').update(this.options.token).digest();
-    const received = crypto.createHash('sha256').update(String(candidate)).digest();
-    return crypto.timingSafeEqual(expected, received);
-  }
-
   private send(socket: WebSocket, msg: ServerMessage): void {
     try {
       socket.send(JSON.stringify(msg));
     } catch {
       // socket raced shut; reattach replays from the buffer
     }
+  }
+
+  private getRemoteAddress(socket: WebSocket): string | undefined {
+    return (socket as unknown as { _socket?: { remoteAddress?: string } })._socket?.remoteAddress;
   }
 }
 

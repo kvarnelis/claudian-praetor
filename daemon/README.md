@@ -9,9 +9,10 @@ Use the plugin settings rather than editing JSON by hand:
 1. Install and connect [Tailscale](https://tailscale.com/download) on the Mac.
 2. Open Obsidian desktop → Claudian Praetor settings → **Mobile daemon**.
 3. Enable **Host mobile daemon on this Mac**.
-4. Praetor detects the Mac’s Tailscale `100.x.y.z` address, creates `~/.config/claudian-praetor/daemon.json` if needed, starts the bundled daemon, and publishes the mobile URL/token to plugin data for Obsidian Sync.
+4. Praetor detects the Mac’s Tailscale `100.x.y.z` address, creates `~/.config/claudian-praetor/daemon.json` if needed, starts the bundled daemon, and publishes the mobile URL to plugin data for Obsidian Sync.
+5. Click **Pair iPhone or iPad** when adding a mobile device. Pairing stays open for five minutes.
 
-The host checkbox is local to that Mac. The URL/token is synced so iPhone and iPad clients can connect.
+The host checkbox and paired-device list are local to that Mac. Only the URL is synced so iPhone and iPad clients can find the daemon.
 
 ## Manual Build and Run
 
@@ -20,19 +21,22 @@ npm run build:daemon          # -> daemon/dist/praetord.cjs
 node daemon/dist/praetord.cjs --vault /path/to/vault --host 100.x.y.z --port 8423
 ```
 
-First run creates `~/.config/claudian-praetor/daemon.json` with a random auth token. Useful flags: `--vault`, `--host`, `--port`, `--config`, `--print-config`.
+First run creates `~/.config/claudian-praetor/daemon.json` with the daemon host, vault path, and paired clients. Useful flags: `--vault`, `--host`, `--port`, `--config`, `--print-config`.
 
 ## Mobile Client Setup
 
 1. Install Claudian Praetor on Obsidian mobile via BRAT from `kvarnelis/claudian-praetor`.
-2. Install and connect Tailscale on the mobile device.
-3. Let Obsidian Sync carry the URL/token from the Mac, or paste them in **Remote Mac daemon** settings.
-4. Open Claudian Praetor and use a remote-backed provider.
+2. Install and connect Tailscale on the mobile device, signed into the same tailnet as the Mac.
+3. Let Obsidian Sync carry the URL from the Mac, or paste it in **Remote Mac daemon** settings.
+4. Open pairing from the Mac settings, then open Claudian Praetor on mobile to pair the device.
+5. Use a remote-backed provider.
 
 ## Smoke Test
 
+Open pairing from the desktop plugin first; loopback is trusted for local smoke tests, so the client will pair as `test-client` on first connection.
+
 ```bash
-node daemon/test-client.mjs --url ws://127.0.0.1:8423   --token "$(python3 -c "import json;print(json.load(open('$HOME/.config/claudian-praetor/daemon.json'))['token'])")"   --provider claude --model haiku
+node daemon/test-client.mjs --url ws://127.0.0.1:8423 --provider claude --model haiku
 ```
 
 ## Notes
