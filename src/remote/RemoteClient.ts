@@ -17,7 +17,6 @@ import {
 
 export interface RemoteClientConfig {
   url: string;
-  token: string;
 }
 
 export interface DaemonInfo {
@@ -47,9 +46,25 @@ const RPC_TIMEOUT_MS = 120_000;
 // hang that looks like "endlessly gathering thoughts" when Tailscale is off or
 // the Mac daemon isn't running).
 const CONNECT_TIMEOUT_MS = 12_000;
+const CLIENT_ID_STORAGE_KEY = 'claudian-praetor.remoteClientId';
+
+function getPersistentClientId(): string {
+  if (typeof window === 'undefined') return generateId('client');
+
+  try {
+    const stored = window.localStorage?.getItem(CLIENT_ID_STORAGE_KEY);
+    if (stored) return stored;
+
+    const next = generateId('client');
+    window.localStorage?.setItem(CLIENT_ID_STORAGE_KEY, next);
+    return next;
+  } catch {
+    return generateId('client');
+  }
+}
 
 export class RemoteClient {
-  readonly clientId = generateId('client');
+  readonly clientId = getPersistentClientId();
 
   private config: RemoteClientConfig | null = null;
   private ws: WebSocket | null = null;
@@ -73,8 +88,7 @@ export class RemoteClient {
 
   configure(config: RemoteClientConfig): void {
     const changed = !this.config
-      || this.config.url !== config.url
-      || this.config.token !== config.token;
+      || this.config.url !== config.url;
     this.config = config;
     if (changed && this.ws) {
       this.teardownSocket();
@@ -117,8 +131,8 @@ export class RemoteClient {
 
   async ensureConnected(): Promise<void> {
     if (this.state === 'connected' && this.helloDone) return;
-    if (!this.config?.url || !this.config?.token) {
-      throw new Error('Remote daemon is not configured. Set the daemon URL and token under "Remote daemon" in Claudian Praetor settings.');
+    if (!this.config?.url) {
+      throw new Error('Remote daemon is not configured. Pair this device from Claudian Praetor settings on your Mac.');
     }
 
     this.closedByUser = false;
@@ -200,8 +214,8 @@ export class RemoteClient {
       const hello: ClientMessage = {
         t: 'hello',
         proto: PRAETOR_PROTOCOL_VERSION,
-        token: this.config.token,
         clientId: this.clientId,
+        clientInfo: this.getClientInfo(),
       };
       ws.send(JSON.stringify(hello));
     };
@@ -241,7 +255,7 @@ export class RemoteClient {
         break;
       }
       case 'hello.err': {
-        this.closedByUser = true; // bad token: don't retry-loop
+        this.closedByUser = true; // not paired/protocol mismatch: don't retry-loop
         this.failWaiters(new Error(`Daemon rejected connection: ${msg.error}`));
         this.teardownSocket();
         this.setState('disconnected');
@@ -355,6 +369,14 @@ export class RemoteClient {
   private send(msg: ClientMessage): void {
     if (this.ws && this.ws.readyState === WebSocket.OPEN) {
       this.ws.send(JSON.stringify(msg));
+    }
+  }
+
+  private getClientInfo(): string {
+    try {
+      return navigator.userAgent || 'Obsidian mobile';
+    } catch {
+      return 'Obsidian mobile';
     }
   }
 }

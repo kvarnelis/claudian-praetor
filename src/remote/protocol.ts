@@ -142,7 +142,7 @@ export interface ApprovalCallbackPayload {
 // ---------------------------------------------------------------------------
 
 export type ClientMessage =
-  | { t: 'hello'; proto: number; token: string; clientId: string; clientInfo?: string }
+  | { t: 'hello'; proto: number; clientId: string; clientInfo?: string }
   | { t: 'rpc'; id: number; method: string; params: unknown }
   | { t: 'cb.res'; cbId: number; result: unknown }
   | { t: 'q.cancel'; runtimeId: string };

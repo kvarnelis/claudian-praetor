@@ -204,16 +204,15 @@ export class ClaudianSettingTab extends PluginSettingTab {
       });
 
     // --- Mobile daemon (Claudian Praetor) ---
-    // The Mac host toggle is local-only so it cannot confuse other synced Macs.
-    // The URL/token remain in plugin data.json so Obsidian Sync carries them to
-    // mobile devices that need to connect to this Mac over Tailscale.
+    // The Mac host toggle and paired-client list are local-only so they cannot
+    // confuse other synced Macs. Only the Tailscale URL is synced to mobile.
 
     if (Platform.isDesktopApp) {
       new Setting(container).setName('Mobile daemon').setHeading();
 
       const daemonNotice = container.createDiv({ cls: 'claudian-sp-settings-desc' });
       const daemonDesc = daemonNotice.createEl('p', { cls: 'setting-item-description' });
-      daemonDesc.appendText('Host a local Praetor daemon on this Mac for iPhone and iPad. This checkbox is stored only on this machine and does not sync to other Macs. Mobile devices receive the URL and token through Obsidian Sync. ');
+      daemonDesc.appendText('Host Praetor on this Mac for iPhone and iPad. Install and sign in to Tailscale on the Mac and mobile device; Praetor binds to the private Tailscale address and should not be exposed to the public internet. Only the URL syncs. Device pairing stays local to this Mac. ');
       daemonDesc.createEl('a', { text: 'Install Tailscale', href: 'https://tailscale.com/download' });
       const daemonStatus = daemonNotice.createEl('p', { cls: 'setting-item-description' });
       daemonStatus.setText('Tailscale status: checking...');
@@ -231,7 +230,7 @@ export class ClaudianSettingTab extends PluginSettingTab {
 
       new Setting(container)
         .setName('Host mobile daemon on this Mac')
-        .setDesc('Starts the bundled praetord daemon on this Mac and publishes its Tailscale URL/token for synced mobile devices. The checkbox itself is local-only.')
+        .setDesc('Starts the bundled praetord daemon on this Mac and publishes its Tailscale URL for synced mobile devices. The checkbox itself is local-only.')
         .addToggle((toggle) => {
           toggle
             .setValue(this.plugin.isLocalDaemonHostEnabled())
@@ -254,18 +253,37 @@ export class ClaudianSettingTab extends PluginSettingTab {
               }
             });
         });
+
+      new Setting(container)
+        .setName('Pair iPhone or iPad')
+        .setDesc('Opens pairing for five minutes. On the mobile device, keep Tailscale connected and open Claudian to complete pairing.')
+        .addButton((button) => {
+          button
+            .setButtonText('Open pairing')
+            .onClick(async () => {
+              button.setDisabled(true);
+              const result = await this.plugin.openMobileDaemonPairing();
+              button.setDisabled(false);
+
+              if (result?.status === 'pairing-open') {
+                daemonStatus.setText(`Pairing open until ${new Date(result.expiresAt).toLocaleTimeString()}. Mobile URL: ${result.url}`);
+              } else if (result && 'message' in result) {
+                daemonStatus.setText(result.message);
+              }
+            });
+        });
     } else {
-      new Setting(container).setName('Remote Mac daemon').setHeading();
+      new Setting(container).setName('Pair with Mac').setHeading();
 
       const daemonNotice = container.createDiv({ cls: 'claudian-sp-settings-desc' });
       const daemonDesc = daemonNotice.createEl('p', { cls: 'setting-item-description' });
-      daemonDesc.appendText('Connect this mobile device to the Praetor daemon hosted by your Mac. Turn on Tailscale before starting a remote session. ');
+      daemonDesc.appendText('Claudian on mobile connects to Praetor running on your Mac over Tailscale. Sign in to Tailscale on both devices, then on the Mac open Claudian settings and choose Pair iPhone or iPad. The URL can sync through Obsidian Sync; no token is needed. ');
       daemonDesc.createEl('a', { text: 'Install Tailscale', href: 'https://tailscale.com/download' });
 
-      const saveRemoteDaemonField = async (patch: { url?: string; token?: string }): Promise<void> => {
-        const current = this.plugin.settings.remoteDaemon ?? { url: '', token: '' };
-        const next = { url: current.url, token: current.token, ...patch };
-        await this.plugin.saveRemoteDaemonConfig(next.url || next.token ? next : null);
+      const saveRemoteDaemonField = async (patch: { url?: string }): Promise<void> => {
+        const current = this.plugin.settings.remoteDaemon ?? { url: '' };
+        const next = { url: current.url, ...patch };
+        await this.plugin.saveRemoteDaemonConfig(next.url ? next : null);
       };
 
       new Setting(container)
@@ -277,19 +295,6 @@ export class ClaudianSettingTab extends PluginSettingTab {
             .setValue(this.plugin.settings.remoteDaemon?.url ?? '')
             .onChange(async (value) => {
               await saveRemoteDaemonField({ url: value.trim() });
-            });
-        });
-
-      new Setting(container)
-        .setName('Daemon token')
-        .setDesc('Auth token from ~/.config/claudian-praetor/daemon.json on your Mac.')
-        .addText((text) => {
-          text.inputEl.type = 'password';
-          text
-            .setPlaceholder('paste token')
-            .setValue(this.plugin.settings.remoteDaemon?.token ?? '')
-            .onChange(async (value) => {
-              await saveRemoteDaemonField({ token: value.trim() });
             });
         });
     }

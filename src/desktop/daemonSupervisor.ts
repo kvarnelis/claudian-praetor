@@ -5,7 +5,7 @@ import { Notice, Platform } from 'obsidian';
 import * as os from 'os';
 import * as path from 'path';
 
-import { DEFAULT_CONFIG_PATH, loadConfig } from '../../daemon/src/config';
+import { DEFAULT_CONFIG_PATH, loadConfig, openPairingWindow } from '../../daemon/src/config';
 import type ClaudianPlugin from '../main';
 import { DEFAULT_DAEMON_PORT } from '../remote/protocol';
 import { findNodeExecutable, getEnhancedPath } from '../utils/env';
@@ -15,8 +15,9 @@ import { findNodeExecutable, getEnhancedPath } from '../utils/env';
  *
  * When enabled on this specific machine, the desktop plugin spawns praetord
  * (bundled alongside the plugin) so mobile clients have something to reach.
- * The enablement flag is intentionally local-only; the generated URL/token is
+ * The enablement flag is intentionally local-only; the generated URL is
  * published separately to plugin data.json so Obsidian Sync can carry it to iOS.
+ * Pairing state stays on the host Mac.
  *
  * This module is dynamically imported only on desktop — it pulls Node APIs.
  */
@@ -29,10 +30,24 @@ export type DaemonStartResult =
   | {
       status: 'started' | 'already-running';
       url: string;
-      token: string;
       host: string;
       port: number;
       configPath: string;
+    }
+  | {
+      status: 'no-tailnet' | 'missing-vault' | 'error';
+      message: string;
+      configPath?: string;
+    };
+
+export type DaemonPairingResult =
+  | {
+      status: 'pairing-open';
+      url: string;
+      host: string;
+      port: number;
+      configPath: string;
+      expiresAt: number;
     }
   | {
       status: 'no-tailnet' | 'missing-vault' | 'error';
@@ -135,13 +150,12 @@ export class DaemonSupervisor {
       printConfig: false,
     });
     const url = `ws://${config.host}:${config.port}`;
-    await this.plugin.saveRemoteDaemonConfig({ url, token: config.token });
+    await this.plugin.saveRemoteDaemonConfig({ url });
 
     if (await isPortListening(config.host, config.port)) {
       return {
         status: 'already-running',
         url,
-        token: config.token,
         host: config.host,
         port: config.port,
         configPath,
@@ -171,11 +185,56 @@ export class DaemonSupervisor {
     return {
       status: 'started',
       url,
-      token: config.token,
       host: config.host,
       port: config.port,
       configPath,
     };
+  }
+
+  async openPairing(): Promise<DaemonPairingResult> {
+    if (!Platform.isDesktopApp) {
+      return { status: 'error', message: 'Pairing is only available in the desktop app.' };
+    }
+
+    const host = findTailnetIp();
+    if (!host) {
+      return {
+        status: 'no-tailnet',
+        message: 'Tailscale is not connected on this Mac. Turn on Tailscale before pairing a mobile device.',
+        configPath: DEFAULT_CONFIG_PATH,
+      };
+    }
+
+    const vaultPath = this.vaultPath();
+    if (!vaultPath) {
+      return { status: 'missing-vault', message: 'Could not determine this Obsidian vault path.' };
+    }
+
+    try {
+      const { config, configPath } = loadConfig({
+        vault: vaultPath,
+        host,
+        port: DEFAULT_DAEMON_PORT,
+        printConfig: false,
+      });
+      const { expiresAt } = openPairingWindow(configPath);
+      const url = `ws://${config.host}:${config.port}`;
+      await this.plugin.saveRemoteDaemonConfig({ url });
+      return {
+        status: 'pairing-open',
+        url,
+        host: config.host,
+        port: config.port,
+        configPath,
+        expiresAt,
+      };
+    } catch (error) {
+      return {
+        status: 'error',
+        message: `Failed to open pairing: ${errorMessage(error)}`,
+        configPath: DEFAULT_CONFIG_PATH,
+      };
+    }
   }
 
   /** Stop the daemon we spawned (only used if the user disables local hosting). */

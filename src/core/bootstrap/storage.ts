@@ -20,8 +20,8 @@ export interface SharedAppStorage {
    * Obsidian Sync's "community plugin settings" channel between devices (the
    * vault-level .claudian/ folder is a hidden top-level dir Sync skips).
    */
-  setRemoteDaemonConfig(config: { url: string; token: string } | null): Promise<void>;
-  getRemoteDaemonConfig(): Promise<{ url: string; token: string } | null>;
+  setRemoteDaemonConfig(config: { url: string } | null): Promise<void>;
+  getRemoteDaemonConfig(): Promise<{ url: string } | null>;
   sessions: AppSessionStorage;
   getAdapter(): VaultFileAdapter;
 }
