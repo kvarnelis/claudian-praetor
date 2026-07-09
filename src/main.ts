@@ -127,6 +127,17 @@ export default class ClaudianPlugin extends Plugin {
     });
 
     this.addCommand({
+      id: 'copy-last-interaction',
+      name: 'Copy last interaction',
+      callback: () => {
+        void (async () => {
+          const copied = await this.getView()?.copyLastInteraction();
+          if (copied) new Notice('Copied!');
+        })();
+      },
+    });
+
+    this.addCommand({
       id: 'inline-edit',
       name: 'Inline edit',
       editorCallback: async (editor: Editor, ctx) => {

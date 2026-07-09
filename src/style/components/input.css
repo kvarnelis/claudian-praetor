@@ -92,6 +92,12 @@
   height: 16px;
 }
 
+.claudian-copy-last-interaction-btn.copied {
+  color: var(--text-accent);
+  font-size: 11px;
+  font-family: var(--font-monospace);
+}
+
 .claudian-new-tab-btn svg {
   width: 16.8px;
   height: 16.8px;

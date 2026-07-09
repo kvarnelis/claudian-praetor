@@ -4,6 +4,7 @@ import { Platform, Scope } from 'obsidian';
 import { ClaudianView } from '@/features/chat/ClaudianView';
 
 const MockScope = Scope as typeof Scope & { instances: Scope[] };
+const originalNavigator = globalThis.navigator;
 
 function createViewHarness(options: {
   canCreateTab: boolean;
@@ -173,6 +174,88 @@ describe('ClaudianView tab controls', () => {
     view.toggleHistoryDropdown();
 
     expect(historyDropdown.hasClass('visible')).toBe(false);
+  });
+});
+
+describe('ClaudianView copy last interaction', () => {
+  afterEach(() => {
+    jest.useRealTimers();
+    Object.defineProperty(globalThis, 'navigator', {
+      value: originalNavigator,
+      writable: true,
+      configurable: true,
+    });
+  });
+
+  it('copies a payload built from the active tab message model', async () => {
+    const writeText = jest.fn().mockResolvedValue(undefined);
+    Object.defineProperty(globalThis, 'navigator', {
+      value: { clipboard: { writeText } },
+      writable: true,
+      configurable: true,
+    });
+    const view = Object.create(ClaudianView.prototype) as any;
+    view.tabManager = {
+      getActiveTab: jest.fn().mockReturnValue({
+        state: {
+          messages: [
+            { id: '1', role: 'user', content: 'Prompt', timestamp: 1 },
+            { id: '2', role: 'assistant', content: 'Response', timestamp: 2 },
+          ],
+        },
+      }),
+    };
+
+    await expect(view.copyLastInteraction()).resolves.toBe(true);
+    expect(writeText).toHaveBeenCalledWith(
+      '## Prompt\n\nPrompt\n\n## Response\n\nResponse',
+    );
+  });
+
+  it('does not touch the clipboard when there is no completed interaction', async () => {
+    const writeText = jest.fn().mockResolvedValue(undefined);
+    Object.defineProperty(globalThis, 'navigator', {
+      value: { clipboard: { writeText } },
+      writable: true,
+      configurable: true,
+    });
+    const view = Object.create(ClaudianView.prototype) as any;
+    view.tabManager = {
+      getActiveTab: jest.fn().mockReturnValue({
+        state: {
+          messages: [
+            { id: '1', role: 'user', content: 'Unanswered', timestamp: 1 },
+          ],
+        },
+      }),
+    };
+
+    await expect(view.copyLastInteraction()).resolves.toBe(false);
+    expect(writeText).not.toHaveBeenCalled();
+  });
+
+  it('shows transient feedback from the input navigation button', async () => {
+    jest.useFakeTimers();
+    const view = Object.create(ClaudianView.prototype) as any;
+    view.containerEl = createMockEl();
+    view.containerEl.ownerDocument.createDocumentFragment = () => createMockEl();
+    view.copyLastInteraction = jest.fn().mockResolvedValue(true);
+
+    const navRowContent = view.buildNavRowContent();
+    const copyBtn = navRowContent.querySelector('.claudian-copy-last-interaction-btn');
+
+    expect(copyBtn).not.toBeNull();
+    expect(copyBtn.getAttribute('aria-label')).toBe('Copy last interaction');
+
+    copyBtn.click();
+    await Promise.resolve();
+
+    expect(view.copyLastInteraction).toHaveBeenCalledTimes(1);
+    expect(copyBtn.textContent).toBe('Copied!');
+    expect(copyBtn.hasClass('copied')).toBe(true);
+
+    jest.advanceTimersByTime(1500);
+    expect(copyBtn.hasClass('copied')).toBe(false);
   });
 });
 

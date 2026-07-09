@@ -140,6 +140,16 @@ describe('ClaudianPlugin', () => {
       });
     });
 
+    it('should add command to copy the last interaction', async () => {
+      await plugin.onload();
+
+      expect((plugin.addCommand as jest.Mock)).toHaveBeenCalledWith({
+        id: 'copy-last-interaction',
+        name: 'Copy last interaction',
+        callback: expect.any(Function),
+      });
+    });
+
   });
 
   describe('onunload', () => {

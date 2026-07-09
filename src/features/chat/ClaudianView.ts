@@ -23,6 +23,7 @@ import {
 import { TabBar } from './tabs/TabBar';
 import { TabManager } from './tabs/TabManager';
 import type { TabData, TabId } from './tabs/types';
+import { buildLastInteractionPayload } from './utils/lastInteraction';
 import { recalculateUsageForModel } from './utils/usageInfo';
 
 type LoadableView = {
@@ -327,6 +328,29 @@ export class ClaudianView extends ItemView {
     historyBtn.addEventListener('click', (e) => {
       e.stopPropagation();
       this.toggleHistoryDropdown();
+    });
+
+    const copyLastInteractionBtn = navActionsEl.createDiv({
+      cls: 'claudian-input-nav-btn claudian-copy-last-interaction-btn',
+    });
+    setIcon(copyLastInteractionBtn, 'copy');
+    copyLastInteractionBtn.setAttribute('aria-label', 'Copy last interaction');
+
+    let copyFeedbackTimeout: number | null = null;
+    copyLastInteractionBtn.addEventListener('click', () => {
+      void this.copyLastInteraction().then((copied) => {
+        if (!copied) return;
+        if (copyFeedbackTimeout) window.clearTimeout(copyFeedbackTimeout);
+        copyLastInteractionBtn.empty();
+        copyLastInteractionBtn.setText('Copied!');
+        copyLastInteractionBtn.addClass('copied');
+        copyFeedbackTimeout = window.setTimeout(() => {
+          copyLastInteractionBtn.empty();
+          setIcon(copyLastInteractionBtn, 'copy');
+          copyLastInteractionBtn.removeClass('copied');
+          copyFeedbackTimeout = null;
+        }, 1500);
+      });
     });
 
     fragment.appendChild(navActionsEl);
@@ -746,6 +770,20 @@ export class ClaudianView extends ItemView {
   /** Gets the currently active tab. */
   getActiveTab(): TabData | null {
     return this.tabManager?.getActiveTab() ?? null;
+  }
+
+  /** Copies the latest completed prompt/response pair from the active tab. */
+  async copyLastInteraction(): Promise<boolean> {
+    const messages = this.tabManager?.getActiveTab()?.state.messages ?? [];
+    const payload = buildLastInteractionPayload(messages);
+    if (!payload) return false;
+
+    try {
+      await navigator.clipboard.writeText(payload);
+      return true;
+    } catch {
+      return false;
+    }
   }
 
   /** Gets the tab manager. */
