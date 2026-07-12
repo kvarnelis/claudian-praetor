@@ -49,6 +49,40 @@ export interface InitializeResult {
 }
 
 // ---------------------------------------------------------------------------
+// Models
+// ---------------------------------------------------------------------------
+
+export interface CodexAppServerReasoningEffortOption {
+  reasoningEffort: string;
+  description: string;
+}
+
+export interface CodexAppServerModel {
+  id: string;
+  model: string;
+  displayName: string;
+  description: string;
+  hidden: boolean;
+  isDefault: boolean;
+  defaultReasoningEffort: string;
+  supportedReasoningEfforts: CodexAppServerReasoningEffortOption[];
+  serviceTiers?: Array<{ id: string; name: string; description: string }>;
+  defaultServiceTier?: string | null;
+  inputModalities?: Array<'text' | 'image'>;
+}
+
+export interface ModelListParams {
+  cursor?: string | null;
+  includeHidden?: boolean | null;
+  limit?: number | null;
+}
+
+export interface ModelListResponse {
+  data: CodexAppServerModel[];
+  nextCursor?: string | null;
+}
+
+// ---------------------------------------------------------------------------
 // Thread
 // ---------------------------------------------------------------------------
 

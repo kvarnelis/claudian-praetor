@@ -1,5 +1,6 @@
 import { getRuntimeEnvironmentVariables } from '../../core/providers/providerEnvironment';
 import type { ProviderUIOption } from '../../core/providers/types';
+import { getCodexCatalogModelOptions } from './codexModelCatalog';
 import { encodeCodexModelSelectionId, toCodexRuntimeModelId } from './modelSelection';
 import { getCodexProviderSettings } from './settings';
 import {
@@ -46,7 +47,7 @@ export function parseConfiguredCustomModelIds(value: string): string[] {
 }
 
 export function getCodexModelOptions(settings: Record<string, unknown>): ProviderUIOption[] {
-  const models = [...DEFAULT_CODEX_MODELS];
+  const models = getCodexCatalogModelOptions() ?? [...DEFAULT_CODEX_MODELS];
   const seenModelIds = new Set(models.map(model => toCodexRuntimeModelId(model.value)));
 
   const envModel = getConfiguredEnvCustomModel(settings);

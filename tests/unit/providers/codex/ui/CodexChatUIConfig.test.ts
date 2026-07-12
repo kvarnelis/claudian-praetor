@@ -1,13 +1,39 @@
+import { clearCodexModelCatalog, setCodexModelCatalog } from '@/providers/codex/codexModelCatalog';
+import type { CodexAppServerModel } from '@/providers/codex/runtime/codexAppServerTypes';
 import { CODEX_SPARK_MODEL, DEFAULT_CODEX_PRIMARY_MODEL } from '@/providers/codex/types/models';
 import { codexChatUIConfig } from '@/providers/codex/ui/CodexChatUIConfig';
 
+const LIVE_MODELS: CodexAppServerModel[] = [{
+  id: 'gpt-5.6-id',
+  model: 'gpt-5.6',
+  displayName: 'GPT-5.6',
+  description: 'Live model',
+  hidden: false,
+  isDefault: true,
+  defaultReasoningEffort: 'medium',
+  supportedReasoningEfforts: [],
+}];
+
 describe('CodexChatUIConfig', () => {
+  afterEach(() => {
+    clearCodexModelCatalog();
+  });
+
   describe('getModelOptions', () => {
     it('should return default models when no env vars', () => {
       const options = codexChatUIConfig.getModelOptions({});
       expect(options).toHaveLength(2);
       expect(options.map(o => o.value)).toContain(DEFAULT_CODEX_PRIMARY_MODEL);
       expect(options.map(o => o.value)).toContain('gpt-5.4-mini');
+    });
+
+    it('prefers the live app-server catalog over default models', () => {
+      setCodexModelCatalog(LIVE_MODELS);
+      expect(codexChatUIConfig.getModelOptions({})).toEqual([{
+        value: 'gpt-5.6',
+        label: 'GPT-5.6',
+        description: 'Live model',
+      }]);
     });
 
     it('appends settings-defined custom models after the built-in options', () => {
@@ -44,12 +70,17 @@ describe('CodexChatUIConfig', () => {
     });
 
     it('should prepend custom model from OPENAI_MODEL env var', () => {
+      setCodexModelCatalog(LIVE_MODELS);
       const options = codexChatUIConfig.getModelOptions({
         environmentVariables: 'OPENAI_MODEL=my-custom-model',
       });
       expect(options[0].value).toBe('openai-codex/my-custom-model');
       expect(options[0].description).toBe('Custom (env)');
-      expect(options.length).toBe(3);
+      expect(options.slice(1)).toEqual([{
+        value: 'gpt-5.6',
+        label: 'GPT-5.6',
+        description: 'Live model',
+      }]);
     });
 
     it('deduplicates env and settings-defined custom models', () => {

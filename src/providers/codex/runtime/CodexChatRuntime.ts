@@ -31,6 +31,7 @@ import type ClaudianPlugin from '../../../main';
 import { getVaultPath } from '../../../utils/path';
 import { buildContextFromHistory } from '../../../utils/session';
 import { CODEX_PROVIDER_CAPABILITIES } from '../capabilities';
+import { setCodexModelCatalog } from '../codexModelCatalog';
 import {
   deriveCodexMemoriesDirFromSessionsRoot,
   deriveCodexSessionsRootFromSessionPath,
@@ -55,6 +56,8 @@ import {
   resolveCodexAppServerLaunchSpec,
 } from './codexAppServerSupport';
 import type {
+  ModelListParams,
+  ModelListResponse,
   SandboxPolicy,
   ServerRequestResolvedNotification,
   SkillInput,
@@ -820,6 +823,7 @@ export class CodexChatRuntime implements ChatRuntime {
     this.transport.start();
 
     const initializeResult = await initializeCodexAppServerTransport(this.transport);
+    void this.fetchAndCacheModels();
     this.runtimeContext = createCodexRuntimeContext(launchSpec, initializeResult);
     this.clientConfigKey = clientConfigKey;
   }
@@ -876,6 +880,40 @@ export class CodexChatRuntime implements ChatRuntime {
       this.transport.onServerRequest(method, (requestId, params) => {
         return this.serverRequestRouter.handleServerRequest(requestId, method, params);
       });
+    }
+  }
+
+  /**
+   * Publishes the app-server model list for picker consumers. Effort levels and
+   * service tiers are available in this response but remain statically managed.
+   */
+  private async fetchAndCacheModels(): Promise<void> {
+    const transport = this.transport;
+    if (!transport) return;
+
+    try {
+      const models: ModelListResponse['data'] = [];
+      let cursor: string | null | undefined;
+
+      do {
+        const params: ModelListParams = {
+          includeHidden: false,
+          ...(cursor ? { cursor } : {}),
+        };
+        const response = await transport.request<ModelListResponse>('model/list', params);
+        models.push(...response.data);
+        cursor = response.nextCursor;
+      } while (cursor);
+
+      if (this.transport !== transport) {
+        return;
+      }
+      const visibleModels = models.filter(model => !model.hidden);
+      if (visibleModels.length > 0) {
+        setCodexModelCatalog(visibleModels);
+      }
+    } catch {
+      // Non-critical: the selector falls back to DEFAULT_CODEX_MODELS
     }
   }
 
