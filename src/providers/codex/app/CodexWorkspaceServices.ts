@@ -10,8 +10,11 @@ import type { VaultFileAdapter } from '../../../core/storage/VaultFileAdapter';
 import type ClaudianPlugin from '../../../main';
 import { getVaultPath } from '../../../utils/path';
 import { CodexAgentMentionProvider } from '../agents/CodexAgentMentionProvider';
+import { setCodexModelCatalog } from '../codexModelCatalog';
 import { CodexSkillCatalog } from '../commands/CodexSkillCatalog';
+import { CodexModelListingService } from '../models/CodexModelListingService';
 import { CodexCliResolver } from '../runtime/CodexCliResolver';
+import { getCodexProviderSettings } from '../settings';
 import { CodexSkillListingService } from '../skills/CodexSkillListingService';
 import { CodexSkillStorage } from '../storage/CodexSkillStorage';
 import { CodexSubagentStorage } from '../storage/CodexSubagentStorage';
@@ -36,6 +39,15 @@ export async function createCodexWorkspaceServices(
   const subagentStorage = new CodexSubagentStorage(vaultAdapter);
   const agentMentionProvider = new CodexAgentMentionProvider(subagentStorage);
   await agentMentionProvider.loadAgents();
+
+  if (getCodexProviderSettings(plugin.settings).enabled) {
+    const modelListProvider = new CodexModelListingService(plugin);
+    void modelListProvider.listModels()
+      .then(models => setCodexModelCatalog(models.filter(model => !model.hidden)))
+      .catch(() => {
+        // Non-critical: the selector falls back to DEFAULT_CODEX_MODELS.
+      });
+  }
 
   const skillListProvider = new CodexSkillListingService(plugin);
   const commandCatalog = new CodexSkillCatalog(
