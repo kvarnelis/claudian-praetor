@@ -199,6 +199,17 @@ describe('ModelSelector', () => {
     expect(container).not.toBeNull();
   });
 
+  it('re-reads model options on hover so an async-populated catalog appears', () => {
+    // The dropdown opens on hover and its options are built once at
+    // construction; hovering must re-read getModelOptions so models loaded
+    // live from the provider CLI after startup are reflected without a reload.
+    const container = parentEl.querySelector('.claudian-model-selector');
+    const uiConfig = callbacks.getUIConfig();
+    uiConfig.getModelOptions.mockClear();
+    container.dispatchEvent('mouseenter');
+    expect(uiConfig.getModelOptions).toHaveBeenCalled();
+  });
+
   it('should display current model label', () => {
     // Default model is 'sonnet' which maps to 'Sonnet'
     const btn = parentEl.querySelector('.claudian-model-btn');

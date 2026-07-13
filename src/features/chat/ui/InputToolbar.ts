@@ -73,6 +73,14 @@ export class ModelSelector {
     this.callbacks = callbacks;
     this.container = parentEl.createDiv({ cls: 'claudian-model-selector' });
     this.render();
+    // The dropdown opens on hover (CSS) and its options are built once. Rebuild
+    // them on hover so an async-populated model catalog (models read live from
+    // the provider CLI after startup) appears without needing a manual model
+    // change or reload.
+    this.container.addEventListener('mouseenter', () => {
+      this.updateDisplay();
+      this.renderOptions();
+    });
   }
 
   private getAvailableModels() {
