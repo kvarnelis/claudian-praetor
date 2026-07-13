@@ -6,6 +6,7 @@ import type {
   ProviderReasoningOption,
   ProviderUIOption,
 } from '../../../core/providers/types';
+import { getGrokCatalogModelOptions } from '../grokModelCatalog';
 
 export const XAI_PROVIDER_ICON: ProviderIconSvg = {
   viewBox: '0 0 24 24',
@@ -15,8 +16,6 @@ export const XAI_PROVIDER_ICON: ProviderIconSvg = {
 export const GROK_MODELS: ProviderUIOption[] = [
   { value: 'grok-build', label: 'Grok Build', description: 'xAI coding agent' },
 ];
-
-const GROK_MODEL_SET = new Set(GROK_MODELS.map((model) => model.value));
 
 const GROK_EFFORT_LEVELS: ProviderReasoningOption[] = [
   { value: 'low', label: 'Low' },
@@ -39,18 +38,21 @@ function looksLikeGrokModel(model: string): boolean {
   return /^grok-/i.test(model);
 }
 
+function getBaseGrokModelOptions(): ProviderUIOption[] {
+  const catalog = getGrokCatalogModelOptions();
+  return catalog ? [...catalog] : [...GROK_MODELS];
+}
+
 export const grokChatUIConfig: ProviderChatUIConfig = {
   getModelOptions(settings: Record<string, unknown>): ProviderUIOption[] {
+    const models = getBaseGrokModelOptions();
     const envVars = getRuntimeEnvironmentVariables(settings, 'grok');
     const customModel = envVars.GROK_MODEL || envVars.XAI_MODEL;
-    if (customModel && !GROK_MODEL_SET.has(customModel)) {
-      return [
-        { value: customModel, label: customModel, description: 'Custom (env)' },
-        ...GROK_MODELS,
-      ];
+    if (customModel && !models.some(model => model.value === customModel)) {
+      models.unshift({ value: customModel, label: customModel, description: 'Custom (env)' });
     }
 
-    return [...GROK_MODELS];
+    return models;
   },
 
   ownsModel(model: string, settings: Record<string, unknown>): boolean {
@@ -78,7 +80,7 @@ export const grokChatUIConfig: ProviderChatUIConfig = {
   },
 
   isDefaultModel(model: string): boolean {
-    return GROK_MODEL_SET.has(model);
+    return getBaseGrokModelOptions().some(option => option.value === model);
   },
 
   applyModelDefaults(): void {
@@ -92,7 +94,7 @@ export const grokChatUIConfig: ProviderChatUIConfig = {
   getCustomModelIds(envVars: Record<string, string>): Set<string> {
     const ids = new Set<string>();
     const customModel = envVars.GROK_MODEL || envVars.XAI_MODEL;
-    if (customModel && !GROK_MODEL_SET.has(customModel)) {
+    if (customModel && !getBaseGrokModelOptions().some(model => model.value === customModel)) {
       ids.add(customModel);
     }
     return ids;

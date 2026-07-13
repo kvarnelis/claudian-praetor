@@ -13,7 +13,7 @@ A personal fork of **[Claudian](https://github.com/YishenTu/claudian)** by **[Yi
 
 - **Mobile remote mode** — drive the agents running on your Mac from Obsidian on an iPhone or iPad, over a private [Tailscale](https://tailscale.com/download) connection. It's peer-to-peer (no cloud relay); your vault and prompts never leave your own devices. [Setup below](#mobile-remote-mode).
 - **Grok provider** — adds Grok to Claudian's built-in set (Claude, Codex, OpenCode, Pi).
-- **Live model lists** — the Claude and Codex model pickers read their models directly from your installed CLIs at runtime, so they always show exactly what each CLI supports and pick up new models on their own. No hardcoded list to keep updated.
+- **Live model lists** — the Claude, Codex, and Grok model pickers read their models directly from your installed CLIs at runtime, so they always show exactly what each CLI supports and pick up new models on their own. No hardcoded list to keep updated.
 - **Date-based versioning** — this fork versions by date (e.g. `2026.7.2`) to stay clearly distinct from upstream's numbering.
 
 ## Install

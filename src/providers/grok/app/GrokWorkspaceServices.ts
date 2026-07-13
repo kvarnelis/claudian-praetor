@@ -3,6 +3,7 @@ import type {
   ProviderWorkspaceRegistration,
   ProviderWorkspaceServices,
 } from '../../../core/providers/types';
+import type ClaudianPlugin from '../../../main';
 import {
   GrokInlineEditService,
   GrokInstructionRefineService,
@@ -11,7 +12,9 @@ import {
 } from '../auxiliary/GrokAuxiliaryServices';
 import { GROK_PROVIDER_CAPABILITIES } from '../capabilities';
 import { grokSettingsReconciler } from '../env/GrokSettingsReconciler';
+import { setGrokModelCatalog } from '../grokModelCatalog';
 import { GrokConversationHistoryService } from '../history/GrokConversationHistoryService';
+import { GrokModelListingService } from '../models/GrokModelListingService';
 import { GrokChatRuntime } from '../runtime/GrokChatRuntime';
 import { GrokCliResolver } from '../runtime/GrokCliResolver';
 import { getGrokProviderSettings } from '../settings';
@@ -20,7 +23,16 @@ import { grokSettingsTabRenderer } from '../ui/GrokSettingsTab';
 
 export { grokSettingsReconciler } from '../env/GrokSettingsReconciler';
 
-export function createGrokWorkspaceServices(): ProviderWorkspaceServices {
+export function createGrokWorkspaceServices(plugin: ClaudianPlugin): ProviderWorkspaceServices {
+  if (getGrokProviderSettings(plugin.settings).enabled) {
+    const modelListProvider = new GrokModelListingService(plugin);
+    void modelListProvider.listModels()
+      .then(setGrokModelCatalog)
+      .catch(() => {
+        // Non-critical: the selector falls back to GROK_MODELS.
+      });
+  }
+
   return {
     cliResolver: new GrokCliResolver(),
     settingsTabRenderer: grokSettingsTabRenderer,
@@ -28,7 +40,7 @@ export function createGrokWorkspaceServices(): ProviderWorkspaceServices {
 }
 
 export const grokWorkspaceRegistration: ProviderWorkspaceRegistration = {
-  initialize: async () => createGrokWorkspaceServices(),
+  initialize: async ({ plugin }) => createGrokWorkspaceServices(plugin),
 };
 
 export const grokProviderRegistration: ProviderRegistration = {
