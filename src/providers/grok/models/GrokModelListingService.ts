@@ -6,6 +6,7 @@ import type { ProviderUIOption } from '../../../core/providers/types';
 import type ClaudianPlugin from '../../../main';
 import { parseEnvironmentVariables } from '../../../utils/env';
 import { getVaultPath } from '../../../utils/path';
+import { GrokCliResolver } from '../runtime/GrokCliResolver';
 
 export interface GrokModelListProvider {
   listModels(options?: { forceReload?: boolean }): Promise<ProviderUIOption[]>;
@@ -28,6 +29,10 @@ export class GrokModelListingService implements GrokModelListProvider {
   private pending: Promise<ProviderUIOption[]> | null = null;
   private readonly ttlMs: number;
   private readonly now: () => number;
+  // Resolve the CLI path directly rather than via the workspace-services
+  // registry: this service is kicked during provider init, before the registry
+  // has registered the resolver, so a registry lookup would return null.
+  private readonly cliResolver = new GrokCliResolver();
 
   constructor(
     private readonly plugin: ClaudianPlugin,
@@ -70,7 +75,7 @@ export class GrokModelListingService implements GrokModelListProvider {
   }
 
   private async fetchModels(): Promise<ProviderUIOption[]> {
-    const command = this.plugin.getResolvedProviderCliPath('grok');
+    const command = this.cliResolver.resolveFromSettings(this.plugin.settings);
     if (!command) {
       return [];
     }

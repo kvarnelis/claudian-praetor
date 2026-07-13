@@ -7,9 +7,19 @@ jest.mock('child_process', () => ({
   execFile: jest.fn(),
 }));
 
+// The service resolves the CLI path via its own GrokCliResolver (not the
+// workspace-services registry, which isn't populated yet during provider init).
+let mockResolvedGrokPath: string | null = '/usr/local/bin/grok';
+jest.mock('@/providers/grok/runtime/GrokCliResolver', () => ({
+  GrokCliResolver: jest.fn().mockImplementation(() => ({
+    resolveFromSettings: jest.fn(() => mockResolvedGrokPath),
+  })),
+}));
+
 const mockExecFile = execFile as jest.MockedFunction<typeof execFile>;
 
 function createPlugin(resolvedPath: string | null = '/usr/local/bin/grok') {
+  mockResolvedGrokPath = resolvedPath;
   return {
     app: {
       vault: {
@@ -18,7 +28,6 @@ function createPlugin(resolvedPath: string | null = '/usr/local/bin/grok') {
         },
       },
     },
-    getResolvedProviderCliPath: jest.fn(() => resolvedPath),
     settings: {
       providerConfigs: {
         grok: {
@@ -32,6 +41,7 @@ function createPlugin(resolvedPath: string | null = '/usr/local/bin/grok') {
 describe('GrokModelListingService', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockResolvedGrokPath = '/usr/local/bin/grok';
   });
 
   function createService(ttlMs = 5_000) {
