@@ -6,6 +6,29 @@ import { ClaudianView } from '@/features/chat/ClaudianView';
 const MockScope = Scope as typeof Scope & { instances: Scope[] };
 const originalNavigator = globalThis.navigator;
 
+describe('ClaudianView appearance', () => {
+  it('adds the theme-native modifier when the setting is enabled', () => {
+    const view = Object.create(ClaudianView.prototype) as any;
+    view.plugin = { settings: { useThemeNativeAppearance: true } };
+    view.viewContainerEl = createMockEl();
+
+    view.refreshAppearance();
+
+    expect(view.viewContainerEl.hasClass('claudian-container--theme-native')).toBe(true);
+  });
+
+  it('removes the theme-native modifier when the setting is disabled', () => {
+    const view = Object.create(ClaudianView.prototype) as any;
+    view.plugin = { settings: { useThemeNativeAppearance: false } };
+    view.viewContainerEl = createMockEl();
+    view.viewContainerEl.addClass('claudian-container--theme-native');
+
+    view.refreshAppearance();
+
+    expect(view.viewContainerEl.hasClass('claudian-container--theme-native')).toBe(false);
+  });
+});
+
 function createViewHarness(options: {
   canCreateTab: boolean;
   tabCount?: number;

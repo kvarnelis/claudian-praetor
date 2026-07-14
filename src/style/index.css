@@ -20,6 +20,9 @@
 @import "./components/input.css";
 @import "./components/context-footer.css";
 
+/* Optional host-theme integration */
+@import "./base/theme-integration.css";
+
 /* Toolbar */
 @import "./toolbar/model-selector.css";
 @import "./toolbar/mode-selector.css";

@@ -225,6 +225,8 @@ export type TranslationKey =
   | 'settings.maxTabs.name'
   | 'settings.maxTabs.desc'
   | 'settings.maxTabs.warning'
+  | 'settings.useThemeNativeAppearance.name'
+  | 'settings.useThemeNativeAppearance.desc'
   | 'settings.enableAutoScroll.name'
   | 'settings.enableAutoScroll.desc'
   | 'settings.deferMathRenderingDuringStreaming.name'

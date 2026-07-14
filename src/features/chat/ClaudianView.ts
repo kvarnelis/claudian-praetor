@@ -101,6 +101,14 @@ export class ClaudianView extends ItemView {
     return 'bot';
   }
 
+  /** Applies appearance preferences that can change while the view is open. */
+  refreshAppearance(): void {
+    this.viewContainerEl?.toggleClass(
+      'claudian-container--theme-native',
+      this.plugin.settings.useThemeNativeAppearance === true,
+    );
+  }
+
   /** Refreshes model-dependent UI across all tabs (used after settings/env changes). */
   refreshModelSelector(): void {
     for (const tab of this.tabManager?.getAllTabs() ?? []) {
@@ -173,6 +181,7 @@ export class ClaudianView extends ItemView {
     this.viewContainerEl = container;
     this.viewContainerEl.empty();
     this.viewContainerEl.addClass('claudian-container');
+    this.refreshAppearance();
 
     const header = this.viewContainerEl.createDiv({ cls: 'claudian-header' });
     this.buildHeader(header);

@@ -303,6 +303,21 @@ export class ClaudianSettingTab extends PluginSettingTab {
 
     new Setting(container).setName(t('settings.display')).setHeading();
 
+    new Setting(container)
+      .setName(t('settings.useThemeNativeAppearance.name'))
+      .setDesc(t('settings.useThemeNativeAppearance.desc'))
+      .addToggle((toggle) =>
+        toggle
+          .setValue(this.plugin.settings.useThemeNativeAppearance ?? false)
+          .onChange(async (value) => {
+            this.plugin.settings.useThemeNativeAppearance = value;
+            await this.plugin.saveSettings();
+            for (const view of this.plugin.getAllViews()) {
+              view.refreshAppearance();
+            }
+          })
+      );
+
     const maxTabsSetting = new Setting(container)
       .setName(t('settings.maxTabs.name'))
       .setDesc(t('settings.maxTabs.desc'));

@@ -285,6 +285,10 @@
       "desc": "Nombre maximum d'onglets de chat simultanés (3-10). Chaque onglet utilise une session Claude séparée.",
       "warning": "Plus de 5 onglets peut affecter les performances et l'utilisation de la mémoire."
     },
+    "useThemeNativeAppearance": {
+      "name": "Adopter le style de la barre latérale d’Obsidian",
+      "desc": "Utiliser dans Claudian la police d’interface, le texte plus petit et la couleur atténuée de la barre latérale du thème actuel."
+    },
     "enableAutoScroll": {
       "name": "Défilement automatique pendant le streaming",
       "desc": "Défiler automatiquement vers le bas pendant que Claude diffuse les réponses. Désactiver pour rester en haut et lire depuis le début."

@@ -285,6 +285,10 @@
       "desc": "Número máximo de abas de chat simultâneas (3-10). Cada aba usa uma sessão Claude separada.",
       "warning": "Mais de 5 abas pode afetar o desempenho e o uso de memória."
     },
+    "useThemeNativeAppearance": {
+      "name": "Combinar com o estilo da barra lateral do Obsidian",
+      "desc": "Usar no Claudian a fonte de interface, o texto menor e a cor suave da barra lateral do tema atual."
+    },
     "enableAutoScroll": {
       "name": "Rolagem automática durante streaming",
       "desc": "Rolar automaticamente para baixo enquanto o Claude transmite respostas. Desativar para ficar no topo e ler desde o início."

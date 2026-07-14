@@ -66,6 +66,10 @@ describe('types.ts', () => {
     it('should collapse file edits by default', () => {
       expect(DEFAULT_SETTINGS.expandFileEditsByDefault).toBe(false);
     });
+
+    it('should keep theme-native appearance opt-in', () => {
+      expect(DEFAULT_SETTINGS.useThemeNativeAppearance).toBe(false);
+    });
   });
 
   describe('ClaudianSettings type', () => {
@@ -104,6 +108,7 @@ describe('types.ts', () => {
         enableAutoScroll: true,
         deferMathRenderingDuringStreaming: true,
         expandFileEditsByDefault: false,
+        useThemeNativeAppearance: false,
         chatViewPlacement: 'right-sidebar',
         hiddenProviderCommands: {
           claude: [],
@@ -158,6 +163,7 @@ describe('types.ts', () => {
         enableAutoScroll: true,
         deferMathRenderingDuringStreaming: true,
         expandFileEditsByDefault: false,
+        useThemeNativeAppearance: false,
         chatViewPlacement: 'right-sidebar',
         hiddenProviderCommands: {
           claude: [],
@@ -213,6 +219,7 @@ describe('types.ts', () => {
         enableAutoScroll: false,
         deferMathRenderingDuringStreaming: true,
         expandFileEditsByDefault: true,
+        useThemeNativeAppearance: true,
         chatViewPlacement: 'right-sidebar',
         hiddenProviderCommands: {
           claude: [],

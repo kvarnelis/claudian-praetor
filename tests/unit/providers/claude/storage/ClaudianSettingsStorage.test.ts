@@ -53,6 +53,7 @@ describe('ClaudianSettingsStorage', () => {
       expect(result.thinkingBudget).toBe(DEFAULT_SETTINGS.thinkingBudget);
       expect(result.permissionMode).toBe(DEFAULT_SETTINGS.permissionMode);
       expect(result.requireCommandOrControlEnterToSend).toBe(false);
+      expect(result.useThemeNativeAppearance).toBe(false);
       expect(mockAdapter.read).not.toHaveBeenCalled();
     });
 
@@ -94,6 +95,18 @@ describe('ClaudianSettingsStorage', () => {
       expect(result.userName).toBe('TestUser');
       // Defaults should still be present for unspecified fields
       expect(result.thinkingBudget).toBe(DEFAULT_SETTINGS.thinkingBudget);
+      expect(result.useThemeNativeAppearance).toBe(false);
+    });
+
+    it('loads an explicit theme-native appearance preference', async () => {
+      mockAdapter.exists.mockResolvedValue(true);
+      mockAdapter.read.mockResolvedValue(JSON.stringify({
+        useThemeNativeAppearance: true,
+      }));
+
+      const result = await storage.load();
+
+      expect(result.useThemeNativeAppearance).toBe(true);
     });
 
     it('migrates legacy openInMainTab true to main-tab placement', async () => {
@@ -513,6 +526,7 @@ describe('ClaudianSettingsStorage', () => {
       const settings = {
         ...DEFAULT_SETTINGS,
         model: 'claude-opus-4-5' as const,
+        useThemeNativeAppearance: true,
       };
 
       await storage.save(settings);
@@ -523,6 +537,7 @@ describe('ClaudianSettingsStorage', () => {
       );
       const writtenContent = JSON.parse(mockAdapter.write.mock.calls[0][1]);
       expect(writtenContent.model).toBe('claude-opus-4-5');
+      expect(writtenContent.useThemeNativeAppearance).toBe(true);
       expect(writtenContent.providerConfigs.codex.installationMethodsByHost).toEqual({});
       expect(writtenContent.providerConfigs.codex.wslDistroOverridesByHost).toEqual({});
     });

@@ -1,0 +1,25 @@
+.claudian-container--theme-native {
+  /* Right-side themes can remap secondary; the ribbon token retains their sidebar surface. */
+  background-color: var(--ribbon-background, var(--background-primary-alt, var(--background-secondary)));
+  font-family: var(--font-interface);
+}
+
+.claudian-container--theme-native .claudian-message-content {
+  color: var(--nav-item-color, var(--text-muted));
+  font-size: var(--font-ui-small, 13px);
+}
+
+.claudian-container--theme-native .claudian-message-user {
+  align-self: flex-end;
+  padding: 0;
+  background: transparent;
+  border-radius: 0;
+  border-inline-end: 1px solid var(--text-faint);
+  font-weight: 500;
+  text-align: end;
+}
+
+.claudian-container--theme-native .claudian-input-wrapper textarea.claudian-input {
+  color: var(--text-normal);
+  font-size: var(--font-ui-small, 13px);
+}

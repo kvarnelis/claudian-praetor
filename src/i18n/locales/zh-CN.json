@@ -285,6 +285,10 @@
       "desc": "同时开启的最大聊天标签数（3-10）。每个标签使用独立的 Claude 会话。",
       "warning": "超过 5 个标签可能会影响性能和内存使用。"
     },
+    "useThemeNativeAppearance": {
+      "name": "匹配 Obsidian 侧边栏样式",
+      "desc": "在 Claudian 中使用当前主题的界面字体、较小字号和柔和的侧边栏颜色。"
+    },
     "enableAutoScroll": {
       "name": "流式传输时自动滚动",
       "desc": "在 Claude 流式传输响应时自动滚动到底部。禁用后将停留在顶部，从头开始阅读。"

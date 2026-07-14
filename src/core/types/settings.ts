@@ -147,6 +147,7 @@ export interface ClaudianSettings {
   enableAutoScroll: boolean;
   deferMathRenderingDuringStreaming: boolean;
   expandFileEditsByDefault: boolean;
+  useThemeNativeAppearance: boolean;
   chatViewPlacement: ChatViewPlacement;
 
   // Provider command visibility

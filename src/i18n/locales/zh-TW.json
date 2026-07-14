@@ -285,6 +285,10 @@
       "desc": "同時開啟的最大聊天標籤數（3-10）。每個標籤使用獨立的 Claude 對話。",
       "warning": "超過 5 個標籤可能會影響效能和記憶體使用。"
     },
+    "useThemeNativeAppearance": {
+      "name": "符合 Obsidian 側邊欄樣式",
+      "desc": "在 Claudian 中使用目前主題的介面字型、較小字級與柔和的側邊欄顏色。"
+    },
     "enableAutoScroll": {
       "name": "串流傳輸時自動捲動",
       "desc": "在 Claude 串流傳輸回應時自動捲動到底部。停用後將停留在頂部，從頭開始閱讀。"
