@@ -14,11 +14,10 @@ import { getClaudeProviderSettings } from '@/providers/claude/settings';
 import {
   CONTEXT_WINDOW_1M,
   CONTEXT_WINDOW_STANDARD,
-  DEFAULT_CLAUDE_MODELS,
-  filterVisibleModelOptions,
   getContextWindowSize,
   normalizeEffortLevel,
-  normalizeVisibleModelVariant,
+  normalizeLegacyClaudeModelAlias,
+  resolveContextWindowSize,
   supportsXHighEffort,
 } from '@/providers/claude/types/models';
 import {
@@ -53,6 +52,11 @@ describe('types.ts', () => {
 
     it('should have lastClaudeModel set to haiku by default', () => {
       expect(getClaudeProviderSettings(DEFAULT_SETTINGS).lastModel).toBe('haiku');
+    });
+
+    it('should have no Claude model environment source by default', () => {
+      expect(getClaudeProviderSettings(DEFAULT_SETTINGS).modelEnvironmentType).toBe('');
+      expect(getClaudeProviderSettings(DEFAULT_SETTINGS).titleModelEnvironmentType).toBe('');
     });
 
     it('should have empty custom Claude models by default', () => {
@@ -103,8 +107,6 @@ describe('types.ts', () => {
         maxTabs: 3,
         enableChrome: false,
         enableBangBash: false,
-        enableOpus1M: false,
-        enableSonnet1M: false,
         enableAutoScroll: true,
         deferMathRenderingDuringStreaming: true,
         expandFileEditsByDefault: false,
@@ -158,8 +160,6 @@ describe('types.ts', () => {
         maxTabs: 3,
         enableChrome: false,
         enableBangBash: false,
-        enableOpus1M: false,
-        enableSonnet1M: false,
         enableAutoScroll: true,
         deferMathRenderingDuringStreaming: true,
         expandFileEditsByDefault: false,
@@ -214,8 +214,6 @@ describe('types.ts', () => {
         maxTabs: 5,
         enableChrome: false,
         enableBangBash: false,
-        enableOpus1M: false,
-        enableSonnet1M: false,
         enableAutoScroll: false,
         deferMathRenderingDuringStreaming: true,
         expandFileEditsByDefault: true,
@@ -566,10 +564,19 @@ describe('types.ts', () => {
   });
 
   describe('getContextWindowSize', () => {
-    it('should return standard context window by default', () => {
-      expect(getContextWindowSize('sonnet')).toBe(CONTEXT_WINDOW_STANDARD);
-      expect(getContextWindowSize('opus')).toBe(CONTEXT_WINDOW_STANDARD);
+    it('should use the current built-in model context windows by default', () => {
+      expect(getContextWindowSize('sonnet')).toBe(CONTEXT_WINDOW_1M);
+      expect(getContextWindowSize('opus')).toBe(CONTEXT_WINDOW_1M);
       expect(getContextWindowSize('haiku')).toBe(CONTEXT_WINDOW_STANDARD);
+    });
+
+    it('should recognize current and legacy versioned context windows', () => {
+      expect(getContextWindowSize('claude-opus-4-6')).toBe(CONTEXT_WINDOW_1M);
+      expect(getContextWindowSize('claude-opus-4-8')).toBe(CONTEXT_WINDOW_1M);
+      expect(getContextWindowSize('claude-sonnet-4-6')).toBe(CONTEXT_WINDOW_1M);
+      expect(getContextWindowSize('claude-sonnet-5')).toBe(CONTEXT_WINDOW_1M);
+      expect(getContextWindowSize('claude-opus-4-5')).toBe(CONTEXT_WINDOW_STANDARD);
+      expect(getContextWindowSize('claude-sonnet-4-5')).toBe(CONTEXT_WINDOW_STANDARD);
     });
 
     it('should use custom limits when provided', () => {
@@ -579,15 +586,15 @@ describe('types.ts', () => {
 
     it('should fall back to default when model not in custom limits', () => {
       const customLimits = { 'other-model': 256000 };
-      expect(getContextWindowSize('sonnet', customLimits)).toBe(CONTEXT_WINDOW_STANDARD);
+      expect(getContextWindowSize('sonnet', customLimits)).toBe(CONTEXT_WINDOW_1M);
     });
 
     it('should handle empty custom limits object', () => {
-      expect(getContextWindowSize('sonnet', {})).toBe(CONTEXT_WINDOW_STANDARD);
+      expect(getContextWindowSize('sonnet', {})).toBe(CONTEXT_WINDOW_1M);
     });
 
     it('should handle undefined custom limits', () => {
-      expect(getContextWindowSize('sonnet', undefined)).toBe(CONTEXT_WINDOW_STANDARD);
+      expect(getContextWindowSize('sonnet', undefined)).toBe(CONTEXT_WINDOW_1M);
     });
 
     describe('defensive validation for invalid custom limit values', () => {
@@ -649,14 +656,15 @@ describe('types.ts', () => {
         expect(getContextWindowSize('claude-opus-4-6[1M]', customLimits)).toBe(500000);
       });
 
-      it('should return standard for models without [1m] suffix', () => {
-        expect(getContextWindowSize('opus')).toBe(CONTEXT_WINDOW_STANDARD);
-        expect(getContextWindowSize('sonnet')).toBe(CONTEXT_WINDOW_STANDARD);
+      it('should keep retired 1M variants on their current standard window', () => {
+        expect(getContextWindowSize('claude-opus-4-5[1m]')).toBe(CONTEXT_WINDOW_STANDARD);
+        expect(getContextWindowSize('claude-sonnet-4-5[1m]')).toBe(CONTEXT_WINDOW_STANDARD);
       });
     });
 
     describe('fable models', () => {
       it('should default to 1M context window with no [1m] suffix needed', () => {
+        expect(getContextWindowSize('fable')).toBe(CONTEXT_WINDOW_1M);
         expect(getContextWindowSize('claude-fable-5')).toBe(CONTEXT_WINDOW_1M);
         expect(getContextWindowSize('claude-fable-6')).toBe(CONTEXT_WINDOW_1M);
       });
@@ -665,47 +673,33 @@ describe('types.ts', () => {
         const customLimits = { 'claude-fable-5': 500000 };
         expect(getContextWindowSize('claude-fable-5', customLimits)).toBe(500000);
       });
-    });
 
-    describe('filterVisibleModelOptions', () => {
-      it('should hide 1M variants when toggles are disabled', () => {
-        const models = filterVisibleModelOptions(DEFAULT_CLAUDE_MODELS, false, false).map((model) => model.value);
-        expect(models).toEqual(['haiku', 'sonnet', 'opus', 'claude-fable-5']);
-      });
+      it('should preserve legacy Fable custom limits after alias migration', () => {
+        const customLimits = { 'claude-fable-5': 500000 };
 
-      it('should swap in 1M variants when toggles are enabled', () => {
-        const models = filterVisibleModelOptions(DEFAULT_CLAUDE_MODELS, true, true).map((model) => model.value);
-        expect(models).toEqual(['haiku', 'sonnet[1m]', 'opus[1m]', 'claude-fable-5']);
-      });
-
-      it('should swap only opus when enableOpus1M is true and enableSonnet1M is false', () => {
-        const models = filterVisibleModelOptions(DEFAULT_CLAUDE_MODELS, true, false).map((model) => model.value);
-        expect(models).toEqual(['haiku', 'sonnet', 'opus[1m]', 'claude-fable-5']);
-      });
-
-      it('should swap only sonnet when enableSonnet1M is true and enableOpus1M is false', () => {
-        const models = filterVisibleModelOptions(DEFAULT_CLAUDE_MODELS, false, true).map((model) => model.value);
-        expect(models).toEqual(['haiku', 'sonnet[1m]', 'opus', 'claude-fable-5']);
+        expect(getContextWindowSize('fable', customLimits)).toBe(500000);
+        expect(resolveContextWindowSize('fable', customLimits, 1000000)).toEqual({
+          contextWindow: 500000,
+          source: 'custom',
+        });
       });
     });
 
-    describe('normalizeVisibleModelVariant', () => {
-      it('should normalize built-in variants to the visible option', () => {
-        expect(normalizeVisibleModelVariant('sonnet', true, true)).toBe('sonnet[1m]');
-        expect(normalizeVisibleModelVariant('sonnet[1m]', false, false)).toBe('sonnet');
-        expect(normalizeVisibleModelVariant('opus', true, false)).toBe('opus[1m]');
-        expect(normalizeVisibleModelVariant('opus[1m]', false, true)).toBe('opus');
+    describe('normalizeLegacyClaudeModelAlias', () => {
+      it('should migrate legacy built-in variants to the current aliases', () => {
+        expect(normalizeLegacyClaudeModelAlias('sonnet[1m]')).toBe('sonnet');
+        expect(normalizeLegacyClaudeModelAlias('sonnet[1M]')).toBe('sonnet');
+        expect(normalizeLegacyClaudeModelAlias('opus[1m]')).toBe('opus');
+        expect(normalizeLegacyClaudeModelAlias('opus[1M]')).toBe('opus');
+        expect(normalizeLegacyClaudeModelAlias('claude-fable-5')).toBe('fable');
       });
 
-      it('should normalize built-in variants regardless of 1M suffix casing', () => {
-        expect(normalizeVisibleModelVariant('sonnet[1M]', false, false)).toBe('sonnet');
-        expect(normalizeVisibleModelVariant('opus[1M]', true, false)).toBe('opus[1m]');
-      });
-
-      it('should leave unrelated model ids unchanged', () => {
-        expect(normalizeVisibleModelVariant('', true, true)).toBe('');
-        expect(normalizeVisibleModelVariant('haiku', true, true)).toBe('haiku');
-        expect(normalizeVisibleModelVariant('custom-model', true, true)).toBe('custom-model');
+      it('should leave explicit and custom model ids unchanged', () => {
+        expect(normalizeLegacyClaudeModelAlias('')).toBe('');
+        expect(normalizeLegacyClaudeModelAlias('haiku')).toBe('haiku');
+        expect(normalizeLegacyClaudeModelAlias('claude-opus-4-6[1m]')).toBe('claude-opus-4-6[1m]');
+        expect(normalizeLegacyClaudeModelAlias('claude-fable-6')).toBe('claude-fable-6');
+        expect(normalizeLegacyClaudeModelAlias('custom-model')).toBe('custom-model');
       });
     });
   });
@@ -735,6 +729,7 @@ describe('types.ts', () => {
     });
 
     it('returns true for fable models', () => {
+      expect(supportsXHighEffort('fable')).toBe(true);
       expect(supportsXHighEffort('claude-fable-5')).toBe(true);
       expect(supportsXHighEffort('claude-fable-6')).toBe(true);
     });

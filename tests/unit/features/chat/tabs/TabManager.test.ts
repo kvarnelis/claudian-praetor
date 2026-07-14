@@ -1,3 +1,4 @@
+import { TEST_CODEX_MODEL } from '@test/helpers/codexModels';
 import { createMockEl } from '@test/helpers/mockElement';
 
 import { ProviderWorkspaceRegistry } from '@/core/providers/ProviderWorkspaceRegistry';
@@ -7,7 +8,6 @@ import {
   type PersistedTabManagerState,
   type TabManagerCallbacks,
 } from '@/features/chat/tabs/types';
-import { DEFAULT_CODEX_PRIMARY_MODEL } from '@/providers/codex/types/models';
 
 // Mock Tab module functions
 const mockCreateTab = jest.fn();
@@ -285,6 +285,27 @@ describe('TabManager - Tab Lifecycle', () => {
       expect(manager.getTabCount()).toBe(DEFAULT_MAX_TABS);
     });
 
+    it('reserves capacity before awaited conversation loading', async () => {
+      let releaseConversation!: () => void;
+      const conversationGate = new Promise<any>(resolve => {
+        releaseConversation = () => resolve(null);
+      });
+      const plugin = createMockPlugin({
+        getConversationById: jest.fn().mockReturnValue(conversationGate),
+      });
+      const manager = createManager({ plugin });
+      await manager.createTab();
+      await manager.createTab();
+
+      const third = manager.createTab('conversation-3');
+      const fourth = manager.createTab('conversation-4');
+
+      await expect(fourth).resolves.toBeNull();
+      releaseConversation();
+      await expect(third).resolves.toBeTruthy();
+      expect(manager.getTabCount()).toBe(DEFAULT_MAX_TABS);
+    });
+
     it('should use provided tab ID for restoration', async () => {
       const manager = createManager({ callbacks });
       mockCreateTab.mockImplementationOnce(() =>
@@ -483,6 +504,20 @@ describe('TabManager - Tab Lifecycle', () => {
       await manager.closeTab('tab-with-save', true);
 
       expect(mockSave).toHaveBeenCalled();
+    });
+
+    it('destroys and removes the tab even when save-on-close fails', async () => {
+      const saveError = new Error('save failed');
+      const tab = createMockTabData({ id: 'tab-save-failure' });
+      tab.controllers.conversationController.save = jest.fn().mockRejectedValue(saveError);
+      mockCreateTab.mockReturnValueOnce(tab);
+      const manager = createManager({ callbacks });
+      await manager.createTab();
+      await manager.createTab();
+
+      await expect(manager.closeTab(tab.id, true)).rejects.toBe(saveError);
+      expect(mockDestroyTab).toHaveBeenCalledWith(tab);
+      expect(manager.getTab(tab.id)).toBeNull();
     });
 
     it('should switch to next tab when closing first tab', async () => {
@@ -1046,6 +1081,38 @@ describe('TabManager - Broadcast', () => {
       expect(broadcastFn).toHaveBeenCalledWith(expect.objectContaining({ providerId: 'opencode' }));
     });
   });
+
+  describe('recycleProviderRuntimes', () => {
+    it('disposes and detaches matching runtimes so the next turn creates a fresh instance', async () => {
+      const opencodeCleanup = jest.fn();
+      const claudeCleanup = jest.fn();
+      manager = createManager({
+        tabFactory: (n) => createMockTabData({
+          id: `tab-${n}`,
+          conversationId: `conversation-${n}`,
+          lifecycleState: 'bound_active',
+          providerId: n === 1 ? 'claude' : 'opencode',
+          runtimeSupervisor: {
+            cleanup: n === 1 ? claudeCleanup : opencodeCleanup,
+          },
+          service: {
+            providerId: n === 1 ? 'claude' : 'opencode',
+          },
+          serviceInitialized: true,
+        }),
+      });
+      await manager.createTab();
+      const opencodeTab = (await manager.createTab())!;
+
+      await manager.recycleProviderRuntimes('opencode');
+
+      expect(opencodeCleanup).toHaveBeenCalledTimes(1);
+      expect(opencodeTab.service).toBeNull();
+      expect(opencodeTab.serviceInitialized).toBe(false);
+      expect(opencodeTab.lifecycleState).toBe('bound_cold');
+      expect(claudeCleanup).not.toHaveBeenCalled();
+    });
+  });
 });
 
 describe('TabManager - SDK Commands', () => {
@@ -1149,7 +1216,7 @@ describe('TabManager - SDK Commands', () => {
       tabFactory: (n) => createMockTabData({
         id: `tab-${n}`,
         lifecycleState: n === 2 ? 'blank' : 'bound_cold',
-        draftModel: n === 2 ? DEFAULT_CODEX_PRIMARY_MODEL : null,
+        draftModel: n === 2 ? TEST_CODEX_MODEL : null,
         providerId: 'claude',
         service: n === 1 ? readyClaudeService : null,
       }),
@@ -1753,7 +1820,7 @@ describe('TabManager - Provider Command Catalog', () => {
       tabFactory: () => createMockTabData({
         id: 'tab-1',
         lifecycleState: 'blank',
-        draftModel: DEFAULT_CODEX_PRIMARY_MODEL,
+        draftModel: TEST_CODEX_MODEL,
         providerId: 'claude',
       }),
     });
@@ -2108,7 +2175,7 @@ describe('TabManager - Service Initialization Errors', () => {
 });
 
 describe('TabManager - Concurrent Switch Guard', () => {
-  it('should prevent concurrent tab switches', async () => {
+  it('should execute the latest switch requested while another switch is pending', async () => {
     const callbacks: TabManagerCallbacks = {
       onTabSwitched: jest.fn(),
     };
@@ -2132,8 +2199,7 @@ describe('TabManager - Concurrent Switch Guard', () => {
     // Start first switch to tab-1 (will hang on conversationController.switchTo)
     const firstSwitch = manager.switchToTab(tab1!.id);
 
-    // While first switch is in progress, try a second switch.
-    // isSwitchingTab is true, so this should return immediately (lines 143-144)
+    // While the first switch is in progress, retain the newer target.
     await manager.switchToTab(tab2!.id);
 
     expect(mockDeactivateTab).toHaveBeenCalledTimes(1);
@@ -2143,12 +2209,8 @@ describe('TabManager - Concurrent Switch Guard', () => {
     resolveSwitchTo();
     await firstSwitch;
 
-    expect(callbacks.onTabSwitched).toHaveBeenCalledTimes(1);
-
-    // After first switch completes, isSwitchingTab is false
-    // and subsequent switches should work normally
-    await manager.switchToTab(tab2!.id);
     expect(callbacks.onTabSwitched).toHaveBeenCalledTimes(2);
+    expect(manager.getActiveTabId()).toBe(tab2!.id);
   });
 });
 

@@ -15,10 +15,9 @@
 /* outline + offset only */
 .claudian-action-btn:focus-visible,
 .claudian-toggle-switch:focus-visible,
-.claudian-file-chip:focus-visible,
-.claudian-image-chip:focus-visible,
-.claudian-file-chip-remove:focus-visible,
-.claudian-image-remove:focus-visible,
+.claudian-context-chip-main:focus-visible,
+.claudian-context-chip-remove:focus-visible,
+.claudian-context-more:focus-visible,
 .claudian-image-modal-close:focus-visible,
 .claudian-approved-remove-btn:focus-visible,
 .claudian-save-env-btn:focus-visible,
@@ -30,6 +29,17 @@
 .claudian-code-lang-label:focus-visible {
   outline: 2px solid var(--interactive-accent);
   outline-offset: 2px;
+}
+
+.claudian-inline-preview-action:focus-visible {
+  outline: 2px solid var(--interactive-accent);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .claudian-inline-spinner {
+    animation: none;
+  }
 }
 
 /* outline + negative offset + border-radius */

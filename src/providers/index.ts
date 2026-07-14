@@ -1,35 +1,30 @@
 import { ProviderRegistry } from '../core/providers/ProviderRegistry';
 import { ProviderWorkspaceRegistry } from '../core/providers/ProviderWorkspaceRegistry';
-import { claudeWorkspaceRegistration } from './claude/app/ClaudeWorkspaceServices';
 import { claudeProviderRegistration } from './claude/registration';
-import { codexWorkspaceRegistration } from './codex/app/CodexWorkspaceServices';
 import { codexProviderRegistration } from './codex/registration';
-import {
-  grokProviderRegistration,
-  grokWorkspaceRegistration,
-} from './grok/app/GrokWorkspaceServices';
-import { opencodeWorkspaceRegistration } from './opencode/app/OpencodeWorkspaceServices';
+import { grokProviderRegistration } from './grok/app/GrokWorkspaceServices';
 import { opencodeProviderRegistration } from './opencode/registration';
-import { piWorkspaceRegistration } from './pi/app/PiWorkspaceServices';
 import { piProviderRegistration } from './pi/registration';
 
 let builtInProvidersRegistered = false;
+
+export const BUILT_IN_PROVIDER_MODULES = [
+  claudeProviderRegistration,
+  codexProviderRegistration,
+  grokProviderRegistration,
+  opencodeProviderRegistration,
+  piProviderRegistration,
+] as const;
 
 export function registerBuiltInProviders(): void {
   if (builtInProvidersRegistered) {
     return;
   }
 
-  ProviderRegistry.register('claude', claudeProviderRegistration);
-  ProviderRegistry.register('codex', codexProviderRegistration);
-  ProviderRegistry.register('grok', grokProviderRegistration);
-  ProviderRegistry.register('opencode', opencodeProviderRegistration);
-  ProviderRegistry.register('pi', piProviderRegistration);
-  ProviderWorkspaceRegistry.register('claude', claudeWorkspaceRegistration);
-  ProviderWorkspaceRegistry.register('codex', codexWorkspaceRegistration);
-  ProviderWorkspaceRegistry.register('grok', grokWorkspaceRegistration);
-  ProviderWorkspaceRegistry.register('opencode', opencodeWorkspaceRegistration);
-  ProviderWorkspaceRegistry.register('pi', piWorkspaceRegistration);
+  for (const providerModule of BUILT_IN_PROVIDER_MODULES) {
+    ProviderRegistry.register(providerModule.id, providerModule);
+    ProviderWorkspaceRegistry.register(providerModule.id, providerModule.workspace);
+  }
   builtInProvidersRegistered = true;
 }
 

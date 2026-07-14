@@ -14,7 +14,7 @@ export interface PersistedGrokProviderSettings {
 
 export const DEFAULT_GROK_PROVIDER_SETTINGS: Readonly<PersistedGrokProviderSettings> = Object.freeze({
   enabled: false,
-  safeMode: 'workspace-write' as GrokSafeMode,
+  safeMode: 'workspace-write',
   cliPath: '',
   cliPathsByHost: {},
   environmentVariables: '',

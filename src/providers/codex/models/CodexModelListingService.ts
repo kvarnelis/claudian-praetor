@@ -1,4 +1,4 @@
-import type ClaudianPlugin from '../../../main';
+import type { ProviderHost } from '../../../core/providers/ProviderHost';
 import { CodexAppServerProcess } from '../runtime/CodexAppServerProcess';
 import {
   initializeCodexAppServerTransport,
@@ -32,7 +32,7 @@ export class CodexModelListingService implements CodexModelListProvider {
   private readonly now: () => number;
 
   constructor(
-    private readonly plugin: ClaudianPlugin,
+    private readonly plugin: ProviderHost,
     options: CodexModelListingServiceOptions = {},
   ) {
     this.ttlMs = options.ttlMs ?? DEFAULT_MODEL_LIST_TTL_MS;

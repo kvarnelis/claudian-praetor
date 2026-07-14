@@ -14,7 +14,9 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint \"{src,tests}/**/*.ts\"",
     "lint:fix": "npm run lint -- --fix",
-    "test": "node scripts/run-jest.js",
+    "test": "node scripts/run-tests.js",
+    "test:unit": "node scripts/run-jest.js",
+    "test:architecture": "node --test scripts/check-architecture-boundaries.test.mjs",
     "test:watch": "node scripts/run-jest.js --watch",
     "test:coverage": "node scripts/run-jest.js --coverage",
     "version": "node scripts/sync-version.js && git add manifest.json",
@@ -50,7 +52,7 @@
     "typescript": "^6.0.2"
   },
   "dependencies": {
-    "@anthropic-ai/claude-agent-sdk": "^0.3.159",
+    "@anthropic-ai/claude-agent-sdk": "^0.3.209",
     "@codemirror/state": "^6.5.0",
     "@codemirror/view": "^6.38.6",
     "@modelcontextprotocol/sdk": "~1.29.0",

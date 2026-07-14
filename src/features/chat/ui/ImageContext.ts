@@ -1,6 +1,7 @@
 import { Notice } from 'obsidian';
 
 import type { ImageAttachment, ImageMediaType } from '../../../core/types';
+import { ComposerContextTray } from './ComposerContextTray';
 
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
 
@@ -20,14 +21,14 @@ const IMAGE_EXTENSIONS: Record<string, ImageMediaType> = {
 };
 
 export interface ImageContextCallbacks {
-  onImagesChanged: () => void;
+  onImagesChanged?: () => void;
 }
 
 export class ImageContextManager {
   private callbacks: ImageContextCallbacks;
   private containerEl: HTMLElement;
-  private previewContainerEl: HTMLElement;
-  private imagePreviewEl: HTMLElement;
+  private contextTray: ComposerContextTray;
+  private ownedContextTray: ComposerContextTray | null = null;
   private inputEl: HTMLTextAreaElement;
   private dropOverlay: HTMLElement | null = null;
   private attachedImages: Map<string, ImageAttachment> = new Map();
@@ -37,18 +38,18 @@ export class ImageContextManager {
     containerEl: HTMLElement,
     inputEl: HTMLTextAreaElement,
     callbacks: ImageContextCallbacks,
-    previewContainerEl?: HTMLElement
+    previewContainerEl?: HTMLElement,
+    contextTray?: ComposerContextTray,
   ) {
     this.containerEl = containerEl;
-    this.previewContainerEl = previewContainerEl ?? containerEl;
     this.inputEl = inputEl;
     this.callbacks = callbacks;
-
-    // Create image preview in previewContainerEl, before file indicator if present
-    const fileIndicator = this.previewContainerEl.querySelector('.claudian-file-indicator');
-    this.imagePreviewEl = this.previewContainerEl.createDiv({ cls: 'claudian-image-preview' });
-    if (fileIndicator && fileIndicator.parentElement === this.previewContainerEl) {
-      this.previewContainerEl.insertBefore(this.imagePreviewEl, fileIndicator);
+    const ownedTrayContainer = contextTray
+      ? null
+      : (previewContainerEl ?? containerEl).createDiv({ cls: 'claudian-context-row' });
+    this.contextTray = contextTray ?? new ComposerContextTray(ownedTrayContainer!);
+    if (!contextTray) {
+      this.ownedContextTray = this.contextTray;
     }
 
     this.setupDragAndDrop();
@@ -74,7 +75,7 @@ export class ImageContextManager {
   clearImages() {
     this.attachedImages.clear();
     this.updateImagePreview();
-    this.callbacks.onImagesChanged();
+    this.callbacks.onImagesChanged?.();
   }
 
   /** Sets images directly (used for queued messages). */
@@ -84,7 +85,14 @@ export class ImageContextManager {
       this.attachedImages.set(image.id, image);
     }
     this.updateImagePreview();
-    this.callbacks.onImagesChanged();
+    this.callbacks.onImagesChanged?.();
+  }
+
+  destroy(): void {
+    this.contextTray.clearItems('images');
+    this.contextTray.clearLeadingAccessory('image-attach');
+    this.ownedContextTray?.destroy();
+    this.ownedContextTray = null;
   }
 
   private setupDragAndDrop() {
@@ -181,14 +189,14 @@ export class ImageContextManager {
     // An explicit attach button on every platform: on touch it's the only way
     // to attach an image (no clipboard paste or drag-drop into the input); on
     // desktop it sits alongside paste and drag-drop as a discoverable option.
-    const button = this.previewContainerEl.createEl('button', {
-      cls: 'claudian-image-attach-btn',
-      attr: { type: 'button', 'aria-label': 'Attach image' },
-    });
+    const ownerDocument = this.containerEl.ownerDocument ?? window.document;
+    const button = ownerDocument.createElement('button');
+    button.className = 'claudian-image-attach-btn';
+    button.setAttribute('type', 'button');
+    button.setAttribute('aria-label', 'Attach image');
     // Inline SVG rather than setIcon: on iOS, Obsidian's icon lookup paints an
     // empty button for some names / dynamically-created elements, so an inline
     // path is the only reliable option. This is Lucide's "paperclip" glyph.
-    const ownerDocument = button.ownerDocument ?? window.document;
     const svgNs = 'http://www.w3.org/2000/svg';
     const svg = ownerDocument.createElementNS(svgNs, 'svg');
     svg.setAttribute('viewBox', '0 0 24 24');
@@ -203,15 +211,14 @@ export class ImageContextManager {
     clipPath.setAttribute('d', 'm21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48');
     svg.appendChild(clipPath);
     button.appendChild(svg);
-    this.previewContainerEl.insertBefore(button, this.imagePreviewEl);
-    // Keep the context row visible even when it has no chips, so the button is
-    // always reachable (the row is otherwise collapsed until it has content).
-    this.previewContainerEl.addClass('claudian-has-attach-button');
 
-    const fileInput = this.previewContainerEl.createEl('input', {
-      cls: 'claudian-hidden',
-      attr: { type: 'file', accept: 'image/*', multiple: '' },
-    });
+    const fileInput = ownerDocument.createElement('input');
+    fileInput.className = 'claudian-hidden';
+    fileInput.setAttribute('type', 'file');
+    fileInput.setAttribute('accept', 'image/*');
+    fileInput.multiple = true;
+
+    this.contextTray.setLeadingAccessory('image-attach', [button, fileInput]);
 
     button.addEventListener('click', () => {
       if (!this.enabled) {
@@ -294,7 +301,7 @@ export class ImageContextManager {
 
       this.attachedImages.set(attachment.id, attachment);
       this.updateImagePreview();
-      this.callbacks.onImagesChanged();
+      this.callbacks.onImagesChanged?.();
       return true;
     } catch (error) {
       this.notifyImageError('Failed to attach image.', error);
@@ -334,55 +341,25 @@ export class ImageContextManager {
   // ============================================
 
   private updateImagePreview() {
-    this.imagePreviewEl.empty();
-
     if (this.attachedImages.size === 0) {
-      this.imagePreviewEl.removeClass('claudian-visible-flex');
-      this.imagePreviewEl.addClass('claudian-hidden');
+      this.contextTray.clearItems('images');
       return;
     }
 
-    this.imagePreviewEl.addClass('claudian-visible-flex');
-    this.imagePreviewEl.removeClass('claudian-hidden');
-
-    for (const [id, image] of this.attachedImages) {
-      this.renderImagePreview(id, image);
-    }
-  }
-
-  private renderImagePreview(id: string, image: ImageAttachment) {
-    const previewEl = this.imagePreviewEl.createDiv({ cls: 'claudian-image-chip' });
-
-    const thumbEl = previewEl.createDiv({ cls: 'claudian-image-thumb' });
-    thumbEl.createEl('img', {
-      attr: {
-        src: `data:${image.mediaType};base64,${image.data}`,
-        alt: image.name,
+    const images = Array.from(this.attachedImages);
+    this.contextTray.setItems('images', images.map(([id, image], index) => ({
+      id,
+      kind: 'image' as const,
+      label: images.length === 1 ? 'Image' : `Image ${index + 1}`,
+      title: `${image.name} · ${this.formatSize(image.size)}`,
+      ariaLabel: `Image attachment: ${image.name}`,
+      onActivate: () => this.showFullImage(image),
+      onRemove: () => {
+        this.attachedImages.delete(id);
+        this.updateImagePreview();
+        this.callbacks.onImagesChanged?.();
       },
-    });
-
-    const infoEl = previewEl.createDiv({ cls: 'claudian-image-info' });
-    const nameEl = infoEl.createSpan({ cls: 'claudian-image-name' });
-    nameEl.setText(this.truncateName(image.name, 20));
-    nameEl.setAttribute('title', image.name);
-
-    const sizeEl = infoEl.createSpan({ cls: 'claudian-image-size' });
-    sizeEl.setText(this.formatSize(image.size));
-
-    const removeEl = previewEl.createSpan({ cls: 'claudian-image-remove' });
-    removeEl.setText('\u00D7');
-    removeEl.setAttribute('aria-label', 'Remove image');
-
-    removeEl.addEventListener('click', (e) => {
-      e.stopPropagation();
-      this.attachedImages.delete(id);
-      this.updateImagePreview();
-      this.callbacks.onImagesChanged();
-    });
-
-    thumbEl.addEventListener('click', () => {
-      this.showFullImage(image);
-    });
+    })));
   }
 
   private showFullImage(image: ImageAttachment) {
@@ -420,14 +397,6 @@ export class ImageContextManager {
 
   private generateId(): string {
     return `img-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`;
-  }
-
-  private truncateName(name: string, maxLen: number): string {
-    if (name.length <= maxLen) return name;
-    const ext = fileExtension(name);
-    const base = name.slice(0, name.length - ext.length);
-    const truncatedBase = base.slice(0, maxLen - ext.length - 3);
-    return `${truncatedBase}...${ext}`;
   }
 
   private formatSize(bytes: number): string {

@@ -988,9 +988,85 @@ describe('transformSDKMessage', () => {
             inputTokens: 10,
             cacheCreationInputTokens: 0,
             cacheReadInputTokens: 0,
-            contextWindow: 200000,
+            contextWindow: 1000000,
             contextTokens: 10,
             percentage: 0,
+          },
+        },
+      ]);
+    });
+
+    it('uses an authoritative context window supplied by the SDK runtime', () => {
+      const usageState = createTransformUsageState();
+      const assistantMessage = msg({
+        type: 'assistant',
+        parent_tool_use_id: null,
+        message: {
+          content: [{ type: 'text', text: 'Hello' }],
+          usage: {
+            input_tokens: 250000,
+            output_tokens: 4,
+            cache_creation_input_tokens: 0,
+            cache_read_input_tokens: 0,
+          },
+        },
+      });
+
+      expect([...transformSDKMessage(assistantMessage, {
+        intendedModel: 'custom-model',
+        authoritativeContextWindow: 1_000_000,
+        usageState,
+      })]).toEqual([
+        { type: 'text', content: 'Hello' },
+        {
+          type: 'usage',
+          usage: {
+            model: 'custom-model',
+            inputTokens: 250000,
+            cacheCreationInputTokens: 0,
+            cacheReadInputTokens: 0,
+            contextWindow: 1_000_000,
+            contextWindowIsAuthoritative: true,
+            contextTokens: 250000,
+            percentage: 25,
+          },
+        },
+      ]);
+    });
+
+    it('prefers an explicit custom-model context limit over the SDK runtime window', () => {
+      const usageState = createTransformUsageState();
+      const assistantMessage = msg({
+        type: 'assistant',
+        parent_tool_use_id: null,
+        message: {
+          content: [{ type: 'text', text: 'Hello' }],
+          usage: {
+            input_tokens: 250000,
+            output_tokens: 4,
+            cache_creation_input_tokens: 0,
+            cache_read_input_tokens: 0,
+          },
+        },
+      });
+
+      expect([...transformSDKMessage(assistantMessage, {
+        intendedModel: 'custom-model',
+        customContextLimits: { 'custom-model': 1_000_000 },
+        authoritativeContextWindow: 200_000,
+        usageState,
+      })]).toEqual([
+        { type: 'text', content: 'Hello' },
+        {
+          type: 'usage',
+          usage: {
+            model: 'custom-model',
+            inputTokens: 250000,
+            cacheCreationInputTokens: 0,
+            cacheReadInputTokens: 0,
+            contextWindow: 1_000_000,
+            contextTokens: 250000,
+            percentage: 25,
           },
         },
       ]);
@@ -1048,7 +1124,7 @@ describe('transformSDKMessage', () => {
             inputTokens: 10,
             cacheCreationInputTokens: 0,
             cacheReadInputTokens: 0,
-            contextWindow: 200000,
+            contextWindow: 1000000,
             contextTokens: 10,
             percentage: 0,
           },
@@ -1279,7 +1355,7 @@ describe('transformSDKMessage', () => {
         },
       });
 
-      const results = [...transformSDKMessage(message, { intendedModel: 'claude-fable-5' })];
+      const results = [...transformSDKMessage(message, { intendedModel: 'fable' })];
 
       expect(results).toEqual([
         { type: 'context_window', contextWindow: 1000000 },
@@ -1479,8 +1555,8 @@ describe('transformSDKMessage', () => {
       expect(usage.cacheCreationInputTokens).toBe(300);
       expect(usage.cacheReadInputTokens).toBe(200);
       expect(usage.contextTokens).toBe(1500); // 1000 + 300 + 200
-      expect(usage.contextWindow).toBe(200000); // Standard context window
-      expect(usage.percentage).toBe(1); // 1500 / 200000 * 100 rounded
+      expect(usage.contextWindow).toBe(1000000);
+      expect(usage.percentage).toBe(0); // 1500 / 1000000 * 100 rounded
     });
 
     it('yields usage from assistant message when usage state has no stream prompt usage', () => {
@@ -1511,9 +1587,9 @@ describe('transformSDKMessage', () => {
         inputTokens: 1000,
         cacheCreationInputTokens: 300,
         cacheReadInputTokens: 200,
-        contextWindow: 200000,
+        contextWindow: 1000000,
         contextTokens: 1500,
-        percentage: 1,
+        percentage: 0,
       });
     });
 
@@ -1659,7 +1735,7 @@ describe('transformSDKMessage', () => {
             inputTokens: 0,
             cacheCreationInputTokens: 0,
             cacheReadInputTokens: 0,
-            contextWindow: 200000,
+            contextWindow: 1000000,
             contextTokens: 0,
             percentage: 0,
           },

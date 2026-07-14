@@ -2,11 +2,11 @@ import type { AuxQueryConfig, AuxQueryRunner } from '../../../core/auxiliary/Aux
 import { QueryBackedInlineEditService } from '../../../core/auxiliary/QueryBackedInlineEditService';
 import { QueryBackedInstructionRefineService } from '../../../core/auxiliary/QueryBackedInstructionRefineService';
 import { QueryBackedTitleGenerationService } from '../../../core/auxiliary/QueryBackedTitleGenerationService';
+import type { ProviderHost } from '../../../core/providers/ProviderHost';
 import type {
   ProviderTaskResultInterpreter,
   ProviderTaskTerminalStatus,
 } from '../../../core/providers/types';
-import type ClaudianPlugin from '../../../main';
 import { getVaultPath } from '../../../utils/path';
 import { runGrokHeadless } from '../runtime/GrokHeadlessRunner';
 import { grokChatUIConfig } from '../ui/GrokChatUIConfig';
@@ -14,7 +14,7 @@ import { grokChatUIConfig } from '../ui/GrokChatUIConfig';
 class GrokAuxQueryRunner implements AuxQueryRunner {
   private abortController: AbortController | null = null;
 
-  constructor(private readonly plugin: ClaudianPlugin) {}
+  constructor(private readonly plugin: ProviderHost) {}
 
   async query(config: AuxQueryConfig, prompt: string): Promise<string> {
     const cliPath = this.plugin.getResolvedProviderCliPath('grok');
@@ -42,19 +42,19 @@ class GrokAuxQueryRunner implements AuxQueryRunner {
 }
 
 export class GrokInlineEditService extends QueryBackedInlineEditService {
-  constructor(plugin: ClaudianPlugin) {
+  constructor(plugin: ProviderHost) {
     super(new GrokAuxQueryRunner(plugin));
   }
 }
 
 export class GrokInstructionRefineService extends QueryBackedInstructionRefineService {
-  constructor(plugin: ClaudianPlugin) {
+  constructor(plugin: ProviderHost) {
     super(new GrokAuxQueryRunner(plugin));
   }
 }
 
 export class GrokTitleGenerationService extends QueryBackedTitleGenerationService {
-  constructor(plugin: ClaudianPlugin) {
+  constructor(plugin: ProviderHost) {
     super({
       createRunner: () => new GrokAuxQueryRunner(plugin),
       resolveModel: () => {

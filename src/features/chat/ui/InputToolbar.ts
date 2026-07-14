@@ -304,6 +304,9 @@ export class ThinkingBudgetSelector {
     for (const effort of [...options].reverse()) {
       const gearEl = optionsEl.createDiv({ cls: 'claudian-thinking-gear' });
       gearEl.setText(effort.label);
+      if (effort.description) {
+        gearEl.setAttribute('title', effort.description);
+      }
 
       if (effort.value === currentEffort) {
         gearEl.addClass('selected');

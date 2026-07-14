@@ -1,10 +1,16 @@
 import type { SDKMessage, SDKResultError } from '@anthropic-ai/claude-agent-sdk';
 
 import type { SDKToolUseResult, StreamChunk, UsageInfo } from '../../../core/types';
+import {
+  CLAUDE_MODEL_TIER_PATTERN,
+  type ClaudeModelTier,
+  getClaudeModelTierDefinition,
+  isClaudeModelTier,
+} from '../modelTiers';
 import { isBlockedMessage } from '../sdk/messages';
 import { extractToolResultContent } from '../sdk/toolResultContent';
 import type { TransformEvent } from '../sdk/types';
-import { getContextWindowSize, isDefaultClaudeModel } from '../types/models';
+import { isDefaultClaudeModel, resolveContextWindowSize } from '../types/models';
 import { createTransformStreamState, type TransformStreamState } from './toolInputStreamState';
 
 type ToolUseFields = { id: string; name: string; input: Record<string, unknown> };
@@ -70,6 +76,8 @@ export interface TransformOptions {
   intendedModel?: string;
   /** Custom context limits from settings (model ID → tokens). */
   customContextLimits?: Record<string, number>;
+  /** Context window reported by the active provider runtime. */
+  authoritativeContextWindow?: number;
   /** Tracks active streamed tool blocks so input_json_delta can be normalized. */
   streamState?: TransformStreamState;
   /** Tracks prompt-token usage across Anthropic-compatible stream events. */
@@ -105,7 +113,7 @@ interface ContextWindowEntry {
 
 interface ClaudeModelSignature {
   normalizedModel: string;
-  family: 'haiku' | 'sonnet' | 'opus' | 'fable';
+  family: ClaudeModelTier;
   is1M: boolean;
   major?: string;
   minor?: string;
@@ -124,22 +132,23 @@ function normalizeClaudeModelId(model: string): string {
 
 function parseClaudeModelSignature(model: string): ClaudeModelSignature | null {
   const normalized = normalizeClaudeModelId(model);
-  if (normalized === 'haiku') {
-    return { normalizedModel: normalized, family: 'haiku', is1M: false };
-  }
-  if (normalized === 'sonnet' || normalized === 'sonnet[1m]') {
-    return { normalizedModel: normalized, family: 'sonnet', is1M: normalized.endsWith('[1m]') };
-  }
-  if (normalized === 'opus' || normalized === 'opus[1m]') {
-    return { normalizedModel: normalized, family: 'opus', is1M: normalized.endsWith('[1m]') };
+  const aliasMatch = normalized.match(/^(\w+?)(\[1m\])?$/);
+  if (aliasMatch && isClaudeModelTier(aliasMatch[1])) {
+    const family = aliasMatch[1];
+    const hasOneMillionSuffix = aliasMatch[2] !== undefined;
+    if (hasOneMillionSuffix && !getClaudeModelTierDefinition(family).supportsOneMillionSuffix) {
+      return null;
+    }
+    return { normalizedModel: normalized, family, is1M: hasOneMillionSuffix };
   }
 
-  const versionedMatch = normalized.match(
-    /^claude-(haiku|sonnet|opus|fable)-(\d+)(?:-(\d+))?(?:-(\d{8}))?(?:-v\d+:\d+)?(\[1m\])?$/,
-  );
+  const versionedMatch = normalized.match(new RegExp(
+    `^claude-(${CLAUDE_MODEL_TIER_PATTERN})-(\\d+)(?:-(\\d+))?`
+    + '(?:-(\\d{8}))?(?:-v\\d+:\\d+)?(\\[1m\\])?$',
+  ));
   if (versionedMatch) {
     const [, familyMatch, major, minor, date, oneMillionSuffix] = versionedMatch;
-    const family = familyMatch as ClaudeModelSignature['family'];
+    const family = familyMatch as ClaudeModelTier;
     return {
       normalizedModel: normalized,
       family,
@@ -303,7 +312,12 @@ function samePromptUsage(a: PromptUsageSnapshot, b: PromptUsageSnapshot): boolea
 
 function buildUsageInfo(promptUsage: PromptUsageSnapshot, options?: TransformOptions): UsageInfo {
   const model = options?.intendedModel ?? 'sonnet';
-  const contextWindow = getContextWindowSize(model, options?.customContextLimits);
+  const contextWindowResolution = resolveContextWindowSize(
+    model,
+    options?.customContextLimits,
+    options?.authoritativeContextWindow,
+  );
+  const { contextWindow } = contextWindowResolution;
   const percentage = Math.min(100, Math.max(0, Math.round((promptUsage.contextTokens / contextWindow) * 100)));
 
   return {
@@ -312,6 +326,7 @@ function buildUsageInfo(promptUsage: PromptUsageSnapshot, options?: TransformOpt
     cacheCreationInputTokens: promptUsage.cacheCreationInputTokens,
     cacheReadInputTokens: promptUsage.cacheReadInputTokens,
     contextWindow,
+    ...(contextWindowResolution.source === 'runtime' ? { contextWindowIsAuthoritative: true } : {}),
     contextTokens: promptUsage.contextTokens,
     percentage,
   };

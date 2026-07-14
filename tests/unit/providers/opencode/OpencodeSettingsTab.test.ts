@@ -1,6 +1,9 @@
 import * as fs from 'fs';
 
-import { OPENCODE_DEFAULT_ENVIRONMENT_VARIABLES } from '@/providers/opencode/settings';
+import {
+  getOpencodeProviderSettings,
+  OPENCODE_DEFAULT_ENVIRONMENT_VARIABLES,
+} from '@/providers/opencode/settings';
 import { opencodeSettingsTabRenderer } from '@/providers/opencode/ui/OpencodeSettingsTab';
 
 const mockGetHostnameKey = jest.fn(() => 'host-a');
@@ -24,6 +27,14 @@ const mockCreatedAgentSettings: Array<{
 }> = [];
 
 jest.mock('fs');
+jest.mock('@/core/providers/ProviderSettingsCoordinator', () => ({
+  ProviderSettingsCoordinator: {
+    applyProviderEnablement: jest.fn((settings: Record<string, unknown>, providerId: string, enabled: boolean) => {
+      const providerConfigs = settings.providerConfigs as Record<string, { enabled: boolean }>;
+      providerConfigs[providerId].enabled = enabled;
+    }),
+  },
+}));
 jest.mock('obsidian', () => {
   class MockSetting {
     public name = '';
@@ -71,7 +82,7 @@ jest.mock('obsidian', () => {
   };
 });
 
-jest.mock('@/features/settings/ui/EnvironmentSettingsSection', () => ({
+jest.mock('@/shared/settings/EnvironmentSettingsSection', () => ({
   renderEnvironmentSettingsSection: (...args: unknown[]) => mockRenderEnvironmentSettingsSection(...args),
 }));
 
@@ -369,7 +380,7 @@ function createPlugin(overrides: Record<string, unknown> = {}): any {
     refreshModelSelector: mockRefreshModelSelector,
   };
 
-  return {
+  const plugin: any = {
     settings: {
       providerConfigs: {
         opencode: {
@@ -391,6 +402,21 @@ function createPlugin(overrides: Record<string, unknown> = {}): any {
     getView: jest.fn(() => viewA),
     getAllViews: jest.fn(() => [viewA, viewB]),
   };
+  plugin.recycleProviderRuntimes = jest.fn(async (providerId: string) => {
+    for (const view of plugin.getAllViews()) {
+      await view.getTabManager()?.broadcastToProviderTabs(
+        providerId,
+        (runtime: { cleanup(): void }) => Promise.resolve(runtime.cleanup()),
+      );
+      view.invalidateProviderCommandCaches([providerId]);
+      view.refreshModelSelector();
+    }
+  });
+  plugin.mutateSettings = jest.fn(async (mutation: (settings: any) => void | Promise<void>) => {
+    await mutation(plugin.settings);
+    await plugin.saveSettings();
+  });
+  return plugin;
 }
 
 function createContext(plugin: any) {
@@ -398,8 +424,13 @@ function createContext(plugin: any) {
     plugin,
     renderHiddenProviderCommandSetting: jest.fn(),
     refreshModelSelectors: jest.fn(),
+    refreshTitleGenerationModelOptions: jest.fn(),
     renderCustomContextLimits: jest.fn(),
   };
+}
+
+async function flushPromises(): Promise<void> {
+  await new Promise<void>(resolve => setImmediate(resolve));
 }
 
 function findSetting(name: string): MockSettingRecord {
@@ -432,6 +463,16 @@ describe('OpencodeSettingsTab', () => {
     mockRuntimeWarmModelMetadata.mockResolvedValue(false);
     mockedExistsSync.mockReturnValue(false);
     mockedStatSync.mockReturnValue({ isFile: () => true } as fs.Stats);
+  });
+
+  it('refreshes title model options after OpenCode enablement changes', async () => {
+    const plugin = createPlugin();
+    const context = createContext(plugin);
+
+    opencodeSettingsTabRenderer.render(createContainer(), context);
+    await findSetting('Enable OpenCode').toggleComponents[0].onChangeCallback?.(false);
+
+    expect(context.refreshTitleGenerationModelOptions).toHaveBeenCalledTimes(1);
   });
 
   it('stores the CLI path per host and resets active runtime state across all views', async () => {
@@ -546,9 +587,10 @@ describe('OpencodeSettingsTab', () => {
 
     opencodeSettingsTabRenderer.render(createContainer(), context);
 
-    const catalogEl = findElement('details', 'claudian-opencode-model-picker-catalog');
+    const catalogEl = findElement('details', 'claudian-provider-model-picker-catalog');
     catalogEl.open = true;
     await catalogEl.dispatchMockEvent('toggle');
+    await flushPromises();
 
     expect(mockRuntimeSyncConversationState).toHaveBeenCalledWith({
       providerState: { databasePath: ':memory:' },
@@ -603,6 +645,42 @@ describe('OpencodeSettingsTab', () => {
     expect(context.refreshModelSelectors).toHaveBeenCalledTimes(1);
   });
 
+  it('loads the OpenCode catalog when saved models start with the browser collapsed', async () => {
+    mockRuntimeEnsureReady.mockImplementation(async (plugin: any) => {
+      plugin.settings.providerConfigs.opencode.discoveredModels = [
+        { label: 'DeepSeek/DeepSeek V4 Pro', rawId: 'deepseek/deepseek-v4-pro' },
+      ];
+      return true;
+    });
+    const plugin = createPlugin({
+      providerConfigs: {
+        opencode: {
+          availableModes: [],
+          cliPath: '',
+          cliPathsByHost: {},
+          discoveredModels: [],
+          enabled: true,
+          environmentVariables: OPENCODE_DEFAULT_ENVIRONMENT_VARIABLES,
+          modelAliases: {},
+          preferredThinkingByModel: {},
+          selectedMode: '',
+          visibleModels: ['deepseek/deepseek-v4-pro'],
+        },
+      },
+    });
+    const context = createContext(plugin);
+
+    opencodeSettingsTabRenderer.render(createContainer(), context);
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(mockRuntimeEnsureReady).toHaveBeenCalledWith(
+      plugin,
+      { allowSessionCreation: true },
+    );
+    expect(context.refreshModelSelectors).toHaveBeenCalledTimes(1);
+  });
+
   it('warms and persists thinking metadata when a model is added to the visible list', async () => {
     mockRuntimeWarmModelMetadata.mockResolvedValue(true);
     const plugin = createPlugin({
@@ -634,8 +712,7 @@ describe('OpencodeSettingsTab', () => {
 
     checkboxEl.checked = true;
     await checkboxEl.dispatchMockEvent('change');
-    await Promise.resolve();
-    await Promise.resolve();
+    await flushPromises();
 
     expect(plugin.settings.providerConfigs.opencode.visibleModels).toEqual([
       'deepseek/deepseek-v4-pro',
@@ -644,6 +721,33 @@ describe('OpencodeSettingsTab', () => {
       plugin,
       'opencode:deepseek/deepseek-v4-pro',
     );
+    expect(context.refreshModelSelectors).toHaveBeenCalled();
+  });
+
+  it('persists aliases through the shared model picker', async () => {
+    const plugin = createPlugin({
+      providerConfigs: {
+        opencode: {
+          discoveredModels: [
+            { label: 'DeepSeek/DeepSeek V4 Pro', rawId: 'deepseek/deepseek-v4-pro' },
+          ],
+          modelAliases: {},
+          visibleModels: ['deepseek/deepseek-v4-pro'],
+        },
+      },
+    });
+    const context = createContext(plugin);
+
+    opencodeSettingsTabRenderer.render(createContainer(), context);
+
+    const aliasInput = findElement('input', 'claudian-provider-model-picker-selected-alias');
+    aliasInput.value = 'V4 Pro';
+    await aliasInput.dispatchMockEvent('blur');
+    await flushPromises();
+
+    expect(getOpencodeProviderSettings(plugin.settings).modelAliases).toEqual({
+      'deepseek/deepseek-v4-pro': 'V4 Pro',
+    });
     expect(context.refreshModelSelectors).toHaveBeenCalled();
   });
 });

@@ -306,6 +306,13 @@ describe('StatusPanel', () => {
       expect(todoContainer).not.toBeNull();
       expect(todoContainer!.style.display).toBe('none');
     });
+
+    it('should not reserve panel spacing before content is shown', () => {
+      panel.mount(containerEl as unknown as HTMLElement);
+
+      const panelEl = containerEl.querySelector('.claudian-status-panel');
+      expect(panelEl?.hasClass('claudian-status-panel--visible')).toBe(false);
+    });
   });
 
   describe('updateTodos', () => {
@@ -322,6 +329,8 @@ describe('StatusPanel', () => {
 
       const todoContainer = containerEl.querySelector('.claudian-status-panel-todos');
       expect(todoContainer!.style.display).toBe('block');
+      expect(containerEl.querySelector('.claudian-status-panel')
+        ?.hasClass('claudian-status-panel--visible')).toBe(true);
     });
 
     it('should hide panel when todos is null', () => {
@@ -334,6 +343,8 @@ describe('StatusPanel', () => {
 
       const todoContainer = containerEl.querySelector('.claudian-status-panel-todos');
       expect(todoContainer!.style.display).toBe('none');
+      expect(containerEl.querySelector('.claudian-status-panel')
+        ?.hasClass('claudian-status-panel--visible')).toBe(false);
     });
 
     it('should hide panel when todos is empty array', () => {

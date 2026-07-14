@@ -71,6 +71,8 @@ export interface Conversation {
   /** Timestamp when the last agent response completed. */
   lastResponseAt?: number;
   sessionId: string | null;
+  /** Conversation-owned model selection. Missing values are migrated lazily. */
+  selectedModel?: string;
   /** Opaque provider-owned state bag (session tracking, fork metadata, etc.). */
   providerState?: Record<string, unknown>;
   messages: ChatMessage[];
@@ -116,6 +118,8 @@ export interface SessionMetadata {
   lastResponseAt?: number;
   /** Session ID used for provider resume (may be cleared when invalidated). */
   sessionId?: string | null;
+  /** Conversation-owned model selection. */
+  selectedModel?: string;
   /** Opaque provider-owned state bag. */
   providerState?: Record<string, unknown>;
   currentNote?: string;
@@ -142,7 +146,12 @@ export type StreamChunk =
   | { type: 'tool_use'; id: string; name: string; input: Record<string, unknown> }
   | { type: 'tool_result'; id: string; content: string; isError?: boolean; toolUseResult?: SDKToolUseResult }
   | { type: 'tool_output'; id: string; content: string }
-  | { type: 'error'; content: string }
+  | {
+      type: 'error';
+      content: string;
+      code?: 'provider_session_missing';
+      providerSessionId?: string;
+    }
   | { type: 'notice'; content: string; level?: 'info' | 'warning' }
   | { type: 'done' }
   | { type: 'usage'; usage: UsageInfo; sessionId?: string | null }

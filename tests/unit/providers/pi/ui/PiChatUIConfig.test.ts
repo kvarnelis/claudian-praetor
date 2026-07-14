@@ -36,7 +36,34 @@ const settings: Record<string, unknown> = {
 };
 
 describe('PiChatUIConfig', () => {
-  it('returns visible model options with aliases and pins saved selections', () => {
+  it('returns visible model options in reverse order with aliases', () => {
+    const piSettings = (settings.providerConfigs as Record<string, Record<string, unknown>>).pi;
+    const options = piChatUIConfig.getModelOptions({
+      ...settings,
+      providerConfigs: {
+        pi: {
+          ...piSettings,
+          visibleModels: [
+            'pi:anthropic/claude-sonnet-4',
+            'pi:openai/gpt-5',
+          ],
+        },
+      },
+    });
+
+    expect(options).toEqual([
+      expect.objectContaining({
+        label: 'GPT-5',
+        value: 'pi:openai/gpt-5',
+      }),
+      expect.objectContaining({
+        label: 'Sonnet',
+        value: 'pi:anthropic/claude-sonnet-4',
+      }),
+    ]);
+  });
+
+  it('pins saved selections after visible model options', () => {
     const options = piChatUIConfig.getModelOptions({
       ...settings,
       savedProviderModel: {
@@ -77,6 +104,42 @@ describe('PiChatUIConfig', () => {
       { label: 'High', value: 'high' },
     ]);
     expect(piChatUIConfig.getDefaultReasoningValue('pi:anthropic/claude-sonnet-4', settings)).toBe('high');
+  });
+
+  it('defaults reasoning models to high without a saved preference', () => {
+    const settingsWithoutPreference: Record<string, unknown> = {
+      providerConfigs: {
+        pi: {
+          discoveredModels: (settings.providerConfigs as any).pi.discoveredModels,
+          preferredThinkingByModel: {},
+          visibleModels: ['pi:anthropic/claude-sonnet-4'],
+        },
+      },
+    };
+
+    expect(piChatUIConfig.getDefaultReasoningValue(
+      'pi:anthropic/claude-sonnet-4',
+      settingsWithoutPreference,
+    )).toBe('high');
+  });
+
+  it('applies only an existing per-model preference to conversation projections', () => {
+    const withPreference = structuredClone(settings);
+    withPreference.effortLevel = 'medium';
+    piChatUIConfig.applyModelProjectionDefaults?.(
+      'pi:anthropic/claude-sonnet-4',
+      withPreference,
+    );
+    expect(withPreference.effortLevel).toBe('high');
+
+    const withoutPreference = structuredClone(settings);
+    (withoutPreference.providerConfigs as any).pi.preferredThinkingByModel = {};
+    withoutPreference.effortLevel = 'medium';
+    piChatUIConfig.applyModelProjectionDefaults?.(
+      'pi:anthropic/claude-sonnet-4',
+      withoutPreference,
+    );
+    expect(withoutPreference.effortLevel).toBe('medium');
   });
 
   it('resolves context windows from cached Pi model metadata before falling back', () => {
@@ -137,7 +200,7 @@ describe('PiChatUIConfig', () => {
       { label: 'Medium', value: 'medium' },
       { label: 'High', value: 'high' },
     ]);
-    expect(piChatUIConfig.getDefaultReasoningValue('pi:custom/model', staleSettings)).toBe('medium');
+    expect(piChatUIConfig.getDefaultReasoningValue('pi:custom/model', staleSettings)).toBe('high');
 
     piChatUIConfig.applyReasoningSelection?.('pi:custom/model', 'high', staleSettings);
     expect(getPiProviderSettings(staleSettings).preferredThinkingByModel).toEqual({

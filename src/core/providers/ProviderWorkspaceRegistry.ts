@@ -1,12 +1,13 @@
 import { Platform } from 'obsidian';
 
-import type ClaudianPlugin from '../../main';
 import type { HomeFileAdapter } from '../storage/HomeFileAdapter';
 import type { ProviderCommandCatalog } from './commands/ProviderCommandCatalog';
+import type { ProviderHost } from './ProviderHost';
 import type {
   AgentMentionProvider,
   ProviderCliResolver,
   ProviderId,
+  ProviderModelCatalogRefreshResult,
   ProviderRuntimeCommandLoader,
   ProviderSettingsTabRenderer,
   ProviderTabWarmupPolicy,
@@ -40,7 +41,7 @@ export class ProviderWorkspaceRegistry {
     return registration;
   }
 
-  static async initializeAll(plugin: ClaudianPlugin): Promise<void> {
+  static async initializeAll(plugin: ProviderHost): Promise<void> {
     const providerIds = Object.keys(this.registrations);
     const storage = plugin.storage;
     const vaultAdapter = storage.getAdapter();
@@ -100,6 +101,12 @@ export class ProviderWorkspaceRegistry {
 
   static async refreshAgentMentions(providerId: ProviderId): Promise<void> {
     await this.getServices(providerId)?.refreshAgentMentions?.();
+  }
+
+  static async refreshModelCatalog(
+    providerId: ProviderId,
+  ): Promise<ProviderModelCatalogRefreshResult> {
+    return await this.getServices(providerId)?.refreshModelCatalog?.() ?? { changed: false };
   }
 
   static getCliResolver(providerId: ProviderId): ProviderCliResolver | null {

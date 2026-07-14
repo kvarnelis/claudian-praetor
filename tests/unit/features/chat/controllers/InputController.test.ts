@@ -118,14 +118,20 @@ function createMockDeps(overrides: Partial<InputControllerDeps> = {}): InputCont
 
   const imageContextManager = createMockImageContextManager();
   const mockAgentService = createMockAgentService();
+  const pluginSettings = {
+    permissionMode: 'yolo',
+    enableAutoTitleGeneration: true,
+  };
+  const saveSettings = jest.fn();
 
   return {
     plugin: {
-      saveSettings: jest.fn(),
-      settings: {
-        permissionMode: 'yolo',
-        enableAutoTitleGeneration: true,
-      },
+      saveSettings,
+      mutateSettings: jest.fn(async (mutation) => {
+        await mutation(pluginSettings);
+        await saveSettings();
+      }),
+      settings: pluginSettings,
       mcpManager: {
         extractMentions: jest.fn().mockReturnValue(new Set()),
         transformMentions: jest.fn().mockImplementation((text: string) => text),
@@ -135,6 +141,8 @@ function createMockDeps(overrides: Partial<InputControllerDeps> = {}): InputCont
       getConversationSync: jest.fn().mockReturnValue(null),
       getConversationById: jest.fn().mockResolvedValue(null),
       createConversation: jest.fn().mockResolvedValue({ id: 'conv-1' }),
+      deleteConversation: jest.fn().mockResolvedValue(undefined),
+      handleMissingProviderSession: jest.fn().mockResolvedValue('deleted'),
     } as any,
     state,
     renderer: {
@@ -213,6 +221,139 @@ function createSendableDeps(
   }
   return result;
 }
+
+describe('InputController - Missing provider session', () => {
+  it('rolls back the failed turn and restores unsent input after resume state is reset', async () => {
+    const deps = createSendableDeps();
+    const inputEl = deps.getInputEl();
+    inputEl.value = 'retry this prompt';
+    (deps.plugin.handleMissingProviderSession as jest.Mock).mockResolvedValue('reset');
+    deps.mockAgentService.query.mockReturnValue(createMockStream([{
+      type: 'error',
+      content: 'No conversation found with session ID: missing-session',
+      code: 'provider_session_missing',
+    }]));
+    const controller = new InputController(deps);
+
+    await controller.sendMessage();
+
+    expect(deps.plugin.handleMissingProviderSession).toHaveBeenCalledWith(
+      'conv-1',
+      undefined,
+    );
+    expect(inputEl.value).toBe('retry this prompt');
+    expect(deps.state.messages).toEqual([]);
+    expect(deps.state.isStreaming).toBe(false);
+    expect(deps.state.hasPendingConversationSave).toBe(false);
+    expect(deps.streamController.hideThinkingIndicator).toHaveBeenCalled();
+    expect(deps.renderer.removeMessage).toHaveBeenCalledTimes(2);
+    expect(deps.conversationController.save).not.toHaveBeenCalled();
+    expect(deps.streamController.handleStreamChunk).not.toHaveBeenCalled();
+  });
+
+  it('restores a programmatic queued turn without overwriting a newer draft', async () => {
+    const deps = createSendableDeps();
+    const inputEl = deps.getInputEl();
+    const retryImage = {
+      id: 'retry-image',
+      name: 'retry.png',
+      mediaType: 'image/png' as const,
+      data: 'cmV0cnk=',
+      size: 5,
+      source: 'paste' as const,
+    };
+    inputEl.value = 'newer draft';
+    (deps.plugin.handleMissingProviderSession as jest.Mock).mockResolvedValue('reset');
+    deps.mockAgentService.query.mockReturnValue(createMockStream([{
+      type: 'error',
+      content: 'No conversation found with session ID: missing-session',
+      code: 'provider_session_missing',
+    }]));
+
+    await new InputController(deps).sendMessage({
+      content: 'queued prompt',
+      images: [retryImage],
+      turnRequestOverride: { text: 'provider-ready prompt' },
+    });
+
+    expect(inputEl.value).toBe('queued prompt\n\nnewer draft');
+    expect(deps.getImageContextManager()?.setImages).toHaveBeenCalledWith([retryImage]);
+    expect(deps.state.messages).toEqual([]);
+    expect(deps.state.isStreaming).toBe(false);
+  });
+
+  it('does not claim a record was removed when no conversation is active', async () => {
+    const deps = createSendableDeps({}, null);
+    deps.state.currentConversationId = null;
+    (deps.plugin.createConversation as jest.Mock).mockResolvedValue({ id: '' });
+    deps.getInputEl().value = 'retry this prompt';
+    deps.mockAgentService.query.mockReturnValue(createMockStream([{
+      type: 'error',
+      content: 'No conversation found with session ID: missing-session',
+      code: 'provider_session_missing',
+    }]));
+
+    await new InputController(deps).sendMessage();
+
+    expect(deps.plugin.handleMissingProviderSession).not.toHaveBeenCalled();
+    expect(mockNotice).toHaveBeenLastCalledWith(
+      'The provider session no longer exists. Send again to start a new session.',
+    );
+  });
+
+  it('reports that recoverable history was preserved after resetting resume state', async () => {
+    const deps = createSendableDeps();
+    deps.getInputEl().value = 'retry this prompt';
+    (deps.plugin.handleMissingProviderSession as jest.Mock).mockResolvedValue('reset');
+    deps.mockAgentService.query.mockReturnValue(createMockStream([{
+      type: 'error',
+      content: 'No conversation found with session ID: missing-session',
+      code: 'provider_session_missing',
+      providerSessionId: 'missing-session',
+    }]));
+
+    await new InputController(deps).sendMessage();
+
+    expect(deps.plugin.handleMissingProviderSession).toHaveBeenCalledWith(
+      'conv-1',
+      'missing-session',
+    );
+    expect(mockNotice).toHaveBeenLastCalledWith(
+      'The provider session no longer exists. Claudian preserved the recoverable history; send again to rebuild the session.',
+    );
+  });
+
+  it('preserves drafts and queued follow-ups when deleting the stale record resets the tab', async () => {
+    const deps = createSendableDeps();
+    const inputEl = deps.getInputEl();
+    const imageContextManager = deps.getImageContextManager()!;
+    deps.mockAgentService.query.mockImplementation(() => (async function* () {
+      inputEl.value = 'newer draft';
+      deps.state.queuedMessage = {
+        content: 'queued follow-up',
+        images: undefined,
+        editorContext: null,
+        browserContext: null,
+        canvasContext: null,
+      };
+      yield {
+        type: 'error',
+        content: 'No conversation found with session ID: missing-session',
+        code: 'provider_session_missing',
+      };
+    })());
+    (deps.plugin.handleMissingProviderSession as jest.Mock).mockImplementation(async () => {
+      inputEl.value = '';
+      deps.state.queuedMessage = null;
+      imageContextManager.clearImages();
+      return 'deleted';
+    });
+
+    await new InputController(deps).sendMessage({ content: 'failed prompt' });
+
+    expect(inputEl.value).toBe('failed prompt\n\nqueued follow-up\n\nnewer draft');
+  });
+});
 
 describe('InputController - Message Queue', () => {
   let controller: InputController;
@@ -1052,6 +1193,41 @@ describe('InputController - Message Queue', () => {
       expect(prepareTurnCall[0].enabledMcpServers).toBe(enabledServers);
       const queryCall = ((deps as any).mockAgentService.query as jest.Mock).mock.calls[0];
       expect(queryCall[0].mcpMentions).toBe(mcpMentions);
+    });
+
+    it('should pass the selected model in runtime query options', async () => {
+      deps = createSendableDeps({
+        getAuxiliaryModel: () => 'opus',
+      });
+      (deps as any).mockAgentService.query = jest.fn().mockImplementation(() => createMockStream([{ type: 'done' }]));
+
+      inputEl = deps.getInputEl() as ReturnType<typeof createMockInputEl>;
+      inputEl.value = 'hello';
+      controller = new InputController(deps);
+
+      await controller.sendMessage();
+
+      const queryCall = ((deps as any).mockAgentService.query as jest.Mock).mock.calls[0];
+      expect(queryCall[2]).toEqual({ model: 'opus' });
+    });
+
+    it('should persist the selected model when title generation creates the first-send conversation', async () => {
+      deps = createSendableDeps({
+        getAuxiliaryModel: () => 'opus',
+      }, null);
+      (deps as any).mockAgentService.query = jest.fn().mockImplementation(() => createMockStream([{ type: 'done' }]));
+
+      inputEl = deps.getInputEl() as ReturnType<typeof createMockInputEl>;
+      inputEl.value = 'hello';
+      controller = new InputController(deps);
+
+      await controller.sendMessage();
+
+      expect(deps.plugin.createConversation).toHaveBeenCalledWith({
+        providerId: 'claude',
+        sessionId: undefined,
+        selectedModel: 'opus',
+      });
     });
 
     it('should append browser selection context when available', async () => {
@@ -1898,7 +2074,9 @@ describe('InputController - Message Queue', () => {
       expect(mockNotice).toHaveBeenCalledWith('Failed to initialize agent service. Please try again.');
       expect(deps.streamController.hideThinkingIndicator).toHaveBeenCalled();
       expect(deps.state.isStreaming).toBe(false);
-      expect(deps.state.hasPendingConversationSave).toBe(true);
+      expect(deps.state.hasPendingConversationSave).toBe(false);
+      expect(deps.state.messages).toEqual([]);
+      expect(inputEl.value).toBe('test message');
       expect((deps as any).mockAgentService.query).not.toHaveBeenCalled();
     });
   });
@@ -1920,7 +2098,10 @@ describe('InputController - Message Queue', () => {
       await controller.sendMessage();
 
       expect(mockNotice).toHaveBeenCalledWith('Agent service not available. Please reload the plugin.');
-      expect(deps.state.hasPendingConversationSave).toBe(true);
+      expect(deps.state.hasPendingConversationSave).toBe(false);
+      expect(deps.state.isStreaming).toBe(false);
+      expect(deps.state.messages).toEqual([]);
+      expect(inputEl.value).toBe('test message');
       expect((deps as any).mockAgentService.query).not.toHaveBeenCalled();
     });
   });

@@ -4,6 +4,8 @@ import { Notice } from 'obsidian';
 import { SESSIONS_PATH, SessionStorage } from '../../core/bootstrap/SessionStorage';
 import type { SharedAppStorage } from '../../core/bootstrap/storage';
 import { CLAUDIAN_STORAGE_PATH } from '../../core/bootstrap/StoragePaths';
+import { normalizeTabManagerState } from '../../core/bootstrap/tabManagerState';
+import type { AppTabManagerState } from '../../core/providers/types';
 import { VaultFileAdapter } from '../../core/storage/VaultFileAdapter';
 import { ClaudianSettingsStorage, type StoredClaudianSettings } from '../settings/ClaudianSettingsStorage';
 
@@ -17,6 +19,7 @@ export class SharedStorageService implements SharedAppStorage {
 
   private adapter: VaultFileAdapter;
   private plugin: Plugin;
+  private pluginDataMutationQueue: Promise<void> = Promise.resolve();
 
   constructor(plugin: Plugin) {
     this.plugin = plugin;
@@ -35,25 +38,24 @@ export class SharedStorageService implements SharedAppStorage {
     await this.claudianSettings.save(settings as StoredClaudianSettings);
   }
 
-  async setTabManagerState(state: { openTabs: Array<{ tabId: string; conversationId: string | null; draftModel?: string | null }>; activeTabId: string | null }): Promise<void> {
+  async setTabManagerState(state: AppTabManagerState): Promise<void> {
     try {
-      const loaded: unknown = await this.plugin.loadData();
-      const data = isRecord(loaded) ? loaded : {};
-      data.tabManagerState = state;
-      await this.plugin.saveData(data);
+      await this.mutatePluginData((data) => {
+        data.tabManagerState = state;
+      });
     } catch {
       new Notice('Failed to save tab layout');
     }
   }
 
-  async getTabManagerState(): Promise<{ openTabs: Array<{ tabId: string; conversationId: string | null; draftModel?: string | null }>; activeTabId: string | null } | null> {
+  async getTabManagerState(): Promise<AppTabManagerState | null> {
     try {
-      const data: unknown = await this.plugin.loadData();
+      const data: unknown = await this.loadPluginData();
       if (!isRecord(data) || !data.tabManagerState) {
         return null;
       }
 
-      return this.validateTabManagerState(data.tabManagerState);
+      return normalizeTabManagerState(data.tabManagerState);
     } catch {
       return null;
     }
@@ -61,14 +63,13 @@ export class SharedStorageService implements SharedAppStorage {
 
   async setRemoteDaemonConfig(config: { url: string } | null): Promise<void> {
     try {
-      const loaded: unknown = await this.plugin.loadData();
-      const data = isRecord(loaded) ? loaded : {};
-      if (config) {
-        data.remoteDaemon = { url: config.url };
-      } else {
-        delete data.remoteDaemon;
-      }
-      await this.plugin.saveData(data);
+      await this.mutatePluginData((data) => {
+        if (config) {
+          data.remoteDaemon = { url: config.url };
+        } else {
+          delete data.remoteDaemon;
+        }
+      });
     } catch {
       new Notice('Failed to save remote daemon settings');
     }
@@ -76,7 +77,7 @@ export class SharedStorageService implements SharedAppStorage {
 
   async getRemoteDaemonConfig(): Promise<{ url: string } | null> {
     try {
-      const data: unknown = await this.plugin.loadData();
+      const data: unknown = await this.loadPluginData();
       if (!isRecord(data) || !isRecord(data.remoteDaemon)) {
         return null;
       }
@@ -86,8 +87,11 @@ export class SharedStorageService implements SharedAppStorage {
         return null;
       }
       if (Object.keys(remoteDaemon).some((key) => key !== 'url')) {
-        data.remoteDaemon = { url };
-        await this.plugin.saveData(data);
+        await this.mutatePluginData((latest) => {
+          if (isRecord(latest.remoteDaemon) && latest.remoteDaemon.url === url) {
+            latest.remoteDaemon = { url };
+          }
+        });
       }
       return { url };
     } catch {
@@ -104,39 +108,22 @@ export class SharedStorageService implements SharedAppStorage {
     await this.adapter.ensureFolder(SESSIONS_PATH);
   }
 
-  private validateTabManagerState(data: unknown): { openTabs: Array<{ tabId: string; conversationId: string | null; draftModel?: string | null }>; activeTabId: string | null } | null {
-    if (!data || typeof data !== 'object') {
-      return null;
-    }
-
-    const state = data as Record<string, unknown>;
-    if (!Array.isArray(state.openTabs)) {
-      return null;
-    }
-
-    const validatedTabs: Array<{ tabId: string; conversationId: string | null; draftModel?: string | null }> = [];
-    for (const tab of state.openTabs) {
-      if (!tab || typeof tab !== 'object') {
-        continue;
-      }
-
-      const tabObj = tab as Record<string, unknown>;
-      if (typeof tabObj.tabId !== 'string') {
-        continue;
-      }
-
-      validatedTabs.push({
-        tabId: tabObj.tabId,
-        conversationId: typeof tabObj.conversationId === 'string' ? tabObj.conversationId : null,
-        ...(typeof tabObj.draftModel === 'string'
-          ? { draftModel: tabObj.draftModel }
-          : {}),
-      });
-    }
-
-    return {
-      openTabs: validatedTabs,
-      activeTabId: typeof state.activeTabId === 'string' ? state.activeTabId : null,
-    };
+  private async loadPluginData(): Promise<unknown> {
+    await this.pluginDataMutationQueue;
+    return this.plugin.loadData();
   }
+
+  private mutatePluginData(
+    mutation: (data: Record<string, unknown>) => void,
+  ): Promise<void> {
+    const pending = this.pluginDataMutationQueue.then(async () => {
+      const loaded: unknown = await this.plugin.loadData();
+      const data = isRecord(loaded) ? loaded : {};
+      mutation(data);
+      await this.plugin.saveData(data);
+    });
+    this.pluginDataMutationQueue = pending.catch(() => undefined);
+    return pending;
+  }
+
 }

@@ -4,6 +4,11 @@ import { Notice, Platform } from 'obsidian';
 import { getHiddenProviderCommandSet } from '../../../core/providers/commands/hiddenCommands';
 import type { ProviderCommandDropdownConfig } from '../../../core/providers/commands/ProviderCommandCatalog';
 import type { ProviderCommandEntry } from '../../../core/providers/commands/ProviderCommandEntry';
+import {
+  getProviderSettingsSnapshotWithModel,
+  normalizeProviderModelSelection,
+  resolveConversationModel,
+} from '../../../core/providers/conversationModel';
 import { getEnabledProviderForModel, getProviderForModel } from '../../../core/providers/modelRouting';
 import { ProviderRegistry } from '../../../core/providers/ProviderRegistry';
 import { ProviderSettingsCoordinator } from '../../../core/providers/ProviderSettingsCoordinator';
@@ -22,10 +27,10 @@ import type { AutoTurnResult } from '../../../core/runtime/types';
 import { TOOL_AGENT_OUTPUT } from '../../../core/tools/toolNames';
 import type { ChatMessage, ClaudianSettings, Conversation, StreamChunk } from '../../../core/types';
 import { t } from '../../../i18n/i18n';
-import type ClaudianPlugin from '../../../main';
 import { SlashCommandDropdown } from '../../../shared/components/SlashCommandDropdown';
 import { getEnhancedPath } from '../../../utils/env';
 import { getVaultPath } from '../../../utils/path';
+import type { FeatureHost } from '../../FeatureHost';
 import { BrowserSelectionController } from '../controllers/BrowserSelectionController';
 import { CanvasSelectionController } from '../controllers/CanvasSelectionController';
 import { ConversationController } from '../controllers/ConversationController';
@@ -40,6 +45,7 @@ import { BangBashService } from '../services/BangBashService';
 import { SubagentManager } from '../services/SubagentManager';
 import { ChatState } from '../state/ChatState';
 import { BangBashModeManager as BangBashModeManagerClass } from '../ui/BangBashModeManager';
+import { ComposerContextTray } from '../ui/ComposerContextTray';
 import { FileContextManager } from '../ui/FileContext';
 import { ImageContextManager } from '../ui/ImageContext';
 import { createInputToolbar } from '../ui/InputToolbar';
@@ -49,6 +55,7 @@ import { StatusPanel } from '../ui/StatusPanel';
 import { autoResizeTextarea } from '../ui/textareaResize';
 import { recalculateUsageForModel } from '../utils/usageInfo';
 import { getTabProviderId } from './providerResolution';
+import { TabSession } from './TabSession';
 import type { TabData, TabDOMElements, TabId, TabManagerViewHost, TabProviderContext } from './types';
 import { generateTabId } from './types';
 
@@ -90,7 +97,7 @@ export function getBlankTabModelOptions(
  * settings-provider's model, which may belong to a different provider.
  */
 function resolveBlankTabModel(
-  plugin: ClaudianPlugin,
+  plugin: FeatureHost,
   providerId?: ProviderId,
 ): string {
   const settings = plugin.settings as unknown as Record<string, unknown>;
@@ -106,7 +113,7 @@ function resolveBlankTabModel(
 }
 
 export interface TabCreateOptions {
-  plugin: ClaudianPlugin;
+  plugin: FeatureHost;
 
   containerEl: HTMLElement;
   conversation?: Conversation;
@@ -125,7 +132,7 @@ export { getTabProviderId } from './providerResolution';
 
 function getTabCapabilities(
   tab: TabProviderContext,
-  plugin: ClaudianPlugin,
+  plugin: FeatureHost,
   conversation?: Conversation | null,
 ): ProviderCapabilities {
   const providerId = getTabProviderId(tab, plugin, conversation);
@@ -138,7 +145,7 @@ function getTabCapabilities(
 
 function getTabChatUIConfig(
   tab: TabProviderContext,
-  plugin: ClaudianPlugin,
+  plugin: FeatureHost,
   conversation?: Conversation | null,
 ): ProviderChatUIConfig {
   return ProviderRegistry.getChatUIConfig(getTabProviderId(tab, plugin, conversation));
@@ -146,17 +153,57 @@ function getTabChatUIConfig(
 
 function getTabSettingsSnapshot(
   tab: TabProviderContext,
-  plugin: ClaudianPlugin,
+  plugin: FeatureHost,
+): TabProviderSettings {
+  const providerId = getTabProviderId(tab, plugin);
+  return getProviderSettingsSnapshotWithModel(
+    plugin.settings,
+    providerId,
+    getTabSelectedModel(tab, plugin),
+  );
+}
+
+function getWritableTabSettingsSnapshot(
+  tab: TabProviderContext,
+  plugin: FeatureHost,
+  settings: ClaudianSettings = plugin.settings,
 ): TabProviderSettings {
   return ProviderSettingsCoordinator.getProviderSettingsSnapshot(
-    plugin.settings,
+    settings,
     getTabProviderId(tab, plugin),
   );
 }
 
+function getTabConversation(
+  tab: TabProviderContext,
+  plugin: FeatureHost,
+): Conversation | null {
+  return tab.conversationId ? plugin.getConversationSync(tab.conversationId) : null;
+}
+
+function getTabSelectedModel(
+  tab: TabProviderContext,
+  plugin: FeatureHost,
+): string | null {
+  const providerId = getTabProviderId(tab, plugin);
+  if (tab.lifecycleState === 'blank') {
+    return normalizeProviderModelSelection(providerId, plugin.settings, tab.draftModel)
+      ?? tab.service?.getAuxiliaryModel?.()
+      ?? tab.draftModel
+      ?? null;
+  }
+
+  const conversation = getTabConversation(tab, plugin);
+  if (conversation) {
+    return resolveConversationModel(plugin.settings, providerId, conversation).model;
+  }
+
+  return tab.service?.getAuxiliaryModel?.() ?? null;
+}
+
 function getTabPermissionMode(
   tab: TabProviderContext,
-  plugin: ClaudianPlugin,
+  plugin: FeatureHost,
 ): string {
   const permissionMode = getTabSettingsSnapshot(tab, plugin).permissionMode;
   return typeof permissionMode === 'string' && permissionMode
@@ -166,7 +213,7 @@ function getTabPermissionMode(
 
 function getTabHiddenCommands(
   tab: TabProviderContext,
-  plugin: ClaudianPlugin,
+  plugin: FeatureHost,
   conversation?: Conversation | null,
 ): Set<string> {
   return getHiddenProviderCommandSet(
@@ -280,7 +327,7 @@ function getProviderMcpManager(providerId: ProviderId) {
 
 function syncSlashCommandDropdownForProvider(
   tab: TabData,
-  plugin: ClaudianPlugin,
+  plugin: FeatureHost,
   getProviderCatalogConfig?: () => ProviderCatalogInfo,
   conversation?: Conversation | null,
 ): void {
@@ -303,22 +350,24 @@ function syncSlashCommandDropdownForProvider(
 
 async function updateTabProviderSettings(
   tab: TabProviderContext,
-  plugin: ClaudianPlugin,
+  plugin: FeatureHost,
   update: (settings: TabProviderSettings) => void,
 ): Promise<TabProviderSettings> {
   const providerId = getTabProviderId(tab, plugin);
-  const snapshot = getTabSettingsSnapshot(tab, plugin);
-  update(snapshot);
-  ProviderSettingsCoordinator.commitProviderSettingsSnapshot(
-    plugin.settings,
-    providerId,
-    snapshot,
-  );
-  await plugin.saveSettings();
+  let snapshot!: TabProviderSettings;
+  await plugin.mutateSettings((settings) => {
+    snapshot = getWritableTabSettingsSnapshot(tab, plugin, settings);
+    update(snapshot);
+    ProviderSettingsCoordinator.commitProviderSettingsSnapshot(
+      settings,
+      providerId,
+      snapshot,
+    );
+  });
   return snapshot;
 }
 
-function refreshTabProviderUI(tab: TabData, plugin: ClaudianPlugin): void {
+function refreshTabProviderUI(tab: TabData, plugin: FeatureHost): void {
   const capabilities = getTabCapabilities(tab, plugin);
   const permissionMode = getTabPermissionMode(tab, plugin);
   tab.ui.modelSelector?.updateDisplay();
@@ -338,7 +387,7 @@ function refreshTabProviderUI(tab: TabData, plugin: ClaudianPlugin): void {
  * Hides or disables UI elements that the active provider does not support.
  * Called after toolbar initialization and on provider switches.
  */
-function applyProviderUIGating(tab: TabData, plugin: ClaudianPlugin): void {
+function applyProviderUIGating(tab: TabData, plugin: FeatureHost): void {
   const capabilities = getTabCapabilities(tab, plugin);
   const uiConfig = getTabChatUIConfig(tab, plugin);
   const mcpManager = capabilities.supportsMcpTools
@@ -363,19 +412,24 @@ function applyProviderUIGating(tab: TabData, plugin: ClaudianPlugin): void {
 
 function syncTabProviderServices(
   tab: TabData,
-  plugin: ClaudianPlugin,
+  plugin: FeatureHost,
 ): void {
   tab.services.instructionRefineService?.cancel();
   tab.services.instructionRefineService?.resetConversation();
-  tab.services.instructionRefineService = ProviderRegistry.createInstructionRefineService(plugin, tab.providerId);
+  tab.services.instructionRefineService = ProviderRegistry.createInstructionRefineService(
+    plugin.providerHost,
+    tab.providerId,
+  );
   tab.services.subagentManager.setTaskResultInterpreter?.(
     ProviderRegistry.getTaskResultInterpreter(tab.providerId)
   );
 }
 
-function ensureTitleGenerationService(tab: TabData, plugin: ClaudianPlugin): void {
+function ensureTitleGenerationService(tab: TabData, plugin: FeatureHost): void {
   if (!tab.services.titleGenerationService) {
-    tab.services.titleGenerationService = ProviderRegistry.createTitleGenerationService(plugin);
+    tab.services.titleGenerationService = ProviderRegistry.createTitleGenerationService(
+      plugin.providerHost,
+    );
   }
 }
 
@@ -392,7 +446,7 @@ function cleanupTabRuntime(tab: TabData): void {
  * that is now disabled, it falls back to the first enabled provider's default
  * blank-tab model. Refreshes model selector options for all blank tabs.
  */
-export function onProviderAvailabilityChanged(tab: TabData, plugin: ClaudianPlugin): void {
+export function onProviderAvailabilityChanged(tab: TabData, plugin: FeatureHost): void {
   if (tab.lifecycleState !== 'blank') return;
 
   const settingsSnapshot = plugin.settings as unknown as Record<string, unknown>;
@@ -478,14 +532,51 @@ export function createTab(options: TabCreateOptions): TabData {
     ?? (draftModel
       ? getEnabledProviderForModel(draftModel, plugin.settings)
       : DEFAULT_CHAT_PROVIDER_ID);
-
-  const tab: TabData = {
+  const session = new TabSession({
     id,
     lifecycleState: isBound ? 'bound_cold' : 'blank',
     draftModel,
     providerId: initialProviderId,
     conversationId: conversation?.id ?? null,
-    service: null,
+  });
+  const runtimeSupervisor = session.runtimeSupervisor;
+
+  const tab: TabData = {
+    session,
+    get id() {
+      return session.id;
+    },
+    get lifecycleState() {
+      return session.lifecycleState;
+    },
+    set lifecycleState(value) {
+      session.lifecycleState = value;
+    },
+    get draftModel() {
+      return session.draftModel;
+    },
+    set draftModel(value) {
+      session.draftModel = value;
+    },
+    get providerId() {
+      return session.providerId;
+    },
+    set providerId(value) {
+      session.providerId = value;
+    },
+    get conversationId() {
+      return session.conversationId;
+    },
+    set conversationId(value) {
+      session.conversationId = value;
+    },
+    get service() {
+      return runtimeSupervisor.current;
+    },
+    set service(runtime) {
+      runtimeSupervisor.setCurrent(runtime);
+    },
+    runtimeSupervisor,
     serviceInitialized: false,
     state,
     controllers: {
@@ -503,6 +594,7 @@ export function createTab(options: TabCreateOptions): TabData {
       titleGenerationService: null,
     },
     ui: {
+      contextTray: null,
       fileContextManager: null,
       imageContextManager: null,
       modelSelector: null,
@@ -561,9 +653,6 @@ function buildTabDOM(contentEl: HTMLElement): TabDOMElements {
     inputEl,
     navRowEl,
     contextRowEl,
-    selectionIndicatorEl: null,
-    browserIndicatorEl: null,
-    canvasIndicatorEl: null,
     eventCleanups: [],
   };
 }
@@ -579,18 +668,18 @@ function buildTabDOM(contentEl: HTMLElement): TabDOMElements {
  */
 export async function initializeTabService(
   tab: TabData,
-  plugin: ClaudianPlugin,
+  plugin: FeatureHost,
   conversationOverride?: Conversation | null,
 ): Promise<void>;
 export async function initializeTabService(
   tab: TabData,
-  plugin: ClaudianPlugin,
+  plugin: FeatureHost,
   _legacyArg: unknown,
   conversationOverride?: Conversation | null,
 ): Promise<void>;
 export async function initializeTabService(
   tab: TabData,
-  plugin: ClaudianPlugin,
+  plugin: FeatureHost,
   argOrOverride?: unknown,
   maybeOverride?: Conversation | null,
 ): Promise<void> {
@@ -609,6 +698,9 @@ export async function initializeTabService(
       : null
   );
   const providerId = getTabProviderId(tab, plugin, conversation);
+  const selectedModel = conversation
+    ? resolveConversationModel(plugin.settings, providerId, conversation).model
+    : getTabSelectedModel(tab, plugin);
 
   if (tab.serviceInitialized && tab.service?.providerId === providerId) {
     return;
@@ -625,21 +717,23 @@ export async function initializeTabService(
     tab.service = null;
     tab.serviceInitialized = false;
 
-    const runtime = ProviderRegistry.createChatRuntime({ plugin, providerId });
+    const runtime = ProviderRegistry.createChatRuntime({
+      plugin: plugin.providerHost,
+      providerId,
+    });
     service = runtime;
     unsubscribeReadyState = runtime.onReadyStateChange(() => {});
     tab.dom.eventCleanups.push(() => unsubscribeReadyState?.());
 
     // Passive sync: set session state without starting the runtime process.
     // The runtime starts on demand when query() is called.
-    if (conversation) {
-      const hasMessages = conversation.messages.length > 0;
-      const externalContextPaths = hasMessages
-        ? conversation.externalContextPaths || []
-        : (plugin.settings.persistentExternalContextPaths || []);
-
-      runtime.syncConversationState(conversation, externalContextPaths);
-    }
+    const hasMessages = conversation ? conversation.messages.length > 0 : false;
+    const externalContextPaths = conversation && hasMessages
+      ? conversation.externalContextPaths || []
+      : (plugin.settings.persistentExternalContextPaths || []);
+    const runtimeConversationState = conversation
+      ?? (selectedModel ? { sessionId: null, selectedModel } : null);
+    runtime.syncConversationState(runtimeConversationState, externalContextPaths);
 
     // Re-check after async operations — tab may have been closed during init
     if (isClosingLifecycleState(tab.lifecycleState)) {
@@ -677,44 +771,33 @@ function isConversationLike(value: unknown): value is Conversation {
     && Array.isArray((value as Conversation).messages);
 }
 
-function initializeContextManagers(tab: TabData, plugin: ClaudianPlugin): void {
+function initializeContextManagers(tab: TabData, plugin: FeatureHost): void {
   const { dom } = tab;
   const app = plugin.app;
+  const contextTray = tab.ui.contextTray;
+  if (!contextTray) {
+    throw new Error('Composer context tray must be initialized before context managers');
+  }
 
-  // File context manager - chips in contextRowEl, dropdown in inputContainerEl
   tab.ui.fileContextManager = new FileContextManager(
     app,
     dom.contextRowEl,
     dom.inputEl,
     {
       getExcludedTags: () => plugin.settings.excludedTags,
-      onChipsChanged: () => {
-        tab.controllers.selectionController?.updateContextRowVisibility();
-        tab.controllers.browserSelectionController?.updateContextRowVisibility();
-        tab.controllers.canvasSelectionController?.updateContextRowVisibility();
-        autoResizeTextarea(dom.inputEl);
-        tab.renderer?.scrollToBottomIfNeeded();
-      },
       getExternalContexts: () => tab.ui.externalContextSelector?.getExternalContexts() || [],
     },
-    dom.inputContainerEl
+    dom.inputContainerEl,
+    contextTray,
   );
   tab.ui.fileContextManager.setMcpManager(getProviderMcpManager(getTabProviderId(tab, plugin)));
 
-  // Image context manager - drag/drop uses inputContainerEl, preview in contextRowEl
   tab.ui.imageContextManager = new ImageContextManager(
     dom.inputContainerEl,
     dom.inputEl,
-    {
-      onImagesChanged: () => {
-        tab.controllers.selectionController?.updateContextRowVisibility();
-        tab.controllers.browserSelectionController?.updateContextRowVisibility();
-        tab.controllers.canvasSelectionController?.updateContextRowVisibility();
-        autoResizeTextarea(dom.inputEl);
-        tab.renderer?.scrollToBottomIfNeeded();
-      },
-    },
-    dom.contextRowEl
+    {},
+    dom.contextRowEl,
+    contextTray,
   );
 }
 
@@ -743,7 +826,7 @@ function initializeSlashCommands(
 /**
  * Initializes instruction mode and todo panel for a tab.
  */
-function initializeInstructionAndTodo(tab: TabData, plugin: ClaudianPlugin): void {
+function initializeInstructionAndTodo(tab: TabData, plugin: FeatureHost): void {
   const { dom } = tab;
 
   syncTabProviderServices(tab, plugin);
@@ -801,7 +884,7 @@ function isBangBashEnabled(settings: Record<string, unknown>): boolean {
  */
 function initializeInputToolbar(
   tab: TabData,
-  plugin: ClaudianPlugin,
+  plugin: FeatureHost,
   getProviderCatalogConfig?: () => ProviderCatalogInfo,
   onProviderChanged?: (providerId: ProviderId) => void | Promise<void>,
 ): void {
@@ -851,16 +934,15 @@ function initializeInputToolbar(
         }
         syncSlashCommandDropdownForProvider(tab, plugin, getProviderCatalogConfig);
 
-        // Update settings for the new provider
         const uiConfig = ProviderRegistry.getChatUIConfig(newProvider);
-        await updateTabProviderSettings(tab, plugin, (settings) => {
-          settings.model = model;
-          uiConfig.applyModelDefaults(model, settings);
-        });
         if (didProviderChange) {
           await onProviderChanged?.(newProvider);
         }
-        await uiConfig.prepareModelMetadata?.(model, plugin.settings, { plugin });
+        await uiConfig.prepareModelMetadata?.(
+          model,
+          getProviderSettingsSnapshotWithModel(plugin.settings, newProvider, model),
+          { plugin: plugin.providerHost },
+        );
         tab.ui.thinkingBudgetSelector?.updateDisplay();
         tab.ui.serviceTierToggle?.updateDisplay();
         tab.ui.modelSelector?.updateDisplay();
@@ -882,11 +964,33 @@ function initializeInputToolbar(
       }
 
       const uiConfig: ProviderChatUIConfig = getTabChatUIConfig(tab, plugin);
-      const providerSettings = await updateTabProviderSettings(tab, plugin, (settings) => {
-        settings.model = model;
-        uiConfig.applyModelDefaults(model, settings);
-      });
-      await uiConfig.prepareModelMetadata?.(model, plugin.settings, { plugin });
+      const normalizedModel = normalizeProviderModelSelection(boundProvider, plugin.settings, model) ?? model;
+      const providerSettings = getProviderSettingsSnapshotWithModel(
+        plugin.settings,
+        boundProvider,
+        normalizedModel,
+      ) as TabProviderSettings;
+
+      if (tab.conversationId) {
+        await plugin.updateConversation(tab.conversationId, {
+          selectedModel: normalizedModel,
+        });
+        const updatedConversation = plugin.getConversationSync(tab.conversationId);
+        if (updatedConversation && tab.service?.providerId === boundProvider) {
+          const hasMessages = updatedConversation.messages.length > 0;
+          const externalContextPaths = tab.ui.externalContextSelector?.getExternalContexts()
+            ?? (hasMessages
+              ? updatedConversation.externalContextPaths ?? []
+              : plugin.settings.persistentExternalContextPaths ?? []);
+          tab.service.syncConversationState(updatedConversation, externalContextPaths);
+        }
+      }
+
+      await uiConfig.prepareModelMetadata?.(
+        normalizedModel,
+        providerSettings,
+        { plugin: plugin.providerHost },
+      );
       tab.ui.thinkingBudgetSelector?.updateDisplay();
       tab.ui.serviceTierToggle?.updateDisplay();
       tab.ui.modelSelector?.updateDisplay();
@@ -896,11 +1000,11 @@ function initializeInputToolbar(
       const currentUsage = tab.state.usage;
       if (currentUsage) {
         const newContextWindow = uiConfig.getContextWindowSize(
-          model,
+          normalizedModel,
           providerSettings.customContextLimits,
           providerSettings,
         );
-        tab.state.usage = recalculateUsageForModel(currentUsage, model, newContextWindow);
+        tab.state.usage = recalculateUsageForModel(currentUsage, normalizedModel, newContextWindow);
       }
     },
     onModeChange: async (mode: string) => {
@@ -912,14 +1016,16 @@ function initializeInputToolbar(
     },
     onThinkingBudgetChange: async (budget: string) => {
       await updateTabProviderSettings(tab, plugin, (settings) => {
+        const model = getTabSelectedModel(tab, plugin) ?? settings.model;
         settings.thinkingBudget = budget;
-        getTabChatUIConfig(tab, plugin).applyReasoningSelection?.(settings.model, budget, settings);
+        getTabChatUIConfig(tab, plugin).applyReasoningSelection?.(model, budget, settings);
       });
     },
     onEffortLevelChange: async (effort: string) => {
       await updateTabProviderSettings(tab, plugin, (settings) => {
+        const model = getTabSelectedModel(tab, plugin) ?? settings.model;
         settings.effortLevel = effort;
-        getTabChatUIConfig(tab, plugin).applyReasoningSelection?.(settings.model, effort, settings);
+        getTabChatUIConfig(tab, plugin).applyReasoningSelection?.(model, effort, settings);
       });
     },
     onServiceTierChange: async (serviceTier: string) => {
@@ -973,8 +1079,9 @@ function initializeInputToolbar(
 
   // Wire persistence changes
   tab.ui.externalContextSelector.setOnPersistenceChange((paths) => {
-    plugin.settings.persistentExternalContextPaths = paths;
-    void plugin.saveSettings();
+    void plugin.mutateSettings((settings) => {
+      settings.persistentExternalContextPaths = paths;
+    });
   });
 
   refreshTabProviderUI(tab, plugin);
@@ -994,20 +1101,18 @@ export interface InitializeTabUIOptions {
  */
 export function initializeTabUI(
   tab: TabData,
-  plugin: ClaudianPlugin,
+  plugin: FeatureHost,
   options: InitializeTabUIOptions = {}
 ): void {
   const { dom, state } = tab;
 
-  // Initialize context managers (file/image)
+  tab.ui.contextTray = new ComposerContextTray(dom.contextRowEl, {
+    onDidChange: () => {
+      autoResizeTextarea(dom.inputEl);
+      tab.renderer?.scrollToBottomIfNeeded();
+    },
+  });
   initializeContextManagers(tab, plugin);
-
-  // Selection indicator - add to contextRowEl
-  dom.selectionIndicatorEl = dom.contextRowEl.createDiv({ cls: 'claudian-selection-indicator claudian-hidden' });
-
-  dom.browserIndicatorEl = dom.contextRowEl.createDiv({ cls: 'claudian-browser-selection-indicator claudian-hidden' });
-
-  dom.canvasIndicatorEl = dom.contextRowEl.createDiv({ cls: 'claudian-canvas-indicator claudian-hidden' });
 
   const catalogInfo = options.getProviderCatalogConfig?.() ?? null;
   initializeSlashCommands(
@@ -1048,6 +1153,7 @@ export interface ForkContext {
   providerId?: ProviderId;
   sourceSessionId: string;
   sourceProviderState?: Record<string, unknown>;
+  sourceSelectedModel?: string;
   resumeAt: string;
   sourceTitle?: string;
   /** 1-based index used for fork title suffix (counts only non-interrupt user messages). */
@@ -1075,6 +1181,7 @@ interface ForkSource {
   providerId?: ProviderId;
   sourceSessionId: string;
   sourceProviderState?: Record<string, unknown>;
+  sourceSelectedModel?: string;
   sourceTitle?: string;
   currentNote?: string;
 }
@@ -1084,7 +1191,7 @@ interface ForkSource {
  * Prefers the live service session ID; falls back to persisted conversation metadata.
  * Shows a notice and returns null when no session can be resolved.
  */
-function resolveForkSource(tab: TabData, plugin: ClaudianPlugin): ForkSource | null {
+function resolveForkSource(tab: TabData, plugin: FeatureHost): ForkSource | null {
   const conversation = tab.conversationId
     ? plugin.getConversationSync(tab.conversationId)
     : null;
@@ -1102,10 +1209,15 @@ function resolveForkSource(tab: TabData, plugin: ClaudianPlugin): ForkSource | n
     return null;
   }
 
+  const providerId = getTabProviderId(tab, plugin, conversation);
+
   return {
-    providerId: getTabProviderId(tab, plugin, conversation),
+    providerId,
     sourceSessionId,
     sourceProviderState: conversation?.providerState,
+    sourceSelectedModel: conversation
+      ? resolveConversationModel(plugin.settings, providerId, conversation).model
+      : getTabSelectedModel(tab, plugin) ?? undefined,
     sourceTitle: conversation?.title,
     currentNote: conversation?.currentNote,
   };
@@ -1113,7 +1225,7 @@ function resolveForkSource(tab: TabData, plugin: ClaudianPlugin): ForkSource | n
 
 async function handleForkRequest(
   tab: TabData,
-  plugin: ClaudianPlugin,
+  plugin: FeatureHost,
   userMessageId: string,
   forkRequestCallback: (forkContext: ForkContext) => Promise<void>,
 ): Promise<void> {
@@ -1155,6 +1267,7 @@ async function handleForkRequest(
     providerId: source.providerId,
     sourceSessionId: source.sourceSessionId,
     sourceProviderState: source.sourceProviderState,
+    sourceSelectedModel: source.sourceSelectedModel,
     resumeAt: rewindCtx.prevAssistantUuid,
     sourceTitle: source.sourceTitle,
     forkAtUserMessage: countUserMessagesForForkTitle(msgs.slice(0, userIdx + 1)),
@@ -1164,7 +1277,7 @@ async function handleForkRequest(
 
 async function handleForkAll(
   tab: TabData,
-  plugin: ClaudianPlugin,
+  plugin: FeatureHost,
   forkRequestCallback: (forkContext: ForkContext) => Promise<void>,
 ): Promise<void> {
   const { state } = tab;
@@ -1206,6 +1319,7 @@ async function handleForkAll(
     providerId: source.providerId,
     sourceSessionId: source.sourceSessionId,
     sourceProviderState: source.sourceProviderState,
+    sourceSelectedModel: source.sourceSelectedModel,
     resumeAt: lastAssistantUuid,
     sourceTitle: source.sourceTitle,
     forkAtUserMessage: countUserMessagesForForkTitle(msgs) + 1,
@@ -1215,7 +1329,7 @@ async function handleForkAll(
 
 export function initializeTabControllers(
   tab: TabData,
-  plugin: ClaudianPlugin,
+  plugin: FeatureHost,
   component: Component,
   forkRequestCallback?: (forkContext: ForkContext) => Promise<void>,
   openConversation?: (conversationId: string) => Promise<void>,
@@ -1224,7 +1338,7 @@ export function initializeTabControllers(
 /** @deprecated Legacy 7-arg overload — 4th arg was previously an MCP manager. */
 export function initializeTabControllers(
   tab: TabData,
-  plugin: ClaudianPlugin,
+  plugin: FeatureHost,
   component: Component,
   _legacyArg: unknown,
   forkRequestCallback?: (forkContext: ForkContext) => Promise<void>,
@@ -1233,7 +1347,7 @@ export function initializeTabControllers(
 ): void;
 export function initializeTabControllers(
   tab: TabData,
-  plugin: ClaudianPlugin,
+  plugin: FeatureHost,
   component: Component,
   arg4?: unknown,
   arg5?: unknown,
@@ -1266,27 +1380,22 @@ export function initializeTabControllers(
   // Selection controller
   tab.controllers.selectionController = new SelectionController(
     plugin.app,
-    dom.selectionIndicatorEl!,
+    ui.contextTray!,
     dom.inputEl,
-    dom.contextRowEl,
-    () => autoResizeTextarea(dom.inputEl),
+    undefined,
     [dom.contentEl, dom.inputComposerEl, ...getSharedSelectionFocusScopeEls(component)],
   );
 
   tab.controllers.browserSelectionController = new BrowserSelectionController(
     plugin.app,
-    dom.browserIndicatorEl!,
+    ui.contextTray!,
     dom.inputEl,
-    dom.contextRowEl,
-    () => autoResizeTextarea(dom.inputEl)
   );
 
   tab.controllers.canvasSelectionController = new CanvasSelectionController(
     plugin.app,
-    dom.canvasIndicatorEl!,
+    ui.contextTray!,
     dom.inputEl,
-    dom.contextRowEl,
-    () => autoResizeTextarea(dom.inputEl)
   );
 
   tab.controllers.streamController = new StreamController({
@@ -1335,6 +1444,7 @@ export function initializeTabControllers(
       getTitleGenerationService: () => services.titleGenerationService,
       getStatusPanel: () => ui.statusPanel,
       getAgentService: () => tab.service, // Use tab's service instead of plugin's
+      getSelectedModel: () => getTabSelectedModel(tab, plugin),
       dismissPendingInlinePrompts: () => tab.controllers.inputController?.dismissPendingApproval(),
       ensureServiceForConversation: async (conversation) => {
         const nextProviderId = getTabProviderId(tab, plugin, conversation);
@@ -1409,12 +1519,13 @@ export function initializeTabControllers(
     getStatusPanel: () => ui.statusPanel,
     generateId: generateMessageId,
     resetInputHeight: () => {
-      // Per-tab input height is managed by CSS, no dynamic adjustment needed
+      autoResizeTextarea(dom.inputEl);
     },
-    getAuxiliaryModel: () => tab.service?.getAuxiliaryModel?.() ?? tab.draftModel ?? null,
+    getAuxiliaryModel: () => getTabSelectedModel(tab, plugin),
     getAgentService: () => tab.service,
     getSubagentManager: () => services.subagentManager,
     getTabProviderId: () => getTabProviderId(tab, plugin),
+    turnOwner: tab.session,
     ensureServiceInitialized: async () => {
       if (tab.serviceInitialized && tab.lifecycleState === 'bound_active') {
         return true;
@@ -1446,11 +1557,16 @@ export function initializeTabControllers(
     onForkAll: forkRequestCallback
       ? () => handleForkAll(tab, plugin, forkRequestCallback)
       : undefined,
-    restorePrePlanPermissionModeIfNeeded: () => {
+    restorePrePlanPermissionModeIfNeeded: async () => {
       if (getTabPermissionMode(tab, plugin) === 'plan') {
         const restoreMode = tab.state.prePlanPermissionMode ?? 'normal';
-        tab.state.prePlanPermissionMode = null;
-        updatePlanModeUI(tab, plugin, restoreMode);
+        try {
+          await updatePlanModeUI(tab, plugin, restoreMode);
+        } finally {
+          if (getTabPermissionMode(tab, plugin) !== 'plan') {
+            tab.state.prePlanPermissionMode = null;
+          }
+        }
       }
     },
   });
@@ -1477,7 +1593,7 @@ export function initializeTabControllers(
  * Call this after controllers are initialized.
  * Stores cleanup functions in dom.eventCleanups for proper memory management.
  */
-export function wireTabInputEvents(tab: TabData, plugin: ClaudianPlugin): void {
+export function wireTabInputEvents(tab: TabData, plugin: FeatureHost): void {
   const { dom, ui, state, controllers } = tab;
 
   let wasBangBashActive = ui.bangBashModeManager?.isActive() ?? false;
@@ -1631,6 +1747,17 @@ export function deactivateTab(tab: TabData): void {
 export async function destroyTab(tab: TabData): Promise<void> {
   tab.lifecycleState = 'closing';
 
+  tab.controllers.inputController?.dismissPendingApproval();
+  const activeTurn = tab.session.activeTurn;
+  if (activeTurn) {
+    tab.state.cancelRequested = true;
+    tab.state.bumpStreamGeneration();
+    tab.service?.cancel();
+  }
+  tab.runtimeSupervisor.cleanup();
+  tab.service = null;
+  await activeTurn?.catch(() => undefined);
+
   tab.controllers.selectionController?.stop();
   tab.controllers.selectionController?.clear();
   tab.controllers.browserSelectionController?.stop();
@@ -1642,11 +1769,11 @@ export async function destroyTab(tab: TabData): Promise<void> {
   cleanupThinkingBlock(tab.state.currentThinkingState);
   tab.state.currentThinkingState = null;
 
-  // Dismiss pending inline prompts before DOM teardown
-  tab.controllers.inputController?.dismissPendingApproval();
-
   tab.controllers.inputController?.destroyResumeDropdown();
   tab.ui.fileContextManager?.destroy();
+  tab.ui.imageContextManager?.destroy();
+  tab.ui.contextTray?.destroy();
+  tab.ui.contextTray = null;
   tab.ui.slashCommandDropdown?.destroy();
   tab.ui.slashCommandDropdown = null;
   tab.ui.instructionModeManager?.destroy();
@@ -1671,9 +1798,6 @@ export async function destroyTab(tab: TabData): Promise<void> {
   }
   tab.dom.eventCleanups.length = 0;
 
-  // Clean up runtime before removing DOM
-  tab.service?.cleanup();
-  tab.service = null;
   tab.dom.contentEl.remove();
 }
 
@@ -1681,7 +1805,7 @@ export async function destroyTab(tab: TabData): Promise<void> {
  * Gets the display title for a tab.
  * Uses synchronous access since we only need the title, not messages.
  */
-export function getTabTitle(tab: TabData, plugin: ClaudianPlugin): string {
+export function getTabTitle(tab: TabData, plugin: FeatureHost): string {
   if (tab.conversationId) {
     const conversation = plugin.getConversationSync(tab.conversationId);
     if (conversation?.title) {
@@ -1692,7 +1816,7 @@ export function getTabTitle(tab: TabData, plugin: ClaudianPlugin): string {
 }
 
 /** Shared between Tab.ts and TabManager.ts to avoid duplication. */
-export function setupServiceCallbacks(tab: TabData, plugin: ClaudianPlugin): void {
+export function setupServiceCallbacks(tab: TabData, plugin: FeatureHost): void {
   if (tab.service && tab.controllers.inputController) {
     tab.service.setApprovalCallback(
       async (toolName, input, description, options) =>
@@ -1715,8 +1839,13 @@ export function setupServiceCallbacks(tab: TabData, plugin: ClaudianPlugin): voi
           // Only restore permission mode if still in plan mode — user may have toggled out via Shift+Tab
           if (getTabPermissionMode(tab, plugin) === 'plan') {
             const restoreMode = tab.state.prePlanPermissionMode ?? 'normal';
-            tab.state.prePlanPermissionMode = null;
-            updatePlanModeUI(tab, plugin, restoreMode);
+            try {
+              await updatePlanModeUI(tab, plugin, restoreMode);
+            } finally {
+              if (getTabPermissionMode(tab, plugin) !== 'plan') {
+                tab.state.prePlanPermissionMode = null;
+              }
+            }
           }
           if (decision.type === 'approve-new-session') {
             tab.state.pendingNewSessionPlan = decision.planContent;
@@ -1741,11 +1870,18 @@ export function setupServiceCallbacks(tab: TabData, plugin: ClaudianPlugin): voi
       const currentMode = getTabPermissionMode(tab, plugin);
 
       if (currentMode !== mode) {
+        let capturedPrePlanMode = false;
         // Save pre-plan mode when entering plan (for Shift+Tab toggle restore)
         if (mode === 'plan' && tab.state.prePlanPermissionMode === null) {
           tab.state.prePlanPermissionMode = currentMode;
+          capturedPrePlanMode = true;
         }
-        updatePlanModeUI(tab, plugin, mode);
+        void updatePlanModeUI(tab, plugin, mode).catch((error: unknown) => {
+          if (capturedPrePlanMode && getTabPermissionMode(tab, plugin) !== 'plan') {
+            tab.state.prePlanPermissionMode = null;
+          }
+          new Notice(error instanceof Error ? error.message : 'Failed to change permission mode.');
+        });
       }
     });
   }
@@ -1863,24 +1999,33 @@ async function renderAutoTriggeredTurn(tab: TabData, result: AutoTurnResult): Pr
   }
 }
 
-export function updatePlanModeUI(tab: TabData, plugin: ClaudianPlugin, mode: string): void {
+export async function updatePlanModeUI(
+  tab: TabData,
+  plugin: FeatureHost,
+  mode: string,
+): Promise<void> {
   const providerId = getTabProviderId(tab, plugin);
-  const snapshot = getTabSettingsSnapshot(tab, plugin);
   const uiConfig = ProviderRegistry.getChatUIConfig(providerId);
-  if (uiConfig.applyPermissionMode) {
-    uiConfig.applyPermissionMode(mode, snapshot);
-  } else {
-    snapshot.permissionMode = mode;
+  try {
+    await plugin.mutateSettings((settings) => {
+      const snapshot = getWritableTabSettingsSnapshot(tab, plugin, settings);
+      if (uiConfig.applyPermissionMode) {
+        uiConfig.applyPermissionMode(mode, snapshot);
+      } else {
+        snapshot.permissionMode = mode;
+      }
+      ProviderSettingsCoordinator.commitProviderSettingsSnapshot(
+        settings,
+        providerId,
+        snapshot,
+      );
+    });
+  } finally {
+    const activeMode = getTabPermissionMode(tab, plugin);
+    tab.ui.permissionToggle?.updateDisplay();
+    tab.dom.inputWrapper.toggleClass(
+      'claudian-input-plan-mode',
+      activeMode === 'plan' && getTabCapabilities(tab, plugin).supportsPlanMode,
+    );
   }
-  ProviderSettingsCoordinator.commitProviderSettingsSnapshot(
-    plugin.settings,
-    providerId,
-    snapshot,
-  );
-  void plugin.saveSettings();
-  tab.ui.permissionToggle?.updateDisplay();
-  tab.dom.inputWrapper.toggleClass(
-    'claudian-input-plan-mode',
-    mode === 'plan' && getTabCapabilities(tab, plugin).supportsPlanMode,
-  );
 }

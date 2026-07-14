@@ -10,6 +10,7 @@ import {
   OPENCODE_DEFAULT_THINKING_LEVEL,
   OPENCODE_SYNTHETIC_MODEL_ID,
   resolveOpencodeBaseModelRawId,
+  resolveOpencodeDefaultThinkingLevel,
   splitOpencodeModelLabel,
 } from '../../../../src/providers/opencode/models';
 import { opencodeChatUIConfig } from '../../../../src/providers/opencode/ui/OpencodeChatUIConfig';
@@ -21,6 +22,19 @@ describe('OpenCode model identity', () => {
     expect(decodeOpencodeModelId(OPENCODE_SYNTHETIC_MODEL_ID)).toBeNull();
     expect(isOpencodeModelSelectionId('opencode:anthropic/claude-sonnet-4')).toBe(true);
     expect(isOpencodeModelSelectionId('claude-sonnet-4')).toBe(false);
+  });
+});
+
+describe('OpenCode thinking defaults', () => {
+  it('falls back to the current provider level when high is unsupported', () => {
+    expect(resolveOpencodeDefaultThinkingLevel(
+      [
+        { label: 'Low', value: 'low' },
+        { label: 'Medium', value: 'medium' },
+      ],
+      undefined,
+      'medium',
+    )).toBe('medium');
   });
 });
 
@@ -103,7 +117,7 @@ describe('OpenCode base model derivation', () => {
 });
 
 describe('opencodeChatUIConfig', () => {
-  it('keeps visible OpenCode model order stable and appends saved variant selections only when absent', () => {
+  it('appends saved variant selections only when absent from visible models', () => {
     const options = opencodeChatUIConfig.getModelOptions({
       model: 'haiku',
       providerConfigs: {
@@ -141,7 +155,7 @@ describe('opencodeChatUIConfig', () => {
     ]);
   });
 
-  it('uses modelAliases to override the label in model selector options', () => {
+  it('returns visible model selector options in reverse order with aliases', () => {
     const options = opencodeChatUIConfig.getModelOptions({
       providerConfigs: {
         opencode: {
@@ -163,13 +177,13 @@ describe('opencodeChatUIConfig', () => {
     expect(options).toEqual([
       {
         description: 'ACP runtime',
-        label: 'Sonnet',
-        value: 'opencode:anthropic/claude-sonnet-4',
+        label: 'OpenAI/GPT-5',
+        value: 'opencode:openai/gpt-5',
       },
       {
         description: 'ACP runtime',
-        label: 'OpenAI/GPT-5',
-        value: 'opencode:openai/gpt-5',
+        label: 'Sonnet',
+        value: 'opencode:anthropic/claude-sonnet-4',
       },
     ]);
   });
@@ -232,6 +246,31 @@ describe('opencodeChatUIConfig', () => {
       'opencode:anthropic/claude-sonnet-4',
       settings,
     )).toBe('max');
+  });
+
+  it('defaults ACP thought-level models to high without a saved preference', () => {
+    const settings = {
+      providerConfigs: {
+        opencode: {
+          discoveredModels: [
+            { label: 'Anthropic/Claude Sonnet 4', rawId: 'anthropic/claude-sonnet-4' },
+          ],
+          preferredThinkingByModel: {},
+          thinkingOptionsByModel: {
+            'anthropic/claude-sonnet-4': [
+              { label: 'Low', value: 'low' },
+              { label: 'High', value: 'high' },
+              { label: 'Max', value: 'max' },
+            ],
+          },
+        },
+      },
+    };
+
+    expect(opencodeChatUIConfig.getDefaultReasoningValue(
+      'opencode:anthropic/claude-sonnet-4',
+      settings,
+    )).toBe('high');
   });
 });
 

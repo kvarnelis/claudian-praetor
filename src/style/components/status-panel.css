@@ -6,6 +6,10 @@
 }
 
 .claudian-status-panel {
+  padding-top: 0;
+}
+
+.claudian-status-panel--visible {
   padding-top: 12px;
 }
 

@@ -5,7 +5,7 @@
 
 A personal fork of **[Claudian](https://github.com/YishenTu/claudian)** by **[Yishen Tu](https://github.com/YishenTu)**. Claudian is his project and does all the real work — embedding Claude Code, Codex, and other AI coding agents in Obsidian, with your vault as their working directory. This fork adds a few things on top and tracks his releases.
 
-**Currently synced with upstream Claudian `2.0.27`** (the latest upstream release).
+**Currently synced with upstream Claudian `main` at `178c73a6` (2026-07-14), including release `2.0.34`.**
 
 > For what the plugin actually does and how to use it — the chat, file edits, providers, skills, MCP, plan mode — see **[Claudian](https://github.com/YishenTu/claudian)**. That's the source of truth. This README only covers what's different in the fork.
 
@@ -15,6 +15,7 @@ A personal fork of **[Claudian](https://github.com/YishenTu/claudian)** by **[Yi
 - **Grok provider** — adds Grok to Claudian's built-in set (Claude, Codex, OpenCode, Pi).
 - **Live model lists** — the Claude, Codex, and Grok model pickers read their models directly from your installed CLIs at runtime, so they always show exactly what each CLI supports and pick up new models on their own. No hardcoded list to keep updated.
 - **Date-based versioning** — this fork versions by date (e.g. `2026.7.2`) to stay clearly distinct from upstream's numbering.
+- **Theme-native appearance** — an opt-in setting lets the chat inherit the current Obsidian theme's sidebar typography and colors.
 
 ## Install
 

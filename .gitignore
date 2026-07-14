@@ -89,6 +89,8 @@ dev
 # ...but keep committed dev tooling (mobile load simulation gate)
 !dev/
 !dev/mobile-load-harness.mjs
+.context/
+CLAUDE.local.md
 
 # Lock files (uncomment based on package manager)
 # yarn.lock

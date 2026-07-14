@@ -1,6 +1,6 @@
 import { Platform } from 'obsidian';
 
-import type ClaudianPlugin from '../../../main';
+import type { FeatureHost } from '../../FeatureHost';
 
 const BODY_CLASS = 'claudian-ipad-docked';
 const DRAWER_CLASS = 'claudian-dock-drawer';
@@ -25,7 +25,7 @@ const MIN_DOCK_PX = 280;
 export class MobileDock {
   private handleEl: HTMLElement | null = null;
 
-  constructor(private readonly plugin: ClaudianPlugin) {}
+  constructor(private readonly plugin: FeatureHost) {}
 
   private get enabledForLayout(): boolean {
     return Boolean(Platform?.isMobile)

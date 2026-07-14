@@ -1,9 +1,10 @@
 import * as fs from 'fs';
 import { Setting } from 'obsidian';
 
+import { ProviderSettingsCoordinator } from '../../../core/providers/ProviderSettingsCoordinator';
 import type { ProviderSettingsTabRenderer } from '../../../core/providers/types';
-import { renderEnvironmentSettingsSection } from '../../../features/settings/ui/EnvironmentSettingsSection';
 import { t } from '../../../i18n/i18n';
+import { renderEnvironmentSettingsSection } from '../../../shared/settings/EnvironmentSettingsSection';
 import { getHostnameKey } from '../../../utils/env';
 import { expandHomePath } from '../../../utils/path';
 import { getGrokProviderSettings, updateGrokProviderSettings } from '../settings';
@@ -23,9 +24,11 @@ export const grokSettingsTabRenderer: ProviderSettingsTabRenderer = {
         toggle
           .setValue(grokSettings.enabled)
           .onChange(async (value) => {
-            updateGrokProviderSettings(settingsBag, { enabled: value });
-            await context.plugin.saveSettings();
+            await context.plugin.mutateSettings((settings) => {
+              ProviderSettingsCoordinator.applyProviderEnablement(settings, 'grok', value);
+            });
             context.refreshModelSelectors();
+            context.refreshTitleGenerationModelOptions();
           })
       );
 
@@ -83,12 +86,10 @@ export const grokSettingsTabRenderer: ProviderSettingsTabRenderer = {
       } else {
         delete cliPathsByHost[hostnameKey];
       }
-      updateGrokProviderSettings(settingsBag, { cliPathsByHost: { ...cliPathsByHost } });
-      await context.plugin.saveSettings();
-      const view = context.plugin.getView();
-      await view?.getTabManager()?.broadcastToAllTabs(
-        (service) => Promise.resolve(service.cleanup())
-      );
+      await context.plugin.mutateSettings((settings) => {
+        updateGrokProviderSettings(settings, { cliPathsByHost: { ...cliPathsByHost } });
+      });
+      await context.plugin.recycleProviderRuntimes?.('grok');
       return true;
     };
 
@@ -118,11 +119,12 @@ export const grokSettingsTabRenderer: ProviderSettingsTabRenderer = {
           .addOption('read-only', 'Read only')
           .setValue(grokSettings.safeMode)
           .onChange(async (value) => {
-            updateGrokProviderSettings(
-              settingsBag,
-              { safeMode: value as 'workspace-write' | 'read-only' },
-            );
-            await context.plugin.saveSettings();
+            await context.plugin.mutateSettings((settings) => {
+              updateGrokProviderSettings(
+                settings,
+                { safeMode: value as 'workspace-write' | 'read-only' },
+              );
+            });
           });
       });
 

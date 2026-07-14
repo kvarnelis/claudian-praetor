@@ -7,6 +7,8 @@ import {
   computeSystemPromptKey,
   type SystemPromptSettings,
 } from '../../../core/prompt/mainAgent';
+import { getProviderSettingsSnapshotWithModel } from '../../../core/providers/conversationModel';
+import type { ProviderHost } from '../../../core/providers/ProviderHost';
 import { ProviderSettingsCoordinator } from '../../../core/providers/ProviderSettingsCoordinator';
 import type { ProviderCapabilities, ProviderId } from '../../../core/providers/types';
 import type { ChatRuntime } from '../../../core/runtime/ChatRuntime';
@@ -27,16 +29,15 @@ import type {
   SubagentRuntimeState,
 } from '../../../core/runtime/types';
 import type { ChatMessage, Conversation, ForkSource, SlashCommand, StreamChunk } from '../../../core/types';
-import type ClaudianPlugin from '../../../main';
 import { getVaultPath } from '../../../utils/path';
 import { buildContextFromHistory } from '../../../utils/session';
 import { CODEX_PROVIDER_CAPABILITIES } from '../capabilities';
-import { setCodexModelCatalog } from '../codexModelCatalog';
 import {
   deriveCodexMemoriesDirFromSessionsRoot,
   deriveCodexSessionsRootFromSessionPath,
   findCodexSessionFile,
 } from '../history/CodexHistoryStore';
+import { findCodexModel, getDefaultCodexModel } from '../models';
 import { toCodexRuntimeModelId } from '../modelSelection';
 import { encodeCodexTurn } from '../prompt/encodeCodexTurn';
 import {
@@ -49,15 +50,12 @@ import {
   findPreferredCodexSkillByName,
 } from '../skills/CodexSkillListingService';
 import { type CodexProviderState, getCodexState } from '../types';
-import { DEFAULT_CODEX_PRIMARY_MODEL, FAST_TIER_CODEX_MODEL } from '../types/models';
 import { CodexAppServerProcess } from './CodexAppServerProcess';
 import {
   initializeCodexAppServerTransport,
   resolveCodexAppServerLaunchSpec,
 } from './codexAppServerSupport';
 import type {
-  ModelListParams,
-  ModelListResponse,
   SandboxPolicy,
   ServerRequestResolvedNotification,
   SkillInput,
@@ -93,24 +91,32 @@ function resolveCodexSandboxConfig(
   return { approvalPolicy: 'on-request', sandbox: codexSafeMode };
 }
 
-function resolveCodexServiceTier(serviceTier: unknown, model: string | undefined): string | null {
-  if (model !== FAST_TIER_CODEX_MODEL) {
+function resolveCodexServiceTier(
+  serviceTier: unknown,
+  modelId: string | undefined,
+  settings: Record<string, unknown>,
+): string | null {
+  const model = findCodexModel(getCodexProviderSettings(settings).discoveredModels, modelId);
+  if (!model) {
     return null;
   }
-  return serviceTier === 'fast' ? 'fast' : null;
-}
 
-const EFFORT_MAP: Record<string, string> = {
-  low: 'low',
-  medium: 'medium',
-  high: 'high',
-  xhigh: 'xhigh',
-};
+  if (typeof serviceTier === 'string') {
+    if (model.serviceTiers.some(tier => tier.id === serviceTier)) {
+      return serviceTier;
+    }
+    if (serviceTier === 'fast') {
+      return model.serviceTiers.find(tier => tier.name.toLowerCase() === 'fast')?.id ?? null;
+    }
+  }
+
+  return model.defaultServiceTier;
+}
 
 export class CodexChatRuntime implements ChatRuntime {
   readonly providerId: ProviderId = 'codex';
 
-  private plugin: ClaudianPlugin;
+  private plugin: ProviderHost;
   private session = new CodexSessionManager();
   private process: CodexAppServerProcess | null = null;
   private transport: CodexRpcTransport | null = null;
@@ -119,6 +125,9 @@ export class CodexChatRuntime implements ChatRuntime {
   private notificationRouter: CodexNotificationRouter | null = null;
   private serverRequestRouter = new CodexServerRequestRouter();
   private ready = false;
+  private readinessFlight: { key: string; promise: Promise<boolean> } | null = null;
+  private disposed = false;
+  private lifecycleGeneration = 0;
   private readyListeners = new Set<(ready: boolean) => void>();
   private clientConfigKey: string | null = null;
   private currentTurnId: string | null = null;
@@ -140,6 +149,7 @@ export class CodexChatRuntime implements ChatRuntime {
   private autoTurnCallback: AutoTurnCallback | null = null;
   private resumeCheckpoint: string | undefined;
   private activeInputBundles = new Set<CodexInputBundle>();
+  private currentConversationModel: string | null = null;
 
   // Fork state
   private pendingFork: ForkSource | null = null;
@@ -148,7 +158,7 @@ export class CodexChatRuntime implements ChatRuntime {
   private canceled = false;
   private turnMetadata: ChatTurnMetadata = {};
 
-  constructor(plugin: ClaudianPlugin) {
+  constructor(plugin: ProviderHost) {
     this.plugin = plugin;
   }
 
@@ -182,6 +192,7 @@ export class CodexChatRuntime implements ChatRuntime {
     _externalContextPaths?: string[],
   ): void {
     if (!conversation) {
+      this.currentConversationModel = null;
       this.session.reset();
       this.loadedThreadId = null;
       this.currentThreadPath = null;
@@ -189,6 +200,7 @@ export class CodexChatRuntime implements ChatRuntime {
       return;
     }
 
+    this.setCurrentConversationModel(conversation.selectedModel);
     const state = getCodexState(conversation.providerState);
 
     // Pending fork: store fork metadata, don't set the source thread as our session
@@ -218,6 +230,33 @@ export class CodexChatRuntime implements ChatRuntime {
   }
 
   async ensureReady(options?: ChatRuntimeEnsureReadyOptions): Promise<boolean> {
+    if (this.disposed) {
+      throw new Error('Codex runtime has been disposed.');
+    }
+    const key = JSON.stringify(options ?? {});
+    if (this.readinessFlight) {
+      if (this.readinessFlight.key === key) {
+        return this.readinessFlight.promise;
+      }
+      await this.readinessFlight.promise.catch(() => undefined);
+      return this.ensureReady(options);
+    }
+
+    const generation = this.lifecycleGeneration;
+    const promise = this.ensureReadyInternal(options, generation);
+    this.readinessFlight = { key, promise };
+    return promise.finally(() => {
+      if (this.readinessFlight?.promise === promise) {
+        this.readinessFlight = null;
+      }
+    });
+  }
+
+  private async ensureReadyInternal(
+    options: ChatRuntimeEnsureReadyOptions | undefined,
+    generation: number,
+  ): Promise<boolean> {
+    this.assertLifecycleCurrent(generation);
     const promptSettings = this.getSystemPromptSettings();
     const promptKey = computeSystemPromptKey(promptSettings);
     const launchSpec = resolveCodexAppServerLaunchSpec(this.plugin, this.providerId);
@@ -236,9 +275,15 @@ export class CodexChatRuntime implements ChatRuntime {
 
     if (shouldRebuild) {
       await this.shutdownProcess();
+      this.assertLifecycleCurrent(generation);
       await this.startAppServer(launchSpec, clientConfigKey);
+      if (!this.isLifecycleCurrent(generation)) {
+        await this.shutdownProcess();
+        this.assertLifecycleCurrent(generation);
+      }
     }
 
+    this.assertLifecycleCurrent(generation);
     this.setReady(true);
     return shouldRebuild;
   }
@@ -248,6 +293,9 @@ export class CodexChatRuntime implements ChatRuntime {
     _conversationHistory?: ChatMessage[],
     queryOptions?: ChatRuntimeQueryOptions,
   ): AsyncGenerator<StreamChunk> {
+    if (queryOptions?.model) {
+      this.setCurrentConversationModel(queryOptions.model);
+    }
     this.resetTurnMetadata();
     let turn = originalTurn;
     await this.ensureReady();
@@ -259,7 +307,8 @@ export class CodexChatRuntime implements ChatRuntime {
     this.currentQueryThreadId = null;
     this.pendingTurnNotifications = [];
 
-    const model = this.resolveModel(queryOptions);
+    const providerSettings = this.getProviderSettings();
+    const model = this.resolveModel(queryOptions, providerSettings);
     const promptSettings = this.getSystemPromptSettings();
     const promptText = buildSystemPrompt(promptSettings);
 
@@ -317,10 +366,10 @@ export class CodexChatRuntime implements ChatRuntime {
         const permissionMode = this.resolveSandboxConfig();
         await this.transport!.request<ThreadResumeResult>('thread/resume', {
           threadId,
-          model: model ?? DEFAULT_CODEX_PRIMARY_MODEL,
+          ...(model ? { model } : {}),
           approvalPolicy: permissionMode.approvalPolicy,
           sandbox: permissionMode.sandbox,
-          serviceTier: resolveCodexServiceTier(this.getProviderSettings().serviceTier, model ?? DEFAULT_CODEX_PRIMARY_MODEL),
+          serviceTier: resolveCodexServiceTier(providerSettings.serviceTier, model, providerSettings),
           baseInstructions: promptText,
           experimentalRawEvents: true,
           persistExtendedHistory: true,
@@ -357,10 +406,10 @@ export class CodexChatRuntime implements ChatRuntime {
         const permissionMode = this.resolveSandboxConfig();
         const resumeResult = await this.transport!.request<ThreadResumeResult>('thread/resume', {
           threadId: existingThreadId,
-          model: model ?? DEFAULT_CODEX_PRIMARY_MODEL,
+          ...(model ? { model } : {}),
           approvalPolicy: permissionMode.approvalPolicy,
           sandbox: permissionMode.sandbox,
-          serviceTier: resolveCodexServiceTier(this.getProviderSettings().serviceTier, model ?? DEFAULT_CODEX_PRIMARY_MODEL),
+          serviceTier: resolveCodexServiceTier(providerSettings.serviceTier, model, providerSettings),
           baseInstructions: promptText,
           experimentalRawEvents: true,
           persistExtendedHistory: true,
@@ -376,11 +425,11 @@ export class CodexChatRuntime implements ChatRuntime {
         // New thread
         const permissionMode = this.resolveSandboxConfig();
         const startResult = await this.transport!.request<ThreadStartResult>('thread/start', {
-          model: model ?? DEFAULT_CODEX_PRIMARY_MODEL,
+          ...(model ? { model } : {}),
           cwd: this.launchSpec?.targetCwd ?? getVaultPath(this.plugin.app) ?? undefined,
           approvalPolicy: permissionMode.approvalPolicy,
           sandbox: permissionMode.sandbox,
-          serviceTier: resolveCodexServiceTier(this.getProviderSettings().serviceTier, model ?? DEFAULT_CODEX_PRIMARY_MODEL),
+          serviceTier: resolveCodexServiceTier(providerSettings.serviceTier, model, providerSettings),
           baseInstructions: promptText,
           experimentalRawEvents: true,
           persistExtendedHistory: true,
@@ -419,9 +468,11 @@ export class CodexChatRuntime implements ChatRuntime {
         this.registerActiveInputBundle(turnInputBundle);
 
         // Start turn
-        const providerSettings = this.getProviderSettings();
-        const effort = EFFORT_MAP[providerSettings.effortLevel as string] ?? 'medium';
-        const resolvedModel = model ?? DEFAULT_CODEX_PRIMARY_MODEL;
+        const selectedEffort = typeof providerSettings.effortLevel === 'string'
+          ? providerSettings.effortLevel.trim()
+          : '';
+        const effort = selectedEffort || 'medium';
+        const resolvedModel = model;
         const isPlanMode = providerSettings.permissionMode === 'plan';
         const externalContextPaths = this.resolveExternalContextPaths(turn, queryOptions);
         const permissionMode = this.resolveSandboxConfig();
@@ -435,17 +486,17 @@ export class CodexChatRuntime implements ChatRuntime {
           sessionFilePathHint,
         );
 
-        const collaborationMode = {
+        const collaborationMode = resolvedModel ? {
           mode: isPlanMode ? 'plan' as const : 'default' as const,
           settings: {
             model: resolvedModel,
             reasoning_effort: effort,
             developer_instructions: null,
           },
-        };
+        } : undefined;
 
         const summary = getEffectiveCodexReasoningSummary(providerSettings, resolvedModel);
-        const serviceTier = resolveCodexServiceTier(providerSettings.serviceTier, resolvedModel);
+        const serviceTier = resolveCodexServiceTier(providerSettings.serviceTier, resolvedModel, providerSettings);
 
         // Configure router plan state before turn/start so buffered notifications
         // that arrive before currentTurnId is set already see the correct state.
@@ -455,7 +506,7 @@ export class CodexChatRuntime implements ChatRuntime {
           threadId,
           input: turnInputBundle.input,
           approvalPolicy: permissionMode.approvalPolicy,
-          model: resolvedModel,
+          ...(resolvedModel ? { model: resolvedModel } : {}),
           serviceTier,
           effort,
           summary,
@@ -622,6 +673,11 @@ export class CodexChatRuntime implements ChatRuntime {
   }
 
   cleanup(): void {
+    if (this.disposed) {
+      return;
+    }
+    this.disposed = true;
+    this.lifecycleGeneration += 1;
     this.cancel();
     this.teardownState();
     this.readyListeners.clear();
@@ -779,6 +835,16 @@ export class CodexChatRuntime implements ChatRuntime {
     }
   }
 
+  private isLifecycleCurrent(generation: number): boolean {
+    return !this.disposed && generation === this.lifecycleGeneration;
+  }
+
+  private assertLifecycleCurrent(generation: number): void {
+    if (!this.isLifecycleCurrent(generation)) {
+      throw new Error('Codex runtime has been disposed.');
+    }
+  }
+
   private getSystemPromptSettings(): SystemPromptSettings {
     const settings = this.plugin.settings;
     return {
@@ -790,20 +856,37 @@ export class CodexChatRuntime implements ChatRuntime {
   }
 
   private getProviderSettings(): Record<string, unknown> {
-    return ProviderSettingsCoordinator.getProviderSettingsSnapshot(
-      this.plugin.settings,
-      this.providerId,
-    );
+    return this.currentConversationModel
+      ? getProviderSettingsSnapshotWithModel(
+          this.plugin.settings,
+          this.providerId,
+          this.currentConversationModel,
+        )
+      : ProviderSettingsCoordinator.getProviderSettingsSnapshot(
+          this.plugin.settings,
+          this.providerId,
+        );
   }
 
   getAuxiliaryModel(): string | null {
-    return this.resolveModel() ?? null;
+    return this.currentConversationModel ?? this.resolveModel() ?? null;
   }
 
-  private resolveModel(queryOptions?: ChatRuntimeQueryOptions): string | undefined {
-    const providerSettings = this.getProviderSettings();
+  private setCurrentConversationModel(model: unknown): void {
+    const selectedModel = typeof model === 'string' ? model.trim() : '';
+    this.currentConversationModel = selectedModel || null;
+  }
+
+  private resolveModel(
+    queryOptions?: ChatRuntimeQueryOptions,
+    providerSettings: Record<string, unknown> = this.getProviderSettings(),
+  ): string | undefined {
     const model = queryOptions?.model ?? providerSettings.model as string | undefined;
-    return model ? toCodexRuntimeModelId(model) : undefined;
+    if (model) {
+      return toCodexRuntimeModelId(model);
+    }
+
+    return getDefaultCodexModel(getCodexProviderSettings(providerSettings).discoveredModels)?.model;
   }
 
   private resolveSandboxConfig(): { approvalPolicy: string; sandbox: string } {
@@ -823,7 +906,6 @@ export class CodexChatRuntime implements ChatRuntime {
     this.transport.start();
 
     const initializeResult = await initializeCodexAppServerTransport(this.transport);
-    void this.fetchAndCacheModels();
     this.runtimeContext = createCodexRuntimeContext(launchSpec, initializeResult);
     this.clientConfigKey = clientConfigKey;
   }
@@ -880,40 +962,6 @@ export class CodexChatRuntime implements ChatRuntime {
       this.transport.onServerRequest(method, (requestId, params) => {
         return this.serverRequestRouter.handleServerRequest(requestId, method, params);
       });
-    }
-  }
-
-  /**
-   * Publishes the app-server model list for picker consumers. Effort levels and
-   * service tiers are available in this response but remain statically managed.
-   */
-  private async fetchAndCacheModels(): Promise<void> {
-    const transport = this.transport;
-    if (!transport) return;
-
-    try {
-      const models: ModelListResponse['data'] = [];
-      let cursor: string | null | undefined;
-
-      do {
-        const params: ModelListParams = {
-          includeHidden: false,
-          ...(cursor ? { cursor } : {}),
-        };
-        const response = await transport.request<ModelListResponse>('model/list', params);
-        models.push(...response.data);
-        cursor = response.nextCursor;
-      } while (cursor);
-
-      if (this.transport !== transport) {
-        return;
-      }
-      const visibleModels = models.filter(model => !model.hidden);
-      if (visibleModels.length > 0) {
-        setCodexModelCatalog(visibleModels);
-      }
-    } catch {
-      // Non-critical: the selector falls back to DEFAULT_CODEX_MODELS
     }
   }
 

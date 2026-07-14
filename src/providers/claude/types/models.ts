@@ -2,20 +2,27 @@
  * Model type definitions and constants.
  */
 
+import { DEFAULT_REASONING_VALUE } from '../../../core/providers/reasoning';
 import { getCliEffortLevels } from '../modelCatalog';
 import { toClaudeRuntimeModelId } from '../modelSelection';
+import {
+  CLAUDE_MODEL_TIER_DEFINITIONS,
+  CLAUDE_MODEL_TIER_PATTERN,
+  type ClaudeModelTier,
+  getClaudeModelTierDefinition,
+  isVersionAtLeast,
+  resolveClaudeModelTierAlias,
+} from '../modelTiers';
 
 /** Model identifier (string to support custom models via environment variables). */
 export type ClaudeModel = string;
 
-export const DEFAULT_CLAUDE_MODELS: { value: ClaudeModel; label: string; description: string }[] = [
-  { value: 'haiku', label: 'Haiku', description: 'Fast and efficient' },
-  { value: 'sonnet', label: 'Sonnet', description: 'Balanced performance' },
-  { value: 'sonnet[1m]', label: 'Sonnet 1M', description: 'Balanced performance (1M context window)' },
-  { value: 'opus', label: 'Opus', description: 'Most capable' },
-  { value: 'opus[1m]', label: 'Opus 1M', description: 'Most capable (1M context window)' },
-  { value: 'claude-fable-5', label: 'Fable 5 ($$$)', description: "Anthropic's most capable model — premium pricing above Opus" },
-];
+export const DEFAULT_CLAUDE_MODELS: { value: ClaudeModel; label: string; description: string }[] =
+  CLAUDE_MODEL_TIER_DEFINITIONS.map(({ id, label, description }) => ({
+    value: id,
+    label,
+    description,
+  }));
 
 /** Effort levels for adaptive thinking models. */
 export type EffortLevel = 'low' | 'medium' | 'high' | 'xhigh' | 'max';
@@ -29,34 +36,40 @@ export const EFFORT_LEVELS: { value: EffortLevel; label: string }[] = [
 ];
 
 /** Default effort level per model tier. */
-export const DEFAULT_EFFORT_LEVEL: Record<string, EffortLevel> = {
-  'haiku': 'high',
-  'sonnet': 'high',
-  'sonnet[1m]': 'high',
-  'opus': 'high',
-  'opus[1m]': 'high',
-  'claude-fable-5': 'high',
-};
-
-const ONE_M_SUFFIX = '[1m]';
-const DEFAULT_MODEL_VALUES = new Set(DEFAULT_CLAUDE_MODELS.map(m => m.value.toLowerCase()));
+export const DEFAULT_EFFORT_LEVEL: Record<string, EffortLevel> = Object.fromEntries(
+  CLAUDE_MODEL_TIER_DEFINITIONS.map(definition => [definition.id, DEFAULT_REASONING_VALUE]),
+);
 
 function normalizeModelId(model: string): string {
   return toClaudeRuntimeModelId(model).trim().toLowerCase();
 }
 
-function has1MContextSuffix(model: string): boolean {
-  return normalizeModelId(model).endsWith(ONE_M_SUFFIX);
+export function normalizeLegacyClaudeModelAlias(model: string): string {
+  return resolveClaudeModelTierAlias(normalizeModelId(model)) ?? model;
 }
 
-function isBuiltInFamilyVariant(model: string, family: 'sonnet' | 'opus'): boolean {
+interface VersionedClaudeModel {
+  tier: ClaudeModelTier;
+  major: number;
+  minor: number;
+}
+
+function parseVersionedClaudeModel(model: string): VersionedClaudeModel | null {
   const normalized = normalizeModelId(model);
-  return normalized === family || normalized === `${family}${ONE_M_SUFFIX}`;
-}
+  const canonicalStart = normalized.indexOf('claude-');
+  const canonical = canonicalStart >= 0 ? normalized.slice(canonicalStart) : normalized;
+  const match = canonical.match(
+    new RegExp(`^claude-(${CLAUDE_MODEL_TIER_PATTERN})-(\\d+)(?:-(\\d+))?`),
+  );
+  if (!match) {
+    return null;
+  }
 
-/** Fable is a standalone tier (not a haiku/sonnet/opus version bump) — always 1M context, no [1m] toggle. */
-function isFableModel(model: string): boolean {
-  return /claude-fable-\d+/.test(normalizeModelId(model));
+  return {
+    tier: match[1] as ClaudeModelTier,
+    major: Number(match[2]),
+    minor: match[3] === undefined ? 0 : Number(match[3]),
+  };
 }
 
 function isValidContextLimit(limit: unknown): limit is number {
@@ -76,16 +89,20 @@ function resolveCustomContextLimit(
     return exactLimit;
   }
 
-  const normalizedModel = normalizeModelId(model);
+  const normalizedModel = normalizeLegacyClaudeModelAlias(normalizeModelId(model));
   const matchingLimits = Object.entries(customLimits)
-    .filter(([key, limit]) => key !== model && normalizeModelId(key) === normalizedModel && isValidContextLimit(limit))
+    .filter(([key, limit]) =>
+      key !== model
+      && normalizeLegacyClaudeModelAlias(normalizeModelId(key)) === normalizedModel
+      && isValidContextLimit(limit)
+    )
     .map(([, limit]) => limit);
 
   return matchingLimits.length === 1 ? matchingLimits[0] : null;
 }
 
 export function isDefaultClaudeModel(model: string): boolean {
-  return DEFAULT_MODEL_VALUES.has(normalizeModelId(model));
+  return resolveClaudeModelTierAlias(normalizeModelId(model)) !== null;
 }
 
 /**
@@ -99,12 +116,21 @@ export function supportsXHighEffort(model: string): boolean {
   if (cliLevels) {
     return cliLevels.includes('xhigh');
   }
-  if (isBuiltInFamilyVariant(normalized, 'opus')) return true;
-  if (isBuiltInFamilyVariant(normalized, 'sonnet')) return true;
-  if (isFableModel(normalized)) return true;
-  return (
-    /claude-opus-(4-[7-9]|[5-9])/.test(normalized) ||
-    /claude-sonnet-(?:[5-9]|\d{2,})(?:-\d{8})?(?:-|$)/.test(normalized)
+
+  const aliasTier = resolveClaudeModelTierAlias(normalized);
+  if (aliasTier) {
+    return getClaudeModelTierDefinition(aliasTier).aliasSupportsXHigh;
+  }
+
+  const versionedModel = parseVersionedClaudeModel(normalized);
+  if (!versionedModel) {
+    return false;
+  }
+  const definition = getClaudeModelTierDefinition(versionedModel.tier);
+  return isVersionAtLeast(
+    versionedModel.major,
+    versionedModel.minor,
+    definition.versionedXHighFrom,
   );
 }
 
@@ -122,7 +148,8 @@ export function normalizeEffortLevel(
     return effortLevel as EffortLevel;
   }
 
-  return DEFAULT_EFFORT_LEVEL[normalizeModelId(model)] ?? 'high';
+  const modelTier = resolveClaudeModelTierAlias(normalizeModelId(model));
+  return (modelTier && DEFAULT_EFFORT_LEVEL[modelTier]) ?? DEFAULT_REASONING_VALUE;
 }
 
 export function resolveEffortLevel(
@@ -135,38 +162,30 @@ export function resolveEffortLevel(
 export const CONTEXT_WINDOW_STANDARD = 200_000;
 export const CONTEXT_WINDOW_1M = 1_000_000;
 
-export function filterVisibleModelOptions<T extends { value: string }>(
-  models: T[],
-  enableOpus1M: boolean,
-  enableSonnet1M: boolean
-): T[] {
-  return models.filter((model) => {
-    if (isBuiltInFamilyVariant(model.value, 'opus')) {
-      return enableOpus1M ? has1MContextSuffix(model.value) : normalizeModelId(model.value) === 'opus';
-    }
+export type ContextWindowSource = 'custom' | 'runtime' | 'model-default';
 
-    if (isBuiltInFamilyVariant(model.value, 'sonnet')) {
-      return enableSonnet1M ? has1MContextSuffix(model.value) : normalizeModelId(model.value) === 'sonnet';
-    }
-
-    return true;
-  });
+export interface ContextWindowResolution {
+  contextWindow: number;
+  source: ContextWindowSource;
 }
 
-export function normalizeVisibleModelVariant(
-  model: string,
-  enableOpus1M: boolean,
-  enableSonnet1M: boolean
-): string {
-  if (isBuiltInFamilyVariant(model, 'opus')) {
-    return enableOpus1M ? 'opus[1m]' : 'opus';
+function isCurrentOneMillionContextModel(model: string): boolean {
+  const normalized = normalizeModelId(model);
+  const aliasTier = resolveClaudeModelTierAlias(normalized);
+  if (aliasTier) {
+    return getClaudeModelTierDefinition(aliasTier).aliasHasOneMillionContext;
   }
 
-  if (isBuiltInFamilyVariant(model, 'sonnet')) {
-    return enableSonnet1M ? 'sonnet[1m]' : 'sonnet';
+  const versionedModel = parseVersionedClaudeModel(normalized);
+  if (!versionedModel) {
+    return false;
   }
-
-  return model;
+  const definition = getClaudeModelTierDefinition(versionedModel.tier);
+  return isVersionAtLeast(
+    versionedModel.major,
+    versionedModel.minor,
+    definition.versionedOneMillionContextFrom,
+  );
 }
 
 export function getContextWindowSize(
@@ -178,9 +197,30 @@ export function getContextWindowSize(
     return customLimit;
   }
 
-  if (has1MContextSuffix(model) || isFableModel(model)) {
+  if (isCurrentOneMillionContextModel(model)) {
     return CONTEXT_WINDOW_1M;
   }
 
   return CONTEXT_WINDOW_STANDARD;
+}
+
+export function resolveContextWindowSize(
+  model: string,
+  customLimits?: Record<string, number>,
+  runtimeContextWindow?: number,
+): ContextWindowResolution {
+  // Explicit overrides describe custom gateway capabilities that the Claude runtime may not recognize.
+  const customLimit = resolveCustomContextLimit(model, customLimits);
+  if (customLimit !== null) {
+    return { contextWindow: customLimit, source: 'custom' };
+  }
+
+  if (isValidContextLimit(runtimeContextWindow)) {
+    return { contextWindow: runtimeContextWindow, source: 'runtime' };
+  }
+
+  return {
+    contextWindow: getContextWindowSize(model),
+    source: 'model-default',
+  };
 }

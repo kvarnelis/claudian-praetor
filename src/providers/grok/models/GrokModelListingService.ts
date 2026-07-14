@@ -2,8 +2,8 @@ import { execFile } from 'child_process';
 import { promisify } from 'util';
 
 import { getRuntimeEnvironmentText } from '../../../core/providers/providerEnvironment';
+import type { ProviderHost } from '../../../core/providers/ProviderHost';
 import type { ProviderUIOption } from '../../../core/providers/types';
-import type ClaudianPlugin from '../../../main';
 import { parseEnvironmentVariables } from '../../../utils/env';
 import { getVaultPath } from '../../../utils/path';
 import { GrokCliResolver } from '../runtime/GrokCliResolver';
@@ -35,7 +35,7 @@ export class GrokModelListingService implements GrokModelListProvider {
   private readonly cliResolver = new GrokCliResolver();
 
   constructor(
-    private readonly plugin: ClaudianPlugin,
+    private readonly plugin: ProviderHost,
     options: GrokModelListingServiceOptions = {},
   ) {
     this.ttlMs = options.ttlMs ?? DEFAULT_MODEL_LIST_TTL_MS;

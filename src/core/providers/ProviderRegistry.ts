@@ -1,6 +1,6 @@
-import type ClaudianPlugin from '../../main';
 import type { ChatRuntime } from '../runtime/ChatRuntime';
 import { decodeProviderModelSelectionId } from './modelSelection';
+import type { ProviderHost } from './ProviderHost';
 import {
   type CreateChatRuntimeOptions,
   DEFAULT_CHAT_PROVIDER_ID,
@@ -12,8 +12,10 @@ import {
   type ProviderId,
   type ProviderRegistration,
   type ProviderSettingsReconciler,
+  type ProviderSettingsStorageAdapter,
   type ProviderSubagentLifecycleAdapter,
   type ProviderTaskResultInterpreter,
+  type ProviderUIOption,
   type TitleGenerationCallback,
   type TitleGenerationService,
 } from './types';
@@ -48,7 +50,7 @@ export class ProviderRegistry {
     return this.getProviderRegistration(providerId).createRuntime(options);
   }
 
-  static createTitleGenerationService(plugin: ClaudianPlugin, providerId?: ProviderId): TitleGenerationService {
+  static createTitleGenerationService(plugin: ProviderHost, providerId?: ProviderId): TitleGenerationService {
     if (!providerId) {
       return new RoutedTitleGenerationService(plugin);
     }
@@ -66,14 +68,15 @@ export class ProviderRegistry {
 
     return this.resolveProviderForModel(titleModel, settings, {
       fallbackProviderId: DEFAULT_CHAT_PROVIDER_ID,
+      onlyEnabledProviders: true,
     });
   }
 
-  static createInstructionRefineService(plugin: ClaudianPlugin, providerId: ProviderId = DEFAULT_CHAT_PROVIDER_ID): InstructionRefineService {
+  static createInstructionRefineService(plugin: ProviderHost, providerId: ProviderId = DEFAULT_CHAT_PROVIDER_ID): InstructionRefineService {
     return this.getProviderRegistration(providerId).createInstructionRefineService(plugin);
   }
 
-  static createInlineEditService(plugin: ClaudianPlugin, providerId: ProviderId = DEFAULT_CHAT_PROVIDER_ID): InlineEditService {
+  static createInlineEditService(plugin: ProviderHost, providerId: ProviderId = DEFAULT_CHAT_PROVIDER_ID): InlineEditService {
     return this.getProviderRegistration(providerId).createInlineEditService(plugin);
   }
 
@@ -107,8 +110,39 @@ export class ProviderRegistry {
     return this.getProviderRegistration(providerId).chatUIConfig;
   }
 
+  static getTitleGenerationModelOptions(
+    settings: Record<string, unknown>,
+  ): ProviderUIOption[] {
+    const options: ProviderUIOption[] = [];
+    const seenValues = new Set<string>();
+
+    for (const providerId of this.getRegisteredProviderIds()) {
+      if (!this.isEnabled(providerId, settings)) {
+        continue;
+      }
+
+      for (const option of this.getChatUIConfig(providerId).getModelOptions(settings)) {
+        if (seenValues.has(option.value)) {
+          continue;
+        }
+        seenValues.add(option.value);
+        options.push(option);
+      }
+    }
+
+    return options;
+  }
+
   static getSettingsReconciler(providerId: ProviderId = DEFAULT_CHAT_PROVIDER_ID): ProviderSettingsReconciler {
     return this.getProviderRegistration(providerId).settingsReconciler;
+  }
+
+  static getSettingsStorageAdapter(providerId: ProviderId): ProviderSettingsStorageAdapter {
+    const registration = this.getProviderRegistration(providerId);
+    if (!('settingsStorage' in registration)) {
+      throw new Error(`Provider "${providerId}" does not own settings storage normalization.`);
+    }
+    return registration.settingsStorage as ProviderSettingsStorageAdapter;
   }
 
   static getRegisteredProviderIds(): ProviderId[] {
@@ -129,6 +163,22 @@ export class ProviderRegistry {
 
   static isEnabled(providerId: ProviderId, settings: Record<string, unknown>): boolean {
     return this.getProviderRegistration(providerId).isEnabled(settings);
+  }
+
+  static setEnabled(
+    providerId: ProviderId,
+    settings: Record<string, unknown>,
+    enabled: boolean,
+  ): void {
+    const registration = this.getProviderRegistration(providerId);
+    if (registration.setEnabled) {
+      registration.setEnabled(settings, enabled);
+      return;
+    }
+
+    if (registration.isEnabled(settings) !== enabled) {
+      throw new Error(`Provider "${providerId}" enablement is not configurable.`);
+    }
   }
 
   static resolveSettingsProviderId(settings: Record<string, unknown>): ProviderId {
@@ -210,7 +260,7 @@ interface ActiveTitleGeneration {
 class RoutedTitleGenerationService implements TitleGenerationService {
   private readonly activeGenerations = new Map<string, ActiveTitleGeneration>();
 
-  constructor(private readonly plugin: ClaudianPlugin) {}
+  constructor(private readonly plugin: ProviderHost) {}
 
   async generateTitle(
     conversationId: string,
@@ -218,7 +268,7 @@ class RoutedTitleGenerationService implements TitleGenerationService {
     callback: TitleGenerationCallback,
   ): Promise<void> {
     const providerId = ProviderRegistry.resolveTitleGenerationProviderId(
-      this.plugin.settings as unknown as Record<string, unknown>,
+      this.plugin.settings,
     );
     const service = ProviderRegistry.createTitleGenerationService(this.plugin, providerId);
     const generation = { service };

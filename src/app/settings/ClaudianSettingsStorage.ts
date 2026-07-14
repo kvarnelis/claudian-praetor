@@ -11,6 +11,7 @@ import {
   inferEnvironmentSnippetScope,
   resolveEnvironmentSnippetScope,
 } from '../../core/providers/providerEnvironment';
+import { ProviderRegistry } from '../../core/providers/ProviderRegistry';
 import type { VaultFileAdapter } from '../../core/storage/VaultFileAdapter';
 import {
   CHAT_VIEW_PLACEMENTS,
@@ -21,22 +22,6 @@ import {
   type HiddenProviderCommands,
   type ProviderConfigMap,
 } from '../../core/types/settings';
-import {
-  getClaudeProviderSettings,
-  updateClaudeProviderSettings,
-} from '../../providers/claude/settings';
-import {
-  getCodexProviderSettings,
-  updateCodexProviderSettings,
-} from '../../providers/codex/settings';
-import {
-  getOpencodeProviderSettings,
-  updateOpencodeProviderSettings,
-} from '../../providers/opencode/settings';
-import {
-  getPiProviderSettings,
-  updatePiProviderSettings,
-} from '../../providers/pi/settings';
 import { DEFAULT_CLAUDIAN_SETTINGS } from './defaultSettings';
 
 export {
@@ -46,27 +31,7 @@ export {
 
 export type StoredClaudianSettings = ClaudianSettings;
 
-const LEGACY_TOP_LEVEL_PROVIDER_FIELDS = [
-  'claudeSafeMode',
-  'codexSafeMode',
-  'claudeCliPath',
-  'claudeCliPathsByHost',
-  'codexCliPath',
-  'codexCliPathsByHost',
-  'codexReasoningSummary',
-  'loadUserClaudeSettings',
-  'codexEnabled',
-  'lastClaudeModel',
-  'enableChrome',
-  'enableBangBash',
-  'enableOpus1M',
-  'enableSonnet1M',
-  'environmentVariables',
-  'lastEnvHash',
-  'lastCodexEnvHash',
-] as const;
-
-const LEGACY_STRIPPED_SETTING_FIELDS = [
+const LEGACY_STRIPPED_SHARED_SETTING_FIELDS = [
   'activeConversationId',
   'show1MModel',
   'hiddenSlashCommands',
@@ -77,13 +42,26 @@ const LEGACY_STRIPPED_SETTING_FIELDS = [
   'blockedCommands',
   'daemonAutoStart',
   'legacyDaemonAutoStart',
-  ...LEGACY_TOP_LEVEL_PROVIDER_FIELDS,
   'openInMainTab',
 ] as const;
 
+function getProviderSettingsAdapters() {
+  return ProviderRegistry.getRegisteredProviderIds().map(providerId => ({
+    adapter: ProviderRegistry.getSettingsStorageAdapter(providerId),
+    providerId,
+  }));
+}
+
+function getLegacyTopLevelProviderFields(): string[] {
+  return getProviderSettingsAdapters().flatMap(({ adapter }) => adapter.legacyTopLevelFields ?? []);
+}
+
 function stripLegacyFields(settings: Record<string, unknown>): Record<string, unknown> {
   const cleaned = { ...settings };
-  for (const key of LEGACY_STRIPPED_SETTING_FIELDS) {
+  for (const key of [
+    ...LEGACY_STRIPPED_SHARED_SETTING_FIELDS,
+    ...getLegacyTopLevelProviderFields(),
+  ]) {
     delete cleaned[key];
   }
   return cleaned;
@@ -134,12 +112,30 @@ function normalizeProviderConfigs(value: unknown): ProviderConfigMap {
   return result;
 }
 
-const HOST_SCOPED_PROVIDER_CONFIG_FIELDS: Record<string, string[]> = {
-  claude: ['cliPathsByHost'],
-  codex: ['cliPathsByHost', 'installationMethodsByHost', 'wslDistroOverridesByHost'],
-  opencode: ['cliPathsByHost'],
-  pi: ['cliPathsByHost'],
-};
+function projectPersistableProviderConfigs(value: unknown): {
+  changed: boolean;
+  providerConfigs: ProviderConfigMap;
+} {
+  const providerConfigs = normalizeProviderConfigs(value);
+  let changed = false;
+
+  for (const { adapter, providerId } of getProviderSettingsAdapters()) {
+    const fields = adapter.runtimeOnlyFields ?? [];
+    const config = providerConfigs[providerId];
+    if (!config) {
+      continue;
+    }
+
+    for (const field of fields) {
+      if (field in config) {
+        delete config[field];
+        changed = true;
+      }
+    }
+  }
+
+  return { changed, providerConfigs };
+}
 
 function hasHostScopedProviderConfigNormalization(
   original: ProviderConfigMap,
@@ -150,7 +146,8 @@ function hasHostScopedProviderConfigNormalization(
   }
 
   const normalizedConfigs = normalized as ProviderConfigMap;
-  for (const [providerId, fields] of Object.entries(HOST_SCOPED_PROVIDER_CONFIG_FIELDS)) {
+  for (const { adapter, providerId } of getProviderSettingsAdapters()) {
+    const fields = adapter.hostScopedFields ?? [];
     const originalConfig = original[providerId];
     const normalizedConfig = normalizedConfigs[providerId];
     if (!originalConfig || !normalizedConfig) {
@@ -255,7 +252,7 @@ function normalizeEnvSnippets(value: unknown): EnvSnippet[] {
 }
 
 function hasLegacyTopLevelProviderFields(stored: Record<string, unknown>): boolean {
-  return LEGACY_TOP_LEVEL_PROVIDER_FIELDS.some((key) => key in stored);
+  return getLegacyTopLevelProviderFields().some((key) => key in stored);
 }
 
 function mergeLegacyClaudeHiddenCommands(
@@ -291,7 +288,10 @@ export class ClaudianSettingsStorage {
     );
     const envSnippets = normalizeEnvSnippets(stored.envSnippets);
     const customModelAliases = normalizeModelAliases(stored.customModelAliases);
-    const providerConfigs = normalizeProviderConfigs(stored.providerConfigs);
+    const {
+      changed: didStripRuntimeProviderConfig,
+      providerConfigs,
+    } = projectPersistableProviderConfigs(stored.providerConfigs);
     const chatViewPlacement = normalizeChatViewPlacement(
       stored.chatViewPlacement,
       stored.openInMainTab,
@@ -321,22 +321,13 @@ export class ClaudianSettingsStorage {
       ...(legacyDaemonAutoStart ? { legacyDaemonAutoStart: true } : {}),
     };
 
-    updateClaudeProviderSettings(
-      merged,
-      getClaudeProviderSettings(legacyProviderSettings),
-    );
-    updateCodexProviderSettings(
-      merged,
-      getCodexProviderSettings(legacyProviderSettings),
-    );
-    updateOpencodeProviderSettings(
-      merged,
-      getOpencodeProviderSettings(legacyProviderSettings),
-    );
-    updatePiProviderSettings(
-      merged,
-      getPiProviderSettings(legacyProviderSettings),
-    );
+    let didNormalizeProviderSettings = false;
+    for (const { adapter } of getProviderSettingsAdapters()) {
+      didNormalizeProviderSettings = adapter.normalizeStored(
+        merged,
+        legacyProviderSettings,
+      ) || didNormalizeProviderSettings;
+    }
     const didNormalizeHostScopedProviderConfigs = hasHostScopedProviderConfigNormalization(
       providerConfigs,
       merged.providerConfigs,
@@ -361,6 +352,8 @@ export class ClaudianSettingsStorage {
         'customModelAliases' in stored
         && JSON.stringify(customModelAliases) !== JSON.stringify(stored.customModelAliases ?? {})
       )
+      || didNormalizeProviderSettings
+      || didStripRuntimeProviderConfig
       || didNormalizeHostScopedProviderConfigs
       )
     ) {
@@ -371,8 +364,12 @@ export class ClaudianSettingsStorage {
   }
 
   async save(settings: StoredClaudianSettings): Promise<void> {
+    const { providerConfigs } = projectPersistableProviderConfigs(settings.providerConfigs);
     const content = JSON.stringify(
-      stripLegacyFields(settings),
+      stripLegacyFields({
+        ...settings,
+        providerConfigs,
+      }),
       null,
       2,
     );
@@ -391,29 +388,6 @@ export class ClaudianSettingsStorage {
   async update(updates: Partial<StoredClaudianSettings>): Promise<void> {
     const current = await this.load();
     await this.save({ ...current, ...updates });
-  }
-
-  async setLastModel(model: string, isCustom: boolean): Promise<void> {
-    if (isCustom) {
-      await this.update({ lastCustomModel: model });
-      return;
-    }
-
-    const current = await this.load();
-    updateClaudeProviderSettings(
-      current,
-      { lastModel: model },
-    );
-    await this.save(current);
-  }
-
-  async setLastEnvHash(hash: string): Promise<void> {
-    const current = await this.load();
-    updateClaudeProviderSettings(
-      current,
-      { environmentHash: hash },
-    );
-    await this.save(current);
   }
 
   private getDefaults(): StoredClaudianSettings {

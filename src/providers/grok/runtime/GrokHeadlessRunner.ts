@@ -4,9 +4,9 @@ import * as os from 'os';
 import * as path from 'path';
 
 import { getRuntimeEnvironmentText } from '../../../core/providers/providerEnvironment';
+import type { ProviderHost } from '../../../core/providers/ProviderHost';
 import { ProviderSettingsCoordinator } from '../../../core/providers/ProviderSettingsCoordinator';
 import type { PermissionMode } from '../../../core/types/settings';
-import type ClaudianPlugin from '../../../main';
 import { parseEnvironmentVariables } from '../../../utils/env';
 import { getVaultPath } from '../../../utils/path';
 import { extractGrokHistoryText } from '../history/GrokConversationHistoryService';
@@ -281,7 +281,7 @@ export interface GrokHeadlessOptions {
 }
 
 export function runGrokHeadless(
-  plugin: ClaudianPlugin,
+  plugin: ProviderHost,
   cliPath: string,
   prompt: string,
   options: GrokHeadlessOptions = {},

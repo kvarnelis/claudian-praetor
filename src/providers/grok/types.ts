@@ -8,5 +8,5 @@ export interface GrokProviderState {
 export function getGrokState(
   providerState?: Record<string, unknown>,
 ): GrokProviderState {
-  return (providerState ?? {}) as GrokProviderState;
+  return (providerState ?? {});
 }

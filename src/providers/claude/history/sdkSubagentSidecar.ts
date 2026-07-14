@@ -2,6 +2,7 @@ import { existsSync } from 'fs';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 
+import type { ProviderHistoryPathContext } from '../../../core/providers/types';
 import type { ToolCallInfo } from '../../../core/types';
 import { extractFinalResultFromSubagentJsonl } from '../../../utils/subagentJsonl';
 import { extractToolResultContent } from '../sdk/toolResultContent';
@@ -175,15 +176,18 @@ function getSubagentSidecarPath(
   vaultPath: string,
   sessionId: string,
   agentId: string,
+  sessionPath?: string,
+  pathContext?: ProviderHistoryPathContext,
 ): string | null {
   if (!isValidSessionId(sessionId) || !isValidAgentId(agentId)) {
     return null;
   }
 
-  const encodedVault = encodeVaultPathForSDK(vaultPath);
+  const projectPath = sessionPath
+    ? path.dirname(sessionPath)
+    : path.join(getSDKProjectsPath(pathContext), encodeVaultPathForSDK(vaultPath));
   return path.join(
-    getSDKProjectsPath(),
-    encodedVault,
+    projectPath,
     sessionId,
     'subagents',
     `agent-${agentId}.jsonl`,
@@ -194,8 +198,16 @@ export async function loadSubagentToolCalls(
   vaultPath: string,
   sessionId: string,
   agentId: string,
+  sessionPath?: string,
+  pathContext?: ProviderHistoryPathContext,
 ): Promise<ToolCallInfo[]> {
-  const subagentFilePath = getSubagentSidecarPath(vaultPath, sessionId, agentId);
+  const subagentFilePath = getSubagentSidecarPath(
+    vaultPath,
+    sessionId,
+    agentId,
+    sessionPath,
+    pathContext,
+  );
   if (!subagentFilePath) {
     return [];
   }
@@ -242,8 +254,16 @@ export async function loadSubagentFinalResult(
   vaultPath: string,
   sessionId: string,
   agentId: string,
+  sessionPath?: string,
+  pathContext?: ProviderHistoryPathContext,
 ): Promise<string | null> {
-  const subagentFilePath = getSubagentSidecarPath(vaultPath, sessionId, agentId);
+  const subagentFilePath = getSubagentSidecarPath(
+    vaultPath,
+    sessionId,
+    agentId,
+    sessionPath,
+    pathContext,
+  );
   if (!subagentFilePath) {
     return null;
   }

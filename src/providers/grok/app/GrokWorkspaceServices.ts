@@ -1,9 +1,9 @@
+import type { ProviderHost } from '../../../core/providers/ProviderHost';
 import type {
-  ProviderRegistration,
+  ProviderModule,
   ProviderWorkspaceRegistration,
   ProviderWorkspaceServices,
 } from '../../../core/providers/types';
-import type ClaudianPlugin from '../../../main';
 import {
   GrokInlineEditService,
   GrokInstructionRefineService,
@@ -17,13 +17,16 @@ import { GrokConversationHistoryService } from '../history/GrokConversationHisto
 import { GrokModelListingService } from '../models/GrokModelListingService';
 import { GrokChatRuntime } from '../runtime/GrokChatRuntime';
 import { GrokCliResolver } from '../runtime/GrokCliResolver';
-import { getGrokProviderSettings } from '../settings';
+import {
+  getGrokProviderSettings,
+  updateGrokProviderSettings,
+} from '../settings';
 import { grokChatUIConfig } from '../ui/GrokChatUIConfig';
 import { grokSettingsTabRenderer } from '../ui/GrokSettingsTab';
 
 export { grokSettingsReconciler } from '../env/GrokSettingsReconciler';
 
-export function createGrokWorkspaceServices(plugin: ClaudianPlugin): ProviderWorkspaceServices {
+export function createGrokWorkspaceServices(plugin: ProviderHost): ProviderWorkspaceServices {
   if (getGrokProviderSettings(plugin.settings).enabled) {
     const modelListProvider = new GrokModelListingService(plugin);
     void modelListProvider.listModels()
@@ -43,10 +46,12 @@ export const grokWorkspaceRegistration: ProviderWorkspaceRegistration = {
   initialize: async ({ plugin }) => createGrokWorkspaceServices(plugin),
 };
 
-export const grokProviderRegistration: ProviderRegistration = {
+export const grokProviderRegistration: ProviderModule = {
+  id: 'grok',
   displayName: 'Grok',
   blankTabOrder: 18,
   isEnabled: (settings) => getGrokProviderSettings(settings).enabled,
+  setEnabled: (settings, enabled) => updateGrokProviderSettings(settings, { enabled }),
   capabilities: GROK_PROVIDER_CAPABILITIES,
   environmentKeyPatterns: [/^GROK_/i, /^XAI_/i],
   chatUIConfig: grokChatUIConfig,
@@ -57,4 +62,13 @@ export const grokProviderRegistration: ProviderRegistration = {
   createInlineEditService: (plugin) => new GrokInlineEditService(plugin),
   historyService: new GrokConversationHistoryService(),
   taskResultInterpreter: new GrokTaskResultInterpreter(),
+  settingsStorage: {
+    hostScopedFields: ['cliPathsByHost'],
+    legacyTopLevelFields: ['grokEnabled'],
+    normalizeStored(target, stored) {
+      updateGrokProviderSettings(target, getGrokProviderSettings(stored));
+      return false;
+    },
+  },
+  workspace: grokWorkspaceRegistration,
 };

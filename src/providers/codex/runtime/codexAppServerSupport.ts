@@ -1,8 +1,9 @@
+import type { ProviderHost } from '../../../core/providers/ProviderHost';
 import type { ProviderId } from '../../../core/providers/types';
-import type ClaudianPlugin from '../../../main';
 import { getEnhancedPath, parseEnvironmentVariables } from '../../../utils/env';
 import { getVaultPath } from '../../../utils/path';
 import type { InitializeResult } from './codexAppServerTypes';
+import { resolveCodexExecutionTarget } from './CodexExecutionTargetResolver';
 import { buildCodexLaunchSpec } from './CodexLaunchSpecBuilder';
 import type { CodexLaunchSpec } from './codexLaunchTypes';
 import type { CodexRpcTransport } from './CodexRpcTransport';
@@ -12,12 +13,12 @@ const CODEX_APP_SERVER_CLIENT_INFO = Object.freeze({
   version: '1.0.0',
 });
 
-export function getCodexAppServerWorkingDirectory(plugin: ClaudianPlugin): string {
+export function getCodexAppServerWorkingDirectory(plugin: ProviderHost): string {
   return getVaultPath(plugin.app) ?? process.cwd();
 }
 
 export function buildCodexAppServerEnvironment(
-  plugin: ClaudianPlugin,
+  plugin: ProviderHost,
   providerId: ProviderId = 'codex',
 ): Record<string, string> {
   const customEnv = parseEnvironmentVariables(plugin.getActiveEnvironmentVariables(providerId));
@@ -34,14 +35,21 @@ export function buildCodexAppServerEnvironment(
 }
 
 export function resolveCodexAppServerLaunchSpec(
-  plugin: ClaudianPlugin,
+  plugin: ProviderHost,
   providerId: ProviderId = 'codex',
 ): CodexLaunchSpec {
+  const hostVaultPath = getCodexAppServerWorkingDirectory(plugin);
+  const executionTarget = resolveCodexExecutionTarget({
+    settings: plugin.settings,
+    hostVaultPath,
+  });
+
   return buildCodexLaunchSpec({
     settings: plugin.settings,
-    resolvedCliCommand: plugin.getResolvedProviderCliPath(providerId),
-    hostVaultPath: getCodexAppServerWorkingDirectory(plugin),
+    resolvedCliCommand: plugin.getResolvedProviderCliPath(providerId, { executionTarget }),
+    hostVaultPath,
     env: buildCodexAppServerEnvironment(plugin, providerId),
+    executionTarget,
   });
 }
 

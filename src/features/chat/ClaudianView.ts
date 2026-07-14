@@ -2,18 +2,23 @@ import type { EventRef, WorkspaceLeaf } from 'obsidian';
 import { ItemView, Notice, Scope, setIcon } from 'obsidian';
 
 import { getHiddenProviderCommandSet } from '../../core/providers/commands/hiddenCommands';
+import {
+  getProviderSettingsSnapshotWithModel,
+  resolveConversationModel,
+} from '../../core/providers/conversationModel';
 import { ProviderRegistry } from '../../core/providers/ProviderRegistry';
 import { ProviderSettingsCoordinator } from '../../core/providers/ProviderSettingsCoordinator';
-import { DEFAULT_CHAT_PROVIDER_ID, type ProviderId } from '../../core/providers/types';
+import { type AppTabManagerState, DEFAULT_CHAT_PROVIDER_ID, type ProviderId } from '../../core/providers/types';
 import { VIEW_TYPE_CLAUDIAN } from '../../core/types';
-import type ClaudianPlugin from '../../main';
 import { createProviderIconSvg } from '../../shared/icons';
 import {
   cancelScheduledAnimationFrame,
   scheduleAnimationFrame,
   type ScheduledAnimationFrame,
 } from '../../utils/animationFrame';
+import type { FeatureHost } from '../FeatureHost';
 import type { HistoryConversationStatus } from './controllers/ConversationController';
+import { MentionCacheCoordinator } from './services/MentionCacheCoordinator';
 import {
   getTabProviderId,
   onProviderAvailabilityChanged,
@@ -32,10 +37,11 @@ type LoadableView = {
 };
 
 export class ClaudianView extends ItemView {
-  private plugin: ClaudianPlugin;
+  private plugin: FeatureHost;
 
   // Tab management
   private tabManager: TabManager | null = null;
+  private mentionCacheCoordinator: MentionCacheCoordinator | null = null;
   private tabBar: TabBar | null = null;
   private tabBarContainerEl: HTMLElement | null = null;
   private tabContentEl: HTMLElement | null = null;
@@ -62,7 +68,7 @@ export class ClaudianView extends ItemView {
   // Debouncing for tab state persistence
   private pendingPersist: number | null = null;
 
-  constructor(leaf: WorkspaceLeaf, plugin: ClaudianPlugin) {
+  constructor(leaf: WorkspaceLeaf, plugin: FeatureHost) {
     super(leaf);
     this.plugin = plugin;
 
@@ -70,7 +76,7 @@ export class ClaudianView extends ItemView {
     // overwritten by prototype patching. Hover Editor patches ClaudianView.prototype.load
     // after our class is defined, but instance methods take precedence over prototype methods.
     const prototype = Object.getPrototypeOf(this) as LoadableView;
-    const originalLoad = prototype.load.bind(this) as () => Promise<void> | void;
+    const originalLoad = prototype.load.bind(this);
     Object.defineProperty(this, 'load', {
       value: async () => {
         // Ensure containerEl exists before any patched load code tries to use it
@@ -114,9 +120,18 @@ export class ClaudianView extends ItemView {
     for (const tab of this.tabManager?.getAllTabs() ?? []) {
       onProviderAvailabilityChanged(tab, this.plugin);
       const providerId = getTabProviderId(tab, this.plugin);
-      const providerSettings = ProviderSettingsCoordinator.getProviderSettingsSnapshot(
+      const conversation = tab.conversationId
+        ? this.plugin.getConversationSync(tab.conversationId)
+        : null;
+      const modelOverride = conversation
+        ? resolveConversationModel(this.plugin.settings, providerId, conversation).model
+        : tab.lifecycleState === 'blank'
+        ? tab.draftModel
+        : tab.service?.getAuxiliaryModel?.() ?? null;
+      const providerSettings = getProviderSettingsSnapshotWithModel(
         this.plugin.settings,
         providerId,
+        modelOverride,
       );
       const model = providerSettings.model;
       const uiConfig = ProviderRegistry.getChatUIConfig(providerId);
@@ -239,6 +254,11 @@ export class ClaudianView extends ItemView {
         },
       }
     );
+    this.mentionCacheCoordinator = new MentionCacheCoordinator(
+      () => (this.tabManager?.getAllTabs() ?? []).map(tab => ({
+        fileContextManager: tab.ui.fileContextManager,
+      })),
+    );
 
     this.wireEventHandlers();
     await this.restoreOrCreateTabs();
@@ -265,6 +285,7 @@ export class ClaudianView extends ItemView {
     this.restoreActiveInputToTabContent();
     await this.tabManager?.destroy();
     this.tabManager = null;
+    this.mentionCacheCoordinator = null;
 
     this.tabBar?.destroy();
     this.tabBar = null;
@@ -303,6 +324,7 @@ export class ClaudianView extends ItemView {
       onNewTab: () => {
         void this.createNewTab().catch((e) => new Notice(`Failed to create tab: ${e instanceof Error ? e.message : String(e)}`, 10_000));
       },
+      onTitleExpansionChanged: () => this.persistTabState(),
     });
     fragment.appendChild(this.tabBarContainerEl);
 
@@ -660,11 +682,31 @@ export class ClaudianView extends ItemView {
         ).permissionMode as string;
         if (current === 'plan') {
           const restoreMode = activeTab.state.prePlanPermissionMode ?? 'normal';
-          activeTab.state.prePlanPermissionMode = null;
-          updatePlanModeUI(activeTab, this.plugin, restoreMode);
+          void updatePlanModeUI(activeTab, this.plugin, restoreMode)
+            .finally(() => {
+              const activeMode = ProviderSettingsCoordinator.getProviderSettingsSnapshot(
+                this.plugin.settings,
+                providerId,
+              ).permissionMode;
+              if (activeMode !== 'plan') {
+                activeTab.state.prePlanPermissionMode = null;
+              }
+            })
+            .catch((error: unknown) => {
+              new Notice(error instanceof Error ? error.message : 'Failed to change permission mode.');
+            });
         } else {
           activeTab.state.prePlanPermissionMode = current;
-          updatePlanModeUI(activeTab, this.plugin, 'plan');
+          void updatePlanModeUI(activeTab, this.plugin, 'plan').catch((error: unknown) => {
+            const activeMode = ProviderSettingsCoordinator.getProviderSettingsSnapshot(
+              this.plugin.settings,
+              providerId,
+            ).permissionMode;
+            if (activeMode !== 'plan') {
+              activeTab.state.prePlanPermissionMode = null;
+            }
+            new Notice(error instanceof Error ? error.message : 'Failed to change permission mode.');
+          });
         }
       }
     });
@@ -691,18 +733,11 @@ export class ClaudianView extends ItemView {
       }
     });
 
-    // Vault events - forward to active tab's file context manager
-    const markCacheDirty = (includesFolders: boolean): void => {
-      const mgr = this.tabManager?.getActiveTab()?.ui.fileContextManager;
-      if (!mgr) return;
-      mgr.markFileCacheDirty();
-      if (includesFolders) mgr.markFolderCacheDirty();
-    };
     this.eventRefs.push(
-      this.plugin.app.vault.on('create', () => markCacheDirty(true)),
-      this.plugin.app.vault.on('delete', () => markCacheDirty(true)),
-      this.plugin.app.vault.on('rename', () => markCacheDirty(true)),
-      this.plugin.app.vault.on('modify', () => markCacheDirty(false))
+      this.plugin.app.vault.on('create', () => this.mentionCacheCoordinator?.markStructureDirty()),
+      this.plugin.app.vault.on('delete', () => this.mentionCacheCoordinator?.markStructureDirty()),
+      this.plugin.app.vault.on('rename', () => this.mentionCacheCoordinator?.markStructureDirty()),
+      this.plugin.app.vault.on('modify', () => this.mentionCacheCoordinator?.markFilesDirty())
     );
 
     // File open event
@@ -737,6 +772,8 @@ export class ClaudianView extends ItemView {
     const persistedState = await this.plugin.storage.getTabManagerState();
     if (persistedState && persistedState.openTabs.length > 0) {
       await this.tabManager.restoreState(persistedState);
+      this.tabBar?.setExpandedTitleTabIds(persistedState.expandedTitleTabIds ?? []);
+      this.updateTabBar();
       return;
     }
 
@@ -752,8 +789,8 @@ export class ClaudianView extends ItemView {
     }
     this.pendingPersist = window.setTimeout(() => {
       this.pendingPersist = null;
-      if (!this.tabManager) return;
-      const state = this.tabManager.getPersistedState();
+      const state = this.getPersistedTabState();
+      if (!state) return;
       this.plugin.persistTabManagerState(state).catch(() => {
         // Silently ignore persistence errors
       });
@@ -767,9 +804,23 @@ export class ClaudianView extends ItemView {
       window.clearTimeout(this.pendingPersist);
       this.pendingPersist = null;
     }
-    if (!this.tabManager) return;
-    const state = this.tabManager.getPersistedState();
+    const state = this.getPersistedTabState();
+    if (!state) return;
     await this.plugin.persistTabManagerState(state);
+  }
+
+  private getPersistedTabState(): AppTabManagerState | null {
+    if (!this.tabManager) return null;
+
+    const state = this.tabManager.getPersistedState();
+    const openTabIds = new Set(state.openTabs.map(tab => tab.tabId));
+    const expandedTitleTabIds = (this.tabBar?.getExpandedTitleTabIds() ?? [])
+      .filter(tabId => openTabIds.has(tabId));
+
+    return {
+      ...state,
+      ...(expandedTitleTabIds.length > 0 ? { expandedTitleTabIds } : {}),
+    };
   }
 
   // ============================================

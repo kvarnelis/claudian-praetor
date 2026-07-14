@@ -1,4 +1,3 @@
-import type ClaudianPlugin from '../../main';
 import type { CursorContext } from '../../utils/editor';
 import type { SharedAppStorage } from '../bootstrap/storage';
 import type { McpServerManager } from '../mcp/McpServerManager';
@@ -18,6 +17,7 @@ import type {
 } from '../types';
 import type { ProviderId } from '../types/provider';
 import type { ProviderCommandCatalog } from './commands/ProviderCommandCatalog';
+import type { ProviderHost } from './ProviderHost';
 
 export type { ProviderId } from '../types/provider';
 
@@ -40,7 +40,7 @@ export interface ProviderCapabilities {
 export const DEFAULT_CHAT_PROVIDER_ID = 'claude' as const satisfies ProviderId;
 
 export interface CreateChatRuntimeOptions {
-  plugin: ClaudianPlugin;
+  plugin: ProviderHost;
   providerId?: ProviderId;
 }
 
@@ -56,17 +56,34 @@ export interface ProviderRegistration {
   displayName: string;
   blankTabOrder: number;
   isEnabled: (settings: Record<string, unknown>) => boolean;
+  setEnabled?: (settings: Record<string, unknown>, enabled: boolean) => void;
   capabilities: ProviderCapabilities;
   environmentKeyPatterns?: RegExp[];
   chatUIConfig: ProviderChatUIConfig;
   settingsReconciler: ProviderSettingsReconciler;
   createRuntime: (options: Omit<CreateChatRuntimeOptions, 'providerId'>) => ChatRuntime;
-  createTitleGenerationService: (plugin: ClaudianPlugin) => TitleGenerationService;
-  createInstructionRefineService: (plugin: ClaudianPlugin) => InstructionRefineService;
-  createInlineEditService: (plugin: ClaudianPlugin) => InlineEditService;
+  createTitleGenerationService: (plugin: ProviderHost) => TitleGenerationService;
+  createInstructionRefineService: (plugin: ProviderHost) => InstructionRefineService;
+  createInlineEditService: (plugin: ProviderHost) => InlineEditService;
   historyService: ProviderConversationHistoryService;
   taskResultInterpreter: ProviderTaskResultInterpreter;
   subagentLifecycleAdapter?: ProviderSubagentLifecycleAdapter;
+}
+
+export interface ProviderModule extends ProviderRegistration {
+  id: ProviderId;
+  settingsStorage: ProviderSettingsStorageAdapter;
+  workspace: ProviderWorkspaceRegistration;
+}
+
+export interface ProviderSettingsStorageAdapter {
+  hostScopedFields?: string[];
+  legacyTopLevelFields?: string[];
+  runtimeOnlyFields?: string[];
+  normalizeStored(
+    target: Record<string, unknown>,
+    stored: Record<string, unknown>,
+  ): boolean;
 }
 
 export interface ProviderSettingsReconciler {
@@ -88,6 +105,7 @@ export interface ProviderSettingsReconciler {
 export interface AppTabManagerState {
   openTabs: Array<{ tabId: string; conversationId: string | null; draftModel?: string | null }>;
   activeTabId: string | null;
+  expandedTitleTabIds?: string[];
 }
 
 /** Provider-neutral session metadata storage. */
@@ -236,10 +254,13 @@ export interface ProviderModeSelectorConfig {
   value: string;
 }
 
-/** Static UI configuration owned by the provider (model list, reasoning, context window). */
+/** Synchronous UI projection owned by the provider and backed by provider-owned metadata. */
 export interface ProviderChatUIConfig {
   /** Model options for the selector dropdown. Provider extracts what it needs from the settings bag. */
   getModelOptions(settings: Record<string, unknown>): ProviderUIOption[];
+
+  /** Semantic default model, independent from selector display order. */
+  getDefaultModel?(settings: Record<string, unknown>): string | null;
 
   /** Whether this provider owns the given model id. */
   ownsModel(model: string, settings: Record<string, unknown>): boolean;
@@ -266,11 +287,17 @@ export interface ProviderChatUIConfig {
   /** Apply model change side effects to settings (defaults, tracking). */
   applyModelDefaults(model: string, settings: unknown): void;
 
+  /** Track provider-owned metadata when the global title-generation model changes. */
+  applyTitleGenerationModelSelection?(model: string, settings: unknown): void;
+
+  /** Apply model-scoped defaults to an ephemeral conversation settings projection. */
+  applyModelProjectionDefaults?(model: string, settings: unknown): void;
+
   /** Optional provider hook to discover model-scoped metadata after a model is selected. */
   prepareModelMetadata?(
     model: string,
     settings: Record<string, unknown>,
-    context: { plugin: ClaudianPlugin },
+    context: { plugin: ProviderHost },
   ): Promise<void>;
 
   /** Optional hook when the toolbar changes a reasoning selection. */
@@ -311,8 +338,15 @@ export interface ProviderChatUIConfig {
 // Provider-owned boundary services
 // ---------------------------------------------------------------------------
 
+export interface ProviderCliResolutionContext {
+  executionTarget?: unknown;
+}
+
 export interface ProviderCliResolver {
-  resolveFromSettings(settings: Record<string, unknown>): string | null;
+  resolveFromSettings(
+    settings: Record<string, unknown>,
+    context?: ProviderCliResolutionContext,
+  ): string | null;
   reset(): void;
 }
 
@@ -322,7 +356,7 @@ export interface ProviderRuntimeCommandLoaderContext {
   allowSessionCreation?: boolean;
   conversation: Conversation | null;
   externalContextPaths: string[];
-  plugin: ClaudianPlugin;
+  plugin: ProviderHost;
   runtime: ChatRuntime | null;
 }
 
@@ -340,7 +374,7 @@ export type ProviderTabWarmupLifecycleState = 'blank' | 'bound_cold' | 'bound_ac
 export interface ProviderTabWarmupContext {
   conversation: Conversation | null;
   externalContextPaths: string[];
-  plugin: ClaudianPlugin;
+  plugin: ProviderHost;
   runtime: ChatRuntime | null;
   tab: {
     conversationId: string | null;
@@ -363,16 +397,26 @@ export interface ProviderWorkspaceServices {
   mcpServerManager?: McpServerManager | null;
   settingsTabRenderer?: ProviderSettingsTabRenderer | null;
   refreshAgentMentions?(): Promise<void>;
+  refreshModelCatalog?(): Promise<ProviderModelCatalogRefreshResult>;
+}
+
+export interface ProviderModelCatalogRefreshResult {
+  /** Whether runtime catalog or persisted selection state changed. */
+  changed: boolean;
+  diagnostics?: string;
+  /** Whether the provider-owned refresh persisted selection settings. */
+  persistedSettingsChanged?: boolean;
 }
 
 export interface ProviderSettingsTabRendererContext {
-  plugin: ClaudianPlugin;
+  plugin: ProviderHost;
   renderHiddenProviderCommandSetting(
     container: HTMLElement,
     providerId: ProviderId,
     copy: { name: string; desc: string; placeholder: string },
   ): void;
   refreshModelSelectors(): void;
+  refreshTitleGenerationModelOptions(): void;
   renderCustomContextLimits(container: HTMLElement, providerId?: ProviderId): void;
 }
 
@@ -381,7 +425,7 @@ export interface ProviderSettingsTabRenderer {
 }
 
 export interface ProviderWorkspaceInitContext {
-  plugin: ClaudianPlugin;
+  plugin: ProviderHost;
   storage: SharedAppStorage;
   vaultAdapter: VaultFileAdapter;
   /** Null on mobile, where Node home-directory access is unavailable. */
@@ -395,13 +439,38 @@ export interface ProviderWorkspaceRegistration<
 }
 
 export interface ProviderConversationHistoryService {
+  /**
+   * Reports whether the provider-native session needed to resume a persisted
+   * conversation is still available. Providers that cannot distinguish a
+   * missing session from an inaccessible history store should return unknown.
+   */
+  getConversationSessionAvailability?(
+    conversation: Conversation,
+    vaultPath: string | null,
+    pathContext?: ProviderHistoryPathContext,
+  ): Promise<ProviderConversationSessionAvailability>;
+  /** Clears stale resume state so relocated provider history can rebuild natively. */
+  prepareRelocatedConversationSession?(
+    conversation: Conversation,
+    vaultPath: string | null,
+    pathContext?: ProviderHistoryPathContext,
+  ): Promise<boolean>;
+  /** Decides whether a confirmed missing resume session makes the whole record disposable. */
+  resolveMissingConversationSession?(
+    conversation: Conversation,
+    vaultPath: string | null,
+    missingProviderSessionId?: string,
+    pathContext?: ProviderHistoryPathContext,
+  ): Promise<'delete' | 'reset' | 'preserve'>;
   hydrateConversationHistory(
     conversation: Conversation,
     vaultPath: string | null,
+    pathContext?: ProviderHistoryPathContext,
   ): Promise<void>;
   deleteConversationSession(
     conversation: Conversation,
     vaultPath: string | null,
+    pathContext?: ProviderHistoryPathContext,
   ): Promise<void>;
   resolveSessionIdForConversation(conversation: Conversation | null): string | null;
   isPendingForkConversation(conversation: Conversation): boolean;
@@ -414,6 +483,19 @@ export interface ProviderConversationHistoryService {
   /** Adds provider-owned persisted metadata to Conversation.providerState before session save. */
   buildPersistedProviderState?(conversation: Conversation): Record<string, unknown> | undefined;
 }
+
+export interface ProviderHistoryPathContext {
+  environment: NodeJS.ProcessEnv;
+  hostPlatform?: NodeJS.Platform;
+  settings?: Record<string, unknown>;
+  vaultPath?: string | null;
+}
+
+export type ProviderConversationSessionAvailability =
+  | 'available'
+  | 'relocated'
+  | 'missing'
+  | 'unknown';
 
 export type ProviderTaskTerminalStatus = Extract<ToolCallInfo['status'], 'completed' | 'error'>;
 

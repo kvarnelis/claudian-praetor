@@ -2,21 +2,18 @@
  * PluginManager - Discover and manage Claude Code plugins.
  *
  * Plugins are discovered from two sources:
- * - installed_plugins.json: install paths for scanning agents
+ * - {CLAUDE_CONFIG_DIR}/plugins/installed_plugins.json: install paths for scanning agents
  * - settings.json: enabled state (project overrides global)
  */
 
 import * as fs from 'fs';
 import { Notice } from 'obsidian';
-import * as os from 'os';
 import * as path from 'path';
 
 import type { PluginInfo, PluginScope } from '../../../core/types';
+import { resolveClaudeConfigDir } from '../config/ClaudeConfigDir';
 import type { CCSettingsStorage } from '../storage/CCSettingsStorage';
 import type { InstalledPluginEntry, InstalledPluginsFile } from '../types/plugins';
-
-const INSTALLED_PLUGINS_PATH = path.join(os.homedir(), '.claude', 'plugins', 'installed_plugins.json');
-const GLOBAL_SETTINGS_PATH = path.join(os.homedir(), '.claude', 'settings.json');
 
 interface SettingsFile {
   enabledPlugins?: Record<string, boolean>;
@@ -73,16 +70,25 @@ function extractPluginName(pluginId: string): string {
 export class PluginManager {
   private ccSettingsStorage: CCSettingsStorage;
   private vaultPath: string;
+  private resolveConfigDir: () => string;
   private plugins: PluginInfo[] = [];
 
-  constructor(vaultPath: string, ccSettingsStorage: CCSettingsStorage) {
+  constructor(
+    vaultPath: string,
+    ccSettingsStorage: CCSettingsStorage,
+    configDir: string | (() => string) = () => resolveClaudeConfigDir(),
+  ) {
     this.vaultPath = vaultPath;
     this.ccSettingsStorage = ccSettingsStorage;
+    this.resolveConfigDir = typeof configDir === 'function' ? configDir : () => configDir;
   }
 
   async loadPlugins(): Promise<void> {
-    const installedPlugins = readJsonFile<InstalledPluginsFile>(INSTALLED_PLUGINS_PATH);
-    const globalSettings = readJsonFile<SettingsFile>(GLOBAL_SETTINGS_PATH);
+    const configDir = this.resolveConfigDir();
+    const installedPlugins = readJsonFile<InstalledPluginsFile>(
+      path.join(configDir, 'plugins', 'installed_plugins.json'),
+    );
+    const globalSettings = readJsonFile<SettingsFile>(path.join(configDir, 'settings.json'));
     const projectSettings = await this.loadProjectSettings();
 
     const globalEnabled = globalSettings?.enabledPlugins ?? {};
@@ -166,10 +172,7 @@ export class PluginManager {
       return;
     }
 
-    const newEnabled = !plugin.enabled;
-    plugin.enabled = newEnabled;
-
-    await this.ccSettingsStorage.setPluginEnabled(pluginId, newEnabled);
+    await this.persistEnabledState(plugin, !plugin.enabled);
   }
 
   async enablePlugin(pluginId: string): Promise<void> {
@@ -178,8 +181,7 @@ export class PluginManager {
       return;
     }
 
-    plugin.enabled = true;
-    await this.ccSettingsStorage.setPluginEnabled(pluginId, true);
+    await this.persistEnabledState(plugin, true);
   }
 
   async disablePlugin(pluginId: string): Promise<void> {
@@ -188,7 +190,17 @@ export class PluginManager {
       return;
     }
 
-    plugin.enabled = false;
-    await this.ccSettingsStorage.setPluginEnabled(pluginId, false);
+    await this.persistEnabledState(plugin, false);
+  }
+
+  private async persistEnabledState(plugin: PluginInfo, enabled: boolean): Promise<void> {
+    const previous = plugin.enabled;
+    plugin.enabled = enabled;
+    try {
+      await this.ccSettingsStorage.setPluginEnabled(plugin.id, enabled);
+    } catch (error) {
+      plugin.enabled = previous;
+      throw error;
+    }
   }
 }

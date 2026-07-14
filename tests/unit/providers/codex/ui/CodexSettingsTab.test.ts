@@ -6,11 +6,17 @@ import { codexSettingsTabRenderer } from '@/providers/codex/ui/CodexSettingsTab'
 const mockGetHostnameKey = jest.fn(() => 'host-a');
 const mockRenderEnvironmentSettingsSection = jest.fn();
 const mockSaveSettings = jest.fn().mockResolvedValue(undefined);
-const mockBroadcastToAllTabs = jest.fn().mockResolvedValue(undefined);
+const mockRecycleProviderRuntimes = jest.fn().mockResolvedValue(undefined);
+const mockRenderCodexModelPicker = jest.fn();
+const mockRefreshModelCatalog = jest.fn().mockResolvedValue({ changed: false });
 
 jest.mock('fs');
 jest.mock('@/core/providers/ProviderSettingsCoordinator', () => ({
   ProviderSettingsCoordinator: {
+    applyProviderEnablement: jest.fn((settings: Record<string, unknown>, _providerId: string, enabled: boolean) => {
+      const providerConfigs = settings.providerConfigs as { codex: { enabled: boolean } };
+      providerConfigs.codex.enabled = enabled;
+    }),
     reconcileTitleGenerationModelSelection: jest.fn((settings: Record<string, unknown>) => {
       const titleGenerationModel = settings.titleGenerationModel;
       const customModels = (
@@ -93,7 +99,7 @@ jest.mock('obsidian', () => {
   };
 });
 
-jest.mock('@/features/settings/ui/EnvironmentSettingsSection', () => ({
+jest.mock('@/shared/settings/EnvironmentSettingsSection', () => ({
   renderEnvironmentSettingsSection: (...args: unknown[]) => mockRenderEnvironmentSettingsSection(...args),
 }));
 
@@ -102,7 +108,12 @@ jest.mock('@/providers/codex/app/CodexWorkspaceServices', () => ({
     commandCatalog: null,
     subagentStorage: {},
     refreshAgentMentions: jest.fn(),
+    refreshModelCatalog: mockRefreshModelCatalog,
   })),
+}));
+
+jest.mock('@/providers/codex/ui/CodexModelPicker', () => ({
+  renderCodexModelPicker: (...args: unknown[]) => mockRenderCodexModelPicker(...args),
 }));
 
 jest.mock('@/providers/codex/ui/CodexSkillSettings', () => ({
@@ -111,10 +122,6 @@ jest.mock('@/providers/codex/ui/CodexSkillSettings', () => ({
 
 jest.mock('@/providers/codex/ui/CodexSubagentSettings', () => ({
   CodexSubagentSettings: jest.fn(),
-}));
-
-jest.mock('@/i18n/i18n', () => ({
-  t: (key: string) => key,
 }));
 
 jest.mock('@/utils/env', () => ({
@@ -321,7 +328,7 @@ function createContainer(): any {
 }
 
 function createPlugin(overrides: Record<string, unknown> = {}): any {
-  return {
+  const plugin: any = {
     settings: {
       settingsProvider: 'codex',
       model: 'my-custom-model',
@@ -331,16 +338,23 @@ function createPlugin(overrides: Record<string, unknown> = {}): any {
           ...DEFAULT_CODEX_PROVIDER_SETTINGS,
           enabled: true,
           customModels: 'my-custom-model',
+          discoveredModels: [{
+            model: 'gpt-5.6-sol',
+            displayName: 'GPT-5.6-Sol',
+            description: 'Latest frontier agentic coding model.',
+            supportedReasoningEfforts: [{ value: 'low', description: 'Fast' }],
+            defaultReasoningEffort: 'low',
+            serviceTiers: [],
+            defaultServiceTier: null,
+            inputModalities: ['text', 'image'],
+            isDefault: true,
+          }],
         },
       },
       ...overrides,
     },
     saveSettings: mockSaveSettings,
-    getView: jest.fn(() => ({
-      getTabManager: jest.fn(() => ({
-        broadcastToAllTabs: mockBroadcastToAllTabs,
-      })),
-    })),
+    recycleProviderRuntimes: mockRecycleProviderRuntimes,
     app: {
       vault: {
         adapter: {
@@ -349,6 +363,11 @@ function createPlugin(overrides: Record<string, unknown> = {}): any {
       },
     },
   };
+  plugin.mutateSettings = jest.fn(async (mutation: (settings: any) => void | Promise<void>) => {
+    await mutation(plugin.settings);
+    await plugin.saveSettings();
+  });
+  return plugin;
 }
 
 function createContext(plugin: any) {
@@ -356,6 +375,7 @@ function createContext(plugin: any) {
     plugin,
     renderHiddenProviderCommandSetting: jest.fn(),
     refreshModelSelectors: jest.fn(),
+    refreshTitleGenerationModelOptions: jest.fn(),
     renderCustomContextLimits: jest.fn(),
   };
 }
@@ -408,6 +428,32 @@ describe('CodexSettingsTab', () => {
     expect(findOptionalSetting('WSL distro override')).toBeUndefined();
   });
 
+  it('refreshes title model options after Codex enablement changes', async () => {
+    Object.defineProperty(process, 'platform', { value: 'darwin' });
+    const plugin = createPlugin();
+    const context = createContext(plugin);
+
+    codexSettingsTabRenderer.render(createContainer(), context);
+    await findSetting('Enable Codex provider').toggleComponents[0].onChangeCallback?.(false);
+
+    expect(context.refreshTitleGenerationModelOptions).toHaveBeenCalledTimes(1);
+  });
+
+  it('renders the app-server model visibility picker', () => {
+    Object.defineProperty(process, 'platform', { value: 'darwin' });
+    const plugin = createPlugin();
+    const context = createContext(plugin);
+    const container = createContainer();
+
+    codexSettingsTabRenderer.render(container, context);
+
+    expect(mockRenderCodexModelPicker).toHaveBeenCalledWith(
+      container,
+      context,
+      expect.objectContaining({ commandCatalog: null }),
+    );
+  });
+
   it('uses host-native CLI path behavior on non-Windows even when WSL is saved', async () => {
     Object.defineProperty(process, 'platform', { value: 'darwin' });
     const plugin = createPlugin({
@@ -442,7 +488,7 @@ describe('CodexSettingsTab', () => {
 
     expect(plugin.settings.providerConfigs.codex.cliPathsByHost['host-a']).toBeUndefined();
     expect(mockSaveSettings).toHaveBeenCalledTimes(0);
-    expect(mockBroadcastToAllTabs).toHaveBeenCalledTimes(0);
+    expect(mockRecycleProviderRuntimes).toHaveBeenCalledTimes(0);
   });
 
   it('accepts a Linux-side CLI command when installation method is WSL', async () => {
@@ -462,7 +508,8 @@ describe('CodexSettingsTab', () => {
     });
     expect(plugin.settings.providerConfigs.codex.cliPathsByHost['host-a']).toBe('codex');
     expect(mockSaveSettings).toHaveBeenCalled();
-    expect(mockBroadcastToAllTabs).toHaveBeenCalled();
+    expect(mockRecycleProviderRuntimes).toHaveBeenCalledWith('codex');
+    expect(mockRefreshModelCatalog).toHaveBeenCalledTimes(1);
   });
 
   it('rejects a Windows-native CLI path when installation method is WSL', async () => {
@@ -493,86 +540,15 @@ describe('CodexSettingsTab', () => {
     expect(plugin.settings.providerConfigs.codex.cliPathsByHost['host-a']).toBe(
       'C:\\Users\\me\\AppData\\Roaming\\npm\\codex.exe',
     );
-    expect(mockBroadcastToAllTabs).toHaveBeenCalledTimes(0);
+    expect(mockRecycleProviderRuntimes).toHaveBeenCalledTimes(0);
   });
 
-  it('does not switch the active model while the custom models textarea is mid-edit', async () => {
-    Object.defineProperty(process, 'platform', { value: 'darwin' });
-    const plugin = createPlugin();
-    const context = createContext(plugin);
-
-    codexSettingsTabRenderer.render(createContainer(), context);
-
-    const customModelsSetting = findSetting('Custom models');
-    const customModelsTextArea = customModelsSetting.textAreaComponents[0];
-
-    await customModelsTextArea.onChangeCallback?.('different-custom-model');
-
-    expect(plugin.settings.providerConfigs.codex.customModels).toBe('my-custom-model');
-    expect(plugin.settings.model).toBe('my-custom-model');
-    expect(mockSaveSettings).not.toHaveBeenCalled();
-    expect(context.refreshModelSelectors).not.toHaveBeenCalled();
-  });
-
-  it('shows current Codex custom model examples in the custom models textarea', () => {
+  it('does not render the legacy custom models textarea', () => {
     Object.defineProperty(process, 'platform', { value: 'darwin' });
     const plugin = createPlugin();
 
     codexSettingsTabRenderer.render(createContainer(), createContext(plugin));
 
-    const customModelsSetting = findSetting('Custom models');
-    expect(customModelsSetting.textAreaComponents[0].placeholder).toBe(
-      'gpt-5.4\ngpt-5.3-codex-spark',
-    );
-  });
-
-  it('reconciles removed custom models on blur and clears stale title model selections', async () => {
-    Object.defineProperty(process, 'platform', { value: 'darwin' });
-    const plugin = createPlugin({
-      titleGenerationModel: 'my-custom-model',
-    });
-    const context = createContext(plugin);
-
-    codexSettingsTabRenderer.render(createContainer(), context);
-
-    const customModelsSetting = findSetting('Custom models');
-    const customModelsTextArea = customModelsSetting.textAreaComponents[0];
-
-    await customModelsTextArea.onChangeCallback?.('different-custom-model');
-    await customModelsTextArea.trigger('blur');
-
-    expect(plugin.settings.providerConfigs.codex.customModels).toBe('different-custom-model');
-    expect(plugin.settings.model).toBe('gpt-5.4-mini');
-    expect(plugin.settings.titleGenerationModel).toBe('');
-    expect(mockSaveSettings).toHaveBeenCalledTimes(1);
-    expect(context.refreshModelSelectors).toHaveBeenCalledTimes(1);
-  });
-
-  it('reconciles an inactive Codex saved model when a removed custom model was selected', async () => {
-    Object.defineProperty(process, 'platform', { value: 'darwin' });
-    const plugin = createPlugin({
-      settingsProvider: 'claude',
-      model: 'haiku',
-      savedProviderModel: {
-        claude: 'haiku',
-        codex: 'my-custom-model',
-      },
-    });
-    const context = createContext(plugin);
-
-    codexSettingsTabRenderer.render(createContainer(), context);
-
-    const customModelsSetting = findSetting('Custom models');
-    const customModelsTextArea = customModelsSetting.textAreaComponents[0];
-
-    await customModelsTextArea.onChangeCallback?.('different-custom-model');
-    await customModelsTextArea.trigger('blur');
-
-    expect(plugin.settings.model).toBe('haiku');
-    expect(plugin.settings.savedProviderModel).toEqual({
-      claude: 'haiku',
-      codex: 'gpt-5.4-mini',
-    });
-    expect(mockSaveSettings).toHaveBeenCalledTimes(1);
+    expect(createdSettings.some(setting => setting.name === 'Custom models')).toBe(false);
   });
 });

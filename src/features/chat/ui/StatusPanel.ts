@@ -178,6 +178,14 @@ export class StatusPanel {
     this.containerEl.appendChild(this.panelEl);
   }
 
+  private syncPanelVisibility(): void {
+    if (!this.panelEl) return;
+
+    const hasTodos = (this.currentTodos?.length ?? 0) > 0;
+    const hasBashOutputs = this.currentBashOutputs.size > 0;
+    this.panelEl.toggleClass('claudian-status-panel--visible', hasTodos || hasBashOutputs);
+  }
+
   /**
    * Update the panel with new todo items.
    * Called by ChatState.onTodosChanged callback when TodoWrite tool is used.
@@ -196,10 +204,12 @@ export class StatusPanel {
       this.todoContainerEl.addClass('claudian-hidden');
       this.todoHeaderEl.empty();
       this.todoContentEl.empty();
+      this.syncPanelVisibility();
       return;
     }
 
     this.todoContainerEl.removeClass('claudian-hidden');
+    this.syncPanelVisibility();
 
     // Count completed and find current task
     const completedCount = todos.filter(t => t.status === 'completed').length;
@@ -331,7 +341,7 @@ export class StatusPanel {
   addBashOutput(info: PanelBashOutput): void {
     this.currentBashOutputs.set(info.id, info);
     while (this.currentBashOutputs.size > MAX_BASH_OUTPUTS) {
-      const oldest = this.currentBashOutputs.keys().next().value as string | undefined;
+      const oldest = this.currentBashOutputs.keys().next().value;
       if (!oldest) break;
       this.currentBashOutputs.delete(oldest);
       this.bashEntryExpanded.delete(oldest);
@@ -358,10 +368,12 @@ export class StatusPanel {
 
     if (this.currentBashOutputs.size === 0) {
       this.bashOutputContainerEl.addClass('claudian-hidden');
+      this.syncPanelVisibility();
       return;
     }
 
     this.bashOutputContainerEl.removeClass('claudian-hidden');
+    this.syncPanelVisibility();
     this.bashHeaderEl.empty();
     this.bashContentEl.empty();
     const ownerDocument = this.bashHeaderEl.ownerDocument ?? window.document;

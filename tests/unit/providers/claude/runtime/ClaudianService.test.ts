@@ -5,6 +5,7 @@ import { Notice } from 'obsidian';
 
 import type { McpServerManager } from '@/core/mcp/McpServerManager';
 import type ClaudianPlugin from '@/main';
+import * as historyStore from '@/providers/claude/history/ClaudeHistoryStore';
 import {
   clearCliModelCatalog,
   getCliModelOptions,
@@ -20,6 +21,7 @@ const sdkMock = sdkModule as unknown as {
   setMockMessages: (messages: any[], options?: { appendResult?: boolean }) => void;
   resetMockMessages: () => void;
   simulateCrash: (afterChunks?: number) => void;
+  getLastOptions: () => { model?: string } | undefined;
   query: typeof sdkModule.query;
 };
 
@@ -184,6 +186,38 @@ describe('ClaudianService', () => {
       expect(service.getSessionId()).toBeNull();
     });
 
+    it('uses the effective SDK environment for live subagent sidecar recovery', async () => {
+      jest.mocked(mockPlugin.getActiveEnvironmentVariables!)
+        .mockReturnValue('CLAUDE_CONFIG_DIR=/custom/claude');
+      const toolCallsSpy = jest.spyOn(historyStore, 'loadSubagentToolCalls')
+        .mockResolvedValue([]);
+      const finalResultSpy = jest.spyOn(historyStore, 'loadSubagentFinalResult')
+        .mockResolvedValue(null);
+      service.setSessionId('session-custom');
+
+      await service.loadSubagentToolCalls('agent-1');
+      await service.loadSubagentFinalResult('agent-1');
+
+      const expectedContext = expect.objectContaining({
+        environment: expect.objectContaining({ CLAUDE_CONFIG_DIR: '/custom/claude' }),
+        vaultPath: '/mock/vault/path',
+      });
+      expect(toolCallsSpy).toHaveBeenCalledWith(
+        '/mock/vault/path',
+        'session-custom',
+        'agent-1',
+        undefined,
+        expectedContext,
+      );
+      expect(finalResultSpy).toHaveBeenCalledWith(
+        '/mock/vault/path',
+        'session-custom',
+        'agent-1',
+        undefined,
+        expectedContext,
+      );
+    });
+
     it('should NOT call ensureReady when setting session ID (passive sync)', async () => {
       const ensureReadySpy = jest.spyOn(service, 'ensureReady').mockResolvedValue(true);
 
@@ -221,6 +255,139 @@ describe('ClaudianService', () => {
       expect(service.isPersistentQueryActive()).toBe(false);
     });
 
+    it('should cache the raw model context window reported by the Agent SDK', async () => {
+      const mockQuery = {
+        getContextUsage: jest.fn().mockResolvedValue({
+          model: 'claude-sonnet-5',
+          rawMaxTokens: 1_000_000,
+          maxTokens: 950_000,
+        }),
+      };
+      (service as any).persistentQuery = mockQuery;
+      (service as any).currentConfig = { model: 'sonnet' };
+
+      await (service as any).refreshAuthoritativeContextWindow();
+
+      expect(mockQuery.getContextUsage).toHaveBeenCalledTimes(1);
+      expect((service as any).getTransformOptions('sonnet').authoritativeContextWindow).toBe(1_000_000);
+    });
+
+    it('should preserve an explicit custom-model limit when result metadata reports another window', () => {
+      Object.assign(mockPlugin.settings!, {
+        model: 'custom-model',
+        customContextLimits: { 'custom-model': 1_000_000 },
+      });
+      (service as any).bufferedUsageChunk = {
+        type: 'usage',
+        usage: {
+          model: 'custom-model',
+          inputTokens: 250_000,
+          cacheCreationInputTokens: 0,
+          cacheReadInputTokens: 0,
+          contextWindow: 1_000_000,
+          contextTokens: 250_000,
+          percentage: 25,
+        },
+      };
+
+      const updated = (service as any).updateBufferedUsageContextWindow(200_000);
+
+      expect(updated.usage).toEqual({
+        model: 'custom-model',
+        inputTokens: 250_000,
+        cacheCreationInputTokens: 0,
+        cacheReadInputTokens: 0,
+        contextWindow: 1_000_000,
+        contextTokens: 250_000,
+        percentage: 25,
+      });
+    });
+
+    it('should apply result metadata when no explicit custom-model limit exists', () => {
+      Object.assign(mockPlugin.settings!, { model: 'custom-model', customContextLimits: {} });
+      (service as any).bufferedUsageChunk = {
+        type: 'usage',
+        usage: {
+          model: 'custom-model',
+          inputTokens: 100_000,
+          cacheCreationInputTokens: 0,
+          cacheReadInputTokens: 0,
+          contextWindow: 1_000_000,
+          contextTokens: 100_000,
+          percentage: 10,
+        },
+      };
+
+      const updated = (service as any).updateBufferedUsageContextWindow(200_000);
+
+      expect(updated.usage).toEqual({
+        model: 'custom-model',
+        inputTokens: 100_000,
+        cacheCreationInputTokens: 0,
+        cacheReadInputTokens: 0,
+        contextWindow: 200_000,
+        contextWindowIsAuthoritative: true,
+        contextTokens: 100_000,
+        percentage: 50,
+      });
+    });
+
+    it('should coalesce concurrent context-window discovery for the same query and model', async () => {
+      let resolveContextUsage!: (value: { rawMaxTokens: number }) => void;
+      const mockQuery = {
+        getContextUsage: jest.fn().mockReturnValue(new Promise((resolve) => {
+          resolveContextUsage = resolve;
+        })),
+      };
+      (service as any).persistentQuery = mockQuery;
+      (service as any).currentConfig = { model: 'sonnet' };
+
+      const first = (service as any).refreshAuthoritativeContextWindow();
+      const second = (service as any).refreshAuthoritativeContextWindow();
+      await Promise.resolve();
+
+      expect(mockQuery.getContextUsage).toHaveBeenCalledTimes(1);
+
+      resolveContextUsage({ rawMaxTokens: 1_000_000 });
+      await Promise.all([first, second]);
+    });
+
+    it('should ignore context-window discovery completed after the active query changes', async () => {
+      let resolveContextUsage!: (value: { rawMaxTokens: number }) => void;
+      const mockQuery = {
+        getContextUsage: jest.fn().mockReturnValue(new Promise((resolve) => {
+          resolveContextUsage = resolve;
+        })),
+      };
+      (service as any).persistentQuery = mockQuery;
+      (service as any).currentConfig = { model: 'sonnet' };
+
+      const discovery = (service as any).refreshAuthoritativeContextWindow();
+      await Promise.resolve();
+      (service as any).persistentQuery = { getContextUsage: jest.fn() };
+
+      resolveContextUsage({ rawMaxTokens: 1_000_000 });
+      await discovery;
+
+      expect((service as any).getTransformOptions('sonnet').authoritativeContextWindow).toBeUndefined();
+    });
+
+    it('should ignore an invalid context window reported by the Agent SDK', async () => {
+      const mockQuery = {
+        getContextUsage: jest.fn().mockResolvedValue({
+          model: 'claude-sonnet-5',
+          rawMaxTokens: 0,
+          maxTokens: 0,
+        }),
+      };
+      (service as any).persistentQuery = mockQuery;
+      (service as any).currentConfig = { model: 'sonnet' };
+
+      await (service as any).refreshAuthoritativeContextWindow();
+
+      expect((service as any).getTransformOptions('sonnet').authoritativeContextWindow).toBeUndefined();
+    });
+
     it('should close persistent query', () => {
       service.setSessionId('test-session');
       service.closePersistentQuery('test reason');
@@ -238,6 +405,17 @@ describe('ClaudianService', () => {
 
       expect(result).toBe(true);
       expect(startPersistentQuerySpy).toHaveBeenCalled();
+    });
+
+    it('should use the synced conversation model when starting a persistent query', async () => {
+      service.syncConversationState({
+        sessionId: null,
+        selectedModel: 'claude-3-opus',
+      });
+
+      await service.ensureReady();
+
+      expect(sdkMock.getLastOptions()?.model).toBe('claude-3-opus');
     });
 
     it('should return false (no-op) when config unchanged and query running', async () => {
@@ -2364,6 +2542,36 @@ describe('ClaudianService', () => {
       expect(errorChunks).toHaveLength(1);
       expect(errorChunks[0].content).toContain('session expired');
     });
+
+    it('should classify a confirmed missing session from the cold-start retry', async () => {
+      jest.spyOn(sdkModule, 'query' as any).mockImplementation(() => {
+        // eslint-disable-next-line require-yield
+        const gen = (async function* () {
+          throw new Error('No conversation found with session ID: old-session');
+        })() as any;
+        gen.interrupt = jest.fn();
+        gen.setModel = jest.fn();
+        gen.setMaxThinkingTokens = jest.fn();
+        gen.setPermissionMode = jest.fn();
+        gen.setMcpServers = jest.fn();
+        return gen;
+      });
+
+      service.setSessionId('old-session');
+      const history: any[] = [
+        { id: '1', role: 'user', content: 'Previous', timestamp: 1000 },
+      ];
+
+      const chunks = await collectChunks(
+        service.query('follow up', undefined, history, { forceColdStart: true })
+      );
+
+      expect(chunks).toContainEqual(expect.objectContaining({
+        type: 'error',
+        code: 'provider_session_missing',
+        providerSessionId: 'old-session',
+      }));
+    });
   });
 
   describe('applyDynamicUpdates - cliPath null', () => {
@@ -2590,6 +2798,9 @@ describe('ClaudianService', () => {
         enableChrome: false,
         enableAutoMode: false,
       };
+      const refreshContextWindowSpy = jest
+        .spyOn(service as any, 'refreshAuthoritativeContextWindow')
+        .mockResolvedValue(undefined);
 
       // Set up handler to resolve immediately
       const gen = (service as any).queryViaPersistent(
@@ -2615,8 +2826,66 @@ describe('ClaudianService', () => {
 
       // allowedTools should include the specified tools + Skill
       expect((service as any).currentAllowedTools).toEqual(['Read', 'Glob', 'Skill']);
+      expect(refreshContextWindowSpy).toHaveBeenCalledTimes(1);
 
       // Drain the generator
+      let next = await gen.next();
+      while (!next.done) {
+        next = await gen.next();
+      }
+    });
+
+    it('should not block the turn while context-window discovery is pending', async () => {
+      const mockPQ = {
+        interrupt: jest.fn().mockResolvedValue(undefined),
+        setModel: jest.fn().mockResolvedValue(undefined),
+        setPermissionMode: jest.fn().mockResolvedValue(undefined),
+        setMcpServers: jest.fn().mockResolvedValue({ added: [], removed: [], errors: {} }),
+      };
+      (service as any).persistentQuery = mockPQ;
+      (service as any).messageChannel = new MessageChannel();
+      (service as any).responseConsumerRunning = true;
+      (service as any).vaultPath = '/mock/vault/path';
+      (service as any).currentConfig = {
+        model: 'sonnet',
+        effortLevel: 'high',
+        permissionMode: 'ask',
+        systemPromptKey: '',
+        disallowedToolsKey: '',
+        mcpServersKey: '{}',
+        pluginsKey: '',
+        externalContextPaths: [],
+        settingSources: '',
+        claudeCliPath: '/usr/local/bin/claude',
+        enableChrome: false,
+        enableAutoMode: false,
+      };
+
+      let resolveDiscovery!: () => void;
+      jest.spyOn(service as any, 'refreshAuthoritativeContextWindow').mockReturnValue(
+        new Promise<void>((resolve) => {
+          resolveDiscovery = resolve;
+        }),
+      );
+
+      const gen = (service as any).queryViaPersistent(
+        'test', undefined, '/mock/vault/path', '/usr/local/bin/claude',
+      );
+      const firstChunkPromise = gen.next();
+      await new Promise(resolve => setTimeout(resolve, 10));
+
+      const registeredBeforeDiscovery = (service as any).responseHandlers.length > 0;
+      resolveDiscovery();
+      if (!registeredBeforeDiscovery) {
+        await new Promise(resolve => setTimeout(resolve, 0));
+      }
+
+      const handler = (service as any).responseHandlers[0];
+      handler.onDone();
+      await firstChunkPromise;
+
+      expect(registeredBeforeDiscovery).toBe(true);
+
       let next = await gen.next();
       while (!next.done) {
         next = await gen.next();
@@ -3011,6 +3280,36 @@ describe('ClaudianService', () => {
       expect(errorChunks[0].content).toContain('retry also failed');
     });
 
+    it('should classify a confirmed missing session from the persistent retry', async () => {
+      service.setSessionId('old-persistent-session');
+      const history: any[] = [
+        { id: '1', role: 'user', content: 'Previous question', timestamp: 1000 },
+      ];
+
+      jest.spyOn(service as any, 'queryViaPersistent').mockImplementation(
+        // eslint-disable-next-line require-yield
+        async function* () {
+          throw new Error('session expired');
+        }
+      );
+      jest.spyOn(service as any, 'queryViaSDK').mockImplementation(
+        // eslint-disable-next-line require-yield
+        async function* () {
+          throw new Error('No conversation found with session ID: old-persistent-session');
+        }
+      );
+      (service as any).persistentQuery = { interrupt: jest.fn().mockResolvedValue(undefined) };
+      (service as any).shuttingDown = false;
+
+      const chunks = await collectChunks(service.query('follow up', undefined, history));
+
+      expect(chunks).toContainEqual(expect.objectContaining({
+        type: 'error',
+        code: 'provider_session_missing',
+        providerSessionId: 'old-persistent-session',
+      }));
+    });
+
     it('should re-throw non-session-expired errors from persistent path', async () => {
       jest.spyOn(service as any, 'queryViaPersistent').mockImplementation(
         // eslint-disable-next-line require-yield
@@ -3043,6 +3342,27 @@ describe('ClaudianService', () => {
       await expect(async () => {
         await collectChunks(service.query('hello'));
       }).rejects.toThrow('session expired');
+    });
+
+    it('should classify a confirmed missing session without rendering a generic error', async () => {
+      jest.spyOn(service as any, 'queryViaPersistent').mockImplementation(
+        // eslint-disable-next-line require-yield
+        async function* () {
+          throw new Error('No conversation found with session ID: missing-session');
+        }
+      );
+
+      (service as any).persistentQuery = { interrupt: jest.fn().mockResolvedValue(undefined) };
+      (service as any).shuttingDown = false;
+
+      const chunks = await collectChunks(service.query('hello'));
+
+      expect(chunks).toContainEqual(expect.objectContaining({
+        type: 'error',
+        code: 'provider_session_missing',
+        providerSessionId: 'missing-session',
+      }));
+      expect(service.getSessionId()).toBeNull();
     });
   });
 
@@ -3163,6 +3483,44 @@ describe('ClaudianService', () => {
   });
 
   describe('startResponseConsumer - crash recovery', () => {
+    it('closes a persistent query whose resume session is confirmed missing', async () => {
+      const missingSessionError = new Error(
+        'No conversation found with session ID: missing-session',
+      );
+      const mockPQ = {
+        [Symbol.asyncIterator]() { return this; },
+        async next() {
+          throw missingSessionError;
+        },
+        async return() { return { done: true, value: undefined }; },
+        interrupt: jest.fn().mockResolvedValue(undefined),
+      };
+      const onError = jest.fn();
+      const handler = createResponseHandler({
+        id: 'missing-session-test',
+        onChunk: jest.fn(),
+        onDone: jest.fn(),
+        onError,
+      });
+
+      (service as any).sessionManager.setSessionId('missing-session', 'claude-sonnet-4-5');
+      (service as any).persistentQuery = mockPQ;
+      (service as any).messageChannel = { close: jest.fn() };
+      (service as any).queryAbortController = { abort: jest.fn() };
+      (service as any).responseHandlers = [handler];
+      (service as any).shuttingDown = false;
+      (service as any).coldStartInProgress = false;
+      (service as any).responseConsumerRunning = false;
+
+      (service as any).startResponseConsumer();
+      const consumerPromise = (service as any).responseConsumerPromise;
+      await consumerPromise;
+
+      expect(onError).toHaveBeenCalledWith(missingSessionError);
+      expect((service as any).persistentQuery).toBeNull();
+      expect(service.getSessionId()).toBeNull();
+    });
+
     it('should attempt crash recovery when error occurs before any chunks', async () => {
       // Set up persistent query that will throw on iteration
       const crashError = new Error('process crashed');

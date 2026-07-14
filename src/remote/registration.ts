@@ -7,6 +7,7 @@
  */
 
 
+import type { ProviderHost } from '../core/providers/ProviderHost';
 import { ProviderRegistry } from '../core/providers/ProviderRegistry';
 import { ProviderWorkspaceRegistry } from '../core/providers/ProviderWorkspaceRegistry';
 import type {
@@ -59,7 +60,7 @@ export function getRemoteClient(): RemoteClient {
   return sharedClient;
 }
 
-function readRemoteConfig(plugin: ClaudianPlugin): { url: string } | null {
+function readRemoteConfig(plugin: ProviderHost): { url: string } | null {
   // Registration runs before loadSettings(); settings may not exist yet.
   const settings = plugin.settings as unknown as Record<string, unknown> | undefined;
   const raw = settings?.remoteDaemon;
@@ -69,7 +70,7 @@ function readRemoteConfig(plugin: ClaudianPlugin): { url: string } | null {
   return { url: url.trim() };
 }
 
-function createRemoteRuntime(plugin: ClaudianPlugin, providerId: ProviderId, capabilities: ProviderCapabilities): RemoteChatRuntime {
+function createRemoteRuntime(plugin: ProviderHost, providerId: ProviderId, capabilities: ProviderCapabilities): RemoteChatRuntime {
   const config = readRemoteConfig(plugin);
   if (config) {
     sharedClient.configure(config);
@@ -152,7 +153,7 @@ class RemoteTitleGenerationService implements TitleGenerationService {
   private cancelled = false;
 
   constructor(
-    private readonly plugin: ClaudianPlugin,
+    private readonly plugin: ProviderHost,
     private readonly providerId: ProviderId,
   ) {}
 

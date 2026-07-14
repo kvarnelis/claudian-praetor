@@ -1,5 +1,7 @@
 import '@/providers';
 
+import { TEST_CODEX_CATALOG } from '@test/helpers/codexModels';
+
 import type { VaultFileAdapter } from '@/core/storage/VaultFileAdapter';
 import { getClaudeProviderSettings } from '@/providers/claude/settings';
 import {
@@ -8,12 +10,16 @@ import {
   LEGACY_CLAUDIAN_SETTINGS_PATH,
 } from '@/providers/claude/storage/ClaudianSettingsStorage';
 import { DEFAULT_SETTINGS } from '@/providers/claude/types/settings';
-import { getCodexProviderSettings } from '@/providers/codex/settings';
+import {
+  getCodexProviderSettings,
+  updateCodexProviderSettings,
+} from '@/providers/codex/settings';
 import { getOpencodeProviderSettings } from '@/providers/opencode/settings';
 import { getPiProviderSettings } from '@/providers/pi/settings';
 
 const mockGetHostnameKey = jest.fn(() => 'host-a');
 const mockGetLegacyHostnameKey = jest.fn(() => 'legacy-host');
+const originalPlatform = process.platform;
 
 jest.mock('@/utils/env', () => ({
   ...jest.requireActual('@/utils/env'),
@@ -33,6 +39,7 @@ describe('ClaudianSettingsStorage', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    Object.defineProperty(process, 'platform', { value: originalPlatform });
     // Reset mock implementations to default resolved values
     mockAdapter.exists.mockResolvedValue(false);
     mockAdapter.read.mockResolvedValue('{}');
@@ -41,6 +48,10 @@ describe('ClaudianSettingsStorage', () => {
     mockGetHostnameKey.mockReturnValue('host-a');
     mockGetLegacyHostnameKey.mockReturnValue('legacy-host');
     storage = new ClaudianSettingsStorage(mockAdapter);
+  });
+
+  afterEach(() => {
+    Object.defineProperty(process, 'platform', { value: originalPlatform });
   });
 
   describe('load', () => {
@@ -211,6 +222,7 @@ describe('ClaudianSettingsStorage', () => {
     });
 
     it('migrates current legacy hostname-scoped provider settings to the opaque device key', async () => {
+      Object.defineProperty(process, 'platform', { value: 'win32' });
       mockGetHostnameKey.mockReturnValue('device:current');
       mockGetLegacyHostnameKey.mockReturnValue('host-a');
       mockAdapter.exists.mockResolvedValue(true);
@@ -312,6 +324,76 @@ describe('ClaudianSettingsStorage', () => {
       });
     });
 
+    it('clears Codex Windows installation settings on non-Windows hosts during normalization', async () => {
+      Object.defineProperty(process, 'platform', { value: 'darwin' });
+      mockAdapter.exists.mockResolvedValue(true);
+      mockAdapter.read.mockResolvedValue(JSON.stringify({
+        providerConfigs: {
+          codex: {
+            cliPathsByHost: {
+              'host-a': '/opt/homebrew/bin/codex',
+            },
+            installationMethodsByHost: {
+              'host-a': 'native-windows',
+              'host-b': 'wsl',
+            },
+            wslDistroOverridesByHost: {
+              'host-a': 'Ubuntu',
+              'host-b': 'Debian',
+            },
+          },
+        },
+      }));
+
+      const result = await storage.load();
+      const codexSettings = getCodexProviderSettings(result);
+      const writtenContent = JSON.parse(mockAdapter.write.mock.calls[0][1]);
+
+      expect(codexSettings.cliPathsByHost).toEqual({
+        'host-a': '/opt/homebrew/bin/codex',
+      });
+      expect(codexSettings.installationMethodsByHost).toEqual({
+        'host-b': 'wsl',
+      });
+      expect(codexSettings.wslDistroOverridesByHost).toEqual({
+        'host-b': 'Debian',
+      });
+      expect(writtenContent.providerConfigs.codex.installationMethodsByHost).toEqual({
+        'host-b': 'wsl',
+      });
+      expect(writtenContent.providerConfigs.codex.wslDistroOverridesByHost).toEqual({
+        'host-b': 'Debian',
+      });
+    });
+
+    it('strips legacy Codex installation scalar fields from non-Windows provider config', async () => {
+      Object.defineProperty(process, 'platform', { value: 'darwin' });
+      mockAdapter.exists.mockResolvedValue(true);
+      mockAdapter.read.mockResolvedValue(JSON.stringify({
+        providerConfigs: {
+          codex: {
+            enabled: true,
+            installationMethod: 'wsl',
+            wslDistroOverride: 'Ubuntu',
+            cliPathsByHost: {
+              'host-a': '/opt/homebrew/bin/codex',
+            },
+          },
+        },
+      }));
+
+      const result = await storage.load();
+      const codexConfig = result.providerConfigs.codex as Record<string, unknown>;
+      const writtenContent = JSON.parse(mockAdapter.write.mock.calls[0][1]);
+
+      expect(getCodexProviderSettings(result).installationMethod).toBe('native-windows');
+      expect(getCodexProviderSettings(result).wslDistroOverride).toBe('');
+      expect(codexConfig).not.toHaveProperty('installationMethod');
+      expect(codexConfig).not.toHaveProperty('wslDistroOverride');
+      expect(writtenContent.providerConfigs.codex).not.toHaveProperty('installationMethod');
+      expect(writtenContent.providerConfigs.codex).not.toHaveProperty('wslDistroOverride');
+    });
+
     it('should preserve legacy codexCliPath field', async () => {
       mockAdapter.exists.mockResolvedValue(true);
       mockAdapter.read.mockResolvedValue(JSON.stringify({
@@ -331,6 +413,28 @@ describe('ClaudianSettingsStorage', () => {
 
       expect(getCodexProviderSettings(result).installationMethod).toBe('native-windows');
       expect(getCodexProviderSettings(result).wslDistroOverride).toBe('');
+    });
+
+    it('drops a persisted Codex runtime catalog while preserving hand-picked model IDs', async () => {
+      mockAdapter.exists.mockResolvedValue(true);
+      mockAdapter.read.mockResolvedValue(JSON.stringify({
+        providerConfigs: {
+          codex: {
+            enabled: true,
+            discoveredModels: TEST_CODEX_CATALOG,
+            visibleModels: ['gpt-5.4-mini'],
+          },
+        },
+      }));
+
+      const result = await storage.load();
+      const codexSettings = getCodexProviderSettings(result);
+      const writtenContent = JSON.parse(mockAdapter.write.mock.calls[0][1]);
+
+      expect(codexSettings.discoveredModels).toEqual([]);
+      expect(codexSettings.visibleModels).toEqual(['gpt-5.4-mini']);
+      expect(writtenContent.providerConfigs.codex).not.toHaveProperty('discoveredModels');
+      expect(writtenContent.providerConfigs.codex.visibleModels).toEqual(['gpt-5.4-mini']);
     });
 
     it('normalizes invalid Codex installation fields from provider config', async () => {
@@ -378,15 +482,45 @@ describe('ClaudianSettingsStorage', () => {
         show1MModel: true,
       }));
 
-      const result = await storage.load();
+      await storage.load();
       const writtenContent = JSON.parse(mockAdapter.write.mock.calls[0][1]);
 
-      expect(getClaudeProviderSettings(result).enableSonnet1M).toBe(
-        getClaudeProviderSettings(DEFAULT_SETTINGS).enableSonnet1M,
-      );
       expect(writtenContent.model).toBe('sonnet');
       expect(writtenContent.hiddenProviderCommands).toEqual({});
       expect(writtenContent).not.toHaveProperty('show1MModel');
+    });
+
+    it('should remove legacy Claude 1M toggles from top-level settings', async () => {
+      mockAdapter.exists.mockResolvedValue(true);
+      mockAdapter.read.mockResolvedValue(JSON.stringify({
+        model: 'sonnet',
+        enableOpus1M: true,
+        enableSonnet1M: true,
+      }));
+
+      await storage.load();
+      const writtenContent = JSON.parse(mockAdapter.write.mock.calls[0][1]);
+
+      expect(writtenContent).not.toHaveProperty('enableOpus1M');
+      expect(writtenContent).not.toHaveProperty('enableSonnet1M');
+    });
+
+    it('should remove legacy Claude 1M toggles from provider settings', async () => {
+      mockAdapter.exists.mockResolvedValue(true);
+      mockAdapter.read.mockResolvedValue(JSON.stringify({
+        providerConfigs: {
+          claude: {
+            enableOpus1M: true,
+            enableSonnet1M: true,
+          },
+        },
+      }));
+
+      await storage.load();
+      const writtenContent = JSON.parse(mockAdapter.write.mock.calls[0][1]);
+
+      expect(writtenContent.providerConfigs.claude).not.toHaveProperty('enableOpus1M');
+      expect(writtenContent.providerConfigs.claude).not.toHaveProperty('enableSonnet1M');
     });
 
     it('should remove legacy slashCommands from the stored file', async () => {
@@ -538,7 +672,9 @@ describe('ClaudianSettingsStorage', () => {
       const writtenContent = JSON.parse(mockAdapter.write.mock.calls[0][1]);
       expect(writtenContent.model).toBe('claude-opus-4-5');
       expect(writtenContent.useThemeNativeAppearance).toBe(true);
+      expect(writtenContent.providerConfigs.codex).not.toHaveProperty('installationMethod');
       expect(writtenContent.providerConfigs.codex.installationMethodsByHost).toEqual({});
+      expect(writtenContent.providerConfigs.codex).not.toHaveProperty('wslDistroOverride');
       expect(writtenContent.providerConfigs.codex.wslDistroOverridesByHost).toEqual({});
     });
 
@@ -554,6 +690,64 @@ describe('ClaudianSettingsStorage', () => {
       const writtenContent = JSON.parse(mockAdapter.write.mock.calls[0][1]);
       expect(writtenContent.model).toBe('claude-opus-4-5');
       expect(writtenContent).not.toHaveProperty('slashCommands');
+    });
+
+    it('persists hand-picked Codex model IDs without the runtime catalog', async () => {
+      const settings = {
+        ...DEFAULT_SETTINGS,
+        providerConfigs: {
+          ...DEFAULT_SETTINGS.providerConfigs,
+          codex: {
+            ...DEFAULT_SETTINGS.providerConfigs.codex,
+            discoveredModels: TEST_CODEX_CATALOG,
+            visibleModels: ['gpt-5.4-mini'],
+          },
+        },
+      };
+
+      await storage.save(settings);
+
+      const writtenContent = JSON.parse(mockAdapter.write.mock.calls[0][1]);
+      expect(writtenContent.providerConfigs.codex).not.toHaveProperty('discoveredModels');
+      expect(writtenContent.providerConfigs.codex.visibleModels).toEqual(['gpt-5.4-mini']);
+      expect(getCodexProviderSettings(settings).discoveredModels).toEqual(TEST_CODEX_CATALOG);
+    });
+
+    it('preserves Codex model aliases across restart without the runtime catalog', async () => {
+      const settings = {
+        ...DEFAULT_SETTINGS,
+        providerConfigs: {
+          ...DEFAULT_SETTINGS.providerConfigs,
+          codex: {
+            ...DEFAULT_SETTINGS.providerConfigs.codex,
+            discoveredModels: TEST_CODEX_CATALOG,
+            modelAliases: {
+              'gpt-5.5': 'Primary',
+            },
+            visibleModels: null,
+          },
+        },
+      };
+
+      await storage.save(settings);
+      const persistedContent = mockAdapter.write.mock.calls[0][1];
+      const persistedSettings = JSON.parse(persistedContent);
+      expect(persistedSettings.providerConfigs.codex).not.toHaveProperty('discoveredModels');
+      expect(persistedSettings.providerConfigs.codex.modelAliases).toEqual({
+        'gpt-5.5': 'Primary',
+      });
+
+      mockAdapter.exists.mockResolvedValue(true);
+      mockAdapter.read.mockResolvedValue(persistedContent);
+      const reloaded = await storage.load();
+
+      expect(getCodexProviderSettings(reloaded).modelAliases).toEqual({
+        'gpt-5.5': 'Primary',
+      });
+      updateCodexProviderSettings(reloaded, { discoveredModels: TEST_CODEX_CATALOG as any });
+      expect(getCodexProviderSettings(reloaded).modelAliases).toEqual({
+        'gpt-5.5': 'Primary',
+      });
     });
 
     it('deletes the legacy settings file after writing the new path', async () => {
@@ -627,42 +821,4 @@ describe('ClaudianSettingsStorage', () => {
     });
   });
 
-  describe('setLastModel', () => {
-    it('should update lastClaudeModel for non-custom models', async () => {
-      mockAdapter.exists.mockResolvedValue(true);
-      mockAdapter.read.mockResolvedValue(JSON.stringify({}));
-
-      await storage.setLastModel('claude-sonnet-4-5', false);
-
-      const writeCall = mockAdapter.write.mock.calls[0];
-      const writtenContent = JSON.parse(writeCall[1]);
-      expect(writtenContent.providerConfigs.claude.lastModel).toBe('claude-sonnet-4-5');
-      // lastCustomModel keeps its default value (empty string)
-    });
-
-    it('should update lastCustomModel for custom models', async () => {
-      mockAdapter.exists.mockResolvedValue(true);
-      mockAdapter.read.mockResolvedValue(JSON.stringify({}));
-
-      await storage.setLastModel('custom-model-id', true);
-
-      const writeCall = mockAdapter.write.mock.calls[0];
-      const writtenContent = JSON.parse(writeCall[1]);
-      expect(writtenContent.lastCustomModel).toBe('custom-model-id');
-      // lastClaudeModel keeps its default value
-    });
-  });
-
-  describe('setLastEnvHash', () => {
-    it('should update environment hash', async () => {
-      mockAdapter.exists.mockResolvedValue(true);
-      mockAdapter.read.mockResolvedValue(JSON.stringify({}));
-
-      await storage.setLastEnvHash('abc123');
-
-      const writeCall = mockAdapter.write.mock.calls[0];
-      const writtenContent = JSON.parse(writeCall[1]);
-      expect(writtenContent.providerConfigs.claude.environmentHash).toBe('abc123');
-    });
-  });
 });

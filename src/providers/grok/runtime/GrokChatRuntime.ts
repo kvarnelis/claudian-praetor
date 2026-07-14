@@ -3,6 +3,7 @@ import * as path from 'path';
 
 import { buildSystemPrompt } from '../../../core/prompt/mainAgent';
 import { getRuntimeEnvironmentText } from '../../../core/providers/providerEnvironment';
+import type { ProviderHost } from '../../../core/providers/ProviderHost';
 import { ProviderSettingsCoordinator } from '../../../core/providers/ProviderSettingsCoordinator';
 import type { ProviderCapabilities } from '../../../core/providers/types';
 import type { ChatRuntime } from '../../../core/runtime/ChatRuntime';
@@ -29,7 +30,6 @@ import type {
   StreamChunk,
   UsageInfo,
 } from '../../../core/types';
-import type ClaudianPlugin from '../../../main';
 import { stripCurrentNoteContext } from '../../../utils/context';
 import { getVaultPath } from '../../../utils/path';
 import { buildContextFromHistory, buildPromptWithHistoryContext } from '../../../utils/session';
@@ -152,9 +152,9 @@ export class GrokChatRuntime implements ChatRuntime {
   private supportedCommands: SlashCommand[] = [];
   private transport: AcpJsonRpcTransport | null = null;
   private unregisterTransportClose: (() => void) | null = null;
-  private readonly plugin: ClaudianPlugin;
+  private readonly plugin: ProviderHost;
 
-  constructor(plugin: ClaudianPlugin) {
+  constructor(plugin: ProviderHost) {
     this.plugin = plugin;
   }
 

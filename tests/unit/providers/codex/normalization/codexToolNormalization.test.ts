@@ -1,8 +1,10 @@
 import {
+  decodeCodexExecEnvelope,
   isCodexToolOutputError,
   normalizeCodexMcpToolInput,
   normalizeCodexMcpToolName,
   normalizeCodexMcpToolState,
+  normalizeCodexToolCall,
   normalizeCodexToolInput,
   normalizeCodexToolName,
   normalizeCodexToolResult,
@@ -194,6 +196,151 @@ describe('normalizeCodexToolInput', () => {
     const input = { message: 'Do something', agent_type: 'code-writer' };
     const result = normalizeCodexToolInput('spawn_agent', input);
     expect(result).toEqual(input);
+  });
+});
+
+describe('normalizeCodexToolCall', () => {
+  it('unwraps exec envelopes containing exec_command as Bash', () => {
+    const command = 'rg -n "TODO" src';
+    const source = `const r = await tools.exec_command({cmd:${JSON.stringify(command)},workdir:"/vault"}); text(r.output);`;
+
+    expect(normalizeCodexToolCall('exec', { raw: source })).toEqual({
+      name: 'Bash',
+      input: { command },
+    });
+  });
+
+  it('unwraps exec envelopes containing apply_patch as a native patch', () => {
+    const patch = '*** Begin Patch\n*** Update File: note.md\n@@\n-old\n+new\n*** End Patch';
+    const source = `const patch = ${JSON.stringify(patch)};\ntext(await tools.apply_patch(patch));`;
+
+    expect(normalizeCodexToolCall('exec', { raw: source })).toEqual({
+      name: 'apply_patch',
+      input: { patch },
+    });
+  });
+
+  it('preserves exec when an envelope contains multiple nested tool calls', () => {
+    const source = [
+      'const first = await tools.exec_command({cmd:"pwd"});',
+      'const second = await tools.exec_command({cmd:"ls"});',
+      'text(first.output + second.output);',
+    ].join('\n');
+
+    expect(normalizeCodexToolCall('exec', { raw: source })).toEqual({
+      name: 'exec',
+      input: { raw: source },
+    });
+  });
+
+  it('decodes every supported tool from a multi-call exec envelope', () => {
+    const source = [
+      'const first = await tools.exec_command({cmd:"pwd"});',
+      'const second = await tools.exec_command({cmd:"ls"});',
+      'text(first.output);',
+      'text(second.output);',
+    ].join('\n');
+
+    expect(decodeCodexExecEnvelope({ raw: source })).toEqual([
+      { name: 'Bash', input: { command: 'pwd' } },
+      { name: 'Bash', input: { command: 'ls' } },
+    ]);
+  });
+
+  it('decodes static view_image calls from an exec envelope', () => {
+    const source = [
+      'const first = await tools.view_image({path:"/tmp/first.png",detail:"original"});',
+      'image(first.image_url);',
+      'const second = await tools.view_image({path:"/tmp/second.png",detail:"high"});',
+      'image(second.image_url);',
+    ].join('\n');
+
+    expect(decodeCodexExecEnvelope({ raw: source })).toEqual([
+      {
+        name: 'Read',
+        input: { path: '/tmp/first.png', detail: 'original', file_path: '/tmp/first.png' },
+      },
+      {
+        name: 'Read',
+        input: { path: '/tmp/second.png', detail: 'high', file_path: '/tmp/second.png' },
+      },
+    ]);
+  });
+
+  it('decodes static update_plan calls from an exec envelope', () => {
+    const source = [
+      'const result = await tools.update_plan({',
+      '  explanation:"Starting work",',
+      '  plan:[{step:"Inspect files",status:"in_progress"}]',
+      '});',
+      'text(result);',
+    ].join('\n');
+
+    expect(decodeCodexExecEnvelope({ raw: source })).toEqual([{
+      name: 'TodoWrite',
+      input: {
+        todos: [{
+          id: '',
+          content: 'Inspect files',
+          activeForm: 'Inspect files',
+          status: 'in_progress',
+        }],
+      },
+    }]);
+  });
+
+  it('preserves exec when another nested tool accompanies exec_command', () => {
+    const source = [
+      'await tools.update_plan({plan:[]});',
+      'const result = await tools.exec_command({cmd:"pwd"});',
+      'text(result.output);',
+    ].join('\n');
+
+    expect(normalizeCodexToolCall('exec', { raw: source })).toEqual({
+      name: 'exec',
+      input: { raw: source },
+    });
+  });
+
+  it('preserves exec when unsupported tools access accompanies exec_command', () => {
+    const source = [
+      'await tools["update_plan"]({plan:[]});',
+      'const result = await tools.exec_command({cmd:"pwd"});',
+      'text(result.output);',
+    ].join('\n');
+
+    expect(normalizeCodexToolCall('exec', { raw: source })).toEqual({
+      name: 'exec',
+      input: { raw: source },
+    });
+  });
+
+  it('ignores tool-like text inside command string literals', () => {
+    const command = 'rg -n "tools.exec_command(" src';
+    const source = `const result = await tools.exec_command({cmd:${JSON.stringify(command)}}); text(result.output);`;
+
+    expect(normalizeCodexToolCall('exec', { raw: source })).toEqual({
+      name: 'Bash',
+      input: { command },
+    });
+  });
+
+  it('does not unwrap tool-like text that is never invoked', () => {
+    const source = 'const example = \'tools.exec_command({cmd:"pwd"})\'; text(example);';
+
+    expect(normalizeCodexToolCall('exec', { raw: source })).toEqual({
+      name: 'exec',
+      input: { raw: source },
+    });
+  });
+
+  it('does not read cmd from a later argument', () => {
+    const source = 'const options = {}; const result = await tools.exec_command(options, {cmd:"pwd"}); text(result.output);';
+
+    expect(normalizeCodexToolCall('exec', { raw: source })).toEqual({
+      name: 'exec',
+      input: { raw: source },
+    });
   });
 });
 

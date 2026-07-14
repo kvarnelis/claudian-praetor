@@ -6,6 +6,10 @@ import {
   getLegacyHostnameKey,
   migrateLegacyHostnameKeyedMap,
 } from '../../utils/env';
+import {
+  type ClaudeModelEnvironmentType,
+  isClaudeModelEnvironmentType,
+} from './modelTiers';
 
 export const CLAUDE_SAFE_MODES = ['acceptEdits', 'auto', 'default'] as const;
 export type ClaudeSafeMode = typeof CLAUDE_SAFE_MODES[number];
@@ -18,10 +22,10 @@ export interface ClaudeProviderSettings {
   loadUserSettings: boolean;
   enableChrome: boolean;
   enableBangBash: boolean;
-  enableOpus1M: boolean;
-  enableSonnet1M: boolean;
   customModels: string;
   lastModel: string;
+  modelEnvironmentType: ClaudeModelEnvironmentType | '';
+  titleModelEnvironmentType: ClaudeModelEnvironmentType | '';
   environmentVariables: string;
   environmentHash: string;
 }
@@ -33,10 +37,10 @@ export const DEFAULT_CLAUDE_PROVIDER_SETTINGS: Readonly<ClaudeProviderSettings> 
   loadUserSettings: true,
   enableChrome: false,
   enableBangBash: false,
-  enableOpus1M: false,
-  enableSonnet1M: false,
   customModels: '',
   lastModel: 'haiku',
+  modelEnvironmentType: '',
+  titleModelEnvironmentType: '',
   environmentVariables: '',
   environmentHash: '',
 });
@@ -59,6 +63,14 @@ function normalizeClaudeSafeMode(value: unknown): ClaudeSafeMode | undefined {
   return (CLAUDE_SAFE_MODES as readonly unknown[]).includes(value)
     ? value as ClaudeSafeMode
     : undefined;
+}
+
+function normalizeClaudeModelEnvironmentType(
+  value: unknown,
+): ClaudeModelEnvironmentType | '' {
+  return typeof value === 'string' && isClaudeModelEnvironmentType(value)
+    ? value
+    : '';
 }
 
 export function getClaudeProviderSettings(
@@ -93,17 +105,15 @@ export function getClaudeProviderSettings(
     enableBangBash: (config.enableBangBash as boolean | undefined)
       ?? (settings.enableBangBash as boolean | undefined)
       ?? DEFAULT_CLAUDE_PROVIDER_SETTINGS.enableBangBash,
-    enableOpus1M: (config.enableOpus1M as boolean | undefined)
-      ?? (settings.enableOpus1M as boolean | undefined)
-      ?? DEFAULT_CLAUDE_PROVIDER_SETTINGS.enableOpus1M,
-    enableSonnet1M: (config.enableSonnet1M as boolean | undefined)
-      ?? (settings.enableSonnet1M as boolean | undefined)
-      ?? DEFAULT_CLAUDE_PROVIDER_SETTINGS.enableSonnet1M,
     customModels: (config.customModels as string | undefined)
       ?? DEFAULT_CLAUDE_PROVIDER_SETTINGS.customModels,
     lastModel: (config.lastModel as string | undefined)
       ?? (settings.lastClaudeModel as string | undefined)
       ?? DEFAULT_CLAUDE_PROVIDER_SETTINGS.lastModel,
+    modelEnvironmentType: normalizeClaudeModelEnvironmentType(config.modelEnvironmentType),
+    titleModelEnvironmentType: normalizeClaudeModelEnvironmentType(
+      config.titleModelEnvironmentType,
+    ),
     environmentVariables: (config.environmentVariables as string | undefined)
       ?? getProviderEnvironmentVariables(settings, 'claude')
       ?? DEFAULT_CLAUDE_PROVIDER_SETTINGS.environmentVariables,
