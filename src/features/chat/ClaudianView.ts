@@ -55,7 +55,6 @@ export class ClaudianView extends ItemView {
   private viewContainerEl: HTMLElement | null = null;
   private logoEl: HTMLElement | null = null;
   private newTabButtonEl: HTMLElement | null = null;
-  private closeCurrentTabButtonEl: HTMLElement | null = null;
 
   // Header elements
   private historyDropdown: HTMLElement | null = null;
@@ -385,16 +384,6 @@ export class ClaudianView extends ItemView {
       });
     });
 
-    this.closeCurrentTabButtonEl = navActionsEl.createDiv({
-      cls: 'claudian-input-nav-btn claudian-close-current-tab-btn',
-    });
-    setIcon(this.closeCurrentTabButtonEl, 'x');
-    this.closeCurrentTabButtonEl.setAttribute('aria-label', 'Close current tab');
-    this.closeCurrentTabButtonEl.addEventListener('click', () => {
-      const activeTabId = this.tabManager?.getActiveTabId();
-      if (activeTabId) void this.handleTabClose(activeTabId);
-    });
-
     fragment.appendChild(navActionsEl);
 
     const wrapper = activeDocument.createElement('div');
@@ -527,22 +516,6 @@ export class ClaudianView extends ItemView {
     this.tabBarContainerEl.toggleClass('claudian-hidden', !showTabBar);
 
     this.updateNewTabButtonVisibility();
-    this.updateCloseCurrentTabButtonVisibility();
-  }
-
-  private updateCloseCurrentTabButtonVisibility(): void {
-    if (!this.closeCurrentTabButtonEl || !this.tabManager) return;
-
-    const canClose = this.tabManager.getTabCount() >= 2;
-    this.closeCurrentTabButtonEl.toggleClass('claudian-hidden', !canClose);
-    if (canClose) {
-      this.closeCurrentTabButtonEl.removeAttribute('aria-disabled');
-      this.closeCurrentTabButtonEl.removeAttribute('aria-hidden');
-      return;
-    }
-
-    this.closeCurrentTabButtonEl.setAttribute('aria-disabled', 'true');
-    this.closeCurrentTabButtonEl.setAttribute('aria-hidden', 'true');
   }
 
   private updateNewTabButtonVisibility(): void {
@@ -758,22 +731,6 @@ export class ClaudianView extends ItemView {
       if (sendTabInputMessageFromExplicitEnterShortcut(activeTab, e, { requireInputFocus: true })) {
         return false;
       }
-    });
-    this.scope.register(['Ctrl'], 'Tab', (e: KeyboardEvent) => {
-      if (e.isComposing || e.defaultPrevented || (this.tabManager?.getTabCount() ?? 0) < 2) return;
-      const switched = this.tabManager?.switchToAdjacentTab('next');
-      if (switched) {
-        void switched.catch(() => new Notice('Failed to switch tab'));
-      }
-      return false;
-    });
-    this.scope.register(['Ctrl', 'Shift'], 'Tab', (e: KeyboardEvent) => {
-      if (e.isComposing || e.defaultPrevented || (this.tabManager?.getTabCount() ?? 0) < 2) return;
-      const switched = this.tabManager?.switchToAdjacentTab('previous');
-      if (switched) {
-        void switched.catch(() => new Notice('Failed to switch tab'));
-      }
-      return false;
     });
 
     this.eventRefs.push(

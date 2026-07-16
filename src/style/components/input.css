@@ -93,29 +93,6 @@
   height: 16.8px;
 }
 
-.claudian-close-current-tab-btn {
-  display: none;
-}
-
-body.claudian-mobile .claudian-input-nav-actions {
-  gap: 4px;
-}
-
-body.claudian-mobile .claudian-input-nav-btn {
-  width: 44px;
-  height: 44px;
-  border-radius: 7px;
-}
-
-body.claudian-mobile .claudian-close-current-tab-btn {
-  display: flex;
-  border: 1px solid var(--background-modifier-border);
-}
-
-body.claudian-mobile .claudian-close-current-tab-btn.claudian-hidden {
-  display: none;
-}
-
 .claudian-input-wrapper textarea.claudian-input {
   width: 100%;
   flex: 1 1 0;

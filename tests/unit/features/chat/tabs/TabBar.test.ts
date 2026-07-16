@@ -87,7 +87,7 @@ describe('TabBar', () => {
 
       tabBar.update([createTabBarItem({ index: 5 })]);
 
-      expect(containerEl._children[0].querySelector('.claudian-tab-badge-label')?.textContent).toBe('5');
+      expect(containerEl._children[0].textContent).toBe('5');
     });
 
     it('should use aria-label as the single tab title tooltip source', () => {
@@ -123,7 +123,7 @@ describe('TabBar', () => {
 
       badge.dispatchEvent('dblclick', event);
 
-      expect(badge.querySelector('.claudian-tab-badge-label')?.textContent).toBe('My Conversation');
+      expect(badge.textContent).toBe('My Conversation');
       expect(badge.hasClass('claudian-tab-badge-expanded')).toBe(true);
       expect(badge.getAttribute('data-title-expanded')).toBe('true');
       expect(event.preventDefault).toHaveBeenCalled();
@@ -131,7 +131,7 @@ describe('TabBar', () => {
 
       badge.dispatchEvent('dblclick', { preventDefault: jest.fn(), stopPropagation: jest.fn() });
 
-      expect(badge.querySelector('.claudian-tab-badge-label')?.textContent).toBe('2');
+      expect(badge.textContent).toBe('2');
       expect(badge.hasClass('claudian-tab-badge-expanded')).toBe(false);
       expect(badge.getAttribute('data-title-expanded')).toBe('false');
     });
@@ -162,7 +162,7 @@ describe('TabBar', () => {
       tabBar.setExpandedTitleTabIds(['tab-1']);
       tabBar.update([createTabBarItem({ id: 'tab-1', index: 1, title: 'Restored Title' })]);
 
-      expect(containerEl._children[0].querySelector('.claudian-tab-badge-label')?.textContent).toBe('Restored Title');
+      expect(containerEl._children[0].textContent).toBe('Restored Title');
       expect(containerEl._children[0].getAttribute('data-title-expanded')).toBe('true');
       expect(tabBar.getExpandedTitleTabIds()).toEqual(['tab-1']);
     });
@@ -179,9 +179,8 @@ describe('TabBar', () => {
         stopPropagation: jest.fn(),
       });
 
-      const label = containerEl._children[0].querySelector('.claudian-tab-badge-label');
-      expect(label?.textContent).toBe('ABCDEFGHIJKLMNOPQRSTUVWXYZ012...');
-      expect(label?.textContent.endsWith('...')).toBe(true);
+      expect(containerEl._children[0].textContent).toBe('ABCDEFGHIJKLMNOPQRSTUVWXYZ012...');
+      expect(containerEl._children[0].textContent.endsWith('...')).toBe(true);
     });
 
     it('should keep expanded title state across tab bar updates', () => {
@@ -197,24 +196,8 @@ describe('TabBar', () => {
 
       tabBar.update([createTabBarItem({ id: 'tab-1', index: 1, title: 'Renamed Title' })]);
 
-      expect(containerEl._children[0].querySelector('.claudian-tab-badge-label')?.textContent).toBe('Renamed Title');
+      expect(containerEl._children[0].textContent).toBe('Renamed Title');
       expect(containerEl._children[0].hasClass('claudian-tab-badge-expanded')).toBe(true);
-    });
-
-    it('should keep tab badges select-only even when the tab can be closed', () => {
-      const containerEl = createMockEl();
-      const callbacks = createMockCallbacks();
-      const tabBar = new TabBar(containerEl, callbacks);
-
-      tabBar.update([createTabBarItem({ title: 'Closable Conversation', canClose: true })]);
-
-      const badge = containerEl._children[0];
-      expect(badge.querySelector('.claudian-tab-badge-close')).toBeNull();
-
-      badge.click();
-
-      expect(callbacks.onTabClick).toHaveBeenCalledWith('tab-1');
-      expect(callbacks.onTabClose).not.toHaveBeenCalled();
     });
 
     it('should preserve horizontal scroll position across tab bar updates', () => {

@@ -33,11 +33,9 @@ function createViewHarness(options: {
   canCreateTab: boolean;
   tabCount?: number;
 }): {
-  closeCurrentTabButtonEl: ReturnType<typeof createMockEl>;
   newTabButtonEl: ReturnType<typeof createMockEl>;
   view: any;
 } {
-  const closeCurrentTabButtonEl = createMockEl();
   const newTabButtonEl = createMockEl();
   const view = Object.create(ClaudianView.prototype) as any;
 
@@ -47,14 +45,12 @@ function createViewHarness(options: {
   view.tabManager = {
     canCreateTab: jest.fn().mockReturnValue(options.canCreateTab),
     getTabCount: jest.fn().mockReturnValue(options.tabCount ?? 1),
-    getActiveTab: jest.fn().mockReturnValue({ state: { isStreaming: false } }),
   };
   view.tabBarContainerEl = createMockEl();
   view.logoEl = createMockEl();
   view.newTabButtonEl = newTabButtonEl;
-  view.closeCurrentTabButtonEl = closeCurrentTabButtonEl;
 
-  return { closeCurrentTabButtonEl, newTabButtonEl, view };
+  return { newTabButtonEl, view };
 }
 
 describe('ClaudianView tab controls', () => {
@@ -79,17 +75,6 @@ describe('ClaudianView tab controls', () => {
     expect(newTabButtonEl.hasClass('claudian-hidden')).toBe(false);
     expect(newTabButtonEl.getAttribute('aria-disabled')).toBeNull();
     expect(newTabButtonEl.getAttribute('aria-hidden')).toBeNull();
-  });
-
-  it('shows the separate close-current-tab button only when multiple tabs exist', () => {
-    const single = createViewHarness({ canCreateTab: true, tabCount: 1 });
-    single.view.refreshTabControls();
-    expect(single.closeCurrentTabButtonEl.hasClass('claudian-hidden')).toBe(true);
-
-    const multiple = createViewHarness({ canCreateTab: true, tabCount: 2 });
-    multiple.view.refreshTabControls();
-    expect(multiple.closeCurrentTabButtonEl.hasClass('claudian-hidden')).toBe(false);
-    expect(multiple.closeCurrentTabButtonEl.getAttribute('aria-hidden')).toBeNull();
   });
 
   it('keeps tab controls in the view-owned input row', () => {
@@ -351,24 +336,6 @@ describe('ClaudianView copy last interaction', () => {
     jest.advanceTimersByTime(1500);
     expect(copyBtn.hasClass('copied')).toBe(false);
   });
-
-  it('closes the active tab from the separate close button', () => {
-    const view = Object.create(ClaudianView.prototype) as any;
-    view.containerEl = createMockEl();
-    view.containerEl.ownerDocument.createDocumentFragment = () => createMockEl();
-    view.tabManager = { getActiveTabId: jest.fn().mockReturnValue('tab-2') };
-    view.handleTabClose = jest.fn().mockResolvedValue(undefined);
-
-    const navRowContent = view.buildNavRowContent();
-    const closeBtn = navRowContent.querySelector('.claudian-close-current-tab-btn');
-
-    expect(closeBtn).not.toBeNull();
-    expect(closeBtn.getAttribute('aria-label')).toBe('Close current tab');
-
-    closeBtn.click();
-
-    expect(view.handleTabClose).toHaveBeenCalledWith('tab-2');
-  });
 });
 
 describe('ClaudianView Escape handling', () => {
@@ -508,26 +475,6 @@ describe('ClaudianView Escape handling', () => {
       expect.any(Function),
       { capture: true }
     );
-  });
-
-  it('cycles tabs with Control-Tab and Control-Shift-Tab', () => {
-    const { view } = createEscapeHarness({ isStreaming: false });
-    view.tabManager.switchToAdjacentTab = jest.fn().mockResolvedValue(true);
-    view.tabManager.getTabCount = jest.fn().mockReturnValue(2);
-
-    view.wireEventHandlers();
-
-    const nextHandler = view.scope.handlers.find(
-      (handler: any) => handler.key === 'Tab' && handler.modifiers?.join(',') === 'Ctrl'
-    );
-    const previousHandler = view.scope.handlers.find(
-      (handler: any) => handler.key === 'Tab' && handler.modifiers?.join(',') === 'Ctrl,Shift'
-    );
-
-    expect(nextHandler.func({ isComposing: false, defaultPrevented: false } as KeyboardEvent)).toBe(false);
-    expect(previousHandler.func({ isComposing: false, defaultPrevented: false } as KeyboardEvent)).toBe(false);
-    expect(view.tabManager.switchToAdjacentTab).toHaveBeenNthCalledWith(1, 'next');
-    expect(view.tabManager.switchToAdjacentTab).toHaveBeenNthCalledWith(2, 'previous');
   });
 
   it('cancels streaming and consumes scoped Escape', () => {

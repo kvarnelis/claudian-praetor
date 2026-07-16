@@ -19,7 +19,6 @@ export interface FeatureTabManagerHost {
   getAllTabs(): TabData[];
   getTab(tabId: TabId): TabData | null;
   switchToTab(tabId: TabId): Promise<void>;
-  switchToAdjacentTab(direction: 'previous' | 'next'): Promise<boolean>;
   broadcastToAllTabs(action: (runtime: ChatRuntime) => Promise<void>): Promise<void>;
   recycleProviderRuntimes(providerIds: ProviderId | ProviderId[]): Promise<void>;
 }

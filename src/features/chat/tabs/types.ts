@@ -78,9 +78,6 @@ export interface TabManagerInterface {
   /** Switches to a specific tab. */
   switchToTab(tabId: TabId): Promise<void>;
 
-  /** Switches to the previous or next tab, wrapping at the ends. */
-  switchToAdjacentTab(direction: 'previous' | 'next'): Promise<boolean>;
-
   /** Gets all tabs. */
   getAllTabs(): TabData[];
 }
