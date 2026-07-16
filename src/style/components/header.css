@@ -25,3 +25,8 @@
   align-items: center;
   color: var(--claudian-brand);
 }
+
+/* Obsidian's mobile view selector already names the active sidebar view. */
+body.claudian-mobile .claudian-header {
+  display: none;
+}

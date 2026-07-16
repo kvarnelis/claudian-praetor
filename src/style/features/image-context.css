@@ -117,17 +117,11 @@ body.is-phone .claudian-context-row {
   height: 14px;
 }
 
-/* The attach button lives in the context row above the textarea, which is easy
-   to overlook on a phone/tablet. Make it a prominent accent button on mobile. */
+/* Keep a full touch target without bringing back the prominent blue tile. */
 body.claudian-mobile .claudian-image-attach-btn {
-  width: 40px;
-  height: 40px;
-  color: var(--text-on-accent);
-  background: var(--interactive-accent);
-  border-color: var(--interactive-accent);
-}
-
-body.claudian-mobile .claudian-image-attach-btn svg {
-  width: 22px;
-  height: 22px;
+  width: 44px;
+  height: 44px;
+  margin-right: 0;
+  border-color: transparent;
+  background: transparent;
 }

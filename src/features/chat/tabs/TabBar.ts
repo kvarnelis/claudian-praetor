@@ -89,6 +89,9 @@ export class TabBar {
         stateClass,
         isTitleExpanded ? 'claudian-tab-badge-expanded' : '',
       ].filter(Boolean).join(' '),
+    });
+    const labelEl = badgeEl.createSpan({
+      cls: 'claudian-tab-badge-label',
       text: this.getBadgeLabel(item),
     });
 
@@ -106,54 +109,15 @@ export class TabBar {
     badgeEl.addEventListener('dblclick', (e) => {
       e.preventDefault();
       e.stopPropagation();
-      this.toggleBadgeTitle(item, badgeEl);
+      this.toggleBadgeTitle(item, badgeEl, labelEl);
     });
 
     // Right-click to close (if allowed)
     if (item.canClose) {
-      // Visible close control — shown on mobile via CSS (desktop keeps
-      // right-click + the long-press below). Tap × to close, tap number to switch.
-      const closeEl = badgeEl.createSpan({ cls: 'claudian-tab-badge-close', text: '×' });
-      closeEl.setAttribute('aria-label', 'Close tab');
-      closeEl.addEventListener('click', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        this.callbacks.onTabClose(item.id);
-      });
-
       badgeEl.addEventListener('contextmenu', (e) => {
         e.preventDefault();
         this.callbacks.onTabClose(item.id);
       });
-
-      // Touch devices have no right-click: long-press (500ms) to close.
-      let pressTimer: number | null = null;
-      let longPressed = false;
-      const cancelPress = (): void => {
-        if (pressTimer !== null) {
-          window.clearTimeout(pressTimer);
-          pressTimer = null;
-        }
-      };
-      badgeEl.addEventListener('touchstart', () => {
-        longPressed = false;
-        pressTimer = window.setTimeout(() => {
-          longPressed = true;
-          this.callbacks.onTabClose(item.id);
-        }, 500);
-      }, { passive: true });
-      badgeEl.addEventListener('touchend', cancelPress);
-      badgeEl.addEventListener('touchmove', cancelPress);
-      badgeEl.addEventListener('touchcancel', cancelPress);
-      // Swallow the click that fires after a long-press so it doesn't also
-      // switch to the (now closing) tab. Capture phase to beat the click above.
-      badgeEl.addEventListener('click', (e) => {
-        if (longPressed) {
-          e.preventDefault();
-          e.stopPropagation();
-          longPressed = false;
-        }
-      }, true);
     }
   }
 
@@ -197,7 +161,11 @@ export class TabBar {
     }
   }
 
-  private toggleBadgeTitle(item: TabBarItem, badgeEl: HTMLElement): void {
+  private toggleBadgeTitle(
+    item: TabBarItem,
+    badgeEl: HTMLElement,
+    labelEl: HTMLElement,
+  ): void {
     if (this.expandedTitleTabIds.has(item.id)) {
       this.expandedTitleTabIds.delete(item.id);
     } else {
@@ -205,7 +173,7 @@ export class TabBar {
     }
 
     const isTitleExpanded = this.expandedTitleTabIds.has(item.id);
-    badgeEl.textContent = this.getBadgeLabel(item);
+    labelEl.textContent = this.getBadgeLabel(item);
     badgeEl.toggleClass('claudian-tab-badge-expanded', isTitleExpanded);
     badgeEl.setAttribute('data-title-expanded', isTitleExpanded ? 'true' : 'false');
     this.callbacks.onTitleExpansionChanged?.(this.getExpandedTitleTabIds());

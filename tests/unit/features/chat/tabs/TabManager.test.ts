@@ -349,6 +349,35 @@ describe('TabManager - Tab Lifecycle', () => {
       expect(mockActivateTab).not.toHaveBeenCalled();
     });
 
+    it('should cycle to adjacent tabs and wrap in both directions', async () => {
+      const manager = createManager({ callbacks });
+      const tab1 = await manager.createTab();
+      const tab2 = await manager.createTab();
+      const tab3 = await manager.createTab();
+
+      expect(manager.getActiveTabId()).toBe(tab3!.id);
+
+      await expect(manager.switchToAdjacentTab('next')).resolves.toBe(true);
+      expect(manager.getActiveTabId()).toBe(tab1!.id);
+
+      await expect(manager.switchToAdjacentTab('next')).resolves.toBe(true);
+      expect(manager.getActiveTabId()).toBe(tab2!.id);
+
+      await expect(manager.switchToAdjacentTab('previous')).resolves.toBe(true);
+      expect(manager.getActiveTabId()).toBe(tab1!.id);
+
+      await expect(manager.switchToAdjacentTab('previous')).resolves.toBe(true);
+      expect(manager.getActiveTabId()).toBe(tab3!.id);
+    });
+
+    it('should not cycle when fewer than two tabs exist', async () => {
+      const manager = createManager({ callbacks });
+      const tab = await manager.createTab();
+
+      await expect(manager.switchToAdjacentTab('next')).resolves.toBe(false);
+      expect(manager.getActiveTabId()).toBe(tab!.id);
+    });
+
     it('should NOT initialize service on switch (lazy until first query)', async () => {
       const manager = createManager({ callbacks });
 

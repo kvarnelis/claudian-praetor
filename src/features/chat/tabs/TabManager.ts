@@ -314,6 +314,20 @@ export class TabManager implements TabManagerInterface {
     }
   }
 
+  /** Switches to the previous or next tab, wrapping at the ends. */
+  async switchToAdjacentTab(direction: 'previous' | 'next'): Promise<boolean> {
+    const tabIds = Array.from(this.tabs.keys());
+    if (tabIds.length < 2 || !this.activeTabId) return false;
+
+    const activeIndex = tabIds.indexOf(this.activeTabId);
+    if (activeIndex < 0) return false;
+
+    const delta = direction === 'next' ? 1 : -1;
+    const targetIndex = (activeIndex + delta + tabIds.length) % tabIds.length;
+    await this.switchToTab(tabIds[targetIndex]);
+    return true;
+  }
+
   /**
    * Closes a tab.
    * @param tabId The tab to close.
