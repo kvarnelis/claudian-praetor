@@ -19,7 +19,6 @@ import type {
   ChatTurnRequest,
   PreparedChatTurn,
   SessionUpdateResult,
-  SubagentRuntimeState,
 } from '../../../core/runtime/types';
 import type {
   ApprovalDecision,
@@ -491,8 +490,6 @@ export class GrokChatRuntime implements ChatRuntime {
   setExitPlanModeCallback(_callback: ExitPlanModeCallback | null): void {}
 
   setPermissionModeSyncCallback(_callback: ((sdkMode: string) => void) | null): void {}
-
-  setSubagentHookProvider(_getState: () => SubagentRuntimeState): void {}
 
   setAutoTurnCallback(_callback: AutoTurnCallback | null): void {}
 

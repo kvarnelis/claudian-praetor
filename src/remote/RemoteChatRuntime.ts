@@ -28,7 +28,6 @@ import type {
   ExitPlanModeCallback,
   PreparedChatTurn,
   SessionUpdateResult,
-  SubagentRuntimeState,
 } from '../core/runtime/types';
 import type {
   ChatMessage,
@@ -358,10 +357,6 @@ export class RemoteChatRuntime implements ChatRuntime {
 
   setPermissionModeSyncCallback(callback: ((sdkMode: string) => void) | null): void {
     this.permissionModeSyncCallback = callback;
-  }
-
-  setSubagentHookProvider(_getState: () => SubagentRuntimeState): void {
-    // Subagent hooks run server-side; nothing to mirror yet.
   }
 
   setAutoTurnCallback(callback: AutoTurnCallback | null): void {
