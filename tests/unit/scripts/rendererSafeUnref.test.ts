@@ -84,6 +84,41 @@ describe('rendererSafeUnref helpers', () => {
     expect(findUnsafeTimerUnrefSites(result.contents)).toEqual([]);
   });
 
+  it('patches the async close shape that also guards on signalCode', () => {
+    const input = [
+      'if (Q && !Q.killed && Q.exitCode === null && Q.signalCode == null) setTimeout((J, Y) => {',
+      '  if (J.exitCode !== null || J.signalCode != null) {',
+      '    Y();',
+      '    return;',
+      '  }',
+      '  if (process.platform === "win32") {',
+      '    setTimeout((X, W) => {',
+      '      if (X.exitCode === null) X.kill("SIGKILL");',
+      '      W();',
+      '    }, 5e3, J, Y).unref();',
+      '    return;',
+      '  }',
+      '  J.kill("SIGTERM"), setTimeout((X) => {',
+      '    if (X.exitCode === null) X.kill("SIGKILL");',
+      '  }, 5e3, J).unref(), Y();',
+      '}, Tx, Q, $).unref(), Q.once("exit", () => VX.delete(Q));',
+    ].join('\n');
+
+    const result = patchRendererUnsafeUnrefSites(input);
+
+    expect(result.appliedPatches).toEqual([
+      { name: 'claude-sdk-process-transport-close-async', count: 1 },
+    ]);
+    // The signalCode guards decide whether the SDK arms a kill timer at all;
+    // the rewrite must carry them through untouched, not drop them.
+    expect(result.contents).toContain('Q.exitCode === null && Q.signalCode == null');
+    expect(result.contents).toContain('J.exitCode !== null || J.signalCode != null');
+    expect(result.contents).toContain('processKillTimer.unref?.();');
+    expect(result.contents).toContain('windowsForceKillTimer.unref?.();');
+    expect(result.contents).toContain('forceKillTimer.unref?.();');
+    expect(findUnsafeTimerUnrefSites(result.contents)).toEqual([]);
+  });
+
   it('reports remaining direct timer .unref() calls but ignores guarded usage', () => {
     const input = [
       'const timer = setTimeout(run, 1000);',
