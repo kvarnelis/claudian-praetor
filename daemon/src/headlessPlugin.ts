@@ -9,6 +9,11 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 import { DEFAULT_CLAUDIAN_SETTINGS } from '../../src/app/settings/defaultSettings';
+import {
+  SettingsCoordinator,
+  type ConditionalSettingsMutation,
+  type SettingsMutation,
+} from '../../src/app/settings/SettingsCoordinator';
 import { SharedStorageService } from '../../src/app/storage/SharedStorageService';
 import {
   CLAUDIAN_SETTINGS_PATH,
@@ -18,11 +23,13 @@ import {
   type EnvironmentScope,
   getEnvironmentVariablesForScope,
   getRuntimeEnvironmentText,
+  setEnvironmentVariablesForScope,
 } from '../../src/core/providers/providerEnvironment';
 import { ProviderRegistry } from '../../src/core/providers/ProviderRegistry';
+import type { ProviderHost } from '../../src/core/providers/ProviderHost';
 import { ProviderSettingsCoordinator } from '../../src/core/providers/ProviderSettingsCoordinator';
 import { ProviderWorkspaceRegistry } from '../../src/core/providers/ProviderWorkspaceRegistry';
-import type { ProviderId } from '../../src/core/providers/types';
+import type { ProviderCliResolutionContext, ProviderId } from '../../src/core/providers/types';
 import type { ClaudianSettings } from '../../src/core/types';
 import type ClaudianPlugin from '../../src/main';
 import { OPENCODE_PLAN_MODE_ID, OPENCODE_SAFE_MODE_ID } from '../../src/providers/opencode/modes';
@@ -30,6 +37,10 @@ import type { NodeVaultApp } from './nodeVaultApp';
 
 const DAEMON_DATA_FILE = 'praetor-daemon-data.json';
 const SETTINGS_WATCH_DEBOUNCE_MS = 500;
+
+interface SettingsWatcher {
+  close(): void;
+}
 
 export interface HeadlessPluginHandle {
   plugin: ClaudianPlugin;
@@ -102,25 +113,37 @@ export async function createHeadlessPlugin(options: {
   };
   normalizeLoadedSettings(settings);
 
+  const persistSettings = async (): Promise<void> => {
+    ProviderSettingsCoordinator.normalizeProviderSelection(
+      settings as unknown as Record<string, unknown>,
+    );
+    ProviderSettingsCoordinator.persistProjectedProviderState(
+      settings as unknown as Record<string, unknown>,
+    );
+    await storage.saveClaudianSettings(settings);
+  };
+  const settingsCoordinator = new SettingsCoordinator(settings, persistSettings);
+
   const members = {
-    app,
-    manifest: { id: 'claudian-praetor', name: 'Claudian Praetor', version: '0.1.0' },
+    app: app as never,
+    manifest: { version: '0.1.0' },
     settings,
     storage,
     loadData,
     saveData,
-    saveSettings: async (): Promise<void> => {
-      ProviderSettingsCoordinator.normalizeProviderSelection(
-        settings as unknown as Record<string, unknown>,
-      );
-      ProviderSettingsCoordinator.persistProjectedProviderState(
-        settings as unknown as Record<string, unknown>,
-      );
-      await storage.saveClaudianSettings(settings);
-    },
-    getResolvedProviderCliPath: (providerId: ProviderId): string | null =>
+    saveSettings: (): Promise<void> => settingsCoordinator.persistCurrent(),
+    mutateSettings: (mutation: SettingsMutation<ClaudianSettings>): Promise<void> =>
+      settingsCoordinator.mutate(mutation),
+    mutateSettingsConditionally: (
+      mutation: ConditionalSettingsMutation<ClaudianSettings>,
+    ): Promise<void> => settingsCoordinator.mutateConditionally(mutation),
+    getResolvedProviderCliPath: (
+      providerId: ProviderId,
+      context?: ProviderCliResolutionContext,
+    ): string | null =>
       ProviderWorkspaceRegistry.getCliResolver(providerId)?.resolveFromSettings(
         settings as unknown as Record<string, unknown>,
+        context,
       ) ?? null,
     getActiveEnvironmentVariables: (providerId?: ProviderId): string =>
       getRuntimeEnvironmentText(
@@ -131,12 +154,55 @@ export async function createHeadlessPlugin(options: {
       ),
     getEnvironmentVariablesForScope: (scope: EnvironmentScope): string =>
       getEnvironmentVariablesForScope(settings as unknown as Record<string, unknown>, scope),
+    applyEnvironmentVariables: (scope: EnvironmentScope, envText: string): Promise<void> =>
+      settingsCoordinator.mutate((current) => {
+        const settingsBag = current as unknown as Record<string, unknown>;
+        setEnvironmentVariablesForScope(settingsBag, scope, envText);
+        const providerIds = scope === 'shared'
+          ? ProviderRegistry.getRegisteredProviderIds()
+          : ProviderRegistry.getRegisteredProviderIds().filter(
+            providerId => `provider:${providerId}` === scope,
+          );
+        ProviderSettingsCoordinator.handleEnvironmentChange(settingsBag, providerIds);
+        ProviderSettingsCoordinator.normalizeAllModelVariants(settingsBag);
+      }),
+    applyEnvironmentVariablesBatch: (
+      updates: Array<{ scope: EnvironmentScope; envText: string }>,
+    ): Promise<void> => settingsCoordinator.mutate((current) => {
+      const settingsBag = current as unknown as Record<string, unknown>;
+      const affectedProviderIds = new Set<ProviderId>();
+      for (const { scope, envText } of updates) {
+        setEnvironmentVariablesForScope(settingsBag, scope, envText);
+        if (scope === 'shared') {
+          for (const providerId of ProviderRegistry.getRegisteredProviderIds()) {
+            affectedProviderIds.add(providerId);
+          }
+        } else {
+          const providerId = scope.slice('provider:'.length);
+          if (ProviderRegistry.getRegisteredProviderIds().includes(providerId)) {
+            affectedProviderIds.add(providerId);
+          }
+        }
+      }
+      ProviderSettingsCoordinator.handleEnvironmentChange(
+        settingsBag,
+        Array.from(affectedProviderIds),
+      );
+      ProviderSettingsCoordinator.normalizeAllModelVariants(settingsBag);
+    }),
     getAllViews: (): unknown[] => [],
     getView: (): null => null,
     getConversationSync: (): null => null,
-    normalizeModelVariantSettings: (): boolean => false,
+    normalizeModelVariantSettings: (): boolean =>
+      ProviderSettingsCoordinator.normalizeAllModelVariants(
+        settings as unknown as Record<string, unknown>,
+      ),
     persistTabManagerState: async (): Promise<void> => {},
-  };
+    refreshModelSelectors: (): void => {},
+    broadcastToActiveViewRuntimes: async (): Promise<void> => {},
+    broadcastToAllViewRuntimes: async (): Promise<void> => {},
+    recycleProviderRuntimes: async (): Promise<void> => {},
+  } satisfies Required<ProviderHost> & Record<string, unknown>;
 
   const plugin = new Proxy(members, {
     get(target, prop, receiver) {
@@ -162,11 +228,14 @@ export async function createHeadlessPlugin(options: {
         ...reloaded,
       };
       normalizeLoadedSettings(next);
-      // Mutate in place: live runtimes hold references to this object.
-      for (const key of Object.keys(settings)) {
-        delete (settings as unknown as Record<string, unknown>)[key];
-      }
-      Object.assign(settings, next);
+      await settingsCoordinator.mutateConditionally(() => {
+        // Mutate in place: live runtimes hold references to this object.
+        for (const key of Object.keys(settings)) {
+          delete (settings as unknown as Record<string, unknown>)[key];
+        }
+        Object.assign(settings, next);
+        return false;
+      });
       log('[praetord] settings reloaded from vault');
     } catch (err) {
       log(`[praetord] settings reload failed: ${err instanceof Error ? err.message : String(err)}`);
@@ -191,7 +260,7 @@ export async function createHeadlessPlugin(options: {
 function watchSettingsFile(
   vaultPath: string,
   onChange: () => Promise<void>,
-): fs.FSWatcher | null {
+): SettingsWatcher | null {
   const settingsDir = path.join(vaultPath, CLAUDIAN_STORAGE_PATH);
   const settingsFileName = path.basename(CLAUDIAN_SETTINGS_PATH);
   let timer: ReturnType<typeof setTimeout> | null = null;
@@ -232,7 +301,15 @@ function watchSettingsFile(
     watcher.on('error', () => {
       // Watcher loss is non-fatal; settings just stop live-reloading.
     });
-    return watcher;
+    return {
+      close: () => {
+        if (timer) {
+          clearTimeout(timer);
+          timer = null;
+        }
+        watcher.close();
+      },
+    };
   } catch {
     return null;
   }
