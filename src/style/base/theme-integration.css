@@ -12,6 +12,8 @@
 .claudian-container--theme-native .claudian-message-user {
   align-self: flex-end;
   padding: 0;
+  /* Breathing room between the prompt text and its own right-hand rule. */
+  padding-inline-end: 8px;
   background: transparent;
   border-radius: 0;
   border-inline-end: 1px solid var(--text-faint);

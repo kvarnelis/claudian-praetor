@@ -11,7 +11,9 @@
 .claudian-messages {
   flex: 1;
   overflow-y: auto;
-  padding: 12px 0 0;
+  /* Right gutter keeps message content (and the theme-native prompt rule) off
+     the 6px scrollbar, which content would otherwise sit flush against. */
+  padding: 12px 12px 0 0;
   display: flex;
   flex-direction: column;
   gap: 12px;
