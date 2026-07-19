@@ -45,3 +45,37 @@ node daemon/test-client.mjs --url ws://127.0.0.1:8423 --provider claude --model 
 - Keep the Mac awake while away: System Settings → Energy → prevent automatic sleeping on power, or use `caffeinate -i`.
 - Settings live-reload from `.claudian/claudian-settings.json` as Sync updates arrive.
 - Runtimes survive short mobile disconnects; orphaned runtimes are disposed after 30 minutes.
+
+## Persistent LaunchAgent Deployments
+
+The desktop plugin normally runs the bundled daemon from
+`<vault>/.obsidian/plugins/claudian-praetor/praetord.cjs`. A separately installed
+LaunchAgent may instead run a managed copy such as
+`~/.config/claudian-praetor/praetord.cjs` with `KeepAlive` enabled.
+
+That managed copy must be updated whenever the plugin's daemon protocol changes.
+Otherwise it can continuously restart an obsolete daemon, claim port `8423`, and
+make the current mobile client report misleading authentication errors. Updating
+only the Obsidian plugin is not sufficient for this deployment.
+
+To diagnose the active daemon on macOS:
+
+```bash
+lsof -nP -iTCP:8423 -sTCP:LISTEN
+pgrep -afil praetord
+```
+
+If the process command points at `~/.config/claudian-praetor/praetord.cjs`, copy
+the release's current `praetord.cjs` there and restart
+`com.claudian.praetord`. After a token-to-pairing migration,
+`~/.config/claudian-praetor/daemon.json` should contain `pairedClients` and must
+not contain `token`.
+
+## TODO
+
+- Add a versioned daemon handshake to the desktop supervisor. Do not treat an
+  occupied port as proof that a compatible daemon is running.
+- Add an install/update command for persistent LaunchAgent deployments that
+  atomically updates the managed `praetord.cjs` before restarting the service.
+- Report protocol incompatibility explicitly on mobile instead of surfacing it
+  as an authentication failure.
