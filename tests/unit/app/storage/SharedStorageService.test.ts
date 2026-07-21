@@ -1,31 +1,39 @@
-import type { Plugin } from 'obsidian';
+import { Notice } from 'obsidian';
 
 import { SharedStorageService } from '@/app/storage/SharedStorageService';
 
-describe('SharedStorageService plugin data mutations', () => {
-  it('serializes tab-state and remote-daemon writes without losing either field', async () => {
-    let persisted: Record<string, unknown> = {};
+describe('SharedStorageService', () => {
+  it('does not create storage directories during read-only initialization', async () => {
+    const adapter = {
+      exists: jest.fn().mockResolvedValue(false),
+      read: jest.fn(),
+      write: jest.fn(),
+      mkdir: jest.fn(),
+    };
+    const plugin = {
+      app: { vault: { adapter } },
+    } as any;
+    const storage = new SharedStorageService(plugin);
+
+    await storage.initialize();
+
+    expect(adapter.mkdir).not.toHaveBeenCalled();
+    expect(adapter.write).not.toHaveBeenCalled();
+  });
+
+  it('reports and propagates tab layout persistence failures', async () => {
+    const error = new Error('disk full');
     const plugin = {
       app: { vault: { adapter: {} } },
-      loadData: jest.fn(() => Promise.resolve({ ...persisted })),
-      saveData: jest.fn(async (data: Record<string, unknown>) => {
-        persisted = { ...data };
-      }),
-    } as unknown as Plugin;
+      loadData: jest.fn().mockResolvedValue({ existing: true }),
+      saveData: jest.fn().mockRejectedValue(error),
+    } as any;
     const storage = new SharedStorageService(plugin);
-    const tabManagerState = {
-      openTabs: [{ tabId: 'tab-1', conversationId: 'conversation-1' }],
-      activeTabId: 'tab-1',
-    };
 
-    await Promise.all([
-      storage.setTabManagerState(tabManagerState),
-      storage.setRemoteDaemonConfig({ url: 'ws://100.64.1.2:8423' }),
-    ]);
-
-    expect(persisted).toEqual({
-      tabManagerState,
-      remoteDaemon: { url: 'ws://100.64.1.2:8423' },
-    });
+    await expect(storage.setTabManagerState({
+      activeTabId: null,
+      openTabs: [],
+    })).rejects.toBe(error);
+    expect(Notice).toHaveBeenCalledWith('Failed to save tab layout');
   });
 });

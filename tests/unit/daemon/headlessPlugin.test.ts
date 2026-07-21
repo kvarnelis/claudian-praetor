@@ -43,7 +43,7 @@ describe('daemon headless plugin', () => {
     rmSync(vaultPath, { recursive: true, force: true });
   });
 
-  it('initializes every bundled provider workspace with Codex enabled', async () => {
+  it('initializes bundled provider workspaces without forcing Codex model discovery', async () => {
     const settingsDir = path.join(vaultPath, '.claudian');
     mkdirSync(settingsDir, { recursive: true });
     writeFileSync(path.join(settingsDir, 'claudian-settings.json'), JSON.stringify({
@@ -57,7 +57,7 @@ describe('daemon headless plugin', () => {
     try {
       await expect(ProviderWorkspaceRegistry.initializeAll(handle.plugin))
         .resolves.toBeUndefined();
-      expect(mockDiscoverModels).toHaveBeenCalledTimes(1);
+      expect(mockDiscoverModels).not.toHaveBeenCalled();
     } finally {
       handle.dispose();
     }

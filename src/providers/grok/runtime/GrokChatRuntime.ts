@@ -224,7 +224,7 @@ export class GrokChatRuntime implements ChatRuntime {
   async reloadMcpServers(): Promise<void> {}
 
   async ensureReady(options?: ChatRuntimeEnsureReadyOptions): Promise<boolean> {
-    const cliPath = this.plugin.getResolvedProviderCliPath('grok');
+    const cliPath = await this.plugin.getResolvedProviderCliPath('grok');
     if (!cliPath) {
       this.setReady(false);
       return false;

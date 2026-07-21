@@ -17,7 +17,7 @@ class GrokAuxQueryRunner implements AuxQueryRunner {
   constructor(private readonly plugin: ProviderHost) {}
 
   async query(config: AuxQueryConfig, prompt: string): Promise<string> {
-    const cliPath = this.plugin.getResolvedProviderCliPath('grok');
+    const cliPath = await this.plugin.getResolvedProviderCliPath('grok');
     if (!cliPath) {
       throw new Error('Grok CLI not found. Install Grok Build or set the Grok CLI path in Claudian settings.');
     }

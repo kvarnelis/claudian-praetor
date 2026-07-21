@@ -8,6 +8,10 @@ import { grokChatUIConfig } from '../ui/GrokChatUIConfig';
 // registration can import it without dragging the Node-heavy Grok runtime,
 // history, and settings-tab modules into the mobile bundle graph.
 export const grokSettingsReconciler: ProviderSettingsReconciler = {
+  invalidateConversationSessions(_conversations: Conversation[]): Conversation[] {
+    return [];
+  },
+
   reconcileModelWithEnvironment(
     settings: Record<string, unknown>,
   ): { changed: boolean; invalidatedConversations: Conversation[] } {

@@ -4,30 +4,6 @@ import { Platform, Scope } from 'obsidian';
 import { ClaudianView } from '@/features/chat/ClaudianView';
 
 const MockScope = Scope as typeof Scope & { instances: Scope[] };
-const originalNavigator = globalThis.navigator;
-
-describe('ClaudianView appearance', () => {
-  it('adds the theme-native modifier when the setting is enabled', () => {
-    const view = Object.create(ClaudianView.prototype) as any;
-    view.plugin = { settings: { useThemeNativeAppearance: true } };
-    view.viewContainerEl = createMockEl();
-
-    view.refreshAppearance();
-
-    expect(view.viewContainerEl.hasClass('claudian-container--theme-native')).toBe(true);
-  });
-
-  it('removes the theme-native modifier when the setting is disabled', () => {
-    const view = Object.create(ClaudianView.prototype) as any;
-    view.plugin = { settings: { useThemeNativeAppearance: false } };
-    view.viewContainerEl = createMockEl();
-    view.viewContainerEl.addClass('claudian-container--theme-native');
-
-    view.refreshAppearance();
-
-    expect(view.viewContainerEl.hasClass('claudian-container--theme-native')).toBe(false);
-  });
-});
 
 function createViewHarness(options: {
   canCreateTab: boolean;
@@ -47,7 +23,6 @@ function createViewHarness(options: {
     getTabCount: jest.fn().mockReturnValue(options.tabCount ?? 1),
   };
   view.tabBarContainerEl = createMockEl();
-  view.logoEl = createMockEl();
   view.newTabButtonEl = newTabButtonEl;
 
   return { newTabButtonEl, view };
@@ -199,6 +174,44 @@ describe('ClaudianView tab controls', () => {
     expect(historyDropdown.hasClass('visible')).toBe(false);
   });
 
+  it('defers hidden history rendering and coalesces invalidations until the dropdown opens', () => {
+    const historyDropdown = createMockEl();
+    const renderHistoryDropdown = jest.fn();
+    const view = Object.create(ClaudianView.prototype) as any;
+
+    view.historyDropdown = historyDropdown;
+    view.historyDropdownDirty = true;
+    view.historyDropdownRendered = false;
+    view.tabManager = {
+      getActiveTab: jest.fn().mockReturnValue({
+        controllers: {
+          conversationController: { renderHistoryDropdown },
+        },
+      }),
+    };
+
+    view.updateHistoryDropdown();
+    view.updateHistoryDropdown();
+
+    expect(renderHistoryDropdown).not.toHaveBeenCalled();
+
+    view.toggleHistoryDropdown();
+
+    expect(renderHistoryDropdown).toHaveBeenCalledTimes(1);
+    const firstRenderSignal = renderHistoryDropdown.mock.calls[0][1].signal as AbortSignal;
+    expect(firstRenderSignal.aborted).toBe(false);
+
+    view.updateHistoryDropdown();
+
+    expect(renderHistoryDropdown).toHaveBeenCalledTimes(2);
+
+    view.toggleHistoryDropdown();
+    expect(firstRenderSignal.aborted).toBe(true);
+    view.updateHistoryDropdown();
+
+    expect(renderHistoryDropdown).toHaveBeenCalledTimes(2);
+  });
+
   it('persists expanded title tab ids with the tab layout snapshot', () => {
     const view = Object.create(ClaudianView.prototype) as any;
 
@@ -256,85 +269,89 @@ describe('ClaudianView tab controls', () => {
   });
 });
 
-describe('ClaudianView copy last interaction', () => {
-  afterEach(() => {
-    jest.useRealTimers();
-    Object.defineProperty(globalThis, 'navigator', {
-      value: originalNavigator,
-      writable: true,
-      configurable: true,
-    });
-  });
+describe('ClaudianView composer input', () => {
+  function createComposerHarness(existingContent: string): {
+    inputEl: HTMLTextAreaElement;
+    inputHandler: jest.Mock;
+    view: any;
+  } {
+    const inputEl = createMockEl('textarea') as unknown as HTMLTextAreaElement;
+    const inputHandler = jest.fn();
+    inputEl.value = existingContent;
+    inputEl.selectionStart = 0;
+    inputEl.selectionEnd = 0;
+    inputEl.focus = jest.fn();
+    inputEl.addEventListener('input', inputHandler);
 
-  it('copies a payload built from the active tab message model', async () => {
-    const writeText = jest.fn().mockResolvedValue(undefined);
-    Object.defineProperty(globalThis, 'navigator', {
-      value: { clipboard: { writeText } },
-      writable: true,
-      configurable: true,
-    });
     const view = Object.create(ClaudianView.prototype) as any;
     view.tabManager = {
-      getActiveTab: jest.fn().mockReturnValue({
-        state: {
-          messages: [
-            { id: '1', role: 'user', content: 'Prompt', timestamp: 1 },
-            { id: '2', role: 'assistant', content: 'Response', timestamp: 2 },
-          ],
-        },
-      }),
+      getActiveTab: jest.fn().mockReturnValue({ dom: { inputEl } }),
     };
 
-    await expect(view.copyLastInteraction()).resolves.toBe(true);
-    expect(writeText).toHaveBeenCalledWith(
-      '## Prompt\n\nPrompt\n\n## Response\n\nResponse',
-    );
+    return { inputEl, inputHandler, view };
+  }
+
+  it('appends text after existing composer content', () => {
+    const { inputEl, inputHandler, view } = createComposerHarness('Review this note');
+
+    const appended = view.appendToActiveInput('@projects/plan.md ');
+
+    expect(appended).toBe(true);
+    expect(inputEl.value).toBe('Review this note @projects/plan.md ');
+    expect(inputEl.selectionStart).toBe(inputEl.value.length);
+    expect(inputEl.selectionEnd).toBe(inputEl.value.length);
+    expect(inputHandler).toHaveBeenCalledTimes(1);
+    expect(inputEl.focus).toHaveBeenCalledTimes(1);
   });
 
-  it('does not touch the clipboard when there is no completed interaction', async () => {
-    const writeText = jest.fn().mockResolvedValue(undefined);
-    Object.defineProperty(globalThis, 'navigator', {
-      value: { clipboard: { writeText } },
-      writable: true,
-      configurable: true,
-    });
+  it('does not add another separator when existing content ends in whitespace', () => {
+    const { inputEl, view } = createComposerHarness('Review this note\n');
+
+    view.appendToActiveInput('@projects/plan.md ');
+
+    expect(inputEl.value).toBe('Review this note\n@projects/plan.md ');
+  });
+
+  it('returns false when there is no active composer', () => {
     const view = Object.create(ClaudianView.prototype) as any;
     view.tabManager = {
-      getActiveTab: jest.fn().mockReturnValue({
-        state: {
-          messages: [
-            { id: '1', role: 'user', content: 'Unanswered', timestamp: 1 },
-          ],
-        },
-      }),
+      getActiveTab: jest.fn().mockReturnValue(null),
     };
 
-    await expect(view.copyLastInteraction()).resolves.toBe(false);
-    expect(writeText).not.toHaveBeenCalled();
+    expect(view.appendToActiveInput('@projects/plan.md ')).toBe(false);
   });
+});
 
-  it('shows transient feedback from the input navigation button', async () => {
-    jest.useFakeTimers();
+describe('ClaudianView shutdown', () => {
+  it('disposes view resources when the final tab-state flush fails', async () => {
+    const error = new Error('disk full');
     const view = Object.create(ClaudianView.prototype) as any;
-    view.containerEl = createMockEl();
-    view.containerEl.ownerDocument.createDocumentFragment = () => createMockEl();
-    view.copyLastInteraction = jest.fn().mockResolvedValue(true);
+    const destroy = jest.fn().mockResolvedValue(undefined);
+    const tabBarDestroy = jest.fn();
+    const persistenceDispose = jest.fn();
 
-    const navRowContent = view.buildNavRowContent();
-    const copyBtn = navRowContent.querySelector('.claudian-copy-last-interaction-btn');
+    Object.assign(view, {
+      cancelHistoryRendering: jest.fn(),
+      eventRefs: [],
+      mentionCacheCoordinator: {},
+      pendingTabBarUpdate: null,
+      persistTabStateImmediate: jest.fn().mockRejectedValue(error),
+      plugin: { app: { vault: { offref: jest.fn() } } },
+      restoreActiveInputToTabContent: jest.fn(),
+      scope: {},
+      tabBar: { destroy: tabBarDestroy },
+      tabManager: { destroy },
+      tabStatePersistence: { dispose: persistenceDispose },
+    });
 
-    expect(copyBtn).not.toBeNull();
-    expect(copyBtn.getAttribute('aria-label')).toBe('Copy last interaction');
+    await expect(view.onClose()).resolves.toBeUndefined();
 
-    copyBtn.click();
-    await Promise.resolve();
-
-    expect(view.copyLastInteraction).toHaveBeenCalledTimes(1);
-    expect(copyBtn.textContent).toBe('Copied!');
-    expect(copyBtn.hasClass('copied')).toBe(true);
-
-    jest.advanceTimersByTime(1500);
-    expect(copyBtn.hasClass('copied')).toBe(false);
+    expect(persistenceDispose).toHaveBeenCalledTimes(1);
+    expect(view.restoreActiveInputToTabContent).toHaveBeenCalledTimes(1);
+    expect(destroy).toHaveBeenCalledTimes(1);
+    expect(tabBarDestroy).toHaveBeenCalledTimes(1);
+    expect(view.tabManager).toBeNull();
+    expect(view.scope).toBeNull();
   });
 });
 

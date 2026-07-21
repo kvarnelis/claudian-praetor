@@ -6,11 +6,7 @@ import { Notice } from 'obsidian';
 import type { McpServerManager } from '@/core/mcp/McpServerManager';
 import type ClaudianPlugin from '@/main';
 import * as historyStore from '@/providers/claude/history/ClaudeHistoryStore';
-import {
-  clearCliModelCatalog,
-  getCliModelOptions,
-  setCliModelCatalog,
-} from '@/providers/claude/modelCatalog';
+import * as sdkLoader from '@/providers/claude/loadClaudeAgentSdk';
 import { ClaudianService } from '@/providers/claude/runtime/ClaudeChatRuntime';
 import { MessageChannel } from '@/providers/claude/runtime/ClaudeMessageChannel';
 import { createResponseHandler } from '@/providers/claude/runtime/types';
@@ -75,6 +71,7 @@ describe('ClaudianService', () => {
 
     mockMcpManager = {
       loadServers: jest.fn().mockResolvedValue(undefined),
+      ensureLoaded: jest.fn().mockResolvedValue(undefined),
       getAllDisallowedMcpTools: jest.fn().mockReturnValue([]),
       getActiveServers: jest.fn().mockReturnValue({}),
       getDisallowedMcpTools: jest.fn().mockReturnValue([]),
@@ -86,6 +83,12 @@ describe('ClaudianService', () => {
   });
 
   describe('prepareTurn', () => {
+    it('loads MCP configuration before the first turn is encoded', async () => {
+      await service.prepareForTurn();
+
+      expect(mockMcpManager.ensureLoaded).toHaveBeenCalledTimes(1);
+    });
+
     it('should return PreparedChatTurn with encoded prompt', () => {
       const result = service.prepareTurn({ text: 'hello world' });
       expect(result.request.text).toBe('hello world');
@@ -966,89 +969,6 @@ describe('ClaudianService', () => {
       }]);
       expect(staleCommands).toEqual(activeCommands);
       expect((service as any).cachedSdkCommands).toEqual(activeCommands);
-    });
-  });
-
-  describe('CLI Model Catalog (Supported Models)', () => {
-    afterEach(() => {
-      clearCliModelCatalog();
-    });
-
-    it('should populate the CLI model catalog from the SDK', async () => {
-      const mockModels = [
-        { value: 'opus', displayName: 'Opus', description: 'Opus 4.8 · Best for everyday, complex tasks' },
-        { value: 'claude-fable-5[1m]', displayName: 'Fable', description: 'Fable 5 · Most capable' },
-      ];
-      const mockQuery = {
-        supportedModels: jest.fn().mockResolvedValue(mockModels),
-      };
-      (service as any).persistentQuery = mockQuery;
-
-      await (service as any).fetchAndCacheModels(mockQuery);
-
-      expect(mockQuery.supportedModels).toHaveBeenCalled();
-      expect(getCliModelOptions()?.map((o) => o.value)).toEqual([
-        'claude-fable-5[1m]',
-        'opus',
-        'opus[1m]',
-      ]);
-    });
-
-    it('should keep the previous catalog on SDK error', async () => {
-      setCliModelCatalog([
-        { value: 'opus', displayName: 'Opus', description: 'Opus 4.8' },
-      ]);
-      const mockQuery = {
-        supportedModels: jest.fn().mockRejectedValue(new Error('SDK error')),
-      };
-      (service as any).persistentQuery = mockQuery;
-
-      await (service as any).fetchAndCacheModels(mockQuery);
-
-      expect(getCliModelOptions()?.map((o) => o.value)).toEqual(['opus', 'opus[1m]']);
-    });
-
-    it('should keep the previous catalog when the SDK reports no models', async () => {
-      setCliModelCatalog([
-        { value: 'opus', displayName: 'Opus', description: 'Opus 4.8' },
-      ]);
-      const mockQuery = {
-        supportedModels: jest.fn().mockResolvedValue([]),
-      };
-      (service as any).persistentQuery = mockQuery;
-
-      await (service as any).fetchAndCacheModels(mockQuery);
-
-      expect(getCliModelOptions()?.map((o) => o.value)).toEqual(['opus', 'opus[1m]']);
-    });
-
-    it('should ignore late supportedModels results from a stale query', async () => {
-      let resolveStaleModels!: (models: Array<{ value: string; displayName: string; description: string }>) => void;
-      const staleModelsPromise = new Promise<Array<{ value: string; displayName: string; description: string }>>((resolve) => {
-        resolveStaleModels = resolve;
-      });
-
-      const staleQuery = {
-        supportedModels: jest.fn().mockReturnValue(staleModelsPromise),
-      };
-      const activeQuery = {
-        supportedModels: jest.fn().mockResolvedValue([
-          { value: 'sonnet', displayName: 'Sonnet', description: 'Sonnet 4.6' },
-        ]),
-      };
-
-      (service as any).persistentQuery = staleQuery;
-      const staleFetch = (service as any).fetchAndCacheModels(staleQuery);
-
-      (service as any).persistentQuery = activeQuery;
-      await (service as any).fetchAndCacheModels(activeQuery);
-
-      resolveStaleModels([
-        { value: 'haiku', displayName: 'Haiku', description: 'Haiku 4.5' },
-      ]);
-      await staleFetch;
-
-      expect(getCliModelOptions()?.map((o) => o.value)).toEqual(['sonnet', 'sonnet[1m]']);
     });
   });
 
@@ -2263,6 +2183,45 @@ describe('ClaudianService', () => {
       await (service as any).startPersistentQuery('/vault', '/cli', 'session');
 
       expect(buildOptsSpy).not.toHaveBeenCalled();
+    });
+
+    it('does not finish starting after cleanup while the SDK is loading', async () => {
+      let resolveQuery!: (query: typeof sdkModule.query) => void;
+      const loadingQuery = new Promise<typeof sdkModule.query>((resolve) => {
+        resolveQuery = resolve;
+      });
+      const loaderSpy = jest.spyOn(sdkLoader, 'loadClaudeAgentQuery').mockReturnValue(loadingQuery);
+
+      const startPromise = (service as any).startPersistentQuery('/vault', '/cli', 'session');
+      service.cleanup();
+      resolveQuery(sdkMock.query);
+      await startPromise;
+      loaderSpy.mockRestore();
+
+      expect((service as any).persistentQuery).toBeNull();
+      expect((service as any).messageChannel).toBeNull();
+    });
+  });
+
+  describe('cold-start query guard', () => {
+    it('does not start a query after cleanup while the SDK is loading', async () => {
+      let resolveQuery!: (query: typeof sdkModule.query) => void;
+      const loadingQuery = new Promise<typeof sdkModule.query>((resolve) => {
+        resolveQuery = resolve;
+      });
+      const loaderSpy = jest.spyOn(sdkLoader, 'loadClaudeAgentQuery').mockReturnValue(loadingQuery);
+      const agentQuery = jest.fn() as unknown as typeof sdkModule.query;
+      (service as any).abortController = new AbortController();
+
+      const generator = (service as any).queryViaSDK('prompt', '/vault', '/cli');
+      const firstChunk = generator.next();
+      await Promise.resolve();
+      service.cleanup();
+      resolveQuery(agentQuery);
+      await firstChunk;
+      loaderSpy.mockRestore();
+
+      expect(agentQuery).not.toHaveBeenCalled();
     });
   });
 

@@ -21,6 +21,7 @@ import {
   TOOL_ASK_USER_QUESTION,
   TOOL_TASK,
   TOOL_TODO_WRITE,
+  TOOL_WRITE_STDIN,
   TOOL_WRITE,
 } from '../../../core/tools/toolNames';
 import { extractToolResultContent } from '../../../core/tools/toolResultContent';
@@ -107,6 +108,18 @@ export class StreamController {
 
   private getSubagentLifecycleAdapter(toolName?: string): ProviderSubagentLifecycleAdapter | null {
     return resolveSubagentLifecycleAdapter(this.getActiveProviderId(), toolName);
+  }
+
+  private shouldRenderToolCall(toolCall: ToolCallInfo): boolean {
+    if (this.getActiveProviderId() !== 'codex') return true;
+    if (toolCall.status === 'error' || toolCall.status === 'blocked') return true;
+    if (isEditTool(toolCall.name)) return true;
+    if (toolCall.name === TOOL_APPLY_PATCH) return true;
+    if (toolCall.name === TOOL_ASK_USER_QUESTION) return true;
+    if (toolCall.name === TOOL_WRITE_STDIN) return true;
+    if (isSubagentToolName(toolCall.name)) return true;
+    if (this.getSubagentLifecycleAdapter(toolCall.name)?.isSpawnTool(toolCall.name)) return true;
+    return false;
   }
 
   private normalizeToolResultContent(content: unknown): string {
@@ -418,6 +431,10 @@ export class StreamController {
 
     const { toolCall, parentEl } = pending;
     if (!parentEl) return;
+    if (!this.shouldRenderToolCall(toolCall)) {
+      state.pendingTools.delete(toolId);
+      return;
+    }
     if (isWriteEditTool(toolCall.name)) {
       const writeEditState = createWriteEditBlock(parentEl, toolCall, {
         initiallyExpanded: this.shouldExpandFileEditsByDefault(),
@@ -852,6 +869,15 @@ export class StreamController {
     await this.flushPendingThinkingRender();
 
     const thinkingState = state.currentThinkingState;
+    if (!thinkingState.content.trim()) {
+      if (thinkingState.timerInterval) {
+        window.clearInterval(thinkingState.timerInterval);
+      }
+      thinkingState.wrapperEl?.remove();
+      state.currentThinkingState = null;
+      return;
+    }
+
     if (this.getStreamingRenderOptions(thinkingState.content)) {
       await renderer.renderContent(thinkingState.contentEl, thinkingState.content);
     }

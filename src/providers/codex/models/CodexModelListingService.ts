@@ -72,7 +72,7 @@ export class CodexModelListingService implements CodexModelListProvider {
   }
 
   private async fetchModels(): Promise<CodexAppServerModel[]> {
-    const launchSpec = resolveCodexAppServerLaunchSpec(this.plugin, 'codex');
+    const launchSpec = await resolveCodexAppServerLaunchSpec(this.plugin, 'codex');
     const process = new CodexAppServerProcess(launchSpec);
     process.start();
 

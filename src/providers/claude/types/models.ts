@@ -2,7 +2,10 @@
  * Model type definitions and constants.
  */
 
-import { DEFAULT_REASONING_VALUE } from '../../../core/providers/reasoning';
+import {
+  DEFAULT_REASONING_VALUE,
+  formatReasoningValueLabel,
+} from '../../../core/providers/reasoning';
 import { getCliEffortLevels } from '../modelCatalog';
 import { toClaudeRuntimeModelId } from '../modelSelection';
 import {
@@ -27,13 +30,13 @@ export const DEFAULT_CLAUDE_MODELS: { value: ClaudeModel; label: string; descrip
 /** Effort levels for adaptive thinking models. */
 export type EffortLevel = 'low' | 'medium' | 'high' | 'xhigh' | 'max';
 
-export const EFFORT_LEVELS: { value: EffortLevel; label: string }[] = [
-  { value: 'low', label: 'Low' },
-  { value: 'medium', label: 'Med' },
-  { value: 'high', label: 'High' },
-  { value: 'xhigh', label: 'XHigh' },
-  { value: 'max', label: 'Max' },
-];
+const EFFORT_LEVEL_VALUES: EffortLevel[] = ['low', 'medium', 'high', 'xhigh', 'max'];
+
+export const EFFORT_LEVELS: { value: EffortLevel; label: string }[] =
+  EFFORT_LEVEL_VALUES.map(value => ({
+    value,
+    label: formatReasoningValueLabel(value),
+  }));
 
 /** Default effort level per model tier. */
 export const DEFAULT_EFFORT_LEVEL: Record<string, EffortLevel> = Object.fromEntries(
@@ -107,8 +110,9 @@ export function isDefaultClaudeModel(model: string): boolean {
 
 /**
  * Whether the model supports the `xhigh` effort level. CLI-reported effort
- * levels win when available; the static fallback covers Opus 4.7+, Sonnet 5+,
- * and Fable. The SDK silently falls back to `high` on other models.
+ * levels win when available. Known Claude models then use their versioned
+ * capability boundary; opaque custom models are assumed to support it because
+ * their gateway capabilities cannot be inferred locally.
  */
 export function supportsXHighEffort(model: string): boolean {
   const normalized = normalizeModelId(model);
@@ -124,7 +128,7 @@ export function supportsXHighEffort(model: string): boolean {
 
   const versionedModel = parseVersionedClaudeModel(normalized);
   if (!versionedModel) {
-    return false;
+    return true;
   }
   const definition = getClaudeModelTierDefinition(versionedModel.tier);
   return isVersionAtLeast(

@@ -137,11 +137,11 @@ export async function createHeadlessPlugin(options: {
     mutateSettingsConditionally: (
       mutation: ConditionalSettingsMutation<ClaudianSettings>,
     ): Promise<void> => settingsCoordinator.mutateConditionally(mutation),
-    getResolvedProviderCliPath: (
+    getResolvedProviderCliPath: async (
       providerId: ProviderId,
       context?: ProviderCliResolutionContext,
-    ): string | null =>
-      ProviderWorkspaceRegistry.getCliResolver(providerId)?.resolveFromSettings(
+    ): Promise<string | null> =>
+      await ProviderWorkspaceRegistry.getCliResolver(providerId)?.resolveFromSettings(
         settings as unknown as Record<string, unknown>,
         context,
       ) ?? null,
