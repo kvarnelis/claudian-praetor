@@ -184,31 +184,31 @@ export class TabManager implements TabManagerInterface {
         ? undefined
         : (activeTab ? getTabProviderId(activeTab, this.plugin) : undefined);
 
-      const tab = createTab({
-        plugin: this.plugin,
-        containerEl: this.containerEl,
-        conversation: conversation ?? undefined,
-        tabId,
-        ...(typeof draftModel === 'string' ? { draftModel } : {}),
-        defaultProviderId,
-        onStreamingChanged: (isStreaming) => {
-          this.callbacks.onTabStreamingChanged?.(tab.id, isStreaming);
-        },
-        onTitleChanged: (title) => {
-          this.callbacks.onTabTitleChanged?.(tab.id, title);
-        },
-        onAttentionChanged: (needsAttention) => {
-          this.callbacks.onTabAttentionChanged?.(tab.id, needsAttention);
-        },
-        onConversationIdChanged: (conversationId) => {
-          // Sync tab.conversationId when conversation is lazily created
-          tab.conversationId = conversationId;
-          this.callbacks.onTabConversationChanged?.(tab.id, conversationId);
-        },
-      });
+      const tab = StartupProfiler.run('tab-dom-create', () => createTab({
+          plugin: this.plugin,
+          containerEl: this.containerEl,
+          conversation: conversation ?? undefined,
+          tabId,
+          ...(typeof draftModel === 'string' ? { draftModel } : {}),
+          defaultProviderId,
+          onStreamingChanged: (isStreaming) => {
+            this.callbacks.onTabStreamingChanged?.(tab.id, isStreaming);
+          },
+          onTitleChanged: (title) => {
+            this.callbacks.onTabTitleChanged?.(tab.id, title);
+          },
+          onAttentionChanged: (needsAttention) => {
+            this.callbacks.onTabAttentionChanged?.(tab.id, needsAttention);
+          },
+          onConversationIdChanged: (conversationId) => {
+            // Sync tab.conversationId when conversation is lazily created
+            tab.conversationId = conversationId;
+            this.callbacks.onTabConversationChanged?.(tab.id, conversationId);
+          },
+        }));
 
       // Initialize UI components with provider catalog
-      initializeTabUI(tab, this.plugin, {
+      StartupProfiler.run('tab-ui-init', () => initializeTabUI(tab, this.plugin, {
         getProviderCatalogConfig: () => this.getProviderCatalogConfig(tab),
         onProviderChanged: (providerId) => {
           this.callbacks.onTabProviderChanged?.(tab.id, providerId);
@@ -217,19 +217,19 @@ export class TabManager implements TabManagerInterface {
               // Provider selection remains usable even when optional workspace services fail.
             });
         },
-      });
+      }));
 
-      initializeTabControllers(
+      StartupProfiler.run('tab-controllers-init', () => initializeTabControllers(
         tab,
         this.plugin,
         this.view,
         (forkContext) => this.handleForkRequest(forkContext),
         (conversationId) => this.openConversation(conversationId),
         () => this.getProviderCatalogConfig(tab),
-      );
+      ));
 
       // Wire input event handlers
-      wireTabInputEvents(tab, this.plugin);
+      StartupProfiler.run('tab-input-wire', () => wireTabInputEvents(tab, this.plugin));
 
       this.tabs.set(tab.id, tab);
       this.pendingTabCreations -= 1;
@@ -286,21 +286,54 @@ export class TabManager implements TabManagerInterface {
       if (needsHydration) {
         tab.hydrationState = 'loading';
         this.renderTabHydrationState(tab);
-        await this.waitForTabPaint(tab);
+        await StartupProfiler.runAsync('hydration-shell-paint', () => this.waitForTabPaint(tab));
         if (!this.isTabAlive(tab)) return;
       }
 
       try {
-        if (!await this.ensureTabWorkspaceServices(tab, providerId, 'tab-activation')) {
+        const workspaceReady = await StartupProfiler.runAsync(
+          'hydration-workspace-services',
+          () => this.ensureTabWorkspaceServices(tab, providerId, 'tab-activation'),
+        );
+        if (!workspaceReady) {
           return;
         }
 
         // Load conversation if not already loaded
         if (needsHydration && tab.conversationId) {
+          const conversationId = tab.conversationId;
           const span = this.profiledFirstHydration ? null : StartupProfiler.start('active-hydration');
           this.profiledFirstHydration = true;
           try {
-            await tab.controllers.conversationController?.switchTo(tab.conversationId);
+            await StartupProfiler.runAsync(
+              'hydration-conversation-switch',
+              async () => tab.controllers.conversationController?.switchTo(conversationId),
+            );
+            // Include the first rendered frame in the startup span. Conversation
+            // restoration schedules Markdown/DOM work synchronously, but the
+            // user does not see the result until the browser paints it.
+            await StartupProfiler.runAsync(
+              'hydration-content-paint',
+              () => this.waitForTabPaint(tab),
+            );
+            StartupProfiler.recordCount(
+              'restored-message-dom-count',
+              tab.dom.messagesEl.querySelectorAll('.claudian-message').length,
+            );
+            const thinkingPanelCount = tab.dom.messagesEl
+              .querySelectorAll('.claudian-thinking-block').length;
+            StartupProfiler.recordCount('restored-thinking-panel-count', thinkingPanelCount);
+            StartupProfiler.recordCount('deferred-thinking-markdown-count', thinkingPanelCount);
+            StartupProfiler.recordCount(
+              'restored-text-block-count',
+              tab.dom.messagesEl.querySelectorAll('.claudian-text-block').length,
+            );
+            StartupProfiler.recordCount(
+              'restored-visible-tool-row-count',
+              tab.dom.messagesEl.querySelectorAll('.claudian-tool-call').length
+                + tab.dom.messagesEl.querySelectorAll('.claudian-write-edit-block').length
+                + tab.dom.messagesEl.querySelectorAll('.claudian-subagent-list').length,
+            );
           } finally {
             if (span) {
               StartupProfiler.finish(span);
@@ -749,10 +782,13 @@ export class TabManager implements TabManagerInterface {
       // Create tabs from persisted state with error handling.
       for (const tabState of state.openTabs) {
         try {
-          await this.createTab(tabState.conversationId, tabState.tabId, {
-            activate: false,
-            ...(typeof tabState.draftModel === 'string' ? { draftModel: tabState.draftModel } : {}),
-          });
+          await StartupProfiler.runAsync(
+            'restored-tab-create',
+            () => this.createTab(tabState.conversationId, tabState.tabId, {
+              activate: false,
+              ...(typeof tabState.draftModel === 'string' ? { draftModel: tabState.draftModel } : {}),
+            }),
+          );
         } catch {
           // Continue restoring other tabs
         }

@@ -624,6 +624,150 @@ describe('MessageRenderer', () => {
     expect(renderContentSpy).toHaveBeenCalledWith(expect.anything(), 'Real content');
   });
 
+  it('coalesces stored Codex thinking separated only by hidden tools', () => {
+    const messagesEl = createMockEl();
+    const { renderer } = createRenderer(messagesEl, 'codex');
+
+    const msg: ChatMessage = {
+      id: 'm-codex-thinking',
+      role: 'assistant',
+      content: '',
+      timestamp: Date.now(),
+      toolCalls: [
+        {
+          id: 'bash-1',
+          name: 'Bash',
+          input: { command: 'rg pattern' },
+          status: 'completed',
+        } as any,
+      ],
+      contentBlocks: [
+        { type: 'thinking', content: 'Inspecting the history.', durationSeconds: 1 } as any,
+        { type: 'tool_use', toolId: 'bash-1' } as any,
+        { type: 'thinking', content: 'Tracing the renderer.', durationSeconds: 2 } as any,
+        { type: 'text', content: 'Found it.' } as any,
+      ],
+    };
+
+    renderer.renderStoredMessage(msg);
+
+    expect(renderStoredThinkingBlock).toHaveBeenCalledTimes(1);
+    expect(renderStoredThinkingBlock).toHaveBeenCalledWith(
+      expect.anything(),
+      'Inspecting the history.\n\nTracing the renderer.',
+      3,
+      expect.any(Function),
+    );
+    expect(renderStoredToolCall).not.toHaveBeenCalled();
+  });
+
+  it('coalesces all stored Codex thinking while preserving visible tools', () => {
+    const messagesEl = createMockEl();
+    const { renderer } = createRenderer(messagesEl, 'codex');
+
+    const msg: ChatMessage = {
+      id: 'm-codex-visible-tool',
+      role: 'assistant',
+      content: '',
+      timestamp: Date.now(),
+      toolCalls: [
+        {
+          id: 'edit-1',
+          name: 'Edit',
+          input: { file_path: 'src/main.ts' },
+          status: 'completed',
+        } as any,
+      ],
+      contentBlocks: [
+        { type: 'thinking', content: 'Preparing the edit.' } as any,
+        { type: 'tool_use', toolId: 'edit-1' } as any,
+        { type: 'thinking', content: 'Checking the result.' } as any,
+      ],
+    };
+
+    renderer.renderStoredMessage(msg);
+
+    expect(renderStoredThinkingBlock).toHaveBeenCalledTimes(1);
+    expect(renderStoredThinkingBlock).toHaveBeenCalledWith(
+      expect.anything(),
+      'Preparing the edit.\n\nChecking the result.',
+      undefined,
+      expect.any(Function),
+    );
+    expect(renderStoredWriteEdit).toHaveBeenCalledTimes(1);
+  });
+
+  it('coalesces stored Codex text separated by hidden tools and thinking', () => {
+    const messagesEl = createMockEl();
+    const { renderer } = createRenderer(messagesEl, 'codex');
+    const renderContentSpy = jest.spyOn(renderer, 'renderContent').mockResolvedValue(undefined);
+
+    const msg: ChatMessage = {
+      id: 'm-codex-text',
+      role: 'assistant',
+      content: 'First update.\n\nSecond update.',
+      timestamp: Date.now(),
+      toolCalls: [
+        {
+          id: 'bash-1',
+          name: 'Bash',
+          input: { command: 'rg pattern' },
+          status: 'completed',
+        } as any,
+      ],
+      contentBlocks: [
+        { type: 'text', content: 'First update.' } as any,
+        { type: 'tool_use', toolId: 'bash-1' } as any,
+        { type: 'thinking', content: 'Checking.' } as any,
+        { type: 'text', content: 'Second update.' } as any,
+      ],
+    };
+
+    renderer.renderStoredMessage(msg);
+
+    expect(renderContentSpy).toHaveBeenCalledTimes(1);
+    expect(renderContentSpy).toHaveBeenCalledWith(
+      expect.anything(),
+      'First update.\n\nSecond update.',
+    );
+  });
+
+  it('keeps large restored Codex tool loops to one thinking and one text render', () => {
+    const messagesEl = createMockEl();
+    const { renderer } = createRenderer(messagesEl, 'codex');
+    const renderContentSpy = jest.spyOn(renderer, 'renderContent').mockResolvedValue(undefined);
+    const toolCalls = Array.from({ length: 68 }, (_, index) => ({
+      id: `bash-${index}`,
+      name: 'Bash',
+      input: { command: `command ${index}` },
+      status: 'completed',
+    })) as any;
+    const contentBlocks: NonNullable<ChatMessage['contentBlocks']> = [];
+
+    for (let index = 0; index < 68; index += 1) {
+      if (index < 56) {
+        contentBlocks.push({ type: 'thinking', content: `Thought ${index}` });
+      }
+      contentBlocks.push({ type: 'tool_use', toolId: `bash-${index}` });
+      if (index < 17) {
+        contentBlocks.push({ type: 'text', content: `Update ${index}` });
+      }
+    }
+
+    renderer.renderStoredMessage({
+      id: 'm-codex-large-loop',
+      role: 'assistant',
+      content: '',
+      timestamp: Date.now(),
+      toolCalls,
+      contentBlocks,
+    });
+
+    expect(renderStoredThinkingBlock).toHaveBeenCalledTimes(1);
+    expect(renderContentSpy).toHaveBeenCalledTimes(1);
+    expect(renderStoredToolCall).not.toHaveBeenCalled();
+  });
+
   it('does not render stored Codex write_stdin transport tools', () => {
     const messagesEl = createMockEl();
     const { renderer } = createRenderer(messagesEl, 'codex');

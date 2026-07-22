@@ -1,6 +1,7 @@
 import type { Component } from 'obsidian';
 import { Notice, Platform } from 'obsidian';
 
+import { StartupProfiler } from '../../../core/performance/StartupProfiler';
 import { getHiddenProviderCommandSet } from '../../../core/providers/commands/hiddenCommands';
 import type { ProviderCommandDropdownConfig } from '../../../core/providers/commands/ProviderCommandCatalog';
 import type { ProviderCommandEntry } from '../../../core/providers/commands/ProviderCommandEntry';
@@ -923,7 +924,7 @@ function initializeInputToolbar(
     };
   };
 
-  const toolbarComponents = createInputToolbar(inputToolbar, {
+  const toolbarComponents = StartupProfiler.run('tab-toolbar-components-create', () => createInputToolbar(inputToolbar, {
     getUIConfig: () => {
       if (tab.lifecycleState === 'blank') {
         return blankTabUIConfigProxy();
@@ -1067,7 +1068,7 @@ function initializeInputToolbar(
         mode === 'plan' && getTabCapabilities(tab, plugin).supportsPlanMode,
       );
     },
-  });
+  }));
 
   dom.eventCleanups.push(() => toolbarComponents.layoutController.destroy());
 
@@ -1080,7 +1081,9 @@ function initializeInputToolbar(
   tab.ui.permissionToggle = toolbarComponents.permissionToggle;
   tab.ui.serviceTierToggle = toolbarComponents.serviceTierToggle;
 
-  tab.ui.mcpServerSelector.setMcpManager(getProviderMcpManager(getTabProviderId(tab, plugin)));
+  StartupProfiler.run('tab-toolbar-mcp-manager', () => {
+    tab.ui.mcpServerSelector?.setMcpManager(getProviderMcpManager(getTabProviderId(tab, plugin)));
+  });
 
   // Sync @-mentions to UI selector
   tab.ui.fileContextManager?.setOnMcpMentionChange((servers) => {
@@ -1093,9 +1096,11 @@ function initializeInputToolbar(
   });
 
   // Initialize persistent paths
-  tab.ui.externalContextSelector.setPersistentPaths(
-    plugin.settings.persistentExternalContextPaths || []
-  );
+  StartupProfiler.run('tab-toolbar-persistent-paths', () => {
+    tab.ui.externalContextSelector?.setPersistentPaths(
+      plugin.settings.persistentExternalContextPaths || []
+    );
+  });
 
   // Wire persistence changes
   tab.ui.externalContextSelector.setOnPersistenceChange((paths) => {
@@ -1104,10 +1109,10 @@ function initializeInputToolbar(
     });
   });
 
-  refreshTabProviderUI(tab, plugin);
+  StartupProfiler.run('tab-toolbar-provider-ui-refresh', () => refreshTabProviderUI(tab, plugin));
 
   // Gate provider-specific UI elements
-  applyProviderUIGating(tab, plugin);
+  StartupProfiler.run('tab-toolbar-provider-ui-gating', () => applyProviderUIGating(tab, plugin));
 }
 
 export interface InitializeTabUIOptions {
@@ -1126,30 +1131,42 @@ export function initializeTabUI(
 ): void {
   const { dom, state } = tab;
 
-  tab.ui.contextTray = new ComposerContextTray(dom.contextRowEl, {
-    onDidChange: () => {
-      autoResizeTextarea(dom.inputEl);
-      tab.renderer?.scrollToBottomIfNeeded();
-    },
+  StartupProfiler.run('tab-ui-context-tray', () => {
+    tab.ui.contextTray = new ComposerContextTray(dom.contextRowEl, {
+      onDidChange: () => {
+        autoResizeTextarea(dom.inputEl);
+        tab.renderer?.scrollToBottomIfNeeded();
+      },
+    });
   });
-  initializeContextManagers(tab, plugin);
+  StartupProfiler.run('tab-ui-context-managers', () => initializeContextManagers(tab, plugin));
 
-  const catalogInfo = options.getProviderCatalogConfig?.() ?? null;
-  initializeSlashCommands(
+  const catalogInfo = StartupProfiler.run(
+    'tab-ui-provider-catalog-config',
+    () => options.getProviderCatalogConfig?.() ?? null,
+  );
+  StartupProfiler.run('tab-ui-slash-commands', () => initializeSlashCommands(
     tab,
     () => getTabHiddenCommands(tab, plugin),
     catalogInfo,
-  );
+  ));
 
   if (dom.messagesEl.parentElement) {
-    tab.ui.navigationSidebar = new NavigationSidebar(
-      dom.messagesEl.parentElement,
-      dom.messagesEl
-    );
+    StartupProfiler.run('tab-ui-navigation-sidebar', () => {
+      tab.ui.navigationSidebar = new NavigationSidebar(
+        dom.messagesEl.parentElement!,
+        dom.messagesEl
+      );
+    });
   }
 
-  initializeInstructionAndTodo(tab, plugin);
-  initializeInputToolbar(tab, plugin, options.getProviderCatalogConfig, options.onProviderChanged);
+  StartupProfiler.run('tab-ui-instruction-todo', () => initializeInstructionAndTodo(tab, plugin));
+  StartupProfiler.run('tab-ui-input-toolbar', () => initializeInputToolbar(
+    tab,
+    plugin,
+    options.getProviderCatalogConfig,
+    options.onProviderChanged,
+  ));
 
   state.callbacks = {
     ...state.callbacks,

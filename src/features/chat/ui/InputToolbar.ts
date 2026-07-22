@@ -3,6 +3,7 @@ import type * as osType from 'os';
 import type * as pathType from 'path';
 
 import type { McpServerManager } from '../../../core/mcp/McpServerManager';
+import { StartupProfiler } from '../../../core/performance/StartupProfiler';
 import type {
   ProviderCapabilities,
   ProviderChatUIConfig,
@@ -1372,15 +1373,42 @@ export function createInputToolbar(
   permissionToggle: PermissionToggle;
   serviceTierToggle: ServiceTierToggle;
 } {
-  const modelSelector = new ModelSelector(parentEl, callbacks);
-  const thinkingBudgetSelector = new ThinkingBudgetSelector(parentEl, callbacks);
-  const serviceTierToggle = new ServiceTierToggle(parentEl, callbacks);
-  const contextUsageMeter = new ContextUsageMeter(parentEl);
-  const externalContextSelector = new ExternalContextSelector(parentEl, callbacks);
-  const mcpServerSelector = new McpServerSelector(parentEl);
-  const permissionToggle = new PermissionToggle(parentEl, callbacks);
-  const modeSelector = new ModeSelector(parentEl, callbacks);
-  const layoutController = new InputToolbarLayoutController(parentEl);
+  const modelSelector = StartupProfiler.run(
+    'tab-toolbar-model-selector',
+    () => new ModelSelector(parentEl, callbacks),
+  );
+  const thinkingBudgetSelector = StartupProfiler.run(
+    'tab-toolbar-thinking-selector',
+    () => new ThinkingBudgetSelector(parentEl, callbacks),
+  );
+  const serviceTierToggle = StartupProfiler.run(
+    'tab-toolbar-service-tier',
+    () => new ServiceTierToggle(parentEl, callbacks),
+  );
+  const contextUsageMeter = StartupProfiler.run(
+    'tab-toolbar-usage-meter',
+    () => new ContextUsageMeter(parentEl),
+  );
+  const externalContextSelector = StartupProfiler.run(
+    'tab-toolbar-external-context',
+    () => new ExternalContextSelector(parentEl, callbacks),
+  );
+  const mcpServerSelector = StartupProfiler.run(
+    'tab-toolbar-mcp-selector',
+    () => new McpServerSelector(parentEl),
+  );
+  const permissionToggle = StartupProfiler.run(
+    'tab-toolbar-permission-toggle',
+    () => new PermissionToggle(parentEl, callbacks),
+  );
+  const modeSelector = StartupProfiler.run(
+    'tab-toolbar-mode-selector',
+    () => new ModeSelector(parentEl, callbacks),
+  );
+  const layoutController = StartupProfiler.run(
+    'tab-toolbar-layout-controller',
+    () => new InputToolbarLayoutController(parentEl),
+  );
 
   return {
     modelSelector,

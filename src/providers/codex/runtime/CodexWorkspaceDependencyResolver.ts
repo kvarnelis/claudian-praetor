@@ -333,7 +333,7 @@ export function formatCodexWorkspaceDependencies(
   ];
 
   if (dependencies.gitExecutable) {
-    lines.push(`- Git executable: \`${dependencies.gitExecutable}\``);
+    lines.push(`- Bundled Git executable: \`${dependencies.gitExecutable}\``);
   }
   lines.push(
     `- Node.js executable: \`${dependencies.nodeExecutable}\``,

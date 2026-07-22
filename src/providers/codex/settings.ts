@@ -353,6 +353,33 @@ function normalizeInstallationMethodsByHost(value: unknown): HostnameInstallatio
   return result;
 }
 
+// Host-scoped settings sync between devices, but a renderer without durable
+// localStorage can generate a new opaque device key on every launch. Bound the
+// maps so one broken client cannot make every settings read clone megabytes of
+// stale entries (and block toolbar construction on startup).
+const MAX_HOST_SCOPED_SETTING_ENTRIES = 32;
+
+function pruneHostScopedEntries<T extends string>(
+  entries: Record<string, T>,
+  priorityKeys: string[],
+): Record<string, T> {
+  const keys = Object.keys(entries);
+  if (keys.length <= MAX_HOST_SCOPED_SETTING_ENTRIES) {
+    return entries;
+  }
+
+  const retained = new Set(
+    priorityKeys.filter(key => key && hasOwnEntry(entries, key)),
+  );
+  for (let index = keys.length - 1; index >= 0 && retained.size < MAX_HOST_SCOPED_SETTING_ENTRIES; index--) {
+    retained.add(keys[index]);
+  }
+
+  return Object.fromEntries(
+    Object.entries(entries).filter(([key]) => retained.has(key)),
+  );
+}
+
 function hasOwnEntry<T>(entries: Record<string, T>, key: string): boolean {
   return Object.prototype.hasOwnProperty.call(entries, key);
 }
@@ -366,16 +393,26 @@ function getCodexStoredConfig(
   const normalizedCliPathsByHost = normalizeHostnameCliPaths(config.cliPathsByHost ?? settings.codexCliPathsByHost);
   const normalizedInstallationMethodsByHost = normalizeInstallationMethodsByHost(config.installationMethodsByHost);
   const normalizedWslDistroOverridesByHost = normalizeHostnameCliPaths(config.wslDistroOverridesByHost);
-  const cliPathsByHost = migrateLegacyHostnameKeyedMap(normalizedCliPathsByHost, hostnameKey, legacyHostnameKey);
-  const installationMethodsByHost = migrateLegacyHostnameKeyedMap(
-    normalizedInstallationMethodsByHost,
-    hostnameKey,
-    legacyHostnameKey,
+  const priorityKeys = [hostnameKey, legacyHostnameKey];
+  const cliPathsByHost = pruneHostScopedEntries(
+    migrateLegacyHostnameKeyedMap(normalizedCliPathsByHost, hostnameKey, legacyHostnameKey),
+    priorityKeys,
   );
-  const wslDistroOverridesByHost = migrateLegacyHostnameKeyedMap(
-    normalizedWslDistroOverridesByHost,
-    hostnameKey,
-    legacyHostnameKey,
+  const installationMethodsByHost = pruneHostScopedEntries(
+    migrateLegacyHostnameKeyedMap(
+      normalizedInstallationMethodsByHost,
+      hostnameKey,
+      legacyHostnameKey,
+    ),
+    priorityKeys,
+  );
+  const wslDistroOverridesByHost = pruneHostScopedEntries(
+    migrateLegacyHostnameKeyedMap(
+      normalizedWslDistroOverridesByHost,
+      hostnameKey,
+      legacyHostnameKey,
+    ),
+    priorityKeys,
   );
   const discoveredModels = normalizeCodexDiscoveredModels(config.discoveredModels);
   const visibleModels = normalizeCodexVisibleModels(config.visibleModels, discoveredModels);

@@ -9,7 +9,10 @@ import { fileURLToPath } from 'node:url';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const mainPath = path.join(root, 'main.js');
 const requiredArtifacts = ['main.js', 'manifest.json', 'styles.css'];
-const mainBudgetBytes = 2_800_000;
+// Praetor pins Claude Agent SDK 0.3.212, whose self-contained renderer-safe
+// bundle is ~388 KB larger than upstream's 0.3.209 bundle. Keep a hard ceiling
+// while measuring cold evaluation separately; bundle bytes are not a timing proxy.
+const mainBudgetBytes = 3_300_000;
 const evaluationIndicatorMs = 50;
 
 for (const relativePath of requiredArtifacts) {
@@ -41,9 +44,7 @@ if (unsupportedChunkReferences.length > 0) {
 }
 
 const mainBytes = statSync(mainPath).size;
-if (mainBytes > mainBudgetBytes) {
-  throw new Error(`main.js is ${mainBytes} bytes; budget is ${mainBudgetBytes} bytes.`);
-}
+const exceedsMainBudget = mainBytes > mainBudgetBytes;
 
 const childScript = String.raw`
 const Module = require('node:module');
@@ -100,4 +101,7 @@ if (medianMs > evaluationIndicatorMs) {
   console.warn(
     `Performance warning: median cold module evaluation is ${medianMs.toFixed(1)} ms; indicator is ${evaluationIndicatorMs} ms.`,
   );
+}
+if (exceedsMainBudget) {
+  throw new Error(`main.js is ${mainBytes} bytes; budget is ${mainBudgetBytes} bytes.`);
 }

@@ -1,6 +1,7 @@
 import { TEST_CODEX_MODEL } from '@test/helpers/codexModels';
 import { createMockEl } from '@test/helpers/mockElement';
 
+import { StartupProfiler } from '@/core/performance/StartupProfiler';
 import { ProviderWorkspaceRegistry } from '@/core/providers/ProviderWorkspaceRegistry';
 import { TabManager } from '@/features/chat/tabs/TabManager';
 import {
@@ -238,6 +239,7 @@ function createManager(options: {
 }
 
 beforeEach(() => {
+  StartupProfiler.reset();
   for (const providerId of Object.keys(mockCommandCatalogs)) {
     delete mockCommandCatalogs[providerId];
   }
@@ -428,6 +430,34 @@ describe('TabManager - Tab Lifecycle', () => {
 
       expect(tab1!.hydrationState).toBe('ready');
       expect(tab1!.controllers.conversationController!.switchTo).toHaveBeenCalledWith('conv-1');
+    });
+
+    it('profiles first hydration through paint and records restored DOM counts', async () => {
+      const manager = createManager();
+      const tab1 = await manager.createTab();
+      await manager.createTab();
+      tab1!.conversationId = 'conv-profiled';
+      tab1!.hydrationState = 'idle';
+      tab1!.state.messages = [];
+      tab1!.controllers.conversationController!.switchTo = jest.fn().mockImplementation(async () => {
+        tab1!.dom.messagesEl.empty();
+        tab1!.dom.messagesEl.createDiv({ cls: 'claudian-message' });
+        tab1!.dom.messagesEl.createDiv({ cls: 'claudian-thinking-block' });
+        tab1!.dom.messagesEl.createDiv({ cls: 'claudian-text-block' });
+        tab1!.dom.messagesEl.createDiv({ cls: 'claudian-tool-call' });
+        tab1!.dom.messagesEl.createDiv({ cls: 'claudian-write-edit-block' });
+        tab1!.dom.messagesEl.createDiv({ cls: 'claudian-subagent-list' });
+      });
+
+      await manager.switchToTab(tab1!.id);
+
+      const report = StartupProfiler.getReport();
+      expect(report.spans.some(span => span.name === 'active-hydration')).toBe(true);
+      expect(report.counts['restored-message-dom-count']).toBe(1);
+      expect(report.counts['restored-thinking-panel-count']).toBe(1);
+      expect(report.counts['deferred-thinking-markdown-count']).toBe(1);
+      expect(report.counts['restored-text-block-count']).toBe(1);
+      expect(report.counts['restored-visible-tool-row-count']).toBe(3);
     });
 
     it('does not rehydrate an already-ready conversation with an empty transcript', async () => {

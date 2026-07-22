@@ -217,6 +217,28 @@ describe('codex settings', () => {
     expect(settings.wslDistroOverride).toBe('');
   });
 
+  it('bounds pathological host-scoped maps while retaining the current and newest devices', () => {
+    mockGetHostnameKey.mockReturnValue('device:current');
+    const installationMethodsByHost = Object.fromEntries([
+      ['device:current', 'wsl'],
+      ...Array.from({ length: 100 }, (_, index) => [
+        `device:stale-${index}`,
+        'native-windows',
+      ]),
+    ]);
+
+    const settings = getCodexProviderSettings({
+      providerConfigs: {
+        codex: { installationMethodsByHost },
+      },
+    });
+
+    expect(Object.keys(settings.installationMethodsByHost)).toHaveLength(32);
+    expect(settings.installationMethodsByHost['device:current']).toBe('wsl');
+    expect(settings.installationMethodsByHost['device:stale-99']).toBe('native-windows');
+    expect(settings.installationMethodsByHost['device:stale-0']).toBeUndefined();
+  });
+
   it('migrates current legacy hostname-scoped settings to the opaque device key', () => {
     mockGetHostnameKey.mockReturnValue('device:current');
     mockGetLegacyHostnameKey.mockReturnValue('host-a');

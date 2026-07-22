@@ -369,19 +369,60 @@ export class MessageRenderer {
 
     if (msg.contentBlocks && msg.contentBlocks.length > 0) {
       const renderedToolIds = new Set<string>();
+      const isCodexHistory = this.getCapabilities().providerId === 'codex';
+      const codexThinkingBlocks = isCodexHistory
+        ? msg.contentBlocks.filter(block => block.type === 'thinking' && block.content.trim())
+        : [];
+      const codexThinkingContent = codexThinkingBlocks
+        .map(block => block.type === 'thinking' ? block.content : '')
+        .join('\n\n');
+      const codexThinkingDurations = codexThinkingBlocks
+        .map(block => block.type === 'thinking' ? block.durationSeconds : undefined)
+        .filter((duration): duration is number => duration !== undefined);
+      let didRenderCodexThinking = false;
+      let pendingCodexText: string[] = [];
+      const flushPendingCodexText = (): void => {
+        if (pendingCodexText.length === 0) return;
+
+        const content = pendingCodexText.join('\n\n');
+        const textEl = contentEl.createDiv({ cls: 'claudian-text-block' });
+        void this.renderContent(textEl, content);
+        this.addTextCopyButton(textEl, content);
+        pendingCodexText = [];
+      };
+
       for (const block of msg.contentBlocks) {
         if (block.type === 'thinking') {
+          if (!block.content.trim()) continue;
+          if (!isCodexHistory) {
+            renderStoredThinkingBlock(
+              contentEl,
+              block.content,
+              block.durationSeconds,
+              (el, md) => this.renderContent(el, md)
+            );
+            continue;
+          }
+
+          if (didRenderCodexThinking) continue;
           renderStoredThinkingBlock(
             contentEl,
-            block.content,
-            block.durationSeconds,
+            codexThinkingContent,
+            codexThinkingDurations.length > 0
+              ? codexThinkingDurations.reduce((sum, duration) => sum + duration, 0)
+              : undefined,
             (el, md) => this.renderContent(el, md)
           );
+          didRenderCodexThinking = true;
         } else if (block.type === 'text') {
           const normalized = stripLegacyInterruptIndicator(block.content);
           hadLegacyInterruptIndicator ||= normalized.interrupted;
           // Skip empty or whitespace-only text blocks to avoid extra gaps
           if (!normalized.content.trim()) {
+            continue;
+          }
+          if (isCodexHistory) {
+            pendingCodexText.push(normalized.content);
             continue;
           }
           const textEl = contentEl.createDiv({ cls: 'claudian-text-block' });
@@ -390,10 +431,14 @@ export class MessageRenderer {
         } else if (block.type === 'tool_use') {
           const toolCall = msg.toolCalls?.find(tc => tc.id === block.toolId);
           if (toolCall) {
+            if (this.shouldRenderToolCall(toolCall)) {
+              flushPendingCodexText();
+            }
             this.renderToolCall(contentEl, toolCall, msg);
             renderedToolIds.add(toolCall.id);
           }
         } else if (block.type === 'context_compacted') {
+          flushPendingCodexText();
           const boundaryEl = contentEl.createDiv({ cls: 'claudian-compact-boundary' });
           boundaryEl.createSpan({ cls: 'claudian-compact-boundary-label', text: 'Conversation compacted' });
         } else if (block.type === 'subagent') {
@@ -402,10 +447,12 @@ export class MessageRenderer {
           );
           if (!taskToolCall) continue;
 
+          flushPendingCodexText();
           this.renderTaskSubagent(contentEl, taskToolCall, block.mode);
           renderedToolIds.add(taskToolCall.id);
         }
       }
+      flushPendingCodexText();
 
       // Defensive fallback: preserve tool visibility when contentBlocks/toolCalls drift on reload.
       if (msg.toolCalls && msg.toolCalls.length > 0) {

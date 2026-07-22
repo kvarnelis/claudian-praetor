@@ -386,6 +386,28 @@ function createOpaqueDeviceSettingsKey(): string {
   return `device:${Date.now().toString(36)}:${entropy}`;
 }
 
+function createStableFallbackDeviceSettingsKey(): string | null {
+  try {
+    const fingerprint = [
+      typeof process === 'undefined' ? '' : process.platform,
+      os.hostname(),
+      getHomeDir(),
+    ].join('\0');
+    if (!fingerprint.replace(/\0/g, '')) {
+      return null;
+    }
+
+    let hash = 2166136261;
+    for (let index = 0; index < fingerprint.length; index++) {
+      hash ^= fingerprint.charCodeAt(index);
+      hash = Math.imul(hash, 16777619);
+    }
+    return `device:fallback:${(hash >>> 0).toString(16).padStart(8, '0')}`;
+  } catch {
+    return null;
+  }
+}
+
 // Backward-compatible name: provider settings still store legacy `cliPathsByHost`
 // maps, but new keys are opaque per-install identifiers rather than hostnames.
 export function getHostnameKey(): string {
@@ -400,13 +422,23 @@ export function getHostnameKey(): string {
     return cachedDeviceSettingsKey;
   }
 
-  cachedDeviceSettingsKey = createOpaqueDeviceSettingsKey();
-  try {
-    storage?.setItem(DEVICE_SETTINGS_STORAGE_KEY, cachedDeviceSettingsKey);
-  } catch {
-    // Local storage can be unavailable in restricted renderer contexts.
+  const generatedKey = createOpaqueDeviceSettingsKey();
+  if (storage) {
+    try {
+      storage.setItem(DEVICE_SETTINGS_STORAGE_KEY, generatedKey);
+      const persistedKey = storage.getItem(DEVICE_SETTINGS_STORAGE_KEY)?.trim();
+      if (persistedKey) {
+        cachedDeviceSettingsKey = persistedKey;
+        return cachedDeviceSettingsKey;
+      }
+    } catch {
+      // Fall back to a stable opaque fingerprint below.
+    }
   }
 
+  // Headless/restricted renderers may not have durable localStorage. A random
+  // fallback would create a new host-scoped settings entry on every launch.
+  cachedDeviceSettingsKey = createStableFallbackDeviceSettingsKey() ?? generatedKey;
   return cachedDeviceSettingsKey;
 }
 

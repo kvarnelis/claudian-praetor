@@ -113,12 +113,41 @@ describe('ThinkingBlockRenderer', () => {
   });
 
   describe('renderStoredThinkingBlock', () => {
-    it('should render stored block with duration label', () => {
+    it('should defer rendering stored content until first expansion', async () => {
       const parentEl = createMockEl();
 
       const wrapperEl = renderStoredThinkingBlock(parentEl, 'thinking content', 10, mockRenderContent);
+      const header = (wrapperEl as any)._children[0];
+      const contentEl = (wrapperEl as any)._children[1];
 
-      expect(wrapperEl).toBeDefined();
+      expect(mockRenderContent).not.toHaveBeenCalled();
+
+      const clickHandlers = header._eventListeners.get('click') || [];
+      clickHandlers.forEach((handler: () => void) => handler());
+      await Promise.resolve();
+
+      expect(mockRenderContent).toHaveBeenCalledTimes(1);
+      expect(mockRenderContent).toHaveBeenCalledWith(contentEl, 'thinking content');
+
+      clickHandlers.forEach((handler: () => void) => handler());
+      await Promise.resolve();
+
+      expect(mockRenderContent).toHaveBeenCalledTimes(1);
+    });
+
+    it('should render stored content when expanded with the keyboard', async () => {
+      const parentEl = createMockEl();
+
+      const wrapperEl = renderStoredThinkingBlock(parentEl, 'thinking content', undefined, mockRenderContent);
+      const header = (wrapperEl as any)._children[0];
+
+      const keydownHandlers = header._eventListeners.get('keydown') || [];
+      keydownHandlers.forEach((handler: (event: KeyboardEvent) => void) =>
+        handler({ key: 'Enter', preventDefault: jest.fn() } as unknown as KeyboardEvent)
+      );
+      await Promise.resolve();
+
+      expect(mockRenderContent).toHaveBeenCalledTimes(1);
     });
   });
 });

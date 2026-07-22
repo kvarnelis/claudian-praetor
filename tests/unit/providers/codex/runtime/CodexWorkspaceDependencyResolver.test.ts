@@ -116,6 +116,9 @@ describe('CodexWorkspaceDependencyResolver', () => {
     expect(formatCodexWorkspaceDependencies(result!)).toContain(
       `- Node.js packages: \`${path.join(runtimeRoot, 'dependencies', 'node', 'node_modules')}\``,
     );
+    expect(formatCodexWorkspaceDependencies(result!)).toContain(
+      `- Bundled Git executable: \`${path.join(runtimeRoot, 'dependencies', 'bin', 'fallback', 'git')}\``,
+    );
   });
 
   it('prefers an explicitly configured dependency root', async () => {

@@ -114,8 +114,31 @@ export function renderStoredThinkingBlock(
 
   // Collapsible content
   const contentEl = wrapperEl.createDiv({ cls: 'claudian-thinking-content' });
-  void renderContent(contentEl, content).catch(() => {
-    contentEl.setText(content);
+
+  // Stored thinking is collapsed by default. Defer its Markdown work until the
+  // user actually opens the panel so restoring a long conversation does not
+  // eagerly render content that may never be viewed.
+  let hasRendered = false;
+  const ensureRendered = async () => {
+    if (hasRendered) return;
+    hasRendered = true;
+    contentEl.setAttribute('aria-busy', 'true');
+    try {
+      await renderContent(contentEl, content);
+    } catch {
+      contentEl.setText(content);
+    } finally {
+      contentEl.removeAttribute('aria-busy');
+    }
+  };
+
+  header.addEventListener('click', () => {
+    void ensureRendered();
+  });
+  header.addEventListener('keydown', (event: KeyboardEvent) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      void ensureRendered();
+    }
   });
 
   // Setup collapsible behavior (handles click, keyboard, ARIA, CSS)
