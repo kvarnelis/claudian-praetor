@@ -1,4 +1,4 @@
-import type { HiddenProviderCommands,ClaudesCodexSettings } from '../../types/settings';
+import type { ClaudesCodexSettings,HiddenProviderCommands } from '../../types/settings';
 import type { ProviderId } from '../types';
 
 function normalizeHiddenCommandName(value: string): string {

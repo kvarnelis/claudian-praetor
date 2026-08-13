@@ -59,7 +59,7 @@ import type {
   StreamChunk,
   ToolCallInfo,
 } from '../../../core/types';
-import type { PermissionMode,ClaudesCodexSettings } from '../../../core/types/settings';
+import type { ClaudesCodexSettings,PermissionMode } from '../../../core/types/settings';
 import { stripCurrentNoteContext } from '../../../utils/context';
 import { getEnhancedPath, getMissingNodeError, parseEnvironmentVariables } from '../../../utils/env';
 import { getVaultPath } from '../../../utils/path';

@@ -30,9 +30,9 @@ import type {
 import type { AppTabManagerState } from './core/providers/types';
 import { DEFAULT_CHAT_PROVIDER_ID } from './core/providers/types';
 import type {
+  ClaudesCodexSettings,
   Conversation,
   ConversationMeta,
-  ClaudesCodexSettings,
   SessionMetadata,
 } from './core/types';
 import {
@@ -41,8 +41,8 @@ import {
 import type { ChatViewPlacement, EnvironmentScope } from './core/types/settings';
 import type { DaemonPairingResult, DaemonStartResult, DaemonSupervisor } from './desktop/daemonSupervisor';
 import { isLocalDaemonHostEnabled, setLocalDaemonHostEnabled } from './desktop/localDaemonSettings';
-import { registerFileMenu } from './features/chat/fileMenu';
 import { ClaudesCodexView } from './features/chat/ClaudesCodexView';
+import { registerFileMenu } from './features/chat/fileMenu';
 import { MobileDock } from './features/chat/ui/mobileDock';
 import { type InlineEditContext, InlineEditModal } from './features/inline-edit/ui/InlineEditModal';
 import { ClaudesCodexSettingTab } from './features/settings/ClaudesCodexSettings';

@@ -1,6 +1,6 @@
 import {
-  LEGACY_CLAUDES_CODEX_SETTINGS_PATH,
   CLAUDES_CODEX_SETTINGS_PATH,
+  LEGACY_CLAUDES_CODEX_SETTINGS_PATH,
 } from '../../core/bootstrap/StoragePaths';
 import {
   normalizeHiddenCommandList,
@@ -16,17 +16,17 @@ import type { VaultFileAdapter } from '../../core/storage/VaultFileAdapter';
 import {
   CHAT_VIEW_PLACEMENTS,
   type ChatViewPlacement,
+  type ClaudesCodexSettings,
   type EnvironmentScope,
   type EnvSnippet,
   type HiddenProviderCommands,
-  type ClaudesCodexSettings,
   type ProviderConfigMap,
 } from '../../core/types/settings';
 import { DEFAULT_CLAUDES_CODEX_SETTINGS } from './defaultSettings';
 
 export {
-  LEGACY_CLAUDES_CODEX_SETTINGS_PATH,
   CLAUDES_CODEX_SETTINGS_PATH,
+  LEGACY_CLAUDES_CODEX_SETTINGS_PATH,
 };
 
 export type StoredClaudesCodexSettings = ClaudesCodexSettings;

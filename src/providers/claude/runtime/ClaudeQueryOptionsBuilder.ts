@@ -11,7 +11,7 @@ import {
   type SystemPromptSettings,
 } from '../../../core/prompt/mainAgent';
 import type { AppPluginManager } from '../../../core/providers/types';
-import type { PermissionMode,ClaudesCodexSettings } from '../../../core/types/settings';
+import type { ClaudesCodexSettings,PermissionMode } from '../../../core/types/settings';
 import { toClaudeRuntimeModelId } from '../modelSelection';
 import {
   type ClaudeSafeMode,

@@ -4,7 +4,7 @@ import type { SharedAppStorage } from '../core/bootstrap/storage';
 import type { ProviderHost } from '../core/providers/ProviderHost';
 import type { AppTabManagerState, ProviderId } from '../core/providers/types';
 import type { ChatRuntime } from '../core/runtime/ChatRuntime';
-import type { Conversation, ConversationMeta,ClaudesCodexSettings } from '../core/types';
+import type { ClaudesCodexSettings,Conversation, ConversationMeta } from '../core/types';
 import type { TabData, TabId, TabManagerViewHost } from './chat/tabs/types';
 
 type MobileDaemonStartResult =

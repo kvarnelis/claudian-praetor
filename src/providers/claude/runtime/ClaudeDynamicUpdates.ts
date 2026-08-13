@@ -8,7 +8,7 @@ import type { McpServerManager } from '../../../core/mcp/McpServerManager';
 import type {
   ChatRuntimeQueryOptions,
 } from '../../../core/runtime/types';
-import type { PermissionMode,ClaudesCodexSettings } from '../../../core/types/settings';
+import type { ClaudesCodexSettings,PermissionMode } from '../../../core/types/settings';
 import { toClaudeRuntimeModelId } from '../modelSelection';
 import {
   resolveEffortLevel,

@@ -8,9 +8,9 @@
 
 import {
   type CallbackKind,
+  CLAUDES_CODEX_PROTOCOL_VERSION,
   type ClientMessage,
   generateId,
-  CLAUDES_CODEX_PROTOCOL_VERSION,
   type QueryEvent,
   type ServerMessage,
 } from './protocol';

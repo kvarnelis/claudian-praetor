@@ -2,14 +2,14 @@ import '@/providers';
 
 import { TEST_CODEX_CATALOG } from '@test/helpers/codexModels';
 
-import type { VaultFileAdapter } from '@/core/storage/VaultFileAdapter';
 import { ProviderRegistry } from '@/core/providers/ProviderRegistry';
 import { ProviderSettingsCoordinator } from '@/core/providers/ProviderSettingsCoordinator';
+import type { VaultFileAdapter } from '@/core/storage/VaultFileAdapter';
 import { getClaudeProviderSettings } from '@/providers/claude/settings';
 import {
-  LEGACY_CLAUDES_CODEX_SETTINGS_PATH,
   CLAUDES_CODEX_SETTINGS_PATH,
   ClaudesCodexSettingsStorage,
+  LEGACY_CLAUDES_CODEX_SETTINGS_PATH,
 } from '@/providers/claude/storage/ClaudesCodexSettingsStorage';
 import { DEFAULT_SETTINGS } from '@/providers/claude/types/settings';
 import {

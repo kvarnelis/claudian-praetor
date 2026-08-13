@@ -17,13 +17,13 @@ export { type ProviderId } from './provider';
 // Settings and command types
 export {
   type ApprovalDecision,
+  type ClaudesCodexSettings,
   type EnvironmentScope,
   type EnvSnippet,
   type HostnameCliPaths,
   type InstructionRefineResult,
   type KeyboardNavigationSettings,
   type PermissionMode,
-  type ClaudesCodexSettings,
   type SlashCommand,
 } from './settings';
 

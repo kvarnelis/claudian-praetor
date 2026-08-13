@@ -26,7 +26,7 @@ import {
 import type { ChatRuntime } from '../../../core/runtime/ChatRuntime';
 import type { AutoTurnResult } from '../../../core/runtime/types';
 import { TOOL_AGENT_OUTPUT } from '../../../core/tools/toolNames';
-import type { ChatMessage, Conversation, ClaudesCodexSettings, StreamChunk } from '../../../core/types';
+import type { ChatMessage, ClaudesCodexSettings, Conversation, StreamChunk } from '../../../core/types';
 import { t } from '../../../i18n/i18n';
 import { SlashCommandDropdown } from '../../../shared/components/SlashCommandDropdown';
 import { getEnhancedPath } from '../../../utils/env';
