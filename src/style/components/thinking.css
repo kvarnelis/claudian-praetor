@@ -1,42 +1,42 @@
-.claudian-thinking {
-  color: var(--claudian-brand);
+.praetor-thinking {
+  color: var(--praetor-brand);
   font-style: italic;
   padding: 4px 0;
   text-align: start;
   animation: thinking-pulse 1.5s ease-in-out infinite;
 }
 
-.claudian-thinking.claudian-thinking--compact {
-  color: var(--claudian-compact);
+.praetor-thinking.praetor-thinking--compact {
+  color: var(--praetor-compact);
 }
 
-.claudian-thinking-hint {
+.praetor-thinking-hint {
   color: var(--text-muted);
   font-style: normal;
   font-variant-numeric: tabular-nums;
 }
 
-.claudian-thinking-block {
+.praetor-thinking-block {
   margin: 8px 0;
 }
 
-.claudian-text-block+.claudian-thinking-block {
+.praetor-text-block+.praetor-thinking-block {
   margin-top: 8px;
 }
 
-.claudian-thinking-block+.claudian-text-block {
+.praetor-thinking-block+.praetor-text-block {
   margin-top: 8px;
 }
 
-.claudian-thinking-block+.claudian-tool-call {
+.praetor-thinking-block+.praetor-tool-call {
   margin-top: 8px;
 }
 
-.claudian-tool-call+.claudian-thinking-block {
+.praetor-tool-call+.praetor-thinking-block {
   margin-top: 8px;
 }
 
-.claudian-thinking-header {
+.praetor-thinking-header {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -45,15 +45,15 @@
   overflow: hidden;
 }
 
-.claudian-thinking-label {
+.praetor-thinking-label {
   flex: 1;
   font-size: 13px;
   font-weight: 500;
-  color: var(--claudian-brand);
+  color: var(--praetor-brand);
 }
 
 /* Thinking block content - tree-branch style */
-.claudian-thinking-content {
+.praetor-thinking-content {
   padding: 4px 0;
   padding-inline-start: 24px;
   font-size: 13px;
@@ -65,24 +65,24 @@
   margin-inline-start: 7px;
 }
 
-.claudian-thinking-content p {
+.praetor-thinking-content p {
   margin: 0 0 8px 0;
 }
 
-.claudian-thinking-content p:last-child {
+.praetor-thinking-content p:last-child {
   margin-bottom: 0;
 }
 
-.claudian-thinking-content .claudian-code-wrapper {
+.praetor-thinking-content .praetor-code-wrapper {
   margin: 8px 0;
 }
 
-.claudian-thinking-content .claudian-code-wrapper pre {
+.praetor-thinking-content .praetor-code-wrapper pre {
   padding: 8px 10px;
   border-radius: 4px;
 }
 
-.claudian-thinking-content code {
+.praetor-thinking-content code {
   font-family: var(--font-monospace);
   font-size: 12px;
 }

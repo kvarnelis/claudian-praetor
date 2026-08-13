@@ -132,7 +132,7 @@ export class RemoteClient {
   async ensureConnected(): Promise<void> {
     if (this.state === 'connected' && this.helloDone) return;
     if (!this.config?.url) {
-      throw new Error('Remote daemon is not configured. Pair this device from Claudian Praetor settings on your Mac.');
+      throw new Error('Remote daemon is not configured. Pair this device from Praetor settings on your Mac.');
     }
 
     this.closedByUser = false;

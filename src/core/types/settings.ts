@@ -60,7 +60,7 @@ export const CHAT_VIEW_PLACEMENTS = [
   'main-split-right',
 ] as const;
 
-/** Workspace location used when opening the Claudian chat view. */
+/** Workspace location used when opening the Praetor chat view. */
 export type ChatViewPlacement = typeof CHAT_VIEW_PLACEMENTS[number];
 
 /** Result from instruction refinement agent query. */
@@ -90,7 +90,7 @@ export type ProviderConfigMap = Partial<Record<string, Record<string, unknown>>>
  * `string` here.  The active provider casts internally when it needs
  * narrower types.
  */
-export interface ClaudianSettings {
+export interface PraetorSettings {
   /** Praetor remote daemon connection used by mobile remote runtimes. */
   remoteDaemon?: { url: string };
   /** Internal one-load migration flag for the pre-2.0.42 synced daemon host toggle. */

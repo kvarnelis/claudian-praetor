@@ -7,9 +7,9 @@ import type {
   ToolCallInfo
 } from '@/core/types';
 import {
-  VIEW_TYPE_CLAUDIAN
+  VIEW_TYPE_PRAETOR
 } from '@/core/types';
-import type { ClaudianSettings } from '@/core/types/settings';
+import type { PraetorSettings } from '@/core/types/settings';
 import { getClaudeProviderSettings } from '@/providers/claude/settings';
 import {
   CONTEXT_WINDOW_1M,
@@ -27,9 +27,9 @@ import {
 } from '@/providers/claude/types/settings';
 
 describe('types.ts', () => {
-  describe('VIEW_TYPE_CLAUDIAN', () => {
+  describe('VIEW_TYPE_PRAETOR', () => {
     it('should be defined as the correct view type', () => {
-      expect(VIEW_TYPE_CLAUDIAN).toBe('claudian-view');
+      expect(VIEW_TYPE_PRAETOR).toBe('praetor-view');
     });
   });
 
@@ -76,9 +76,9 @@ describe('types.ts', () => {
     });
   });
 
-  describe('ClaudianSettings type', () => {
+  describe('PraetorSettings type', () => {
     it('should be assignable with valid settings', () => {
-      const settings: ClaudianSettings = {
+      const settings: PraetorSettings = {
         userName: '',
         model: 'haiku',
         enableAutoTitleGeneration: true,
@@ -132,7 +132,7 @@ describe('types.ts', () => {
     });
 
     it('should accept custom model strings', () => {
-      const settings: ClaudianSettings = {
+      const settings: PraetorSettings = {
         userName: '',
         model: 'anthropic/custom-model-v1',
         enableAutoTitleGeneration: true,
@@ -185,7 +185,7 @@ describe('types.ts', () => {
     });
 
     it('should accept optional lastClaudeModel and lastCustomModel', () => {
-      const settings: ClaudianSettings = {
+      const settings: PraetorSettings = {
         userName: '',
         model: 'sonnet',
         enableAutoTitleGeneration: true,

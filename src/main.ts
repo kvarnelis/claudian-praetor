@@ -6,8 +6,8 @@ import type { Editor, WorkspaceLeaf } from 'obsidian';
 import { MarkdownView, Notice, Platform, Plugin } from 'obsidian';
 
 import { ConversationRepository } from './app/conversations/ConversationRepository';
-import { ClaudianProviderHost } from './app/providers/ClaudianProviderHost';
-import { DEFAULT_CLAUDIAN_SETTINGS } from './app/settings/defaultSettings';
+import { PraetorProviderHost } from './app/providers/PraetorProviderHost';
+import { DEFAULT_PRAETOR_SETTINGS } from './app/settings/defaultSettings';
 import type { ConditionalSettingsMutation } from './app/settings/SettingsCoordinator';
 import { SettingsCoordinator, type SettingsMutation } from './app/settings/SettingsCoordinator';
 import { SharedStorageService } from './app/storage/SharedStorageService';
@@ -30,22 +30,22 @@ import type {
 import type { AppTabManagerState } from './core/providers/types';
 import { DEFAULT_CHAT_PROVIDER_ID } from './core/providers/types';
 import type {
-  ClaudianSettings,
   Conversation,
   ConversationMeta,
+  PraetorSettings,
   SessionMetadata,
 } from './core/types';
 import {
-  VIEW_TYPE_CLAUDIAN,
+  VIEW_TYPE_PRAETOR,
 } from './core/types';
 import type { ChatViewPlacement, EnvironmentScope } from './core/types/settings';
 import type { DaemonPairingResult, DaemonStartResult, DaemonSupervisor } from './desktop/daemonSupervisor';
 import { isLocalDaemonHostEnabled, setLocalDaemonHostEnabled } from './desktop/localDaemonSettings';
-import { ClaudianView } from './features/chat/ClaudianView';
 import { registerFileMenu } from './features/chat/fileMenu';
+import { PraetorView } from './features/chat/PraetorView';
 import { MobileDock } from './features/chat/ui/mobileDock';
 import { type InlineEditContext, InlineEditModal } from './features/inline-edit/ui/InlineEditModal';
-import { ClaudianSettingTab } from './features/settings/ClaudianSettings';
+import { PraetorSettingTab } from './features/settings/PraetorSettings';
 import { setLocale } from './i18n/i18n';
 import type { Locale } from './i18n/types';
 import { OPENCODE_PLAN_MODE_ID, OPENCODE_SAFE_MODE_ID } from './providers/opencode/modes';
@@ -54,8 +54,13 @@ import { revealWorkspaceLeaf } from './utils/obsidianCompat';
 import { getVaultPath } from './utils/path';
 
 const MOBILE_REMOTE_ONBOARDING_SEEN_KEY = 'claudian-praetor.mobileRemoteOnboardingSeen';
+const LEGACY_PLUGIN_DATA_RELATIVE_PATH = 'plugins/claudian-praetor/data.json';
 
-function isClaudianView(value: unknown): value is ClaudianView {
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return !!value && typeof value === 'object' && !Array.isArray(value);
+}
+
+function isPraetorView(value: unknown): value is PraetorView {
   return !!value
     && typeof value === 'object'
     && typeof (value as { getTabManager?: unknown }).getTabManager === 'function';
@@ -104,11 +109,11 @@ function hasSamePendingProviderSessionInvalidations(
     && entries.every(([providerId, generation]) => pending.get(providerId) === generation);
 }
 
-export default class ClaudianPlugin extends Plugin {
-  settings!: ClaudianSettings;
+export default class PraetorPlugin extends Plugin {
+  settings!: PraetorSettings;
   storage!: SharedAppStorage;
-  readonly providerHost = new ClaudianProviderHost(this);
-  private settingsCoordinator!: SettingsCoordinator<ClaudianSettings>;
+  readonly providerHost = new PraetorProviderHost(this);
+  private settingsCoordinator!: SettingsCoordinator<PraetorSettings>;
   private conversationRepository!: ConversationRepository;
   private lastKnownTabManagerState: AppTabManagerState | null = null;
   private mobileDock!: MobileDock;
@@ -156,7 +161,7 @@ export default class ClaudianPlugin extends Plugin {
         const { registerRemoteProviders } = await import('./remote/registration');
         registerRemoteProviders(this);
         this.remoteMode = true;
-        if (typeof document !== 'undefined') document.body?.classList?.add('claudian-mobile');
+        if (typeof document !== 'undefined') document.body?.classList?.add('praetor-mobile');
       }
 
       await StartupProfiler.runAsync(
@@ -177,12 +182,12 @@ export default class ClaudianPlugin extends Plugin {
       this.registerEvent(this.app.workspace.on('layout-change', () => this.mobileDock.sync()));
 
       this.registerView(
-        VIEW_TYPE_CLAUDIAN,
-        (leaf) => new ClaudianView(leaf, this)
+        VIEW_TYPE_PRAETOR,
+        (leaf) => new PraetorView(leaf, this)
       );
       registerFileMenu(this);
 
-      this.addRibbonIcon('bot', 'Open Claudian', () => {
+      this.addRibbonIcon('bot', 'Open Praetor', () => {
         void this.activateView();
       });
 
@@ -315,7 +320,7 @@ export default class ClaudianPlugin extends Plugin {
         },
       });
 
-      this.addSettingTab(new ClaudianSettingTab(this.app, this));
+      this.addSettingTab(new PraetorSettingTab(this.app, this));
       this.scheduleRemainingSessionMetadataLoad();
     } finally {
       StartupProfiler.finishOnload();
@@ -325,7 +330,7 @@ export default class ClaudianPlugin extends Plugin {
   onunload(): void {
     this.isUnloading = true;
     this.mobileDock?.clear();
-    if (typeof document !== 'undefined') document.body?.classList?.remove('claudian-mobile');
+    if (typeof document !== 'undefined') document.body?.classList?.remove('praetor-mobile');
     if (this.sessionMetadataLoadTimer !== null) {
       window.clearTimeout(this.sessionMetadataLoadTimer);
       this.sessionMetadataLoadTimer = null;
@@ -346,13 +351,13 @@ export default class ClaudianPlugin extends Plugin {
 
   async activateView() {
     const { workspace } = this.app;
-    let leaf = workspace.getLeavesOfType(VIEW_TYPE_CLAUDIAN)[0];
+    let leaf = workspace.getLeavesOfType(VIEW_TYPE_PRAETOR)[0];
 
     if (!leaf) {
       const newLeaf = this.getLeafForPlacement(this.settings.chatViewPlacement);
       if (newLeaf) {
         await newLeaf.setViewState({
-          type: VIEW_TYPE_CLAUDIAN,
+          type: VIEW_TYPE_PRAETOR,
           active: true,
         });
         leaf = newLeaf;
@@ -386,7 +391,7 @@ export default class ClaudianPlugin extends Plugin {
   }
 
   private canCreateNewTab(): boolean {
-    const hasClaudianLeaf = this.app.workspace.getLeavesOfType(VIEW_TYPE_CLAUDIAN).length > 0;
+    const hasPraetorLeaf = this.app.workspace.getLeavesOfType(VIEW_TYPE_PRAETOR).length > 0;
     const view = this.getView();
     const tabManager = view?.getTabManager();
 
@@ -394,14 +399,14 @@ export default class ClaudianPlugin extends Plugin {
       return tabManager.canCreateTab();
     }
 
-    if (hasClaudianLeaf) {
+    if (hasPraetorLeaf) {
       return false;
     }
 
     return this.getLastKnownOpenTabCount() < this.getMaxTabsLimit();
   }
 
-  private async ensureViewOpen(): Promise<ClaudianView | null> {
+  private async ensureViewOpen(): Promise<PraetorView | null> {
     const existingView = this.getView();
     if (existingView) {
       return existingView;
@@ -435,20 +440,21 @@ export default class ClaudianPlugin extends Plugin {
 
   async loadSettings(options: { deferNonRestoredSessionMetadata?: boolean } = {}) {
     this.hasLoadedAllSessionMetadata = false;
+    await this.importLegacyPluginDataOnFirstRun();
     this.storage = new SharedStorageService(this);
-    const { claudian } = await this.storage.initialize();
+    const { praetor } = await this.storage.initialize();
     this.lastKnownTabManagerState = await this.storage.getTabManagerState();
 
     this.settings = {
-      ...DEFAULT_CLAUDIAN_SETTINGS,
-      ...claudian,
+      ...DEFAULT_PRAETOR_SETTINGS,
+      ...praetor,
     };
     this.settingsCoordinator = new SettingsCoordinator(
       this.settings,
       async (settings) => {
         ProviderSettingsCoordinator.normalizeProviderSelection(settings);
         ProviderSettingsCoordinator.persistProjectedProviderState(settings);
-        await this.storage.saveClaudianSettings(settings);
+        await this.storage.savePraetorSettings(settings);
       },
     );
     const didNormalizePendingSessionInvalidations = this.syncPendingSessionInvalidations();
@@ -460,7 +466,7 @@ export default class ClaudianPlugin extends Plugin {
     });
 
     // Remote daemon config lives in plugin data.json (Sync-carried), not the
-    // hidden .claudian/ vault folder; it takes precedence over any vault copy.
+    // hidden .claudian/ compatibility folder; it takes precedence over any vault copy.
     const remoteDaemon = await this.storage.getRemoteDaemonConfig();
     if (remoteDaemon) {
       this.settings.remoteDaemon = remoteDaemon;
@@ -571,6 +577,34 @@ export default class ClaudianPlugin extends Plugin {
     await this.completePendingSessionInvalidations(completedInvalidationGenerations);
     this.hasLoadedAllSessionMetadata = initialMetadataScan.complete;
     this.pendingSessionMetadataScan = deferRemainingMetadata;
+  }
+
+  /**
+   * The `praetor` plugin id gives Obsidian a new data.json. Copy the previous
+   * fork's plugin data on first run while leaving its rollback copy untouched.
+   */
+  private async importLegacyPluginDataOnFirstRun(): Promise<void> {
+    const currentData: unknown = await this.loadData();
+    if (isRecord(currentData) && Object.keys(currentData).length > 0) {
+      return;
+    }
+
+    const adapter = this.app.vault.adapter;
+    const legacyPluginDataPath = `${this.app.vault.configDir}/${LEGACY_PLUGIN_DATA_RELATIVE_PATH}`;
+    try {
+      if (!await adapter.exists(legacyPluginDataPath)) {
+        return;
+      }
+
+      const legacyData: unknown = JSON.parse(await adapter.read(legacyPluginDataPath));
+      if (!isRecord(legacyData)) {
+        throw new Error('Legacy plugin data is not a JSON object.');
+      }
+
+      await this.saveData(legacyData);
+    } catch {
+      new Notice('Praetor could not import settings from Claudian Praetor. The old data was left untouched.');
+    }
   }
 
   private async loadRestoredSessionMetadata(): Promise<SessionMetadata[]> {
@@ -706,7 +740,7 @@ export default class ClaudianPlugin extends Plugin {
   }
 
   private markPendingSessionInvalidations(
-    settings: ClaudianSettings,
+    settings: PraetorSettings,
     providerIds: ProviderId[],
   ): Map<ProviderId, number> {
     const pending = readPendingProviderSessionInvalidations(settings);
@@ -861,11 +895,11 @@ export default class ClaudianPlugin extends Plugin {
     const result = await this.daemonSupervisor.start({ retry: options.retry });
     if (options.notify) {
       if (result.status === 'started') {
-        new Notice(`Claudian Praetor: mobile daemon started at ${result.url}.`, 8000);
+        new Notice(`Praetor: mobile daemon started at ${result.url}.`, 8000);
       } else if (result.status === 'already-running') {
-        new Notice(`Claudian Praetor: mobile daemon already running at ${result.url}.`, 8000);
+        new Notice(`Praetor: mobile daemon already running at ${result.url}.`, 8000);
       } else if ('message' in result) {
-        new Notice(`Claudian Praetor: ${result.message}`, 8000);
+        new Notice(`Praetor: ${result.message}`, 8000);
       }
     }
     return result;
@@ -900,7 +934,7 @@ export default class ClaudianPlugin extends Plugin {
     }
 
     new Notice(
-      'Claudian mobile uses your Mac over Tailscale. Connect Tailscale on both devices, then on the Mac enable Mobile daemon and choose Pair iPhone or iPad.',
+      'Praetor mobile uses your Mac over Tailscale. Connect Tailscale on both devices, then on the Mac enable Mobile daemon and choose Pair iPhone or iPad.',
       15_000,
     );
   }
@@ -909,12 +943,12 @@ export default class ClaudianPlugin extends Plugin {
     await this.settingsCoordinator.persistCurrent();
   }
 
-  async mutateSettings(mutation: SettingsMutation<ClaudianSettings>): Promise<void> {
+  async mutateSettings(mutation: SettingsMutation<PraetorSettings>): Promise<void> {
     await this.settingsCoordinator.mutate(mutation);
   }
 
   async mutateSettingsConditionally(
-    mutation: ConditionalSettingsMutation<ClaudianSettings>,
+    mutation: ConditionalSettingsMutation<PraetorSettings>,
   ): Promise<void> {
     await this.settingsCoordinator.mutateConditionally(mutation);
   }
@@ -1027,7 +1061,7 @@ export default class ClaudianPlugin extends Plugin {
   }
 
   private async restartEnvironmentAffectedRuntimes(
-    view: ClaudianView,
+    view: PraetorView,
     affectedProviderIds: ProviderId[],
     resetSessions: boolean,
   ): Promise<number> {
@@ -1212,17 +1246,17 @@ export default class ClaudianPlugin extends Plugin {
     await this.storage.setTabManagerState(state);
   }
 
-  getView(): ClaudianView | null {
-    const leaves = this.app.workspace.getLeavesOfType(VIEW_TYPE_CLAUDIAN);
-    return leaves.map(leaf => leaf.view).find(isClaudianView) ?? null;
+  getView(): PraetorView | null {
+    const leaves = this.app.workspace.getLeavesOfType(VIEW_TYPE_PRAETOR);
+    return leaves.map(leaf => leaf.view).find(isPraetorView) ?? null;
   }
 
-  getAllViews(): ClaudianView[] {
-    const leaves = this.app.workspace.getLeavesOfType(VIEW_TYPE_CLAUDIAN);
-    return leaves.map(leaf => leaf.view).filter(isClaudianView);
+  getAllViews(): PraetorView[] {
+    const leaves = this.app.workspace.getLeavesOfType(VIEW_TYPE_PRAETOR);
+    return leaves.map(leaf => leaf.view).filter(isPraetorView);
   }
 
-  findConversationAcrossViews(conversationId: string): { view: ClaudianView; tabId: string } | null {
+  findConversationAcrossViews(conversationId: string): { view: PraetorView; tabId: string } | null {
     for (const view of this.getAllViews()) {
       const tabManager = view.getTabManager();
       if (!tabManager) continue;

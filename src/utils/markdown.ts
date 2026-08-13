@@ -1,5 +1,5 @@
 /**
- * Claudian - Markdown Utilities
+ * Praetor - Markdown Utilities
  *
  * Markdown manipulation helpers.
  */

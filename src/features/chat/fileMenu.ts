@@ -14,16 +14,16 @@ export interface FileMenuHost {
   registerEvent(eventRef: EventRef): void;
 }
 
-export async function addFileToClaudian(host: FileMenuHost, file: TFile): Promise<boolean> {
+export async function addFileToPraetor(host: FileMenuHost, file: TFile): Promise<boolean> {
   try {
     await host.activateView();
     const appended = host.getView()?.appendToActiveInput(formatVaultFileMention(file.path)) ?? false;
     if (!appended) {
-      new Notice('Claudian chat is not ready.');
+      new Notice('Praetor chat is not ready.');
     }
     return appended;
   } catch {
-    new Notice('Failed to add file to Claudian.');
+    new Notice('Failed to add file to Praetor.');
     return false;
   }
 }
@@ -34,9 +34,9 @@ export function registerFileMenu(host: FileMenuHost): void {
       if (!(file instanceof TFile)) return;
 
       menu.addItem((item) => item
-        .setTitle('Add to Claudian')
+        .setTitle('Add to Praetor')
         .setIcon('message-square-plus')
-        .onClick(() => addFileToClaudian(host, file)));
+        .onClick(() => addFileToPraetor(host, file)));
     }),
   );
 }

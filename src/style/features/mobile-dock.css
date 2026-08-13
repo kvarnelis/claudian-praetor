@@ -4,20 +4,20 @@
  * Tablet only. Obsidian's right sidebar slides over the editor on mobile and
  * never pins; here we override the *actual* drawer + root elements (marked by
  * MobileDock) so the drawer becomes a fixed-width right column and the editor
- * shrinks to sit beside it. Width is tunable via --claudian-dock-width.
+ * shrinks to sit beside it. Width is tunable via --praetor-dock-width.
  */
-body.claudian-ipad-docked {
-  --claudian-dock-width: 46vw;
+body.praetor-ipad-docked {
+  --praetor-dock-width: 46vw;
 }
 
 /* Dock the right drawer: stop the slide-over transform, fix it to a flush
    column (no rounded corners / shadow / inset — those are the leftover
    "floating popup" look). */
-body.claudian-ipad-docked.is-tablet .claudian-dock-drawer {
+body.praetor-ipad-docked.is-tablet .praetor-dock-drawer {
   transform: none !important;
-  width: var(--claudian-dock-width) !important;
-  min-width: var(--claudian-dock-width) !important;
-  max-width: var(--claudian-dock-width) !important;
+  width: var(--praetor-dock-width) !important;
+  min-width: var(--praetor-dock-width) !important;
+  max-width: var(--praetor-dock-width) !important;
   left: auto !important;
   right: 0 !important;
   margin: 0 !important;
@@ -27,17 +27,17 @@ body.claudian-ipad-docked.is-tablet .claudian-dock-drawer {
 }
 
 /* Flatten any rounded/elevated inner container Obsidian gives the mobile drawer. */
-body.claudian-ipad-docked.is-tablet .claudian-dock-drawer > * {
+body.praetor-ipad-docked.is-tablet .praetor-dock-drawer > * {
   border-radius: 0 !important;
   box-shadow: none !important;
 }
 
 /* Draggable divider between editor and dock; positioned at the boundary. */
-.claudian-dock-handle {
+.praetor-dock-handle {
   position: fixed;
   top: 0;
   bottom: 0;
-  right: var(--claudian-dock-width, 46vw);
+  right: var(--praetor-dock-width, 46vw);
   width: 18px;
   transform: translateX(50%);
   z-index: 30;
@@ -48,7 +48,7 @@ body.claudian-ipad-docked.is-tablet .claudian-dock-drawer > * {
   justify-content: center;
 }
 
-.claudian-dock-handle::before {
+.praetor-dock-handle::before {
   content: '';
   width: 4px;
   height: 52px;
@@ -56,22 +56,22 @@ body.claudian-ipad-docked.is-tablet .claudian-dock-drawer > * {
   background: var(--background-modifier-border);
 }
 
-.claudian-dock-handle:active::before {
+.praetor-dock-handle:active::before {
   background: var(--interactive-accent);
 }
 
 /* Make room: shrink the editor area to the remaining width (handles both
    flex-child and positioned layouts). */
-body.claudian-ipad-docked.is-tablet .claudian-dock-root {
-  flex: 1 1 calc(100vw - var(--claudian-dock-width)) !important;
-  width: calc(100vw - var(--claudian-dock-width)) !important;
-  max-width: calc(100vw - var(--claudian-dock-width)) !important;
+body.praetor-ipad-docked.is-tablet .praetor-dock-root {
+  flex: 1 1 calc(100vw - var(--praetor-dock-width)) !important;
+  width: calc(100vw - var(--praetor-dock-width)) !important;
+  max-width: calc(100vw - var(--praetor-dock-width)) !important;
   left: 0 !important;
   right: auto !important;
 }
 
 /* Kill the dimming scrim so the editor stays interactive beside the chat. */
-body.claudian-ipad-docked.is-tablet .workspace-drawer-backdrop {
+body.praetor-ipad-docked.is-tablet .workspace-drawer-backdrop {
   opacity: 0 !important;
   pointer-events: none !important;
 }

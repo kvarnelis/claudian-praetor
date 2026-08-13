@@ -34,7 +34,7 @@ import { fileURLToPath } from 'node:url';
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const BUNDLE_PATH = path.join(ROOT, 'main.js');
-const VIEW_TYPE_CLAUDIAN = 'claudian-view';
+const VIEW_TYPE_PRAETOR = 'praetor-view';
 
 const realRequire = createRequire(import.meta.url);
 
@@ -345,7 +345,7 @@ function createBrowserGlobals() {
     sessionStorage: createMemoryStorage(),
     crypto: globalThis.crypto,
     document: documentStub,
-    navigator: { userAgent: 'Claudian mobile-load-harness', language: 'en' },
+    navigator: { userAgent: 'Praetor mobile-load-harness', language: 'en' },
     matchMedia: () => ({ matches: false, addEventListener: () => {}, removeEventListener: () => {} }),
     open: () => null,
     location: { href: 'app://obsidian.md/index.html' },
@@ -441,7 +441,7 @@ function createFakeApp({ withBasePath }) {
     },
   };
   // iOS (Capacitor) adapters expose no basePath; desktop FileSystemAdapter does.
-  if (withBasePath) adapter.basePath = path.join(os.tmpdir(), 'claudian-harness-vault');
+  if (withBasePath) adapter.basePath = path.join(os.tmpdir(), 'praetor-harness-vault');
 
   const eventRef = () => ({ __eventRef: true });
   return {
@@ -622,14 +622,14 @@ async function runPass(platformKind) {
     }
 
     const app = createFakeApp({ withBasePath: platformKind === 'desktop' });
-    const plugin = new PluginClass(app, { id: 'claudian-praetor', name: 'Claudian Praetor', version: '0.0.0' });
+    const plugin = new PluginClass(app, { id: 'praetor', name: 'Praetor', version: '0.0.0' });
     await plugin.onload();
     result.onloadResolved = true;
 
     // Probe: view registration happened.
     const viewTypes = spies.registeredViews.map((v) => v.type);
-    if (!viewTypes.includes(VIEW_TYPE_CLAUDIAN)) {
-      result.probeFailures.push(`registerView was not called with '${VIEW_TYPE_CLAUDIAN}' (saw: ${JSON.stringify(viewTypes)})`);
+    if (!viewTypes.includes(VIEW_TYPE_PRAETOR)) {
+      result.probeFailures.push(`registerView was not called with '${VIEW_TYPE_PRAETOR}' (saw: ${JSON.stringify(viewTypes)})`);
     }
     if (!plugin.settings || typeof plugin.settings !== 'object') {
       result.probeFailures.push('plugin.settings was not populated by loadSettings()');

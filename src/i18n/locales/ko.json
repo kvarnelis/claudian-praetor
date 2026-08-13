@@ -70,7 +70,7 @@
     }
   },
   "settings": {
-    "title": "Claudian 설정",
+    "title": "Praetor 설정",
     "tabs": {
       "general": "일반",
       "claude": "Claude",
@@ -84,7 +84,7 @@
     "models": "모델",
     "experimental": "실험적 기능",
     "userName": {
-      "name": "Claudian이 당신을 어떻게 불러야 합니까?",
+      "name": "Praetor이 당신을 어떻게 불러야 합니까?",
       "desc": "개인화된 인사에 사용할 이름 (비워두면 일반 인사)"
     },
     "excludedTags": {
@@ -158,7 +158,7 @@
     },
     "hiddenSlashCommands": {
       "name": "숨겨진 명령어와 스킬",
-      "desc": "드롭다운에서 특정 명령어와 스킬을 숨깁니다. Claudian과 관련 없는 Claude Code 항목을 숨기는 데 유용합니다. 앞의 슬래시 없이 이름을 한 줄에 하나씩 입력하세요.",
+      "desc": "드롭다운에서 특정 명령어와 스킬을 숨깁니다. Praetor과 관련 없는 Claude Code 항목을 숨기는 데 유용합니다. 앞의 슬래시 없이 이름을 한 줄에 하나씩 입력하세요.",
       "placeholder": "commit\nbuild\ntest"
     },
     "mcpServers": {
@@ -279,7 +279,7 @@
     },
     "useThemeNativeAppearance": {
       "name": "Obsidian 사이드바 스타일에 맞추기",
-      "desc": "현재 테마의 인터페이스 글꼴, 작은 텍스트 크기, 은은한 사이드바 색상을 Claudian에 사용합니다."
+      "desc": "현재 테마의 인터페이스 글꼴, 작은 텍스트 크기, 은은한 사이드바 색상을 Praetor에 사용합니다."
     },
     "enableAutoScroll": {
       "name": "스트리밍 중 자동 스크롤",
@@ -294,7 +294,7 @@
       "desc": "Write 및 Edit diff가 처음 표시될 때 펼친 상태로 보여줍니다."
     },
     "chatViewPlacement": {
-      "name": "Claudian 열 위치",
+      "name": "Praetor 열 위치",
       "desc": "채팅 패널이 생성될 때 열릴 위치를 선택합니다",
       "rightSidebar": "오른쪽 사이드바",
       "leftSidebar": "왼쪽 사이드바",
@@ -321,7 +321,7 @@
       },
       "installationMethod": {
         "name": "설치 방식",
-        "desc": "Windows에서 Claudian이 Codex를 실행하는 방식입니다. 네이티브 Windows는 Windows 실행 파일 경로를 사용하고, WSL은 선택한 배포판 안에서 Linux CLI를 실행합니다.",
+        "desc": "Windows에서 Praetor이 Codex를 실행하는 방식입니다. 네이티브 Windows는 Windows 실행 파일 경로를 사용하고, WSL은 선택한 배포판 안에서 Linux CLI를 실행합니다.",
         "nativeWindows": "네이티브 Windows",
         "wsl": "WSL"
       },
@@ -368,7 +368,7 @@
       },
       "mcp": {
         "descBeforeCommand": "Codex는 자체 CLI로 MCP 서버를 관리합니다. ",
-        "descAfterCommand": " 명령으로 구성하면 Claudian에서 사용할 수 있습니다. ",
+        "descAfterCommand": " 명령으로 구성하면 Praetor에서 사용할 수 있습니다. ",
         "learnMore": "자세히 알아보기"
       },
       "environment": {

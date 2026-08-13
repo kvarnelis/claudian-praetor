@@ -1,7 +1,7 @@
 {
-  "name": "claudian",
+  "name": "praetor",
   "version": "2026.7.18",
-  "description": "Claudian - Claude Code embedded in Obsidian sidebar",
+  "description": "Provider-backed coding agents embedded in Obsidian, with mobile remote mode over Tailscale",
   "main": "main.js",
   "engines": {
     "node": ">=24 <25"
@@ -32,7 +32,10 @@
     "productivity",
     "ide"
   ],
-  "author": "Yishen Tu",
+  "author": "Kazys Varnelis",
+  "contributors": [
+    "Yishen Tu"
+  ],
   "license": "MIT",
   "devDependencies": {
     "@eslint/js": "^10.0.1",

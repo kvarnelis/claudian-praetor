@@ -35,7 +35,7 @@ describe('ComposerContextTray', () => {
     }]);
 
     expect(containerEl.hasClass('has-content')).toBe(true);
-    expect(containerEl.querySelectorAll('.claudian-context-chip').map((item: any) => item.dataset.contextSlot)).toEqual([
+    expect(containerEl.querySelectorAll('.praetor-context-chip').map((item: any) => item.dataset.contextSlot)).toEqual([
       'current-note',
       'editor-selection',
       'images',
@@ -58,8 +58,8 @@ describe('ComposerContextTray', () => {
       onRemove,
     }]);
 
-    const mainButton = containerEl.querySelector('.claudian-context-chip-main');
-    const removeButton = containerEl.querySelector('.claudian-context-chip-remove');
+    const mainButton = containerEl.querySelector('.praetor-context-chip-main');
+    const removeButton = containerEl.querySelector('.praetor-context-chip-remove');
 
     expect(mainButton?.tagName).toBe('BUTTON');
     expect(removeButton?.tagName).toBe('BUTTON');
@@ -83,22 +83,22 @@ describe('ComposerContextTray', () => {
       onRemove: jest.fn(),
     })));
 
-    const chips = containerEl.querySelectorAll('.claudian-context-chip');
+    const chips = containerEl.querySelectorAll('.praetor-context-chip');
     [0, 0, 38, 76].forEach((offsetTop, index) => {
       Object.defineProperty(chips[index], 'offsetTop', { configurable: true, value: offsetTop });
     });
 
     tray.refreshLayout();
 
-    expect(chips[2].hasClass('claudian-context-chip--overflow-hidden')).toBe(true);
-    expect(chips[3].hasClass('claudian-context-chip--overflow-hidden')).toBe(true);
-    const moreButton = containerEl.querySelector('.claudian-context-more');
+    expect(chips[2].hasClass('praetor-context-chip--overflow-hidden')).toBe(true);
+    expect(chips[3].hasClass('praetor-context-chip--overflow-hidden')).toBe(true);
+    const moreButton = containerEl.querySelector('.praetor-context-more');
     expect(moreButton?.textContent).toBe('+2 more');
 
     moreButton?.click();
 
-    expect(containerEl.hasClass('claudian-context-row--expanded')).toBe(true);
-    expect(chips.every((chip: any) => !chip.hasClass('claudian-context-chip--overflow-hidden'))).toBe(true);
+    expect(containerEl.hasClass('praetor-context-row--expanded')).toBe(true);
+    expect(chips.every((chip: any) => !chip.hasClass('praetor-context-chip--overflow-hidden'))).toBe(true);
     expect(moreButton?.textContent).toBe('Show less');
   });
 
@@ -125,7 +125,7 @@ describe('ComposerContextTray', () => {
       onRemove: jest.fn(),
     }]);
 
-    const chips = containerEl.querySelectorAll('.claudian-context-chip');
+    const chips = containerEl.querySelectorAll('.praetor-context-chip');
     [[4, 24], [0, 32], [4, 24]].forEach(([offsetTop, offsetHeight], index) => {
       Object.defineProperties(chips[index], {
         offsetTop: { configurable: true, value: offsetTop },
@@ -135,7 +135,7 @@ describe('ComposerContextTray', () => {
 
     tray.refreshLayout();
 
-    expect(containerEl.querySelector('.claudian-context-more')?.hasClass('claudian-hidden')).toBe(true);
+    expect(containerEl.querySelector('.praetor-context-more')?.hasClass('praetor-hidden')).toBe(true);
   });
 
   it('removes the tray when the final owner clears its items', () => {

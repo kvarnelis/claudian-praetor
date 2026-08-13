@@ -69,7 +69,7 @@ function openHotkeySettings(app: App): void {
       return;
     }
 
-    searchEl.value = 'Claudian';
+    searchEl.value = 'Praetor';
     tab.updateHotkeyVisibility?.();
   }, 100);
 }
@@ -94,18 +94,18 @@ function addHotkeySettingRow(
   translationPrefix: string,
 ): void {
   const hotkey = getHotkeyForCommand(app, commandId);
-  const item = containerEl.createDiv({ cls: 'claudian-hotkey-item' });
+  const item = containerEl.createDiv({ cls: 'praetor-hotkey-item' });
   item.createSpan({
-    cls: 'claudian-hotkey-name',
+    cls: 'praetor-hotkey-name',
     text: t(`${translationPrefix}.name` as TranslationKey),
   });
   if (hotkey) {
-    item.createSpan({ cls: 'claudian-hotkey-badge', text: hotkey });
+    item.createSpan({ cls: 'praetor-hotkey-badge', text: hotkey });
   }
   item.addEventListener('click', () => openHotkeySettings(app));
 }
 
-export class ClaudianSettingTab extends PluginSettingTab {
+export class PraetorSettingTab extends PluginSettingTab {
   plugin: FeatureHost;
   private activeTab: SettingsTabId = 'general';
   private refreshTitleModelOptions: (() => void) | null = null;
@@ -118,7 +118,7 @@ export class ClaudianSettingTab extends PluginSettingTab {
 
   /**
    * Declarative settings definitions for Obsidian 1.13.0+ settings search.
-   * Claudian still builds its settings imperatively in display(); this empty
+   * Praetor still builds its settings imperatively in display(); this empty
    * array satisfies the contract so the tab is registered in search.
    */
   getSettingDefinitions(): SettingDefinitionItem[] {
@@ -129,7 +129,7 @@ export class ClaudianSettingTab extends PluginSettingTab {
     const displayGeneration = ++this.displayGeneration;
     const { containerEl } = this;
     containerEl.empty();
-    containerEl.addClass('claudian-settings');
+    containerEl.addClass('praetor-settings');
     this.refreshTitleModelOptions = null;
 
     setLocale(this.plugin.settings.locale as Locale);
@@ -140,7 +140,7 @@ export class ClaudianSettingTab extends PluginSettingTab {
       this.activeTab = 'general';
     }
 
-    const tabBar = containerEl.createDiv({ cls: 'claudian-settings-tabs' });
+    const tabBar = containerEl.createDiv({ cls: 'praetor-settings-tabs' });
     const tabButtons = new Map<SettingsTabId, HTMLButtonElement>();
     const tabContents = new Map<SettingsTabId, HTMLDivElement>();
     const renderedProviderTabs = new Set<ProviderId>();
@@ -157,7 +157,7 @@ export class ClaudianSettingTab extends PluginSettingTab {
       }
       content.empty();
       content.createDiv({
-        cls: 'claudian-settings-provider-loading',
+        cls: 'praetor-settings-provider-loading',
         text: `Loading ${ProviderRegistry.getProviderDisplayName(providerId)} settings...`,
       });
 
@@ -203,7 +203,7 @@ export class ClaudianSettingTab extends PluginSettingTab {
         content.empty();
         const message = error instanceof Error ? error.message : 'Unknown error';
         content.createDiv({
-          cls: 'claudian-setting-validation claudian-setting-validation-error',
+          cls: 'praetor-setting-validation praetor-setting-validation-error',
           text: `Could not load provider settings: ${message}`,
         });
       }
@@ -214,14 +214,14 @@ export class ClaudianSettingTab extends PluginSettingTab {
         ? t('settings.tabs.general')
         : ProviderRegistry.getProviderDisplayName(id);
       const button = tabBar.createEl('button', {
-        cls: `claudian-settings-tab${id === this.activeTab ? ' claudian-settings-tab--active' : ''}`,
+        cls: `praetor-settings-tab${id === this.activeTab ? ' praetor-settings-tab--active' : ''}`,
         text: label,
       });
       button.addEventListener('click', () => {
         this.activeTab = id;
         for (const tabId of tabIds) {
-          tabButtons.get(tabId)?.toggleClass('claudian-settings-tab--active', tabId === id);
-          tabContents.get(tabId)?.toggleClass('claudian-settings-tab-content--active', tabId === id);
+          tabButtons.get(tabId)?.toggleClass('praetor-settings-tab--active', tabId === id);
+          tabContents.get(tabId)?.toggleClass('praetor-settings-tab-content--active', tabId === id);
         }
         if (id !== 'general') {
           void renderProviderTab(id);
@@ -232,7 +232,7 @@ export class ClaudianSettingTab extends PluginSettingTab {
 
     for (const id of tabIds) {
       const content = containerEl.createDiv({
-        cls: `claudian-settings-tab-content${id === this.activeTab ? ' claudian-settings-tab-content--active' : ''}`,
+        cls: `praetor-settings-tab-content${id === this.activeTab ? ' praetor-settings-tab-content--active' : ''}`,
       });
       tabContents.set(id, content);
     }
@@ -268,14 +268,14 @@ export class ClaudianSettingTab extends PluginSettingTab {
           });
       });
 
-    // --- Mobile daemon (Claudian Praetor) ---
+    // --- Mobile daemon (Praetor) ---
     // The Mac host toggle and paired-client list are local-only so they cannot
     // confuse other synced Macs. Only the Tailscale URL is synced to mobile.
 
     if (Platform.isDesktopApp) {
       new Setting(container).setName('Mobile daemon').setHeading();
 
-      const daemonNotice = container.createDiv({ cls: 'claudian-sp-settings-desc' });
+      const daemonNotice = container.createDiv({ cls: 'praetor-sp-settings-desc' });
       const daemonDesc = daemonNotice.createEl('p', { cls: 'setting-item-description' });
       daemonDesc.appendText('Host Praetor on this Mac for iPhone and iPad. Install and sign in to Tailscale on the Mac and mobile device; Praetor binds to the private Tailscale address and should not be exposed to the public internet. Only the URL syncs. Device pairing stays local to this Mac. ');
       daemonDesc.createEl('a', { text: 'Install Tailscale', href: 'https://tailscale.com/download' });
@@ -321,7 +321,7 @@ export class ClaudianSettingTab extends PluginSettingTab {
 
       new Setting(container)
         .setName('Pair iPhone or iPad')
-        .setDesc('Opens pairing for five minutes. On the mobile device, keep Tailscale connected and open Claudian to complete pairing.')
+        .setDesc('Opens pairing for five minutes. On the mobile device, keep Tailscale connected and open Praetor to complete pairing.')
         .addButton((button) => {
           button
             .setButtonText('Open pairing')
@@ -340,9 +340,9 @@ export class ClaudianSettingTab extends PluginSettingTab {
     } else {
       new Setting(container).setName('Pair with Mac').setHeading();
 
-      const daemonNotice = container.createDiv({ cls: 'claudian-sp-settings-desc' });
+      const daemonNotice = container.createDiv({ cls: 'praetor-sp-settings-desc' });
       const daemonDesc = daemonNotice.createEl('p', { cls: 'setting-item-description' });
-      daemonDesc.appendText('Claudian on mobile connects to Praetor running on your Mac over Tailscale. Sign in to Tailscale on both devices, then on the Mac open Claudian settings and choose Pair iPhone or iPad. The URL can sync through Obsidian Sync; no token is needed. ');
+      daemonDesc.appendText('Praetor on mobile connects to Praetor running on your Mac over Tailscale. Sign in to Tailscale on both devices, then on the Mac open Praetor settings and choose Pair iPhone or iPad. The URL can sync through Obsidian Sync; no token is needed. ');
       daemonDesc.createEl('a', { text: 'Install Tailscale', href: 'https://tailscale.com/download' });
 
       const saveRemoteDaemonField = async (patch: { url?: string }): Promise<void> => {
@@ -389,12 +389,12 @@ export class ClaudianSettingTab extends PluginSettingTab {
       .setDesc(t('settings.maxTabs.desc'));
 
     const maxTabsWarningEl = container.createDiv({
-      cls: 'claudian-max-tabs-warning claudian-setting-validation claudian-setting-validation-warning claudian-hidden',
+      cls: 'praetor-max-tabs-warning praetor-setting-validation praetor-setting-validation-warning praetor-hidden',
     });
     maxTabsWarningEl.setText(t('settings.maxTabs.warning'));
 
     const updateMaxTabsWarning = (value: number): void => {
-      maxTabsWarningEl.toggleClass('claudian-hidden', value <= 5);
+      maxTabsWarningEl.toggleClass('praetor-hidden', value <= 5);
     };
 
     maxTabsSetting.addSlider((slider) => {
@@ -585,7 +585,7 @@ export class ClaudianSettingTab extends PluginSettingTab {
               settings.mediaFolder = value.trim();
             });
           });
-        text.inputEl.addClass('claudian-settings-media-input');
+        text.inputEl.addClass('praetor-settings-media-input');
         text.inputEl.addEventListener('blur', () => {
           void this.restartServiceForPromptChange();
         });
@@ -667,12 +667,12 @@ export class ClaudianSettingTab extends PluginSettingTab {
 
     new Setting(container).setName(t('settings.hotkeys')).setHeading();
 
-    const hotkeyGrid = container.createDiv({ cls: 'claudian-hotkey-grid' });
-    addHotkeySettingRow(hotkeyGrid, this.app, 'claudian:inline-edit', 'settings.inlineEditHotkey');
-    addHotkeySettingRow(hotkeyGrid, this.app, 'claudian:open-view', 'settings.openChatHotkey');
-    addHotkeySettingRow(hotkeyGrid, this.app, 'claudian:new-session', 'settings.newSessionHotkey');
-    addHotkeySettingRow(hotkeyGrid, this.app, 'claudian:new-tab', 'settings.newTabHotkey');
-    addHotkeySettingRow(hotkeyGrid, this.app, 'claudian:close-current-tab', 'settings.closeTabHotkey');
+    const hotkeyGrid = container.createDiv({ cls: 'praetor-hotkey-grid' });
+    addHotkeySettingRow(hotkeyGrid, this.app, 'praetor:inline-edit', 'settings.inlineEditHotkey');
+    addHotkeySettingRow(hotkeyGrid, this.app, 'praetor:open-view', 'settings.openChatHotkey');
+    addHotkeySettingRow(hotkeyGrid, this.app, 'praetor:new-session', 'settings.newSessionHotkey');
+    addHotkeySettingRow(hotkeyGrid, this.app, 'praetor:new-tab', 'settings.newTabHotkey');
+    addHotkeySettingRow(hotkeyGrid, this.app, 'praetor:close-current-tab', 'settings.closeTabHotkey');
 
     // --- Environment ---
 
@@ -735,30 +735,30 @@ export class ClaudianSettingTab extends PluginSettingTab {
       return;
     }
 
-    const headerEl = container.createDiv({ cls: 'claudian-context-limits-header' });
+    const headerEl = container.createDiv({ cls: 'praetor-context-limits-header' });
     headerEl.createSpan({
       text: t('settings.customModelOverrides.name'),
-      cls: 'claudian-context-limits-label',
+      cls: 'praetor-context-limits-label',
     });
 
-    const descEl = container.createDiv({ cls: 'claudian-context-limits-desc' });
+    const descEl = container.createDiv({ cls: 'praetor-context-limits-desc' });
     descEl.setText(t('settings.customModelOverrides.desc'));
 
-    const listEl = container.createDiv({ cls: 'claudian-context-limits-list' });
+    const listEl = container.createDiv({ cls: 'praetor-context-limits-list' });
 
     for (const modelId of uniqueModelIds) {
       const currentValue = this.plugin.settings.customContextLimits?.[modelId];
       const currentAlias = this.plugin.settings.customModelAliases?.[modelId] ?? '';
 
-      const itemEl = listEl.createDiv({ cls: 'claudian-context-limits-item' });
-      const nameEl = itemEl.createDiv({ cls: 'claudian-context-limits-model' });
+      const itemEl = listEl.createDiv({ cls: 'praetor-context-limits-item' });
+      const nameEl = itemEl.createDiv({ cls: 'praetor-context-limits-model' });
       nameEl.setText(modelId);
 
-      const inputWrapper = itemEl.createDiv({ cls: 'claudian-context-limits-input-wrapper' });
+      const inputWrapper = itemEl.createDiv({ cls: 'praetor-context-limits-input-wrapper' });
       const aliasInputEl = inputWrapper.createEl('input', {
         type: 'text',
         placeholder: t('settings.customModelAliases.placeholder'),
-        cls: 'claudian-context-alias-input',
+        cls: 'praetor-context-alias-input',
         value: currentAlias,
       });
       aliasInputEl.setAttribute('aria-label', `Alias for ${modelId}`);
@@ -767,12 +767,12 @@ export class ClaudianSettingTab extends PluginSettingTab {
       const inputEl = inputWrapper.createEl('input', {
         type: 'text',
         placeholder: '200k',
-        cls: 'claudian-context-limits-input',
+        cls: 'praetor-context-limits-input',
         value: currentValue ? formatContextLimit(currentValue) : '',
       });
       inputEl.setAttribute('aria-label', `Context window for ${modelId}`);
 
-      const validationEl = inputWrapper.createDiv({ cls: 'claudian-context-limit-validation claudian-hidden' });
+      const validationEl = inputWrapper.createDiv({ cls: 'praetor-context-limit-validation praetor-hidden' });
 
       const saveAlias = async (): Promise<void> => {
         const existing = this.plugin.settings.customModelAliases[modelId] ?? '';
@@ -799,19 +799,19 @@ export class ClaudianSettingTab extends PluginSettingTab {
         const trimmed = inputEl.value.trim();
 
         if (!trimmed) {
-          validationEl.toggleClass('claudian-hidden', true);
-          inputEl.classList.remove('claudian-input-error');
+          validationEl.toggleClass('praetor-hidden', true);
+          inputEl.classList.remove('praetor-input-error');
         } else {
           const parsed = parseContextLimit(trimmed);
           if (parsed === null) {
             validationEl.setText(t('settings.customContextLimits.invalid'));
-            validationEl.toggleClass('claudian-hidden', false);
-            inputEl.classList.add('claudian-input-error');
+            validationEl.toggleClass('praetor-hidden', false);
+            inputEl.classList.add('praetor-input-error');
             return;
           }
 
-          validationEl.toggleClass('claudian-hidden', true);
-          inputEl.classList.remove('claudian-input-error');
+          validationEl.toggleClass('praetor-hidden', true);
+          inputEl.classList.remove('praetor-input-error');
         }
         await this.plugin.mutateSettings((settings) => {
           settings.customContextLimits ??= {};

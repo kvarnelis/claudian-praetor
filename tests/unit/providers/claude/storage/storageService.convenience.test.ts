@@ -69,7 +69,7 @@ describe('StorageService convenience methods', () => {
     },
   });
 
-  const claudianSettingsJson = JSON.stringify({
+  const praetorSettingsJson = JSON.stringify({
     userName: 'Test',
     model: 'haiku',
     permissionMode: 'yolo',
@@ -171,53 +171,53 @@ describe('StorageService convenience methods', () => {
     });
   });
 
-  describe('updateClaudianSettings', () => {
+  describe('updatePraetorSettings', () => {
     it('updates partial claudian settings', async () => {
       const { plugin, files } = createMockPlugin({
         initialFiles: {
-          '.claudian/claudian-settings.json': claudianSettingsJson,
+          '.claudian/claudian-settings.json': praetorSettingsJson,
         },
       });
       const storage = new StorageService(plugin);
       await storage.initialize();
 
-      await storage.updateClaudianSettings({ userName: 'NewUser' });
+      await storage.updatePraetorSettings({ userName: 'NewUser' });
 
       const saved = JSON.parse(files.get('.claudian/claudian-settings.json')!) as Record<string, unknown>;
       expect(saved.userName).toBe('NewUser');
     });
   });
 
-  describe('saveClaudianSettings', () => {
+  describe('savePraetorSettings', () => {
     it('saves full claudian settings', async () => {
       const { plugin, files } = createMockPlugin({
         initialFiles: {
-          '.claudian/claudian-settings.json': claudianSettingsJson,
+          '.claudian/claudian-settings.json': praetorSettingsJson,
         },
       });
       const storage = new StorageService(plugin);
       await storage.initialize();
 
-      const existing = await storage.loadClaudianSettings();
+      const existing = await storage.loadPraetorSettings();
       existing.userName = 'FullSave';
-      await storage.saveClaudianSettings(existing);
+      await storage.savePraetorSettings(existing);
 
       const saved = JSON.parse(files.get('.claudian/claudian-settings.json')!) as Record<string, unknown>;
       expect(saved.userName).toBe('FullSave');
     });
   });
 
-  describe('loadClaudianSettings', () => {
+  describe('loadPraetorSettings', () => {
     it('loads claudian settings', async () => {
       const { plugin } = createMockPlugin({
         initialFiles: {
-          '.claudian/claudian-settings.json': claudianSettingsJson,
+          '.claudian/claudian-settings.json': praetorSettingsJson,
         },
       });
       const storage = new StorageService(plugin);
       await storage.initialize();
 
-      const settings = await storage.loadClaudianSettings();
+      const settings = await storage.loadPraetorSettings();
       expect(settings.userName).toBe('Test');
       expect(settings.model).toBe('haiku');
     });
@@ -225,7 +225,7 @@ describe('StorageService convenience methods', () => {
     it('migrates legacy settings into .claudian during initialization', async () => {
       const { plugin, files } = createMockPlugin({
         initialFiles: {
-          '.claude/claudian-settings.json': claudianSettingsJson,
+          '.claude/claudian-settings.json': praetorSettingsJson,
         },
       });
       const storage = new StorageService(plugin);

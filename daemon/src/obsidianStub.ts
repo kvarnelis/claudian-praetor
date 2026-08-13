@@ -1,5 +1,5 @@
 /**
- * Stand-in for the 'obsidian' module when Claudian sources are bundled into
+ * Stand-in for the 'obsidian' module when Praetor sources are bundled into
  * the praetord daemon (plain Node, no Electron renderer).
  *
  * Only the runtime-reachable surface matters: storage adapters, provider

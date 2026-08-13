@@ -1,5 +1,5 @@
 /**
- * Headless ClaudianPlugin shim: just enough plugin surface for provider
+ * Headless PraetorPlugin shim: just enough plugin surface for provider
  * registries, workspace services, and chat runtimes to operate outside
  * Obsidian. Every member NOT explicitly provided throws loudly via a Proxy
  * trap so missing surface is discovered instead of silently undefined.
@@ -8,7 +8,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 
-import { DEFAULT_CLAUDIAN_SETTINGS } from '../../src/app/settings/defaultSettings';
+import { DEFAULT_PRAETOR_SETTINGS } from '../../src/app/settings/defaultSettings';
 import {
   SettingsCoordinator,
   type ConditionalSettingsMutation,
@@ -16,8 +16,8 @@ import {
 } from '../../src/app/settings/SettingsCoordinator';
 import { SharedStorageService } from '../../src/app/storage/SharedStorageService';
 import {
-  CLAUDIAN_SETTINGS_PATH,
-  CLAUDIAN_STORAGE_PATH,
+  PRAETOR_SETTINGS_PATH,
+  PRAETOR_STORAGE_PATH,
 } from '../../src/core/bootstrap/StoragePaths';
 import {
   type EnvironmentScope,
@@ -30,8 +30,8 @@ import type { ProviderHost } from '../../src/core/providers/ProviderHost';
 import { ProviderSettingsCoordinator } from '../../src/core/providers/ProviderSettingsCoordinator';
 import { ProviderWorkspaceRegistry } from '../../src/core/providers/ProviderWorkspaceRegistry';
 import type { ProviderCliResolutionContext, ProviderId } from '../../src/core/providers/types';
-import type { ClaudianSettings } from '../../src/core/types';
-import type ClaudianPlugin from '../../src/main';
+import type { PraetorSettings } from '../../src/core/types';
+import type PraetorPlugin from '../../src/main';
 import { OPENCODE_PLAN_MODE_ID, OPENCODE_SAFE_MODE_ID } from '../../src/providers/opencode/modes';
 import type { NodeVaultApp } from './nodeVaultApp';
 
@@ -43,14 +43,14 @@ interface SettingsWatcher {
 }
 
 export interface HeadlessPluginHandle {
-  plugin: ClaudianPlugin;
-  settings: ClaudianSettings;
+  plugin: PraetorPlugin;
+  settings: PraetorSettings;
   storage: SharedStorageService;
   dispose(): void;
 }
 
 /** Mirrors the load-time normalization in main.ts loadSettings() (essentials only). */
-function normalizeLoadedSettings(settings: ClaudianSettings): void {
+function normalizeLoadedSettings(settings: PraetorSettings): void {
   // Plan mode is ephemeral; never boot stuck in it.
   if (settings.permissionMode === 'plan') {
     settings.permissionMode = 'normal';
@@ -88,7 +88,7 @@ export async function createHeadlessPlugin(options: {
 }): Promise<HeadlessPluginHandle> {
   const { app, vaultPath } = options;
   const log = options.log ?? ((message: string) => console.error(message));
-  const dataFilePath = path.join(vaultPath, CLAUDIAN_STORAGE_PATH, DAEMON_DATA_FILE);
+  const dataFilePath = path.join(vaultPath, PRAETOR_STORAGE_PATH, DAEMON_DATA_FILE);
 
   const loadData = async (): Promise<unknown> => {
     try {
@@ -105,11 +105,11 @@ export async function createHeadlessPlugin(options: {
   // SharedStorageService only touches plugin.app + loadData/saveData.
   const storageHost = { app, loadData, saveData };
   const storage = new SharedStorageService(storageHost as never);
-  const { claudian } = await storage.initialize();
+  const { praetor } = await storage.initialize();
 
-  const settings: ClaudianSettings = {
-    ...DEFAULT_CLAUDIAN_SETTINGS,
-    ...claudian,
+  const settings: PraetorSettings = {
+    ...DEFAULT_PRAETOR_SETTINGS,
+    ...praetor,
   };
   normalizeLoadedSettings(settings);
 
@@ -120,7 +120,7 @@ export async function createHeadlessPlugin(options: {
     ProviderSettingsCoordinator.persistProjectedProviderState(
       settings as unknown as Record<string, unknown>,
     );
-    await storage.saveClaudianSettings(settings);
+    await storage.savePraetorSettings(settings);
   };
   const settingsCoordinator = new SettingsCoordinator(settings, persistSettings);
 
@@ -132,10 +132,10 @@ export async function createHeadlessPlugin(options: {
     loadData,
     saveData,
     saveSettings: (): Promise<void> => settingsCoordinator.persistCurrent(),
-    mutateSettings: (mutation: SettingsMutation<ClaudianSettings>): Promise<void> =>
+    mutateSettings: (mutation: SettingsMutation<PraetorSettings>): Promise<void> =>
       settingsCoordinator.mutate(mutation),
     mutateSettingsConditionally: (
-      mutation: ConditionalSettingsMutation<ClaudianSettings>,
+      mutation: ConditionalSettingsMutation<PraetorSettings>,
     ): Promise<void> => settingsCoordinator.mutateConditionally(mutation),
     getResolvedProviderCliPath: async (
       providerId: ProviderId,
@@ -216,15 +216,15 @@ export async function createHeadlessPlugin(options: {
       if (prop === 'then') {
         return undefined;
       }
-      throw new Error(`praetord shim: ClaudianPlugin.${String(prop)} is not implemented`);
+      throw new Error(`praetord shim: PraetorPlugin.${String(prop)} is not implemented`);
     },
-  }) as unknown as ClaudianPlugin;
+  }) as unknown as PraetorPlugin;
 
   const watcher = watchSettingsFile(vaultPath, async () => {
     try {
-      const reloaded = await storage.claudianSettings.load();
-      const next: ClaudianSettings = {
-        ...DEFAULT_CLAUDIAN_SETTINGS,
+      const reloaded = await storage.praetorSettings.load();
+      const next: PraetorSettings = {
+        ...DEFAULT_PRAETOR_SETTINGS,
         ...reloaded,
       };
       normalizeLoadedSettings(next);
@@ -253,7 +253,7 @@ export async function createHeadlessPlugin(options: {
 }
 
 /**
- * Watches the `.claudian` directory (not the file itself: Obsidian/sync tools
+ * Watches the `.claudian` compatibility directory (not the file itself: Obsidian/sync tools
  * replace the file, which kills file-level watchers) and debounces change
  * bursts before invoking the reload callback.
  */
@@ -261,8 +261,8 @@ function watchSettingsFile(
   vaultPath: string,
   onChange: () => Promise<void>,
 ): SettingsWatcher | null {
-  const settingsDir = path.join(vaultPath, CLAUDIAN_STORAGE_PATH);
-  const settingsFileName = path.basename(CLAUDIAN_SETTINGS_PATH);
+  const settingsDir = path.join(vaultPath, PRAETOR_STORAGE_PATH);
+  const settingsFileName = path.basename(PRAETOR_SETTINGS_PATH);
   let timer: ReturnType<typeof setTimeout> | null = null;
   let reloading = false;
   let pendingReload = false;

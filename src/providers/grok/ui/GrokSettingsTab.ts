@@ -37,7 +37,7 @@ export const grokSettingsTabRenderer: ProviderSettingsTabRenderer = {
       .setDesc('Custom path to the local Grok Build CLI. Leave empty for auto-detection from PATH and ~/.grok/bin.');
 
     const validationEl = container.createDiv({
-      cls: 'claudian-cli-path-validation claudian-setting-validation claudian-setting-validation-error claudian-hidden',
+      cls: 'praetor-cli-path-validation praetor-setting-validation praetor-setting-validation-error praetor-hidden',
     });
 
     const validatePath = (value: string): string | null => {
@@ -60,15 +60,15 @@ export const grokSettingsTabRenderer: ProviderSettingsTabRenderer = {
       const error = validatePath(value);
       if (error) {
         validationEl.setText(error);
-        validationEl.toggleClass('claudian-hidden', false);
+        validationEl.toggleClass('praetor-hidden', false);
         if (inputEl) {
-          inputEl.toggleClass('claudian-input-error', true);
+          inputEl.toggleClass('praetor-input-error', true);
         }
         return false;
       }
-      validationEl.toggleClass('claudian-hidden', true);
+      validationEl.toggleClass('praetor-hidden', true);
       if (inputEl) {
-        inputEl.toggleClass('claudian-input-error', false);
+        inputEl.toggleClass('praetor-input-error', false);
       }
       return true;
     };
@@ -102,7 +102,7 @@ export const grokSettingsTabRenderer: ProviderSettingsTabRenderer = {
         .onChange(async (value) => {
           await persistCliPath(value);
         });
-      text.inputEl.addClass('claudian-settings-cli-path-input');
+      text.inputEl.addClass('praetor-settings-cli-path-input');
       cliPathInputEl = text.inputEl;
 
       updateCliPathValidation(currentValue, text.inputEl);

@@ -256,7 +256,7 @@ interface TestWorkspaceRuntime {
 }
 
 function createTestWorkspaceRuntime(): TestWorkspaceRuntime {
-  const home = fs.mkdtempSync(path.join(os.tmpdir(), 'claudian-chat-runtime-'));
+  const home = fs.mkdtempSync(path.join(os.tmpdir(), 'praetor-chat-runtime-'));
   const runtimeRoot = path.join(
     home,
     '.cache',
@@ -519,7 +519,7 @@ describe('CodexChatRuntime', () => {
       expect(mockTransportRequest).toHaveBeenCalledWith(
         'initialize',
         expect.objectContaining({
-          clientInfo: { name: 'claudian', version: '1.0.0' },
+          clientInfo: { name: 'praetor', version: '1.0.0' },
         }),
       );
       expect(mockTransportNotify).toHaveBeenCalledWith('initialized');

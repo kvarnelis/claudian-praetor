@@ -102,7 +102,7 @@ describe('daemon headless plugin', () => {
     writeFileSync(settingsPath, JSON.stringify({
       providerConfigs: {
         codex: { enabled: false, visibleModels: ['gpt-existing'] },
-        opencode: { enabled: true, selectedMode: 'claudian-yolo' },
+        opencode: { enabled: true, selectedMode: 'praetor-yolo' },
       },
     }));
     const handle = await createHeadlessPlugin({
@@ -125,7 +125,7 @@ describe('daemon headless plugin', () => {
       expect(persisted.providerConfigs.codex.visibleModels).toEqual(['gpt-current']);
       expect(persisted.providerConfigs.opencode).toEqual(expect.objectContaining({
         enabled: true,
-        selectedMode: 'claudian-yolo',
+        selectedMode: 'praetor-yolo',
       }));
     } finally {
       handle.dispose();

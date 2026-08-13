@@ -55,9 +55,9 @@ export const MIN_TABS = 3;
 export const MAX_TABS = 10;
 
 /**
- * Minimal interface for the ClaudianView methods used by TabManager and Tab.
+ * Minimal interface for the PraetorView methods used by TabManager and Tab.
  * Extends Component for Obsidian integration (event handling, cleanup).
- * Avoids circular dependency by not importing ClaudianView directly.
+ * Avoids circular dependency by not importing PraetorView directly.
  */
 export interface TabManagerViewHost extends Component {
   /** Reference to the workspace leaf for revealing the view. */

@@ -1,15 +1,15 @@
-.claudian-container--theme-native {
+.praetor-container--theme-native {
   /* Right-side themes can remap secondary; the ribbon token retains their sidebar surface. */
   background-color: var(--ribbon-background, var(--background-primary-alt, var(--background-secondary)));
   font-family: var(--font-interface);
 }
 
-.claudian-container--theme-native .claudian-message-content {
+.praetor-container--theme-native .praetor-message-content {
   color: var(--nav-item-color, var(--text-muted));
   font-size: var(--font-ui-small, 13px);
 }
 
-.claudian-container--theme-native .claudian-message-user {
+.praetor-container--theme-native .praetor-message-user {
   align-self: flex-end;
   padding: 0;
   /* Breathing room between the prompt text and its own right-hand rule. */
@@ -21,7 +21,7 @@
   text-align: end;
 }
 
-.claudian-container--theme-native .claudian-input-wrapper textarea.claudian-input {
+.praetor-container--theme-native .praetor-input-wrapper textarea.praetor-input {
   color: var(--text-normal);
   font-size: var(--font-ui-small, 13px);
 }

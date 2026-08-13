@@ -26,7 +26,7 @@ import type {
   TitleGenerationService,
 } from '../core/providers/types';
 import type { Conversation, InstructionRefineResult } from '../core/types';
-import type ClaudianPlugin from '../main';
+import type PraetorPlugin from '../main';
 import { CLAUDE_PROVIDER_CAPABILITIES } from '../providers/claude/capabilities';
 import { claudeSettingsReconciler } from '../providers/claude/env/ClaudeSettingsReconciler';
 import { claudeChatUIConfig } from '../providers/claude/ui/ClaudeChatUIConfig';
@@ -300,7 +300,7 @@ const REMOTE_PROVIDER_SPECS: RemoteProviderSpec[] = [
 
 let remoteProvidersRegistered = false;
 
-export function registerRemoteProviders(plugin: ClaudianPlugin): void {
+export function registerRemoteProviders(plugin: PraetorPlugin): void {
   if (remoteProvidersRegistered) return;
 
   // Registration runs before loadSettings(), so the daemon config isn't readable

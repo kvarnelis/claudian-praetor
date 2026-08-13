@@ -1,24 +1,24 @@
-.claudian-subagent-list {
+.praetor-subagent-list {
   margin: 8px 0;
 }
 
-.claudian-text-block+.claudian-subagent-list {
+.praetor-text-block+.praetor-subagent-list {
   margin-top: 8px;
 }
 
-.claudian-subagent-list+.claudian-text-block {
+.praetor-subagent-list+.praetor-text-block {
   margin-top: 8px;
 }
 
-.claudian-tool-call+.claudian-subagent-list {
+.praetor-tool-call+.praetor-subagent-list {
   margin-top: 8px;
 }
 
-.claudian-subagent-list+.claudian-tool-call {
+.praetor-subagent-list+.praetor-tool-call {
   margin-top: 8px;
 }
 
-.claudian-subagent-header {
+.praetor-subagent-header {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -27,19 +27,19 @@
   overflow: hidden;
 }
 
-.claudian-subagent-icon {
+.praetor-subagent-icon {
   display: flex;
   align-items: center;
   color: var(--interactive-accent);
   flex-shrink: 0;
 }
 
-.claudian-subagent-icon svg {
+.praetor-subagent-icon svg {
   width: 16px;
   height: 16px;
 }
 
-.claudian-subagent-label {
+.praetor-subagent-label {
   flex: 1;
   font-family: var(--font-monospace);
   font-size: 13px;
@@ -47,41 +47,41 @@
   color: var(--text-normal);
 }
 
-.claudian-subagent-status {
+.praetor-subagent-status {
   display: flex;
   align-items: center;
   flex-shrink: 0;
 }
 
-.claudian-subagent-status svg {
+.praetor-subagent-status svg {
   width: 14px;
   height: 14px;
 }
 
-.claudian-subagent-status.status-running {
+.praetor-subagent-status.status-running {
   color: var(--text-accent);
 }
 
-.claudian-subagent-status.status-completed {
+.praetor-subagent-status.status-completed {
   color: var(--color-green);
 }
 
-.claudian-subagent-status.status-error {
+.praetor-subagent-status.status-error {
   color: var(--color-red);
 }
 
-.claudian-subagent-content {
+.praetor-subagent-content {
   padding: 4px 0;
   padding-inline-start: 16px;
   margin-inline-start: 7px;
   border-inline-start: 2px solid var(--background-modifier-border);
 }
 
-.claudian-subagent-section {
+.praetor-subagent-section {
   margin: 2px 0 6px;
 }
 
-.claudian-subagent-section-header {
+.praetor-subagent-section-header {
   display: flex;
   align-items: center;
   gap: 6px;
@@ -93,21 +93,21 @@
   padding: 2px 0;
 }
 
-.claudian-subagent-section-header:hover {
+.praetor-subagent-section-header:hover {
   color: var(--text-normal);
 }
 
-.claudian-subagent-section-title {
+.praetor-subagent-section-title {
   flex: 1;
   min-width: 0;
 }
 
-.claudian-subagent-section-body {
+.praetor-subagent-section-body {
   padding-inline-start: 6px;
 }
 
-.claudian-subagent-prompt-text,
-.claudian-subagent-result-output {
+.praetor-subagent-prompt-text,
+.praetor-subagent-result-output {
   font-family: var(--font-monospace);
   font-size: 12px;
   line-height: 1.4;
@@ -116,22 +116,22 @@
   word-break: break-word;
 }
 
-.claudian-subagent-result-output {
+.praetor-subagent-result-output {
   max-height: 220px;
   overflow-y: auto;
 }
 
-.claudian-subagent-tools {
+.praetor-subagent-tools {
   display: flex;
   flex-direction: column;
   gap: 4px;
 }
 
-.claudian-subagent-tool-item {
+.praetor-subagent-tool-item {
   display: block;
 }
 
-.claudian-subagent-tool-header {
+.praetor-subagent-tool-header {
   display: flex;
   align-items: center;
   gap: 6px;
@@ -140,23 +140,23 @@
   padding: 2px 0;
 }
 
-.claudian-subagent-tool-header:hover {
+.praetor-subagent-tool-header:hover {
   opacity: 0.85;
 }
 
-.claudian-subagent-tool-icon {
+.praetor-subagent-tool-icon {
   display: flex;
   align-items: center;
   color: var(--text-accent);
   flex-shrink: 0;
 }
 
-.claudian-subagent-tool-icon svg {
+.praetor-subagent-tool-icon svg {
   width: 13px;
   height: 13px;
 }
 
-.claudian-subagent-tool-name {
+.praetor-subagent-tool-name {
   font-family: var(--font-monospace);
   font-size: 12px;
   color: var(--text-normal);
@@ -164,7 +164,7 @@
   flex-shrink: 0;
 }
 
-.claudian-subagent-tool-summary {
+.praetor-subagent-tool-summary {
   font-family: var(--font-monospace);
   font-size: 12px;
   color: var(--text-muted);
@@ -175,35 +175,35 @@
   min-width: 0;
 }
 
-.claudian-subagent-tool-status {
+.praetor-subagent-tool-status {
   display: flex;
   align-items: center;
   flex-shrink: 0;
 }
 
-.claudian-subagent-tool-status svg {
+.praetor-subagent-tool-status svg {
   width: 12px;
   height: 12px;
 }
 
-.claudian-subagent-tool-status.status-running {
+.praetor-subagent-tool-status.status-running {
   color: var(--text-accent);
 }
 
-.claudian-subagent-tool-status.status-completed {
+.praetor-subagent-tool-status.status-completed {
   color: var(--color-green);
 }
 
-.claudian-subagent-tool-status.status-error,
-.claudian-subagent-tool-status.status-blocked {
+.praetor-subagent-tool-status.status-error,
+.praetor-subagent-tool-status.status-blocked {
   color: var(--color-red);
 }
 
-.claudian-subagent-tool-content {
+.praetor-subagent-tool-content {
   padding: 2px 0 2px 16px;
 }
 
-.claudian-subagent-tool-empty {
+.praetor-subagent-tool-empty {
   color: var(--text-faint);
   font-style: italic;
   font-family: var(--font-monospace);
@@ -211,7 +211,7 @@
   padding: 2px 0;
 }
 
-.claudian-subagent-status-text {
+.praetor-subagent-status-text {
   font-size: 11px;
   font-family: var(--font-monospace);
   color: var(--text-muted);
@@ -219,30 +219,30 @@
   padding-inline-start: 8px;
 }
 
-.claudian-subagent-list.async .claudian-subagent-icon {
+.praetor-subagent-list.async .praetor-subagent-icon {
   color: var(--interactive-accent);
 }
 
-.claudian-subagent-list.async.pending .claudian-subagent-status-text {
+.praetor-subagent-list.async.pending .praetor-subagent-status-text {
   color: var(--text-muted);
 }
 
-.claudian-subagent-list.async.running .claudian-subagent-status-text {
+.praetor-subagent-list.async.running .praetor-subagent-status-text {
   color: var(--text-accent);
 }
 
-.claudian-subagent-list.async.awaiting .claudian-subagent-status-text {
+.praetor-subagent-list.async.awaiting .praetor-subagent-status-text {
   color: var(--color-yellow);
 }
 
-.claudian-subagent-list.async.completed .claudian-subagent-status-text {
+.praetor-subagent-list.async.completed .praetor-subagent-status-text {
   color: var(--color-green);
 }
 
-.claudian-subagent-list.async.error .claudian-subagent-status-text {
+.praetor-subagent-list.async.error .praetor-subagent-status-text {
   color: var(--color-red);
 }
 
-.claudian-subagent-list.async.orphaned .claudian-subagent-status-text {
+.praetor-subagent-list.async.orphaned .praetor-subagent-status-text {
   color: var(--color-orange);
 }

@@ -63,7 +63,7 @@ export const opencodeSettingsTabRenderer: ProviderSettingsTabRenderer = {
       .setDesc('Optional absolute path to the OpenCode CLI for this computer. Leave empty to use `opencode` from PATH.');
 
     const validationEl = container.createDiv({
-      cls: 'claudian-cli-path-validation claudian-setting-validation claudian-setting-validation-error claudian-hidden',
+      cls: 'praetor-cli-path-validation praetor-setting-validation praetor-setting-validation-error praetor-hidden',
     });
     const cliPathsByHost = { ...opencodeSettings.cliPathsByHost };
     const currentValue = opencodeSettings.cliPathsByHost[hostnameKey] || '';
@@ -73,13 +73,13 @@ export const opencodeSettingsTabRenderer: ProviderSettingsTabRenderer = {
       const error = validateCliPath(value);
       if (error) {
         validationEl.setText(error);
-        validationEl.toggleClass('claudian-hidden', false);
-        inputEl?.toggleClass('claudian-input-error', true);
+        validationEl.toggleClass('praetor-hidden', false);
+        inputEl?.toggleClass('praetor-input-error', true);
         return false;
       }
 
-      validationEl.toggleClass('claudian-hidden', true);
-      inputEl?.toggleClass('claudian-input-error', false);
+      validationEl.toggleClass('praetor-hidden', true);
+      inputEl?.toggleClass('praetor-input-error', false);
       return true;
     };
 
@@ -117,7 +117,7 @@ export const opencodeSettingsTabRenderer: ProviderSettingsTabRenderer = {
         .onChange(async (value) => {
           await persistCliPath(value);
         });
-      text.inputEl.addClass('claudian-settings-cli-path-input');
+      text.inputEl.addClass('praetor-settings-cli-path-input');
       cliPathInputEl = text.inputEl;
       updateCliPathValidation(currentValue, text.inputEl);
     });
@@ -127,7 +127,7 @@ export const opencodeSettingsTabRenderer: ProviderSettingsTabRenderer = {
 
     new Setting(container).setName('Commands and skills').setHeading();
 
-    const commandsDesc = container.createDiv({ cls: 'claudian-sp-settings-desc' });
+    const commandsDesc = container.createDiv({ cls: 'praetor-sp-settings-desc' });
     commandsDesc.createEl('p', {
       cls: 'setting-item-description',
       text: 'OpenCode can auto-detect vault-level Claude slash commands from .claude/commands/ and skills from .claude/skills/, .codex/skills/, and .agents/skills/. Manage those entries in the Claude or Codex settings tab. This setting only hides entries from the OpenCode dropdown.',
@@ -142,13 +142,13 @@ export const opencodeSettingsTabRenderer: ProviderSettingsTabRenderer = {
     if (opencodeWorkspace?.agentStorage) {
       new Setting(container).setName('Subagents').setHeading();
 
-      const subagentsDesc = container.createDiv({ cls: 'claudian-sp-settings-desc' });
+      const subagentsDesc = container.createDiv({ cls: 'praetor-sp-settings-desc' });
       subagentsDesc.createEl('p', {
         cls: 'setting-item-description',
         text: 'Manage vault-level OpenCode subagents from .opencode/agent/ and legacy .opencode/agents/. New entries are saved as subagent-only files and appear in the @mention menu.',
       });
 
-      const subagentsContainer = container.createDiv({ cls: 'claudian-slash-commands-container' });
+      const subagentsContainer = container.createDiv({ cls: 'praetor-slash-commands-container' });
       new OpencodeAgentSettings(
         subagentsContainer,
         opencodeWorkspace.agentStorage,
@@ -207,7 +207,7 @@ function renderOpencodeModelPicker(
 
   renderProviderModelPicker({
     container,
-    emptyCatalogText: 'Start OpenCode once to load its model catalog. Claudian will then let you pick visible models.',
+    emptyCatalogText: 'Start OpenCode once to load its model catalog. Praetor will then let you pick visible models.',
     failedCatalogText: 'Could not load the OpenCode model catalog. Check the CLI path and login state, then try again.',
     getState,
     async loadCatalog() {

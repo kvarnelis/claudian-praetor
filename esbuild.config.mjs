@@ -133,7 +133,7 @@ function createPatchRendererUnsafeUnref(outputPaths) {
 const manifest = JSON.parse(readFileSync(path.join(process.cwd(), 'manifest.json'), 'utf-8'));
 const OBSIDIAN_PLUGIN_ID = process.env.OBSIDIAN_PLUGIN_ID
   || manifest.id
-  || 'claudian';
+  || 'praetor';
 
 const OBSIDIAN_VAULT = process.env.OBSIDIAN_VAULT;
 const OBSIDIAN_PLUGIN_PATH = OBSIDIAN_VAULT && existsSync(OBSIDIAN_VAULT)

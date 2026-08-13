@@ -69,25 +69,25 @@ export interface MockElement {
 }
 
 const CLASS_DISPLAY: Record<string, string> = {
-  'claudian-context-meter': 'flex',
-  'claudian-mcp-selector': 'flex',
-  'claudian-mode-selector': 'flex',
-  'claudian-permission-toggle': 'flex',
-  'claudian-service-tier-toggle': 'flex',
-  'claudian-status-panel-bash': 'block',
-  'claudian-status-panel-bash-content': 'block',
-  'claudian-status-panel-bash-entry-content': 'block',
-  'claudian-status-panel-content': 'block',
-  'claudian-status-panel-todos': 'block',
-  'claudian-tab-content': 'flex',
-  'claudian-thinking-budget': 'flex',
-  'claudian-thinking-effort': 'flex',
+  'praetor-context-meter': 'flex',
+  'praetor-mcp-selector': 'flex',
+  'praetor-mode-selector': 'flex',
+  'praetor-permission-toggle': 'flex',
+  'praetor-service-tier-toggle': 'flex',
+  'praetor-status-panel-bash': 'block',
+  'praetor-status-panel-bash-content': 'block',
+  'praetor-status-panel-bash-entry-content': 'block',
+  'praetor-status-panel-content': 'block',
+  'praetor-status-panel-todos': 'block',
+  'praetor-tab-content': 'flex',
+  'praetor-thinking-budget': 'flex',
+  'praetor-thinking-effort': 'flex',
 };
 
 const DISPLAY_CLASSES = new Set([
-  'claudian-hidden',
-  'claudian-visible-block',
-  'claudian-visible-flex',
+  'praetor-hidden',
+  'praetor-visible-block',
+  'praetor-visible-flex',
   ...Object.keys(CLASS_DISPLAY),
 ]);
 
@@ -101,9 +101,9 @@ export function createMockEl(tag = 'div'): any {
   let textContent = '';
 
   const resolveDisplay = (): string | null => {
-    if (classes.has('claudian-hidden')) return 'none';
-    if (classes.has('claudian-visible-flex')) return 'flex';
-    if (classes.has('claudian-visible-block')) return 'block';
+    if (classes.has('praetor-hidden')) return 'none';
+    if (classes.has('praetor-visible-flex')) return 'flex';
+    if (classes.has('praetor-visible-block')) return 'block';
 
     for (const [cls, display] of Object.entries(CLASS_DISPLAY)) {
       if (classes.has(cls)) return display;

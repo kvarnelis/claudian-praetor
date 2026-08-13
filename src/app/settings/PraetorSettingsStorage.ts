@@ -1,6 +1,6 @@
 import {
-  CLAUDIAN_SETTINGS_PATH,
-  LEGACY_CLAUDIAN_SETTINGS_PATH,
+  LEGACY_PRAETOR_SETTINGS_PATH,
+  PRAETOR_SETTINGS_PATH,
 } from '../../core/bootstrap/StoragePaths';
 import {
   normalizeHiddenCommandList,
@@ -16,20 +16,20 @@ import type { VaultFileAdapter } from '../../core/storage/VaultFileAdapter';
 import {
   CHAT_VIEW_PLACEMENTS,
   type ChatViewPlacement,
-  type ClaudianSettings,
   type EnvironmentScope,
   type EnvSnippet,
   type HiddenProviderCommands,
+  type PraetorSettings,
   type ProviderConfigMap,
 } from '../../core/types/settings';
-import { DEFAULT_CLAUDIAN_SETTINGS } from './defaultSettings';
+import { DEFAULT_PRAETOR_SETTINGS } from './defaultSettings';
 
 export {
-  CLAUDIAN_SETTINGS_PATH,
-  LEGACY_CLAUDIAN_SETTINGS_PATH,
+  LEGACY_PRAETOR_SETTINGS_PATH,
+  PRAETOR_SETTINGS_PATH,
 };
 
-export type StoredClaudianSettings = ClaudianSettings;
+export type StoredPraetorSettings = PraetorSettings;
 
 const LEGACY_STRIPPED_SHARED_SETTING_FIELDS = [
   'activeConversationId',
@@ -84,7 +84,7 @@ function normalizeChatViewPlacement(
     return legacyOpenInMainTab ? 'main-tab' : 'right-sidebar';
   }
 
-  return DEFAULT_CLAUDIAN_SETTINGS.chatViewPlacement;
+  return DEFAULT_PRAETOR_SETTINGS.chatViewPlacement;
 }
 
 function shouldPersistChatViewPlacementMigration(
@@ -270,10 +270,10 @@ function mergeLegacyClaudeHiddenCommands(
   };
 }
 
-export class ClaudianSettingsStorage {
+export class PraetorSettingsStorage {
   constructor(private adapter: VaultFileAdapter) {}
 
-  async load(): Promise<StoredClaudianSettings> {
+  async load(): Promise<StoredPraetorSettings> {
     const settingsPath = await this.getLoadPath();
     if (!settingsPath) {
       return this.getDefaults();
@@ -334,7 +334,7 @@ export class ClaudianSettingsStorage {
     );
 
     if (
-      settingsPath !== CLAUDIAN_SETTINGS_PATH
+      settingsPath !== PRAETOR_SETTINGS_PATH
       || (
       hasLegacyTopLevelProviderFields(stored)
       || 'show1MModel' in stored
@@ -363,7 +363,7 @@ export class ClaudianSettingsStorage {
     return merged;
   }
 
-  async save(settings: StoredClaudianSettings): Promise<void> {
+  async save(settings: StoredPraetorSettings): Promise<void> {
     const { providerConfigs } = projectPersistableProviderConfigs(settings.providerConfigs);
     const content = JSON.stringify(
       stripLegacyFields({
@@ -373,42 +373,42 @@ export class ClaudianSettingsStorage {
       null,
       2,
     );
-    await this.adapter.write(CLAUDIAN_SETTINGS_PATH, content);
+    await this.adapter.write(PRAETOR_SETTINGS_PATH, content);
     await this.deleteLegacyFileIfPresent();
   }
 
   async exists(): Promise<boolean> {
-    if (await this.adapter.exists(CLAUDIAN_SETTINGS_PATH)) {
+    if (await this.adapter.exists(PRAETOR_SETTINGS_PATH)) {
       return true;
     }
 
-    return this.adapter.exists(LEGACY_CLAUDIAN_SETTINGS_PATH);
+    return this.adapter.exists(LEGACY_PRAETOR_SETTINGS_PATH);
   }
 
-  async update(updates: Partial<StoredClaudianSettings>): Promise<void> {
+  async update(updates: Partial<StoredPraetorSettings>): Promise<void> {
     const current = await this.load();
     await this.save({ ...current, ...updates });
   }
 
-  private getDefaults(): StoredClaudianSettings {
-    return DEFAULT_CLAUDIAN_SETTINGS;
+  private getDefaults(): StoredPraetorSettings {
+    return DEFAULT_PRAETOR_SETTINGS;
   }
 
   private async getLoadPath(): Promise<string | null> {
-    if (await this.adapter.exists(CLAUDIAN_SETTINGS_PATH)) {
-      return CLAUDIAN_SETTINGS_PATH;
+    if (await this.adapter.exists(PRAETOR_SETTINGS_PATH)) {
+      return PRAETOR_SETTINGS_PATH;
     }
 
-    if (await this.adapter.exists(LEGACY_CLAUDIAN_SETTINGS_PATH)) {
-      return LEGACY_CLAUDIAN_SETTINGS_PATH;
+    if (await this.adapter.exists(LEGACY_PRAETOR_SETTINGS_PATH)) {
+      return LEGACY_PRAETOR_SETTINGS_PATH;
     }
 
     return null;
   }
 
   private async deleteLegacyFileIfPresent(): Promise<void> {
-    if (await this.adapter.exists(LEGACY_CLAUDIAN_SETTINGS_PATH)) {
-      await this.adapter.delete(LEGACY_CLAUDIAN_SETTINGS_PATH);
+    if (await this.adapter.exists(LEGACY_PRAETOR_SETTINGS_PATH)) {
+      await this.adapter.delete(LEGACY_PRAETOR_SETTINGS_PATH);
     }
   }
 }

@@ -112,7 +112,7 @@ export function parseCliArgs(argv: string[]): CliOptions {
 }
 
 export function printUsage(): void {
-  console.log(`praetord - Claudian Praetor daemon
+  console.log(`praetord - Praetor daemon
 
 Usage: node praetord.cjs [options]
 
@@ -306,6 +306,6 @@ export function authorizeClient(configPath: string, request: ClientAuthorization
 
   return {
     ok: false,
-    reason: 'device not paired; open pairing in Claudian Praetor settings on your Mac',
+    reason: 'device not paired; open pairing in Praetor settings on your Mac',
   };
 }

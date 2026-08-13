@@ -62,12 +62,14 @@ function loadGrokHistoryMessages(
     const line = lines[i].trim();
     if (!line) continue;
 
-    let record: Record<string, unknown>;
+    let parsed: unknown;
     try {
-      record = JSON.parse(line);
+      parsed = JSON.parse(line) as unknown;
     } catch {
       continue;
     }
+    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) continue;
+    const record = parsed as Record<string, unknown>;
 
     const role = typeof record.type === 'string' ? record.type : '';
     const timestamp = baseTimestamp + messages.length;

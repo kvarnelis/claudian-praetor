@@ -48,7 +48,7 @@ global.ResizeObserver = MockResizeObserver as unknown as typeof ResizeObserver;
 
 // Mock provider runtime used by ProviderRegistry
 jest.mock('@/providers/claude/runtime/ClaudeChatRuntime', () => ({
-  ClaudianService: jest.fn().mockImplementation(() => ({
+  ClaudeChatRuntime: jest.fn().mockImplementation(() => ({
     ensureReady: jest.fn().mockResolvedValue(true),
     cleanup: jest.fn(),
     isReady: jest.fn().mockReturnValue(false),
@@ -124,7 +124,7 @@ const createMockModeSelector = () => ({
   renderOptions: jest.fn(),
 });
 
-const createMockClaudianService = (overrides?: {
+const createMockClaudeChatRuntime = (overrides?: {
   ensureReady?: jest.Mock;
   syncConversationState?: jest.Mock;
   onReadyStateChange?: jest.Mock;
@@ -515,11 +515,11 @@ describe('Tab - Creation', () => {
       expect(tab.id).toMatch(/^tab-/);
     });
 
-    it('should create the welcome container with Claudian branding', () => {
+    it('should create the welcome container with Praetor branding', () => {
       const tab = createTab(createMockOptions());
 
-      expect(tab.dom.welcomeEl?.querySelector('.claudian-welcome-brand')?.textContent)
-        .toBe('Claudian');
+      expect(tab.dom.welcomeEl?.querySelector('.praetor-welcome-brand')?.textContent)
+        .toBe('Praetor');
     });
 
     it('should describe composer actions in the input placeholder', () => {
@@ -716,7 +716,7 @@ describe('Tab - Service Initialization', () => {
       const options = createMockOptions();
       const tab = createTab(options);
       tab.serviceInitialized = true;
-      tab.service = createMockClaudianService() as any;
+      tab.service = createMockClaudeChatRuntime() as any;
 
       await initializeTabService(tab, options.plugin, options.mcpManager);
 
@@ -724,7 +724,7 @@ describe('Tab - Service Initialization', () => {
       expect(tab.service).toEqual(expect.objectContaining({ providerId: 'claude' }));
     });
 
-    it('should create ClaudianService on first initialization', async () => {
+    it('should create ClaudeChatRuntime on first initialization', async () => {
       const options = createMockOptions();
       const tab = createTab(options);
 
@@ -757,7 +757,7 @@ describe('Tab - Service Initialization', () => {
 
     it('should create the runtime for the conversation provider', async () => {
       const createChatRuntimeSpy = jest.spyOn(ProviderRegistry, 'createChatRuntime');
-      const mockRuntime = createMockClaudianService({ providerId: 'codex' });
+      const mockRuntime = createMockClaudeChatRuntime({ providerId: 'codex' });
       createChatRuntimeSpy.mockReturnValue(mockRuntime as any);
 
       const conversation = {
@@ -789,8 +789,8 @@ describe('Tab - Service Initialization', () => {
 
     it('should recreate the runtime when the conversation provider changes', async () => {
       const createChatRuntimeSpy = jest.spyOn(ProviderRegistry, 'createChatRuntime');
-      const oldService = createMockClaudianService({ providerId: 'claude' });
-      const newService = createMockClaudianService({ providerId: 'codex' });
+      const oldService = createMockClaudeChatRuntime({ providerId: 'claude' });
+      const newService = createMockClaudeChatRuntime({ providerId: 'codex' });
       createChatRuntimeSpy.mockReturnValue(newService as any);
 
       const conversation = {
@@ -827,8 +827,8 @@ describe('Tab - Service Initialization', () => {
 
     it('should NOT call ensureReady for blank tabs (lazy start)', async () => {
       const mockEnsureReady = jest.fn().mockResolvedValue(true);
-      const runtimeModule = jest.requireMock('@/providers/claude/runtime/ClaudeChatRuntime') as { ClaudianService: jest.Mock };
-      runtimeModule.ClaudianService.mockImplementationOnce(() => createMockClaudianService({ ensureReady: mockEnsureReady }));
+      const runtimeModule = jest.requireMock('@/providers/claude/runtime/ClaudeChatRuntime') as { ClaudeChatRuntime: jest.Mock };
+      runtimeModule.ClaudeChatRuntime.mockImplementationOnce(() => createMockClaudeChatRuntime({ ensureReady: mockEnsureReady }));
 
       const options = createMockOptions();
       const tab = createTab(options);
@@ -843,7 +843,7 @@ describe('Tab - Service Initialization', () => {
 
     it('should sync existing conversations with saved external contexts', async () => {
       const mockSyncConversationState = jest.fn();
-      jest.spyOn(ProviderRegistry, 'createChatRuntime').mockReturnValue(createMockClaudianService({
+      jest.spyOn(ProviderRegistry, 'createChatRuntime').mockReturnValue(createMockClaudeChatRuntime({
         syncConversationState: mockSyncConversationState,
       }) as any);
 
@@ -974,7 +974,7 @@ describe('Tab - Service Initialization', () => {
       tab.providerId = 'codex';
       tab.lifecycleState = 'blank';
 
-      const staleService = createMockClaudianService({ providerId: 'codex' });
+      const staleService = createMockClaudeChatRuntime({ providerId: 'codex' });
       tab.service = staleService as any;
       tab.serviceInitialized = true;
 
@@ -1118,12 +1118,12 @@ describe('Tab - Service Initialization', () => {
           providerConfigs: {
             opencode: {
               availableModes: [
-                { id: 'claudian-yolo', name: 'YOLO' },
-                { id: 'claudian-safe', name: 'Safe' },
+                { id: 'praetor-yolo', name: 'YOLO' },
+                { id: 'praetor-safe', name: 'Safe' },
                 { id: 'plan', name: 'Plan' },
               ],
               enabled: true,
-              selectedMode: 'claudian-yolo',
+              selectedMode: 'praetor-yolo',
             },
           },
           savedProviderEffort: {
@@ -1163,7 +1163,7 @@ describe('Tab - Service Initialization', () => {
 
       await toolbarCallbacks.onPermissionModeChange('normal');
 
-      expect(plugin.settings.providerConfigs.opencode.selectedMode).toBe('claudian-safe');
+      expect(plugin.settings.providerConfigs.opencode.selectedMode).toBe('praetor-safe');
       expect(plugin.settings.savedProviderPermissionMode).toEqual(expect.objectContaining({
         claude: 'yolo',
         opencode: 'normal',
@@ -1198,7 +1198,7 @@ describe('Tab - Service Initialization', () => {
 
       expect(plugin.settings.permissionMode).toBe('plan');
       expect(tab.ui.permissionToggle!.updateDisplay).toHaveBeenCalledTimes(1);
-      expect(tab.dom.inputWrapper.hasClass('claudian-input-plan-mode')).toBe(true);
+      expect(tab.dom.inputWrapper.hasClass('praetor-input-plan-mode')).toBe(true);
     });
 
     it('renders the in-memory permission mode when persistence fails after mutation', async () => {
@@ -1214,7 +1214,7 @@ describe('Tab - Service Initialization', () => {
 
       expect(plugin.settings.permissionMode).toBe('plan');
       expect(tab.ui.permissionToggle!.updateDisplay).toHaveBeenCalledTimes(1);
-      expect(tab.dom.inputWrapper.hasClass('claudian-input-plan-mode')).toBe(true);
+      expect(tab.dom.inputWrapper.hasClass('praetor-input-plan-mode')).toBe(true);
     });
 
     it('resets to blank state when the new-conversation callback fires', () => {
@@ -1286,7 +1286,7 @@ describe('Tab - Service Initialization', () => {
       initializeTabUI(tab, plugin);
       initializeTabControllers(tab, plugin, {} as any, createMockMcpManager());
 
-      const staleService = createMockClaudianService({ providerId: 'codex' });
+      const staleService = createMockClaudeChatRuntime({ providerId: 'codex' });
       tab.lifecycleState = 'bound_active';
       tab.conversationId = 'conv-1';
       tab.providerId = 'codex';
@@ -1425,7 +1425,7 @@ describe('Tab - Destruction', () => {
       const unsubscribeFn = jest.fn();
       const mockOnReadyStateChange = jest.fn(() => unsubscribeFn);
 
-      jest.spyOn(ProviderRegistry, 'createChatRuntime').mockReturnValue(createMockClaudianService({
+      jest.spyOn(ProviderRegistry, 'createChatRuntime').mockReturnValue(createMockClaudeChatRuntime({
         onReadyStateChange: mockOnReadyStateChange,
       }) as any);
 
@@ -1657,7 +1657,7 @@ describe('Tab - Service Callbacks', () => {
       const addMessageSpy = jest.spyOn(tab.state, 'addMessage');
       const addMessage = jest.fn(() => {
         const msgEl = createMockEl();
-        msgEl.createDiv({ cls: 'claudian-message-content' });
+        msgEl.createDiv({ cls: 'praetor-message-content' });
         return msgEl;
       });
       const scrollToBottom = jest.fn();
@@ -3023,7 +3023,7 @@ describe('Tab - Service Initialization Error Handling', () => {
 
     // Mark as already initialized
     tab.serviceInitialized = true;
-    const originalService = createMockClaudianService() as any;
+    const originalService = createMockClaudeChatRuntime() as any;
     tab.service = originalService;
 
     await initializeTabService(tab, options.plugin, options.mcpManager);
@@ -3128,11 +3128,11 @@ describe('Tab - Controller Configuration', () => {
       const config = constructorCall[0];
       const inputStyle = tab.dom.inputEl.style as unknown as Record<string, string>;
       tab.dom.inputEl.value = '';
-      inputStyle['--claudian-textarea-min-height'] = '240px';
+      inputStyle['--praetor-textarea-min-height'] = '240px';
 
       config.resetInputHeight();
 
-      expect(inputStyle['--claudian-textarea-min-height'])
+      expect(inputStyle['--praetor-textarea-min-height'])
         .toBe(`${TEXTAREA_BASE_MIN_HEIGHT}px`);
     });
 
@@ -4381,7 +4381,7 @@ describe('Tab - Blank Tab Draft Model Change', () => {
     const tab = createTab(createMockOptions({ plugin }));
     initializeTabUI(tab, plugin);
 
-    const staleService = createMockClaudianService({ providerId: 'codex' });
+    const staleService = createMockClaudeChatRuntime({ providerId: 'codex' });
     tab.service = staleService as any;
     tab.serviceInitialized = false;
 
@@ -4408,10 +4408,10 @@ describe('Tab - Blank Tab Draft Model Change', () => {
 describe('Tab - First Send Binding', () => {
   it('derives provider from draft model on first send (Claude)', async () => {
     const mockEnsureReady = jest.fn().mockResolvedValue(true);
-    const runtimeModule = jest.requireMock('@/providers/claude/runtime/ClaudeChatRuntime') as { ClaudianService: jest.Mock };
-    runtimeModule.ClaudianService.mockImplementationOnce(() => createMockClaudianService({ ensureReady: mockEnsureReady }));
+    const runtimeModule = jest.requireMock('@/providers/claude/runtime/ClaudeChatRuntime') as { ClaudeChatRuntime: jest.Mock };
+    runtimeModule.ClaudeChatRuntime.mockImplementationOnce(() => createMockClaudeChatRuntime({ ensureReady: mockEnsureReady }));
     const createChatRuntimeSpy = jest.spyOn(ProviderRegistry, 'createChatRuntime')
-      .mockReturnValue(createMockClaudianService() as any);
+      .mockReturnValue(createMockClaudeChatRuntime() as any);
 
     const plugin = createMockPlugin();
     const tab = createTab(createMockOptions({ plugin }));
@@ -4430,7 +4430,7 @@ describe('Tab - First Send Binding', () => {
 
   it('derives provider from draft model on first send (Codex)', async () => {
     const createChatRuntimeSpy = jest.spyOn(ProviderRegistry, 'createChatRuntime')
-      .mockReturnValue(createMockClaudianService({ providerId: 'codex' }) as any);
+      .mockReturnValue(createMockClaudeChatRuntime({ providerId: 'codex' }) as any);
 
     const plugin = createMockPlugin();
     const tab = createTab(createMockOptions({ plugin }));

@@ -164,9 +164,9 @@ describe('ConversationController', () => {
         await controller.createNew();
 
         const welcomeEl = deps.getWelcomeEl()!;
-        expect(welcomeEl.querySelector('.claudian-welcome-brand')?.textContent)
-          .toBe('Claudian');
-        expect(welcomeEl.querySelector('.claudian-welcome-greeting')).not.toBeNull();
+        expect(welcomeEl.querySelector('.praetor-welcome-brand')?.textContent)
+          .toBe('Praetor');
+        expect(welcomeEl.querySelector('.praetor-welcome-greeting')).not.toBeNull();
       });
 
       it('should clear todos for new conversation', async () => {
@@ -327,8 +327,8 @@ describe('ConversationController', () => {
 
       controller.initializeWelcome();
       const initialCallCount = createDivSpy.mock.calls.length;
-      expect(welcomeEl.querySelector('.claudian-welcome-brand')).not.toBeNull();
-      expect(welcomeEl.querySelector('.claudian-welcome-greeting')).not.toBeNull();
+      expect(welcomeEl.querySelector('.praetor-welcome-brand')).not.toBeNull();
+      expect(welcomeEl.querySelector('.praetor-welcome-greeting')).not.toBeNull();
 
       controller.initializeWelcome();
       expect(createDivSpy).toHaveBeenCalledTimes(initialCallCount);
@@ -641,7 +641,7 @@ describe('ConversationController', () => {
 
         expect(dropdown.children.length).toBe(2);
         const list = dropdown.children[1];
-        expect(list.hasClass('claudian-history-list')).toBe(true);
+        expect(list.hasClass('praetor-history-list')).toBe(true);
         expect(list.children.length).toBe(2);
       });
 
@@ -651,7 +651,7 @@ describe('ConversationController', () => {
         controller.updateHistoryDropdown();
 
         const list = dropdown.children[1];
-        expect(list.children[0].hasClass('claudian-history-empty')).toBe(true);
+        expect(list.children[0].hasClass('praetor-history-empty')).toBe(true);
       });
 
       it('should sort conversations by lastResponseAt descending', () => {
@@ -664,7 +664,7 @@ describe('ConversationController', () => {
         controller.updateHistoryDropdown();
 
         const list = dropdown.children[1];
-        const firstTitle = list.children[0].querySelector('.claudian-history-item-title');
+        const firstTitle = list.children[0].querySelector('.praetor-history-item-title');
         expect(firstTitle?.textContent).toBe('New');
       });
 
@@ -693,7 +693,7 @@ describe('ConversationController', () => {
 
         const list = dropdown.children[1];
         const item = list.children[0];
-        const loadingEl = item.querySelector('.claudian-action-loading');
+        const loadingEl = item.querySelector('.praetor-action-loading');
         expect(loadingEl).toBeTruthy();
       });
 
@@ -706,7 +706,7 @@ describe('ConversationController', () => {
 
         const list = dropdown.children[1];
         const item = list.children[0];
-        const actions = item.querySelector('.claudian-history-item-actions');
+        const actions = item.querySelector('.praetor-history-item-actions');
         expect(actions).toBeTruthy();
         // regenerate button + rename button + delete button = 3 children
         expect(actions!.children.length).toBe(3);
@@ -723,7 +723,7 @@ describe('ConversationController', () => {
 
         const list = dropdown.children[1];
         const item = list.children[0];
-        const content = item.querySelector('.claudian-history-item-content');
+        const content = item.querySelector('.praetor-history-item-content');
         const listeners = content?._eventListeners?.get('click');
         expect(listeners).toBeUndefined();
       });
@@ -757,7 +757,7 @@ describe('ConversationController', () => {
 
         const list = dropdown.children[1];
         const item = list.children[0];
-        const deleteBtn = item.querySelector('.claudian-delete-btn');
+        const deleteBtn = item.querySelector('.praetor-delete-btn');
         expect(deleteBtn).toBeTruthy();
 
         const clickHandlers = deleteBtn!._eventListeners?.get('click');
@@ -798,14 +798,14 @@ describe('ConversationController', () => {
         });
 
         let list = container.children[1];
-        expect(list.querySelectorAll('.claudian-history-item')).toHaveLength(25);
-        const loadMore = list.querySelector('.claudian-history-load-more');
+        expect(list.querySelectorAll('.praetor-history-item')).toHaveLength(25);
+        const loadMore = list.querySelector('.praetor-history-load-more');
         expect(loadMore).not.toBeNull();
 
         loadMore!.click();
         list = container.children[1];
-        expect(list.querySelectorAll('.claudian-history-item')).toHaveLength(50);
-        expect(list.querySelector('.claudian-history-load-more')).not.toBeNull();
+        expect(list.querySelectorAll('.praetor-history-item')).toHaveLength(50);
+        expect(list.querySelector('.praetor-history-load-more')).not.toBeNull();
       });
 
       it('does not render when the history render signal is already aborted', () => {
@@ -838,7 +838,7 @@ describe('ConversationController', () => {
 
         const list = container.children[1];
         const openItem = list.children[1];
-        const openItemDate = openItem.querySelector('.claudian-history-item-date');
+        const openItemDate = openItem.querySelector('.praetor-history-item-date');
 
         expect(openItem.hasClass('open')).toBe(true);
         expect(openItem.hasClass('active')).toBe(false);
@@ -866,7 +866,7 @@ describe('ConversationController', () => {
 
         const list = container.children[1];
         const currentItem = list.children[0];
-        const currentItemDate = currentItem.querySelector('.claudian-history-item-date');
+        const currentItemDate = currentItem.querySelector('.praetor-history-item-date');
 
         expect(currentItem.getAttribute('data-tab-index')).toBe('1');
         expect(currentItem.getAttribute('data-tab-location')).toBe('current-view');
@@ -891,7 +891,7 @@ describe('ConversationController', () => {
 
         const list = container.children[1];
         const openItem = list.children[1];
-        const openItemDate = openItem.querySelector('.claudian-history-item-date');
+        const openItemDate = openItem.querySelector('.praetor-history-item-date');
 
         expect(openItem.getAttribute('data-tab-index')).toBe('2');
         expect(openItem.getAttribute('data-tab-location')).toBe('current-view');
@@ -916,7 +916,7 @@ describe('ConversationController', () => {
 
         const list = container.children[1];
         const currentItem = list.children[0];
-        const currentItemDate = currentItem.querySelector('.claudian-history-item-date');
+        const currentItemDate = currentItem.querySelector('.praetor-history-item-date');
 
         expect(currentItem.hasClass('active')).toBe(true);
         expect(currentItem.hasClass('running')).toBe(true);
@@ -942,7 +942,7 @@ describe('ConversationController', () => {
 
         const list = container.children[1];
         const runningItem = list.children[1];
-        const runningItemDate = runningItem.querySelector('.claudian-history-item-date');
+        const runningItemDate = runningItem.querySelector('.praetor-history-item-date');
 
         expect(runningItem.hasClass('open')).toBe(true);
         expect(runningItem.hasClass('running')).toBe(true);
@@ -977,8 +977,8 @@ describe('ConversationController', () => {
         const list = container.children[1];
         const openOtherPaneItem = list.children[1];
         const runningOtherPaneItem = list.children[2];
-        const runningOtherPaneDate = runningOtherPaneItem.querySelector('.claudian-history-item-date');
-        const openOtherPaneDate = openOtherPaneItem.querySelector('.claudian-history-item-date');
+        const runningOtherPaneDate = runningOtherPaneItem.querySelector('.praetor-history-item-date');
+        const openOtherPaneDate = openOtherPaneItem.querySelector('.praetor-history-item-date');
 
         expect(runningOtherPaneItem.getAttribute('data-tab-location')).toBe('other-view');
         expect(runningOtherPaneItem.getAttribute('data-tab-index')).toBeNull();
@@ -1005,7 +1005,7 @@ describe('ConversationController', () => {
 
         const list = container.children[1];
         const closedItem = list.children[1];
-        const openInNewTabBtn = closedItem.querySelector('.claudian-open-new-tab-btn');
+        const openInNewTabBtn = closedItem.querySelector('.praetor-open-new-tab-btn');
         const clickHandlers = openInNewTabBtn?._eventListeners?.get('click');
 
         expect(openInNewTabBtn).toBeTruthy();
@@ -1035,7 +1035,7 @@ describe('ConversationController', () => {
         const list = container.children[1];
         const openItem = list.children[1];
 
-        expect(openItem.querySelector('.claudian-open-new-tab-btn')).toBeNull();
+        expect(openItem.querySelector('.praetor-open-new-tab-btn')).toBeNull();
       });
 
       it('should open a conversation in a new tab on modifier click when supported', async () => {
@@ -1247,7 +1247,7 @@ describe('ConversationController', () => {
 
       const list = dropdown.children[1];
       const item = list.children[0];
-      const actions = item.querySelector('.claudian-history-item-actions');
+      const actions = item.querySelector('.praetor-history-item-actions');
       // First child is the regenerate button
       const regenerateBtn = actions!.children[0];
       const clickHandlers = regenerateBtn._eventListeners?.get('click');
@@ -1275,7 +1275,7 @@ describe('ConversationController', () => {
 
       const list = dropdown.children[1];
       const item = list.children[0];
-      const actions = item.querySelector('.claudian-history-item-actions');
+      const actions = item.querySelector('.praetor-history-item-actions');
       expect(actions).toBeTruthy();
       // For non-failed items: rename is children[0], delete is children[1]
       const rBtn = actions!.children[0];
@@ -1290,7 +1290,7 @@ describe('ConversationController', () => {
       (mockInput as any).focus = jest.fn();
       (mockInput as any).select = jest.fn();
 
-      const titleEl = item.querySelector('.claudian-history-item-title');
+      const titleEl = item.querySelector('.praetor-history-item-title');
       if (titleEl) {
         (titleEl as any).replaceWith = jest.fn();
       }
@@ -1302,7 +1302,7 @@ describe('ConversationController', () => {
         clickHandlers![0]({ stopPropagation: jest.fn() });
 
         expect(item.createEl).toHaveBeenCalledWith('input', {
-          cls: 'claudian-rename-input',
+          cls: 'praetor-rename-input',
           attr: { type: 'text', value: 'Test Title' },
         });
         expect(titleEl!.replaceWith).toHaveBeenCalledWith(mockInput);
@@ -1322,7 +1322,7 @@ describe('ConversationController', () => {
 
       const list = dropdown.children[1];
       const item = list.children[0];
-      const deleteBtn = item.querySelector('.claudian-delete-btn');
+      const deleteBtn = item.querySelector('.praetor-delete-btn');
       expect(deleteBtn).toBeTruthy();
 
       const clickHandlers = deleteBtn!._eventListeners?.get('click');
@@ -1345,7 +1345,7 @@ describe('ConversationController', () => {
 
       const list = dropdown.children[1];
       const otherItem = list.children[1]; // conv-2
-      const deleteBtn = otherItem.querySelector('.claudian-delete-btn');
+      const deleteBtn = otherItem.querySelector('.praetor-delete-btn');
       const clickHandlers = deleteBtn!._eventListeners?.get('click');
 
       await clickHandlers![0]({ stopPropagation: jest.fn() });

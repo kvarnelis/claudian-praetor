@@ -1,12 +1,12 @@
 /* Drop overlay - inside input wrapper */
-.claudian-drop-overlay {
+.praetor-drop-overlay {
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(var(--claudian-brand-rgb), 0.08);
-  border: 2px dashed var(--claudian-brand);
+  background: rgba(var(--praetor-brand-rgb), 0.08);
+  border: 2px dashed var(--praetor-brand);
   border-radius: 6px;
   display: none;
   align-items: center;
@@ -15,23 +15,23 @@
   pointer-events: none;
 }
 
-.claudian-drop-overlay.visible {
+.praetor-drop-overlay.visible {
   display: flex;
 }
 
-.claudian-drop-content {
+.praetor-drop-content {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 4px;
-  color: var(--claudian-brand);
+  color: var(--praetor-brand);
 }
 
-.claudian-drop-content svg {
+.praetor-drop-content svg {
   opacity: 0.7;
 }
 
-.claudian-drop-content span {
+.praetor-drop-content span {
   font-size: 12px;
   font-weight: 500;
 }
@@ -39,7 +39,7 @@
 /* Images in Messages (displayed above user bubble) */
 
 /* Images container - right-aligned above user message */
-.claudian-message-images {
+.praetor-message-images {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
@@ -49,7 +49,7 @@
 }
 
 /* Individual image in message - standardized size */
-.claudian-message-image {
+.praetor-message-image {
   width: 120px;
   height: 120px;
   border-radius: 8px;
@@ -60,12 +60,12 @@
   border: 1px solid var(--background-modifier-border);
 }
 
-.claudian-message-image:hover {
+.praetor-message-image:hover {
   transform: scale(1.03);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-.claudian-message-image img {
+.praetor-message-image img {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -76,22 +76,22 @@
    attach button living inside it. Keep the row visible on mobile so the
    paperclip is always reachable. Obsidian sets `is-tablet` (not `is-mobile`) on
    iPad, so match all three mobile body classes. */
-body.claudian-mobile .claudian-context-row,
-body.is-mobile .claudian-context-row,
-body.is-tablet .claudian-context-row,
-body.is-phone .claudian-context-row {
+body.praetor-mobile .praetor-context-row,
+body.is-mobile .praetor-context-row,
+body.is-tablet .praetor-context-row,
+body.is-phone .praetor-context-row {
   display: flex !important;
 }
 
 /* The attach button now ships on every platform; keep its row open even when
    it holds no chips so the button stays reachable (desktop included). */
-.claudian-context-row.claudian-has-attach-button {
+.praetor-context-row.praetor-has-attach-button {
   display: flex;
 }
 
 /* Mobile-only attach button: opens the native photo/file picker since touch
    devices have no clipboard-image paste or drag-drop into the input. */
-.claudian-image-attach-btn {
+.praetor-image-attach-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -107,19 +107,19 @@ body.is-phone .claudian-context-row {
   -webkit-tap-highlight-color: transparent;
 }
 
-.claudian-image-attach-btn:active {
+.praetor-image-attach-btn:active {
   background: var(--background-modifier-hover);
   color: var(--text-normal);
 }
 
-.claudian-image-attach-btn svg {
+.praetor-image-attach-btn svg {
   width: 14px;
   height: 14px;
 }
 
 /* The attach button lives in the context row above the textarea, which is easy
    to overlook on a phone/tablet. Make it a prominent accent button on mobile. */
-body.claudian-mobile .claudian-image-attach-btn {
+body.praetor-mobile .praetor-image-attach-btn {
   width: 40px;
   height: 40px;
   color: var(--text-on-accent);
@@ -127,7 +127,7 @@ body.claudian-mobile .claudian-image-attach-btn {
   border-color: var(--interactive-accent);
 }
 
-body.claudian-mobile .claudian-image-attach-btn svg {
+body.praetor-mobile .praetor-image-attach-btn svg {
   width: 22px;
   height: 22px;
 }

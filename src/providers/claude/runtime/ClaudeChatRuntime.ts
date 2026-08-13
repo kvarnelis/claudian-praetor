@@ -1,5 +1,5 @@
 /**
- * Claudian - Claude Agent SDK wrapper
+ * Praetor - Claude Agent SDK wrapper
  *
  * Handles communication with Claude via the Agent SDK. Manages streaming,
  * session persistence and permission modes.
@@ -59,7 +59,7 @@ import type {
   StreamChunk,
   ToolCallInfo,
 } from '../../../core/types';
-import type { ClaudianSettings, PermissionMode } from '../../../core/types/settings';
+import type { PermissionMode,PraetorSettings } from '../../../core/types/settings';
 import { stripCurrentNoteContext } from '../../../utils/context';
 import { getEnhancedPath, getMissingNodeError, parseEnvironmentVariables } from '../../../utils/env';
 import { getVaultPath } from '../../../utils/path';
@@ -141,7 +141,7 @@ function isImageAttachmentArray(value: unknown): value is ImageAttachment[] {
     !!value[0] && typeof value[0] === 'object' && 'mediaType' in value[0] && 'data' in value[0];
 }
 
-export class ClaudianService implements ChatRuntime {
+export class ClaudeChatRuntime implements ChatRuntime {
   readonly providerId = CLAUDE_PROVIDER_CAPABILITIES.providerId;
   private plugin: ProviderHost;
   private agentManager: Pick<AppAgentManager, 'setBuiltinAgentNames'> | null;
@@ -790,7 +790,7 @@ export class ClaudianService implements ChatRuntime {
   /**
    * Builds the base query options context from current state.
    */
-  private getScopedSettings(): ClaudianSettings {
+  private getScopedSettings(): PraetorSettings {
     const settings = ProviderSettingsCoordinator.getProviderSettingsSnapshot(
       this.plugin.settings,
       this.providerId,

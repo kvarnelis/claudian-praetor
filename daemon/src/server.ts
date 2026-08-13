@@ -17,8 +17,8 @@ import { ProviderRegistry } from '../../src/core/providers/ProviderRegistry';
 import type { ProviderId } from '../../src/core/providers/types';
 import type { ChatRuntime } from '../../src/core/runtime/ChatRuntime';
 import type { ChatTurnMetadata } from '../../src/core/runtime/types';
-import type { ClaudianSettings, Conversation } from '../../src/core/types';
-import type ClaudianPlugin from '../../src/main';
+import type { PraetorSettings, Conversation } from '../../src/core/types';
+import type PraetorPlugin from '../../src/main';
 import {
   type ClientMessage,
   generateId,
@@ -66,8 +66,8 @@ interface PendingCallback {
 }
 
 export interface PraetorServerOptions {
-  plugin: ClaudianPlugin;
-  settings: ClaudianSettings;
+  plugin: PraetorPlugin;
+  settings: PraetorSettings;
   vaultPath: string;
   host: string;
   port: number;

@@ -1,5 +1,5 @@
 /* @ Mention dropdown */
-.claudian-mention-dropdown {
+.praetor-mention-dropdown {
   display: none;
   position: absolute;
   bottom: 100%;
@@ -17,21 +17,21 @@
   overflow-y: auto;
 }
 
-.claudian-mention-dropdown.visible {
+.praetor-mention-dropdown.visible {
   display: block;
 }
 
 /* Fixed positioning for inline editor */
-.claudian-mention-dropdown-fixed {
+.praetor-mention-dropdown-fixed {
   position: fixed;
-  bottom: var(--claudian-fixed-dropdown-bottom);
-  left: var(--claudian-fixed-dropdown-left);
+  bottom: var(--praetor-fixed-dropdown-bottom);
+  left: var(--praetor-fixed-dropdown-left);
   right: auto;
-  width: var(--claudian-fixed-dropdown-width);
+  width: var(--praetor-fixed-dropdown-width);
   z-index: 10001;
 }
 
-.claudian-mention-item {
+.praetor-mention-item {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -40,24 +40,24 @@
   transition: background 0.1s ease;
 }
 
-.claudian-mention-item:hover,
-.claudian-mention-item.selected {
+.praetor-mention-item:hover,
+.praetor-mention-item.selected {
   background: var(--background-modifier-hover);
 }
 
-.claudian-mention-icon {
+.praetor-mention-icon {
   display: flex;
   align-items: center;
   color: var(--text-muted);
   flex-shrink: 0;
 }
 
-.claudian-mention-icon svg {
+.praetor-mention-icon svg {
   width: 14px;
   height: 14px;
 }
 
-.claudian-mention-path {
+.praetor-mention-path {
   font-size: 13px;
   color: var(--text-normal);
   overflow: hidden;
@@ -65,7 +65,7 @@
   white-space: nowrap;
 }
 
-.claudian-mention-empty {
+.praetor-mention-empty {
   padding: 12px;
   text-align: center;
   color: var(--text-muted);
@@ -73,29 +73,29 @@
 }
 
 /* Scrollbar for mention dropdown */
-.claudian-mention-dropdown::-webkit-scrollbar {
+.praetor-mention-dropdown::-webkit-scrollbar {
   width: 6px;
 }
 
-.claudian-mention-dropdown::-webkit-scrollbar-track {
+.praetor-mention-dropdown::-webkit-scrollbar-track {
   background: transparent;
 }
 
-.claudian-mention-dropdown::-webkit-scrollbar-thumb {
+.praetor-mention-dropdown::-webkit-scrollbar-thumb {
   background: var(--background-modifier-border);
   border-radius: 3px;
 }
 
 /* MCP items in @-mention dropdown */
-.claudian-mention-item.mcp-server .claudian-mention-icon {
+.praetor-mention-item.mcp-server .praetor-mention-icon {
   color: var(--interactive-accent);
 }
 
-.claudian-mention-item.vault-folder .claudian-mention-icon {
+.praetor-mention-item.vault-folder .praetor-mention-icon {
   color: var(--text-muted);
 }
 
-.claudian-mention-text {
+.praetor-mention-text {
   display: flex;
   flex-direction: column;
   gap: 2px;
@@ -103,13 +103,13 @@
   flex: 1;
 }
 
-.claudian-mention-name {
+.praetor-mention-name {
   font-size: 13px;
   font-weight: 500;
   color: var(--interactive-accent);
 }
 
-.claudian-mention-desc {
+.praetor-mention-desc {
   font-size: 11px;
   color: var(--text-muted);
   overflow: hidden;
@@ -118,17 +118,17 @@
 }
 
 /* Context file items in @-mention dropdown */
-.claudian-mention-item.context-file .claudian-mention-icon {
-  color: var(--claudian-brand);
+.praetor-mention-item.context-file .praetor-mention-icon {
+  color: var(--praetor-brand);
 }
 
-.claudian-mention-item.context-file .claudian-mention-text {
+.praetor-mention-item.context-file .praetor-mention-text {
   flex-direction: row;
   overflow: hidden;
   white-space: nowrap;
 }
 
-.claudian-mention-item.context-file .claudian-mention-name-context {
+.praetor-mention-item.context-file .praetor-mention-name-context {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -136,35 +136,35 @@
 }
 
 /* Context folder filter items in @-mention dropdown */
-.claudian-mention-item.context-folder .claudian-mention-icon {
+.praetor-mention-item.context-folder .praetor-mention-icon {
   color: var(--text-muted);
 }
 
-.claudian-mention-name-folder {
+.praetor-mention-name-folder {
   color: var(--text-normal);
   font-weight: 500;
 }
 
-.claudian-mention-name-context {
+.praetor-mention-name-context {
   color: var(--text-normal);
 }
 
 /* Agent folder items in @-mention dropdown */
-.claudian-mention-item.agent-folder .claudian-mention-icon {
+.praetor-mention-item.agent-folder .praetor-mention-icon {
   color: var(--link-color);
 }
 
-.claudian-mention-name-agent-folder {
+.praetor-mention-name-agent-folder {
   color: var(--link-color);
   font-weight: 600;
 }
 
 /* Agent items in @-mention dropdown (inside @Agents/) */
-.claudian-mention-item.agent .claudian-mention-icon {
+.praetor-mention-item.agent .praetor-mention-icon {
   color: var(--link-color);
 }
 
-.claudian-mention-item.agent .claudian-mention-text {
+.praetor-mention-item.agent .praetor-mention-text {
   flex-direction: row;
   align-items: baseline;
   gap: 6px;
@@ -172,13 +172,13 @@
   white-space: nowrap;
 }
 
-.claudian-mention-item.agent .claudian-mention-name-agent {
+.praetor-mention-item.agent .praetor-mention-name-agent {
   color: var(--text-normal);
   font-size: 13px;
   flex-shrink: 0;
 }
 
-.claudian-mention-item.agent .claudian-mention-agent-desc {
+.praetor-mention-item.agent .praetor-mention-agent-desc {
   font-size: 11px;
   color: var(--text-muted);
   overflow: hidden;

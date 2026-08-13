@@ -1,10 +1,10 @@
 {
-  "id": "claudian-praetor",
-  "name": "Claudian Praetor",
+  "id": "praetor",
+  "name": "Praetor",
   "version": "2026.7.18",
   "minAppVersion": "1.7.2",
-  "description": "Praetor fork of Claudian (adds Grok provider support and mobile remote mode). Embeds Claude Code, Codex, and other coding agents as AI collaborators in your vault.",
-  "author": "Yishen Tu",
-  "authorUrl": "https://github.com/YishenTu",
+  "description": "Embeds Claude Code, Codex, Grok, and other coding agents in your vault, with mobile remote mode over Tailscale.",
+  "author": "Kazys Varnelis",
+  "authorUrl": "https://github.com/kvarnelis",
   "isDesktopOnly": false
 }

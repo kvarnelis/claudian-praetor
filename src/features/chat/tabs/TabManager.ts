@@ -318,21 +318,21 @@ export class TabManager implements TabManagerInterface {
             );
             StartupProfiler.recordCount(
               'restored-message-dom-count',
-              tab.dom.messagesEl.querySelectorAll('.claudian-message').length,
+              tab.dom.messagesEl.querySelectorAll('.praetor-message').length,
             );
             const thinkingPanelCount = tab.dom.messagesEl
-              .querySelectorAll('.claudian-thinking-block').length;
+              .querySelectorAll('.praetor-thinking-block').length;
             StartupProfiler.recordCount('restored-thinking-panel-count', thinkingPanelCount);
             StartupProfiler.recordCount('deferred-thinking-markdown-count', thinkingPanelCount);
             StartupProfiler.recordCount(
               'restored-text-block-count',
-              tab.dom.messagesEl.querySelectorAll('.claudian-text-block').length,
+              tab.dom.messagesEl.querySelectorAll('.praetor-text-block').length,
             );
             StartupProfiler.recordCount(
               'restored-visible-tool-row-count',
-              tab.dom.messagesEl.querySelectorAll('.claudian-tool-call').length
-                + tab.dom.messagesEl.querySelectorAll('.claudian-write-edit-block').length
-                + tab.dom.messagesEl.querySelectorAll('.claudian-subagent-list').length,
+              tab.dom.messagesEl.querySelectorAll('.praetor-tool-call').length
+                + tab.dom.messagesEl.querySelectorAll('.praetor-write-edit-block').length
+                + tab.dom.messagesEl.querySelectorAll('.praetor-subagent-list').length,
             );
           } finally {
             if (span) {
@@ -470,21 +470,21 @@ export class TabManager implements TabManagerInterface {
     const messagesEl = tab.dom.messagesEl;
     messagesEl.empty();
 
-    const statusEl = messagesEl.createDiv({ cls: 'claudian-tab-hydration' });
+    const statusEl = messagesEl.createDiv({ cls: 'praetor-tab-hydration' });
     if (!error) {
       statusEl.createDiv({
-        cls: 'claudian-tab-hydration-loading',
+        cls: 'praetor-tab-hydration-loading',
         text: 'Loading conversation…',
       });
       return;
     }
 
     statusEl.createDiv({
-      cls: 'claudian-tab-hydration-error',
+      cls: 'praetor-tab-hydration-error',
       text: error instanceof Error ? error.message : 'Failed to load conversation',
     });
     const retryButton = statusEl.createEl('button', {
-      cls: 'mod-cta claudian-tab-hydration-retry',
+      cls: 'mod-cta praetor-tab-hydration-retry',
       text: 'Retry',
     });
     retryButton.addEventListener('click', () => {

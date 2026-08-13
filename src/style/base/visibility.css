@@ -2,14 +2,14 @@
  * Visibility utilities are imported late so they can override component display
  * defaults without importance flags.
  */
-.claudian-hidden.claudian-hidden {
+.praetor-hidden.praetor-hidden {
   display: none;
 }
 
-.claudian-visible-block.claudian-visible-block {
+.praetor-visible-block.praetor-visible-block {
   display: block;
 }
 
-.claudian-visible-flex.claudian-visible-flex {
+.praetor-visible-flex.praetor-visible-flex {
   display: flex;
 }

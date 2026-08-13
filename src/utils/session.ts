@@ -1,5 +1,5 @@
 /**
- * Claudian - Session Utilities
+ * Praetor - Session Utilities
  *
  * Session recovery and history reconstruction.
  */

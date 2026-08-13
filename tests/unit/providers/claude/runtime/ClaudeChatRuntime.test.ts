@@ -4,10 +4,10 @@ import * as sdkModule from '@anthropic-ai/claude-agent-sdk';
 import { Notice } from 'obsidian';
 
 import type { McpServerManager } from '@/core/mcp/McpServerManager';
-import type ClaudianPlugin from '@/main';
+import type PraetorPlugin from '@/main';
 import * as historyStore from '@/providers/claude/history/ClaudeHistoryStore';
 import * as sdkLoader from '@/providers/claude/loadClaudeAgentSdk';
-import { ClaudianService } from '@/providers/claude/runtime/ClaudeChatRuntime';
+import { ClaudeChatRuntime } from '@/providers/claude/runtime/ClaudeChatRuntime';
 import { MessageChannel } from '@/providers/claude/runtime/ClaudeMessageChannel';
 import { createResponseHandler } from '@/providers/claude/runtime/types';
 import * as envUtils from '@/utils/env';
@@ -23,10 +23,10 @@ const sdkMock = sdkModule as unknown as {
 
 type MockMcpServerManager = jest.Mocked<McpServerManager>;
 
-describe('ClaudianService', () => {
-  let mockPlugin: Partial<ClaudianPlugin>;
+describe('ClaudeChatRuntime', () => {
+  let mockPlugin: Partial<PraetorPlugin>;
   let mockMcpManager: MockMcpServerManager;
-  let service: ClaudianService;
+  let service: ClaudeChatRuntime;
 
   async function collectChunks(gen: AsyncGenerator<any>): Promise<any[]> {
     const chunks: any[] = [];
@@ -54,7 +54,7 @@ describe('ClaudianService', () => {
         model: 'claude-3-5-sonnet',
         permissionMode: 'ask' as const,
         thinkingBudget: 0,
-        mediaFolder: 'claudian-media',
+        mediaFolder: 'praetor-media',
         systemPrompt: '',
         loadUserClaudeSettings: false,
         claudeCliPath: '/usr/local/bin/claude',
@@ -67,7 +67,7 @@ describe('ClaudianService', () => {
       pluginManager: {
         getPluginsKey: jest.fn().mockReturnValue(''),
       },
-    } as unknown as ClaudianPlugin;
+    } as unknown as PraetorPlugin;
 
     mockMcpManager = {
       loadServers: jest.fn().mockResolvedValue(undefined),
@@ -79,7 +79,7 @@ describe('ClaudianService', () => {
       transformMentions: jest.fn().mockImplementation((text: string) => text),
     } as unknown as MockMcpServerManager;
 
-    service = new ClaudianService(mockPlugin as ClaudianPlugin, mockMcpManager);
+    service = new ClaudeChatRuntime(mockPlugin as PraetorPlugin, mockMcpManager);
   });
 
   describe('prepareTurn', () => {

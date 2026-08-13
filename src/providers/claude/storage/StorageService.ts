@@ -1,9 +1,9 @@
 import type { App } from 'obsidian';
 import { Notice } from 'obsidian';
 
-import { ClaudianSettingsStorage, type StoredClaudianSettings } from '../../../app/settings/ClaudianSettingsStorage';
+import { PraetorSettingsStorage, type StoredPraetorSettings } from '../../../app/settings/PraetorSettingsStorage';
 import { SESSIONS_PATH, SessionStorage } from '../../../core/bootstrap/SessionStorage';
-import { CLAUDIAN_STORAGE_PATH } from '../../../core/bootstrap/StoragePaths';
+import { PRAETOR_STORAGE_PATH } from '../../../core/bootstrap/StoragePaths';
 import { normalizeTabManagerState } from '../../../core/bootstrap/tabManagerState';
 import type { AppTabManagerState } from '../../../core/providers/types';
 import { VaultFileAdapter } from '../../../core/storage/VaultFileAdapter';
@@ -29,7 +29,7 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 
 export interface CombinedSettings {
   cc: CCSettings;
-  claudian: StoredClaudianSettings;
+  praetor: StoredPraetorSettings;
 }
 
 interface StorageServicePlugin {
@@ -40,7 +40,7 @@ interface StorageServicePlugin {
 
 export class StorageService {
   readonly ccSettings: CCSettingsStorage;
-  readonly claudianSettings: ClaudianSettingsStorage;
+  readonly praetorSettings: PraetorSettingsStorage;
   readonly commands: SlashCommandStorage;
   readonly skills: SkillStorage;
   readonly sessions: SessionStorage;
@@ -56,7 +56,7 @@ export class StorageService {
     this.app = plugin.app;
     this.adapter = adapter ?? new VaultFileAdapter(this.app);
     this.ccSettings = new CCSettingsStorage(this.adapter);
-    this.claudianSettings = new ClaudianSettingsStorage(this.adapter);
+    this.praetorSettings = new PraetorSettingsStorage(this.adapter);
     this.commands = new SlashCommandStorage(this.adapter);
     this.skills = new SkillStorage(this.adapter);
     this.sessions = new SessionStorage(this.adapter);
@@ -68,14 +68,14 @@ export class StorageService {
     await this.ensureDirectories();
 
     const cc = await this.ccSettings.load();
-    const claudian = await this.claudianSettings.load();
+    const praetor = await this.praetorSettings.load();
 
-    return { cc, claudian };
+    return { cc, praetor };
   }
 
   async ensureDirectories(): Promise<void> {
     await this.adapter.ensureFolder(CLAUDE_PATH);
-    await this.adapter.ensureFolder(CLAUDIAN_STORAGE_PATH);
+    await this.adapter.ensureFolder(PRAETOR_STORAGE_PATH);
     await this.adapter.ensureFolder(COMMANDS_PATH);
     await this.adapter.ensureFolder(SKILLS_PATH);
     await this.adapter.ensureFolder(SESSIONS_PATH);
@@ -112,16 +112,16 @@ export class StorageService {
     return this.ccSettings.removeRule(createPermissionRule(rule));
   }
 
-  async updateClaudianSettings(updates: Partial<StoredClaudianSettings>): Promise<void> {
-    return this.claudianSettings.update(updates);
+  async updatePraetorSettings(updates: Partial<StoredPraetorSettings>): Promise<void> {
+    return this.praetorSettings.update(updates);
   }
 
-  async saveClaudianSettings(settings: StoredClaudianSettings): Promise<void> {
-    return this.claudianSettings.save(settings);
+  async savePraetorSettings(settings: StoredPraetorSettings): Promise<void> {
+    return this.praetorSettings.save(settings);
   }
 
-  async loadClaudianSettings(): Promise<StoredClaudianSettings> {
-    return this.claudianSettings.load();
+  async loadPraetorSettings(): Promise<StoredPraetorSettings> {
+    return this.praetorSettings.load();
   }
 
   async getTabManagerState(): Promise<TabManagerPersistedState | null> {

@@ -50,7 +50,7 @@ async function main(): Promise<void> {
     log,
   });
   await server.start();
-  log(`[praetord] connect clients to ws://${config.host}:${config.port} (pair devices from Claudian settings)`);
+  log(`[praetord] connect clients to ws://${config.host}:${config.port} (pair devices from Praetor settings)`);
 
   const shutdown = (): void => {
     log('[praetord] shutting down');

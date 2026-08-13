@@ -45,8 +45,8 @@ const stagedObsidianRules = {
   'obsidianmd/ui/sentence-case': [
     obsidianRuleSeverity,
     {
-      ignoreWords: ['Claudian', 'Codex', 'OpenCode', 'Pi', 'WSL'],
-      brands: [...DEFAULT_BRANDS, 'Claudian', 'Codex', 'OpenCode', 'Pi'],
+      ignoreWords: ['Praetor', 'Codex', 'OpenCode', 'Pi', 'WSL'],
+      brands: [...DEFAULT_BRANDS, 'Praetor', 'Codex', 'OpenCode', 'Pi'],
       acronyms: [...DEFAULT_ACRONYMS, 'TOML', 'WSL'],
       ignoreRegex: ['\\.(?:claude|codex|opencode)/'],
       enforceCamelCaseLower: true,
@@ -115,7 +115,7 @@ export default defineConfig([
   },
   {
     files: [
-      'src/ClaudianService.ts',
+      'src/ClaudeChatRuntime.ts',
       'src/InlineEditService.ts',
       'src/InstructionRefineService.ts',
       'src/images/**/*.ts',
@@ -134,7 +134,7 @@ export default defineConfig([
               message: 'Service and shared modules must not import UI modules.',
             },
             {
-              group: ['./ClaudianView', '../ClaudianView'],
+              group: ['./PraetorView', '../PraetorView'],
               message: 'Service and shared modules must not import the view.',
             },
           ],

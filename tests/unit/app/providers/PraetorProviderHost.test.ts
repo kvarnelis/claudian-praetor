@@ -1,7 +1,7 @@
-import { ClaudianProviderHost } from '@/app/providers/ClaudianProviderHost';
-import type ClaudianPlugin from '@/main';
+import { PraetorProviderHost } from '@/app/providers/PraetorProviderHost';
+import type PraetorPlugin from '@/main';
 
-function createPlugin(overrides: Record<string, unknown> = {}): ClaudianPlugin {
+function createPlugin(overrides: Record<string, unknown> = {}): PraetorPlugin {
   return {
     app: {},
     settings: {},
@@ -19,10 +19,10 @@ function createPlugin(overrides: Record<string, unknown> = {}): ClaudianPlugin {
     getAllViews: jest.fn(() => []),
     getView: jest.fn(() => null),
     ...overrides,
-  } as unknown as ClaudianPlugin;
+  } as unknown as PraetorPlugin;
 }
 
-describe('ClaudianProviderHost', () => {
+describe('PraetorProviderHost', () => {
   it('delegates provider capabilities without exposing plugin lifecycle APIs', async () => {
     const trace: string[] = [];
     const plugin = createPlugin({
@@ -33,7 +33,7 @@ describe('ClaudianProviderHost', () => {
         return '/usr/bin/codex';
       }),
     });
-    const host = new ClaudianProviderHost(plugin);
+    const host = new PraetorProviderHost(plugin);
 
     await host.saveSettings();
     await host.applyEnvironmentVariables('provider:codex', 'OPENAI_API_KEY=test');
@@ -60,7 +60,7 @@ describe('ClaudianProviderHost', () => {
     const plugin = createPlugin({
       getAllViews: jest.fn(() => [createView('first'), createView('second')]),
     });
-    const host = new ClaudianProviderHost(plugin);
+    const host = new PraetorProviderHost(plugin);
 
     await host.recycleProviderRuntimes('opencode');
 

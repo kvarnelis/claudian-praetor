@@ -8,7 +8,7 @@ import type { ComposerContextTray } from '../ui/ComposerContextTray';
 
 const SELECTION_POLL_INTERVAL = 250;
 const INPUT_HANDOFF_GRACE_MS = 1500;
-const HIGHLIGHT_KEY = 'claudian-selection';
+const HIGHLIGHT_KEY = 'praetor-selection';
 
 type CustomHighlightRegistry = {
   delete: (name: string) => boolean;

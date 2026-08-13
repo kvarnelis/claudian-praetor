@@ -34,8 +34,8 @@ interface OpencodeAuxQueryRunnerOptions {
 }
 
 const OPENCODE_AUX_AGENT_IDS: Record<OpencodeAuxAgentProfile, string> = {
-  passive: 'claudian-aux-passive',
-  readonly: 'claudian-aux-readonly',
+  passive: 'praetor-aux-passive',
+  readonly: 'praetor-aux-readonly',
 };
 
 const OPENCODE_AUX_READ_PERMISSION = Object.freeze({
@@ -269,7 +269,7 @@ export class OpencodeAuxQueryRunner implements AuxQueryRunner {
 
     this.connection = new AcpClientConnection({
       clientInfo: {
-        name: 'claudian-aux',
+        name: 'praetor-aux',
         version: this.plugin.manifest?.version ?? '0.0.0',
       },
       delegate: {
@@ -382,7 +382,7 @@ function buildOpencodeAuxAgentConfig(profile: OpencodeAuxAgentProfile): Opencode
   if (profile === 'readonly') {
     return {
       definition: {
-        description: 'Internal Claudian read-only agent for OpenCode auxiliary tasks.',
+        description: 'Internal Praetor read-only agent for OpenCode auxiliary tasks.',
         mode: 'primary',
         permission: {
           '*': 'deny',
@@ -402,7 +402,7 @@ function buildOpencodeAuxAgentConfig(profile: OpencodeAuxAgentProfile): Opencode
 
   return {
     definition: {
-      description: 'Internal Claudian no-tool agent for OpenCode auxiliary tasks.',
+      description: 'Internal Praetor no-tool agent for OpenCode auxiliary tasks.',
       mode: 'primary',
       permission: {
         '*': 'deny',

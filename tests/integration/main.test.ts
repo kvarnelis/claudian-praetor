@@ -1,19 +1,19 @@
 
 import { ProviderSettingsCoordinator } from '@/core/providers/ProviderSettingsCoordinator';
 import { TOOL_SUBAGENT } from '@/core/tools/toolNames';
-import { VIEW_TYPE_CLAUDIAN } from '@/core/types';
+import { VIEW_TYPE_PRAETOR } from '@/core/types';
 import * as sdkSession from '@/providers/claude/history/ClaudeHistoryStore';
 import { SessionStorage } from '@/providers/claude/storage/SessionStorage';
 import { DEFAULT_SETTINGS } from '@/providers/claude/types/settings';
 
-// Mock fs for ClaudianService
+// Mock fs for ClaudeChatRuntime
 jest.mock('fs');
 
 // Now import the plugin after mocking
-import ClaudianPlugin from '@/main';
+import PraetorPlugin from '@/main';
 
-describe('ClaudianPlugin', () => {
-  let plugin: ClaudianPlugin;
+describe('PraetorPlugin', () => {
+  let plugin: PraetorPlugin;
   let mockApp: any;
   let mockManifest: any;
 
@@ -70,6 +70,7 @@ describe('ClaudianPlugin', () => {
 
     mockApp = {
       vault: {
+        configDir: '.obsidian',
         adapter: {
           basePath: '/test/vault',
           exists: jest.fn().mockResolvedValue(false),
@@ -101,13 +102,13 @@ describe('ClaudianPlugin', () => {
     };
 
     mockManifest = {
-      id: 'claudian',
-      name: 'Claudian',
+      id: 'praetor',
+      name: 'Praetor',
       version: '0.1.0',
     };
 
     // Create plugin instance with mocked app
-    plugin = new ClaudianPlugin(mockApp, mockManifest);
+    plugin = new PraetorPlugin(mockApp, mockManifest);
     (plugin.loadData as jest.Mock).mockResolvedValue({});
   });
 
@@ -126,7 +127,7 @@ describe('ClaudianPlugin', () => {
       await plugin.onload();
 
       expect((plugin.registerView as jest.Mock)).toHaveBeenCalledWith(
-        VIEW_TYPE_CLAUDIAN,
+        VIEW_TYPE_PRAETOR,
         expect.any(Function)
       );
     });
@@ -136,7 +137,7 @@ describe('ClaudianPlugin', () => {
 
       expect((plugin.addRibbonIcon as jest.Mock)).toHaveBeenCalledWith(
         'bot',
-        'Open Claudian',
+        'Open Praetor',
         expect.any(Function)
       );
     });
@@ -592,7 +593,7 @@ describe('ClaudianPlugin', () => {
       expect(pendingGeneration).toEqual(expect.any(Number));
 
       plugin.onunload();
-      const restartedPlugin = new ClaudianPlugin(mockApp, mockManifest);
+      const restartedPlugin = new PraetorPlugin(mockApp, mockManifest);
       (restartedPlugin.loadData as jest.Mock).mockResolvedValue({});
       const listSpy = jest.spyOn(SessionStorage.prototype, 'scanMetadata')
         .mockImplementation(async (options) => {
@@ -737,7 +738,7 @@ describe('ClaudianPlugin', () => {
 
       expect(mockApp.workspace.getRightLeaf).toHaveBeenCalledWith(false);
       expect(mockRightLeaf.setViewState).toHaveBeenCalledWith({
-        type: VIEW_TYPE_CLAUDIAN,
+        type: VIEW_TYPE_PRAETOR,
         active: true,
       });
     });
@@ -757,7 +758,7 @@ describe('ClaudianPlugin', () => {
       expect(mockApp.workspace.getRightLeaf).not.toHaveBeenCalled();
       expect(mockApp.workspace.getLeaf).not.toHaveBeenCalled();
       expect(mockLeftLeaf.setViewState).toHaveBeenCalledWith({
-        type: VIEW_TYPE_CLAUDIAN,
+        type: VIEW_TYPE_PRAETOR,
         active: true,
       });
     });
@@ -787,7 +788,7 @@ describe('ClaudianPlugin', () => {
       expect(mockApp.workspace.getRightLeaf).not.toHaveBeenCalled();
       expect(mockApp.workspace.getLeftLeaf).not.toHaveBeenCalled();
       expect(mockMainLeaf.setViewState).toHaveBeenCalledWith({
-        type: VIEW_TYPE_CLAUDIAN,
+        type: VIEW_TYPE_PRAETOR,
         active: true,
       });
     });
@@ -804,8 +805,51 @@ describe('ClaudianPlugin', () => {
   });
 
   describe('loadSettings', () => {
+    it('imports legacy plugin data on first run without modifying the old file', async () => {
+      const legacyPath = '.obsidian/plugins/claudian-praetor/data.json';
+      const legacyData = {
+        remoteDaemon: { url: 'ws://100.64.0.10:8423' },
+        localDaemonHostEnabled: true,
+        pairedDevices: [{ id: 'ipad', name: 'iPad' }],
+      };
+      let currentPluginData: Record<string, unknown> = {};
+      (plugin.loadData as jest.Mock).mockImplementation(async () => currentPluginData);
+      (plugin.saveData as jest.Mock).mockImplementation(async (data: Record<string, unknown>) => {
+        currentPluginData = structuredClone(data);
+      });
+      mockApp.vault.adapter.exists.mockImplementation(async (path: string) => path === legacyPath);
+      mockApp.vault.adapter.read.mockImplementation(async (path: string) => {
+        if (path !== legacyPath) throw new Error(`Unexpected read: ${path}`);
+        return JSON.stringify(legacyData);
+      });
+
+      await plugin.onload();
+
+      expect(plugin.saveData).toHaveBeenCalledWith(legacyData);
+      expect(plugin.settings.remoteDaemon).toEqual(legacyData.remoteDaemon);
+      expect(mockApp.vault.adapter.write).not.toHaveBeenCalledWith(legacyPath, expect.anything());
+      expect(mockApp.vault.adapter.rename).not.toHaveBeenCalled();
+      expect(mockApp.vault.adapter.remove).not.toHaveBeenCalledWith(legacyPath);
+    });
+
+    it('does not overwrite existing Praetor plugin data with the legacy file', async () => {
+      const legacyPath = '.obsidian/plugins/claudian-praetor/data.json';
+      const currentData = { remoteDaemon: { url: 'ws://100.64.0.20:8423' } };
+      (plugin.loadData as jest.Mock).mockResolvedValue(currentData);
+      mockApp.vault.adapter.exists.mockImplementation(async (path: string) => path === legacyPath);
+      mockApp.vault.adapter.read.mockResolvedValue(JSON.stringify({
+        remoteDaemon: { url: 'ws://100.64.0.10:8423' },
+      }));
+
+      await plugin.onload();
+
+      expect(plugin.settings.remoteDaemon).toEqual(currentData.remoteDaemon);
+      expect(mockApp.vault.adapter.read).not.toHaveBeenCalledWith(legacyPath);
+      expect(plugin.saveData).not.toHaveBeenCalled();
+    });
+
     it('should merge saved data with defaults', async () => {
-      // Mock claudian-settings.json exists with custom values (Claudian-specific settings)
+      // Mock claudian-settings.json exists with custom values (Praetor-specific settings)
       mockApp.vault.adapter.exists.mockImplementation(async (path: string) => {
         return path === '.claudian/claudian-settings.json';
       });
@@ -927,7 +971,7 @@ describe('ClaudianPlugin', () => {
 
       await plugin.saveSettings();
 
-      // Claudian-specific settings should be written to .claudian/claudian-settings.json
+      // Praetor-specific settings should be written to .claudian/claudian-settings.json
       expect(mockApp.vault.adapter.write).toHaveBeenCalledWith(
         '.claudian/claudian-settings.json',
         expect.any(String)
@@ -1089,7 +1133,7 @@ describe('ClaudianPlugin', () => {
       expect(mockEnsureReady).toHaveBeenCalledWith({ force: true });
     });
 
-    it('restarts affected runtimes in every open Claudian view', async () => {
+    it('restarts affected runtimes in every open Praetor view', async () => {
       await plugin.onload();
 
       const createView = () => {
@@ -1288,7 +1332,7 @@ describe('ClaudianPlugin', () => {
       expect(command.checkCallback(true)).toBe(false);
     });
 
-    it('keeps tab commands unavailable while a Claudian leaf view is not initialized', async () => {
+    it('keeps tab commands unavailable while a Praetor leaf view is not initialized', async () => {
       await plugin.onload();
 
       mockApp.workspace.getLeavesOfType.mockReturnValue([{ view: {} }]);

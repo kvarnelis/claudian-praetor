@@ -1,13 +1,13 @@
 /* Plugin Settings */
-.claudian-plugin-settings-desc {
+.praetor-plugin-settings-desc {
   margin-bottom: 12px;
 }
 
-.claudian-plugins-container {
+.praetor-plugins-container {
   margin-top: 8px;
 }
 
-.claudian-plugin-header {
+.praetor-plugin-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -15,13 +15,13 @@
   padding: 0 12px;
 }
 
-.claudian-plugin-label {
+.praetor-plugin-label {
   font-size: var(--font-ui-small);
   color: var(--text-muted);
   font-weight: var(--font-medium);
 }
 
-.claudian-plugin-empty {
+.praetor-plugin-empty {
   padding: 16px;
   text-align: center;
   color: var(--text-muted);
@@ -30,13 +30,13 @@
   border-radius: 6px;
 }
 
-.claudian-plugin-list {
+.praetor-plugin-list {
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
-.claudian-plugin-section-header {
+.praetor-plugin-section-header {
   font-size: 11px;
   color: var(--text-muted);
   text-transform: uppercase;
@@ -44,7 +44,7 @@
   font-weight: 600;
 }
 
-.claudian-plugin-item {
+.praetor-plugin-item {
   display: flex;
   align-items: flex-start;
   gap: 10px;
@@ -54,19 +54,19 @@
   transition: background 0.15s ease;
 }
 
-.claudian-plugin-item:hover {
+.praetor-plugin-item:hover {
   background: var(--background-modifier-hover);
 }
 
-.claudian-plugin-item-disabled {
+.praetor-plugin-item-disabled {
   opacity: 0.6;
 }
 
-.claudian-plugin-item-error {
+.praetor-plugin-item-error {
   opacity: 0.8;
 }
 
-.claudian-plugin-status {
+.praetor-plugin-status {
   width: 8px;
   height: 8px;
   border-radius: 50%;
@@ -74,35 +74,35 @@
   flex-shrink: 0;
 }
 
-.claudian-plugin-status-enabled {
+.praetor-plugin-status-enabled {
   background: var(--color-green);
 }
 
-.claudian-plugin-status-disabled {
+.praetor-plugin-status-disabled {
   background: var(--text-muted);
 }
 
-.claudian-plugin-status-error {
+.praetor-plugin-status-error {
   background: var(--text-error);
 }
 
-.claudian-plugin-info {
+.praetor-plugin-info {
   flex: 1;
   min-width: 0;
 }
 
-.claudian-plugin-name-row {
+.praetor-plugin-name-row {
   display: flex;
   align-items: center;
   gap: 8px;
   flex-wrap: wrap;
 }
 
-.claudian-plugin-name {
+.praetor-plugin-name {
   font-weight: 600;
 }
 
-.claudian-plugin-version-badge {
+.praetor-plugin-version-badge {
   font-size: 10px;
   padding: 2px 6px;
   background: var(--background-modifier-border);
@@ -110,7 +110,7 @@
   color: var(--text-muted);
 }
 
-.claudian-plugin-error-badge {
+.praetor-plugin-error-badge {
   font-size: 10px;
   padding: 2px 6px;
   background: var(--text-error);
@@ -119,7 +119,7 @@
   text-transform: uppercase;
 }
 
-.claudian-plugin-preview {
+.praetor-plugin-preview {
   font-size: 12px;
   color: var(--text-muted);
   margin-top: 4px;
@@ -128,17 +128,17 @@
   white-space: nowrap;
 }
 
-.claudian-plugin-preview-error {
+.praetor-plugin-preview-error {
   color: var(--text-error);
 }
 
-.claudian-plugin-actions {
+.praetor-plugin-actions {
   display: flex;
   gap: 4px;
   flex-shrink: 0;
 }
 
-.claudian-plugin-action-btn {
+.praetor-plugin-action-btn {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -153,12 +153,12 @@
   transition: background 0.15s ease, color 0.15s ease;
 }
 
-.claudian-plugin-action-btn:hover {
+.praetor-plugin-action-btn:hover {
   background: var(--background-modifier-hover);
   color: var(--text-normal);
 }
 
-.claudian-plugin-action-btn svg {
+.praetor-plugin-action-btn svg {
   width: 14px;
   height: 14px;
 }

@@ -1,35 +1,35 @@
 /* Input area */
-.claudian-input-container {
+.praetor-input-container {
   position: relative;
   padding: 12px 0 0 0;
 }
 
-.claudian-input-footer {
+.praetor-input-footer {
   position: relative;
   flex-shrink: 0;
   padding: 6px 0 0 0;
 }
 
-.claudian-active-input-slot > .claudian-input-composer > .claudian-input-container {
+.praetor-active-input-slot > .praetor-input-composer > .praetor-input-container {
   padding-top: 0;
 }
 
 /* Input wrapper (border container) - flex column so textarea expands when no chips */
-.claudian-input-wrapper {
-  --claudian-input-wrapper-border-color: var(--background-modifier-border);
-  --claudian-input-wrapper-box-shadow: none;
+.praetor-input-wrapper {
+  --praetor-input-wrapper-border-color: var(--background-modifier-border);
+  --praetor-input-wrapper-box-shadow: none;
   position: relative;
   display: flex;
   flex-direction: column;
   min-height: 140px;
-  border: 1px solid var(--claudian-input-wrapper-border-color);
+  border: 1px solid var(--praetor-input-wrapper-border-color);
   border-radius: 6px;
   background: var(--background-primary);
-  box-shadow: var(--claudian-input-wrapper-box-shadow);
+  box-shadow: var(--praetor-input-wrapper-box-shadow);
 }
 
 /* Nav row (tab badges start, action icons end) - above input wrapper */
-.claudian-input-nav-row {
+.praetor-input-nav-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -37,11 +37,11 @@
   min-height: 0;
 }
 
-.claudian-input-nav-row:empty {
+.praetor-input-nav-row:empty {
   display: none;
 }
 
-.claudian-input-nav-content {
+.praetor-input-nav-content {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -49,7 +49,7 @@
   min-width: 0;
 }
 
-.claudian-input-nav-actions {
+.praetor-input-nav-actions {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -57,7 +57,7 @@
   margin-inline-start: auto;
 }
 
-.claudian-input-nav-btn {
+.praetor-input-nav-btn {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -72,32 +72,32 @@
   transition: color 0.15s ease, background 0.15s ease;
 }
 
-.claudian-input-nav-btn:hover {
+.praetor-input-nav-btn:hover {
   color: var(--text-normal);
   background: var(--background-modifier-hover);
 }
 
-.claudian-input-nav-btn svg {
+.praetor-input-nav-btn svg {
   width: 16px;
   height: 16px;
 }
 
-.claudian-copy-last-interaction-btn.copied {
+.praetor-copy-last-interaction-btn.copied {
   color: var(--text-accent);
   font-size: 11px;
   font-family: var(--font-monospace);
 }
 
-.claudian-new-tab-btn svg {
+.praetor-new-tab-btn svg {
   width: 16.8px;
   height: 16.8px;
 }
 
-.claudian-input-wrapper textarea.claudian-input {
+.praetor-input-wrapper textarea.praetor-input {
   width: 100%;
   flex: 1 1 0;
-  min-height: var(--claudian-textarea-min-height, 60px);
-  max-height: var(--claudian-textarea-max-height, none);
+  min-height: var(--praetor-textarea-min-height, 60px);
+  max-height: var(--praetor-textarea-max-height, none);
   resize: none;
   padding: 8px 10px 10px 10px;
   border: none;
@@ -112,20 +112,20 @@
   unicode-bidi: plaintext; /* Proper BiDi text handling for mixed RTL/LTR */
 }
 
-.claudian-input-wrapper textarea.claudian-input:hover,
-.claudian-input-wrapper textarea.claudian-input:focus {
+.praetor-input-wrapper textarea.praetor-input:hover,
+.praetor-input-wrapper textarea.praetor-input:focus {
   outline: none;
   border: none;
   background: transparent;
   box-shadow: none;
 }
 
-.claudian-input-wrapper textarea.claudian-input::placeholder {
+.praetor-input-wrapper textarea.praetor-input::placeholder {
   color: var(--text-muted);
 }
 
 /* Input toolbar */
-.claudian-input-toolbar {
+.praetor-input-toolbar {
   display: flex;
   align-items: center;
   justify-content: flex-start;
@@ -138,13 +138,13 @@
 }
 
 /* Hide secondary text when the full toolbar would wrap. */
-.claudian-input-toolbar--compact .claudian-thinking-effort > .claudian-thinking-label-text,
-.claudian-input-toolbar--compact .claudian-context-meter-percent {
+.praetor-input-toolbar--compact .praetor-thinking-effort > .praetor-thinking-label-text,
+.praetor-input-toolbar--compact .praetor-context-meter-percent {
   display: none;
 }
 
 /* Composer queue status row (queued follow-up preview + steer action) */
-.claudian-input-queue-row {
+.praetor-input-queue-row {
   display: none;
   font-size: 12px;
   color: var(--text-muted);
@@ -154,7 +154,7 @@
   padding: 0 2px 8px 2px;
 }
 
-.claudian-queue-indicator-text {
+.praetor-queue-indicator-text {
   min-width: 0;
   flex: 1 1 auto;
   white-space: nowrap;
@@ -162,14 +162,14 @@
   text-overflow: ellipsis;
 }
 
-.claudian-queue-indicator-actions {
+.praetor-queue-indicator-actions {
   flex: 0 0 auto;
   display: flex;
   align-items: center;
   gap: 4px;
 }
 
-.claudian-queue-indicator-action {
+.praetor-queue-indicator-action {
   flex: 0 0 auto;
   padding: 1px 8px;
   border: 0;
@@ -179,17 +179,17 @@
   cursor: pointer;
 }
 
-.claudian-queue-indicator-action:hover {
+.praetor-queue-indicator-action:hover {
   text-decoration: underline;
 }
 
-.claudian-queue-indicator-action[disabled] {
+.praetor-queue-indicator-action[disabled] {
   color: var(--text-faint);
   cursor: default;
   text-decoration: none;
 }
 
-.claudian-queue-indicator-icon-action {
+.praetor-queue-indicator-icon-action {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -204,29 +204,29 @@
   cursor: pointer;
 }
 
-.claudian-queue-indicator-icon-action:hover {
+.praetor-queue-indicator-icon-action:hover {
   background: var(--background-modifier-hover);
   color: var(--text-normal);
 }
 
-.claudian-queue-indicator-icon-action svg {
+.praetor-queue-indicator-icon-action svg {
   width: 14px;
   height: 14px;
 }
 
 /* Light blue border when instruction mode is active */
-.claudian-input-wrapper.claudian-input-instruction-mode {
-  --claudian-input-wrapper-border-color: #60a5fa;
-  --claudian-input-wrapper-box-shadow: 0 0 0 1px #60a5fa;
+.praetor-input-wrapper.praetor-input-instruction-mode {
+  --praetor-input-wrapper-border-color: #60a5fa;
+  --praetor-input-wrapper-box-shadow: 0 0 0 1px #60a5fa;
 }
 
 /* Pink border when bash mode is active */
-.claudian-input-wrapper.claudian-input-bang-bash-mode {
-  --claudian-input-wrapper-border-color: #f472b6;
-  --claudian-input-wrapper-box-shadow: 0 0 0 1px #f472b6;
+.praetor-input-wrapper.praetor-input-bang-bash-mode {
+  --praetor-input-wrapper-border-color: #f472b6;
+  --praetor-input-wrapper-box-shadow: 0 0 0 1px #f472b6;
 }
 
 /* Monospace input while in bash mode */
-.claudian-input-wrapper.claudian-input-bang-bash-mode .claudian-input {
+.praetor-input-wrapper.praetor-input-bang-bash-mode .praetor-input {
   font-family: var(--font-monospace);
 }

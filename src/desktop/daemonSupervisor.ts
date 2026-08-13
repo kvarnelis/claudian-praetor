@@ -6,7 +6,7 @@ import * as os from 'os';
 import * as path from 'path';
 
 import { DEFAULT_CONFIG_PATH, loadConfig, openPairingWindow } from '../../daemon/src/config';
-import type ClaudianPlugin from '../main';
+import type PraetorPlugin from '../main';
 import { DEFAULT_DAEMON_PORT } from '../remote/protocol';
 import { findNodeExecutable, getEnhancedPath } from '../utils/env';
 
@@ -96,7 +96,7 @@ export class DaemonSupervisor {
   private child: ChildProcess | null = null;
   private disposed = false;
 
-  constructor(private readonly plugin: ClaudianPlugin) {}
+  constructor(private readonly plugin: PraetorPlugin) {}
 
   /**
    * Spawn the daemon if it isn't already running. Safe to call repeatedly.
@@ -177,7 +177,7 @@ export class DaemonSupervisor {
       },
     );
     child.on('error', () => {
-      new Notice('Claudian Praetor: failed to launch the daemon — check the daemon log.', 8000);
+      new Notice('Praetor: failed to launch the daemon — check the daemon log.', 8000);
     });
     child.unref();
     this.child = child;

@@ -6,14 +6,14 @@ import type { SharedAppStorage } from '../../core/bootstrap/storage';
 import { normalizeTabManagerState } from '../../core/bootstrap/tabManagerState';
 import type { AppTabManagerState } from '../../core/providers/types';
 import { VaultFileAdapter } from '../../core/storage/VaultFileAdapter';
-import { ClaudianSettingsStorage, type StoredClaudianSettings } from '../settings/ClaudianSettingsStorage';
+import { PraetorSettingsStorage, type StoredPraetorSettings } from '../settings/PraetorSettingsStorage';
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return !!value && typeof value === 'object' && !Array.isArray(value);
 }
 
 export class SharedStorageService implements SharedAppStorage {
-  readonly claudianSettings: ClaudianSettingsStorage;
+  readonly praetorSettings: PraetorSettingsStorage;
   readonly sessions: SessionStorage;
 
   private adapter: VaultFileAdapter;
@@ -23,17 +23,17 @@ export class SharedStorageService implements SharedAppStorage {
   constructor(plugin: Plugin) {
     this.plugin = plugin;
     this.adapter = new VaultFileAdapter(plugin.app);
-    this.claudianSettings = new ClaudianSettingsStorage(this.adapter);
+    this.praetorSettings = new PraetorSettingsStorage(this.adapter);
     this.sessions = new SessionStorage(this.adapter);
   }
 
-  async initialize(): Promise<{ claudian: Record<string, unknown> }> {
-    const claudian = await this.claudianSettings.load();
-    return { claudian };
+  async initialize(): Promise<{ praetor: Record<string, unknown> }> {
+    const praetor = await this.praetorSettings.load();
+    return { praetor };
   }
 
-  async saveClaudianSettings(settings: Record<string, unknown>): Promise<void> {
-    await this.claudianSettings.save(settings as StoredClaudianSettings);
+  async savePraetorSettings(settings: Record<string, unknown>): Promise<void> {
+    await this.praetorSettings.save(settings as StoredPraetorSettings);
   }
 
   async setTabManagerState(state: AppTabManagerState): Promise<void> {

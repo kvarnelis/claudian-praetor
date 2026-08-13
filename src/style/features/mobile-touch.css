@@ -1,6 +1,6 @@
 /*
  * Touch ergonomics for the inline ask/plan/exit-plan cards on mobile. Rows are
- * already tappable on every card (they share .claudian-ask-item); this hides
+ * already tappable on every card (they share .praetor-ask-item); this hides
  * the keyboard-only hint line, makes rows finger-sized (44px Apple HIG
  * minimum), and gives them visible borders so they read as buttons rather
  * than a keyboard-navigated list.
@@ -9,15 +9,15 @@
  * all three mobile body classes — keying on `is-mobile` alone silently skips
  * the iPad, which is the primary target here.
  */
-body.is-mobile .claudian-ask-hints,
-body.is-tablet .claudian-ask-hints,
-body.is-phone .claudian-ask-hints {
+body.is-mobile .praetor-ask-hints,
+body.is-tablet .praetor-ask-hints,
+body.is-phone .praetor-ask-hints {
   display: none;
 }
 
-body.is-mobile .claudian-ask-item,
-body.is-tablet .claudian-ask-item,
-body.is-phone .claudian-ask-item {
+body.is-mobile .praetor-ask-item,
+body.is-tablet .praetor-ask-item,
+body.is-phone .praetor-ask-item {
   min-height: 44px;
   align-items: center;
   padding: 8px 12px;
@@ -27,22 +27,22 @@ body.is-phone .claudian-ask-item {
   -webkit-tap-highlight-color: transparent;
 }
 
-body.is-mobile .claudian-ask-item:active,
-body.is-tablet .claudian-ask-item:active,
-body.is-phone .claudian-ask-item:active {
+body.is-mobile .praetor-ask-item:active,
+body.is-tablet .praetor-ask-item:active,
+body.is-phone .praetor-ask-item:active {
   background: var(--background-modifier-hover);
 }
 
 /* The '›' keyboard cursor is meaningless on touch; reclaim its gutter. */
-body.is-mobile .claudian-ask-cursor,
-body.is-tablet .claudian-ask-cursor,
-body.is-phone .claudian-ask-cursor {
+body.is-mobile .praetor-ask-cursor,
+body.is-tablet .praetor-ask-cursor,
+body.is-phone .praetor-ask-cursor {
   display: none;
 }
 
-body.is-mobile .claudian-ask-custom-text,
-body.is-tablet .claudian-ask-custom-text,
-body.is-phone .claudian-ask-custom-text {
+body.is-mobile .praetor-ask-custom-text,
+body.is-tablet .praetor-ask-custom-text,
+body.is-phone .praetor-ask-custom-text {
   min-height: 36px;
   font-size: var(--font-ui-medium);
 }

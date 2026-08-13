@@ -107,7 +107,7 @@ export function buildInlineEditInputDecorations(options: {
   const lineStart = options.doc.lineAt(options.inputPos).from;
   return Decoration.set([
     Decoration.line({
-      class: 'claudian-inline-input-line',
+      class: 'praetor-inline-input-line',
     }).range(lineStart),
     Decoration.widget({
       widget: options.widget,
@@ -213,11 +213,11 @@ function mergeAdjacentDiffOps(ops: DiffOp[]): DiffOp[] {
 function getDiffBlockClass(type: DiffOp['type']): string {
   switch (type) {
     case 'delete':
-      return 'claudian-diff-del';
+      return 'praetor-diff-del';
     case 'insert':
-      return 'claudian-diff-ins';
+      return 'praetor-diff-ins';
     default:
-      return 'claudian-diff-equal';
+      return 'praetor-diff-equal';
   }
 }
 
@@ -521,15 +521,15 @@ export class InlineEditSession {
 
   createInputDOM(): HTMLElement {
     const ownerDocument = this.getOwnerDocument();
-    const container = createDiv({ cls: 'claudian-inline-input-container' });
+    const container = createDiv({ cls: 'praetor-inline-input-container' });
     this.containerEl = container;
 
-    this.agentReplyEl = container.createDiv({ cls: 'claudian-inline-agent-reply claudian-hidden' });
+    this.agentReplyEl = container.createDiv({ cls: 'praetor-inline-agent-reply praetor-hidden' });
 
-    const inputWrap = container.createDiv({ cls: 'claudian-inline-input-wrap' });
+    const inputWrap = container.createDiv({ cls: 'praetor-inline-input-wrap' });
 
     const inputEl = inputWrap.createEl('input', {
-      cls: 'claudian-inline-input',
+      cls: 'praetor-inline-input',
       attr: {
         type: 'text',
         placeholder: this.mode === 'cursor' ? 'Insert instructions...' : 'Edit instructions...',
@@ -538,7 +538,7 @@ export class InlineEditSession {
     });
     this.inputEl = inputEl;
 
-    this.spinnerEl = inputWrap.createDiv({ cls: 'claudian-inline-spinner claudian-hidden' });
+    this.spinnerEl = inputWrap.createDiv({ cls: 'praetor-inline-spinner praetor-hidden' });
 
     const inlineCatalog = ProviderWorkspaceRegistry.getCommandCatalog(this.resolvedProviderId);
     this.slashCommandDropdown = new SlashCommandDropdown(
@@ -584,11 +584,11 @@ export class InlineEditSession {
   }
 
   createDiffPreviewDOM(diffOps: DiffOp[]): HTMLElement {
-    const previewEl = createDiv({ cls: 'claudian-inline-diff-preview' });
+    const previewEl = createDiv({ cls: 'praetor-inline-diff-preview' });
 
-    const bodyEl = previewEl.createDiv({ cls: 'claudian-inline-diff-preview-body markdown-rendered' });
+    const bodyEl = previewEl.createDiv({ cls: 'praetor-inline-diff-preview-body markdown-rendered' });
 
-    const actionsEl = previewEl.createDiv({ cls: 'claudian-inline-preview-actions' });
+    const actionsEl = previewEl.createDiv({ cls: 'praetor-inline-preview-actions' });
     actionsEl.setAttribute('role', 'toolbar');
     actionsEl.setAttribute('aria-label', 'Inline edit actions');
     actionsEl.appendChild(this.createPreviewActionButton('Reject', 'reject', () => this.reject()));
@@ -604,7 +604,7 @@ export class InlineEditSession {
     onClick: () => void
   ): HTMLButtonElement {
     const button = createEl('button', {
-      cls: `claudian-inline-preview-action ${variant}`,
+      cls: `praetor-inline-preview-action ${variant}`,
       text: label,
       attr: {
         type: 'button',
@@ -636,7 +636,7 @@ export class InlineEditSession {
     for (const document of buildMarkdownDiffDocuments(diffOps)) {
       if (!document.markdown) continue;
 
-      const opEl = container.createDiv({ cls: `claudian-diff-block ${getDiffBlockClass(document.type)}` });
+      const opEl = container.createDiv({ cls: `praetor-diff-block ${getDiffBlockClass(document.type)}` });
       await this.renderMarkdownPreview(opEl, document.markdown);
     }
   }
@@ -675,7 +675,7 @@ export class InlineEditSession {
     this.removeSelectionListeners();
 
     this.inputEl.disabled = true;
-    this.spinnerEl.removeClass('claudian-hidden');
+    this.spinnerEl.removeClass('praetor-hidden');
 
     const contextFiles = this.resolveContextFilesFromMessage(userMessage);
 
@@ -712,7 +712,7 @@ export class InlineEditSession {
       return;
     } finally {
       if (this.isGenerationActive(generation)) {
-        this.spinnerEl?.addClass('claudian-hidden');
+        this.spinnerEl?.addClass('praetor-hidden');
       }
     }
 
@@ -752,7 +752,7 @@ export class InlineEditSession {
     const renderVersion = ++this.agentReplyRenderVersion;
     const renderedEl = this.agentReplyEl.createDiv();
 
-    replyEl.removeClass('claudian-hidden');
+    replyEl.removeClass('praetor-hidden');
     replyEl.empty();
     void this.renderMarkdownPreview(renderedEl, message).then(() => {
       if (renderVersion !== this.agentReplyRenderVersion || replyEl !== this.agentReplyEl) {

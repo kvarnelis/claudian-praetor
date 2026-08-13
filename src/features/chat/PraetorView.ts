@@ -10,7 +10,7 @@ import {
 import { ProviderRegistry } from '../../core/providers/ProviderRegistry';
 import { ProviderSettingsCoordinator } from '../../core/providers/ProviderSettingsCoordinator';
 import { type AppTabManagerState, DEFAULT_CHAT_PROVIDER_ID, type ProviderId } from '../../core/providers/types';
-import { VIEW_TYPE_CLAUDIAN } from '../../core/types';
+import { VIEW_TYPE_PRAETOR } from '../../core/types';
 import {
   cancelScheduledAnimationFrame,
   scheduleAnimationFrame,
@@ -37,7 +37,7 @@ type LoadableView = {
   load: () => Promise<void> | void;
 };
 
-export class ClaudianView extends ItemView {
+export class PraetorView extends ItemView {
   private plugin: FeatureHost;
 
   // Tab management
@@ -76,7 +76,7 @@ export class ClaudianView extends ItemView {
     );
 
     // Hover Editor compatibility: Define load as an instance method that can't be
-    // overwritten by prototype patching. Hover Editor patches ClaudianView.prototype.load
+    // overwritten by prototype patching. Hover Editor patches PraetorView.prototype.load
     // after our class is defined, but instance methods take precedence over prototype methods.
     const prototype = Object.getPrototypeOf(this) as LoadableView;
     const originalLoad = prototype.load.bind(this);
@@ -99,11 +99,11 @@ export class ClaudianView extends ItemView {
   }
 
   getViewType(): string {
-    return VIEW_TYPE_CLAUDIAN;
+    return VIEW_TYPE_PRAETOR;
   }
 
   getDisplayText(): string {
-    return 'Claudian';
+    return 'Praetor';
   }
 
   getIcon(): string {
@@ -113,7 +113,7 @@ export class ClaudianView extends ItemView {
   /** Applies appearance preferences that can change while the view is open. */
   refreshAppearance(): void {
     this.viewContainerEl?.toggleClass(
-      'claudian-container--theme-native',
+      'praetor-container--theme-native',
       this.plugin.settings.useThemeNativeAppearance === true,
     );
   }
@@ -157,7 +157,7 @@ export class ClaudianView extends ItemView {
       tab.ui.permissionToggle?.updateDisplay();
       tab.ui.serviceTierToggle?.updateDisplay();
       tab.dom.inputWrapper.toggleClass(
-        'claudian-input-plan-mode',
+        'praetor-input-plan-mode',
         providerSettings.permissionMode === 'plan' && capabilities.supportsPlanMode,
       );
     }
@@ -207,11 +207,11 @@ export class ClaudianView extends ItemView {
 
     this.viewContainerEl = container;
     this.viewContainerEl.empty();
-    this.viewContainerEl.addClass('claudian-container');
+    this.viewContainerEl.addClass('praetor-container');
     this.refreshAppearance();
 
     this.navRowContent = this.buildNavRowContent();
-    this.tabContentEl = this.viewContainerEl.createDiv({ cls: 'claudian-tab-content-container' });
+    this.tabContentEl = this.viewContainerEl.createDiv({ cls: 'praetor-tab-content-container' });
     this.buildInputFooter();
 
     this.tabManager = new TabManager(
@@ -318,9 +318,9 @@ export class ClaudianView extends ItemView {
    * The wrapper is moved to the active tab's nav row on tab switches.
    */
   private buildNavRowContent(): HTMLElement {
-    const wrapper = this.containerEl.createDiv({ cls: 'claudian-input-nav-content' });
+    const wrapper = this.containerEl.createDiv({ cls: 'praetor-input-nav-content' });
 
-    this.tabBarContainerEl = wrapper.createDiv({ cls: 'claudian-tab-bar-container' });
+    this.tabBarContainerEl = wrapper.createDiv({ cls: 'praetor-tab-bar-container' });
     this.tabBar = new TabBar(this.tabBarContainerEl, {
       onTabClick: (tabId) => this.handleTabClick(tabId),
       onTabClose: (tabId) => {
@@ -332,16 +332,16 @@ export class ClaudianView extends ItemView {
       onTitleExpansionChanged: () => this.persistTabState(),
     });
 
-    const navActionsEl = wrapper.createDiv({ cls: 'claudian-input-nav-actions' });
+    const navActionsEl = wrapper.createDiv({ cls: 'praetor-input-nav-actions' });
 
-    this.newTabButtonEl = navActionsEl.createDiv({ cls: 'claudian-input-nav-btn claudian-new-tab-btn' });
+    this.newTabButtonEl = navActionsEl.createDiv({ cls: 'praetor-input-nav-btn praetor-new-tab-btn' });
     setIcon(this.newTabButtonEl, 'square-plus');
     this.newTabButtonEl.setAttribute('aria-label', 'New tab');
     this.newTabButtonEl.addEventListener('click', () => {
       void this.createNewTab().catch((e) => new Notice(`Failed to create tab: ${e instanceof Error ? e.message : String(e)}`, 10_000));
     });
 
-    const newBtn = navActionsEl.createDiv({ cls: 'claudian-input-nav-btn' });
+    const newBtn = navActionsEl.createDiv({ cls: 'praetor-input-nav-btn' });
     setIcon(newBtn, 'square-pen');
     newBtn.setAttribute('aria-label', 'New conversation');
     newBtn.addEventListener('click', () => {
@@ -352,12 +352,12 @@ export class ClaudianView extends ItemView {
     });
 
     // History dropdown
-    const historyContainer = navActionsEl.createDiv({ cls: 'claudian-history-container' });
-    const historyBtn = historyContainer.createDiv({ cls: 'claudian-input-nav-btn' });
+    const historyContainer = navActionsEl.createDiv({ cls: 'praetor-history-container' });
+    const historyBtn = historyContainer.createDiv({ cls: 'praetor-input-nav-btn' });
     setIcon(historyBtn, 'history');
     historyBtn.setAttribute('aria-label', 'Chat history');
 
-    this.historyDropdown = historyContainer.createDiv({ cls: 'claudian-history-menu' });
+    this.historyDropdown = historyContainer.createDiv({ cls: 'praetor-history-menu' });
 
     historyBtn.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -365,7 +365,7 @@ export class ClaudianView extends ItemView {
     });
 
     const copyLastInteractionBtn = navActionsEl.createDiv({
-      cls: 'claudian-input-nav-btn claudian-copy-last-interaction-btn',
+      cls: 'praetor-input-nav-btn praetor-copy-last-interaction-btn',
     });
     setIcon(copyLastInteractionBtn, 'copy');
     copyLastInteractionBtn.setAttribute('aria-label', 'Copy last interaction');
@@ -392,11 +392,11 @@ export class ClaudianView extends ItemView {
   private buildInputFooter(): void {
     if (!this.viewContainerEl) return;
 
-    this.inputFooterEl = this.viewContainerEl.createDiv({ cls: 'claudian-input-footer' });
+    this.inputFooterEl = this.viewContainerEl.createDiv({ cls: 'praetor-input-footer' });
     this.inputNavRowHostEl = this.inputFooterEl.createDiv({
-      cls: 'claudian-input-nav-row claudian-view-input-nav-row',
+      cls: 'praetor-input-nav-row praetor-view-input-nav-row',
     });
-    this.activeInputSlotEl = this.inputFooterEl.createDiv({ cls: 'claudian-active-input-slot' });
+    this.activeInputSlotEl = this.inputFooterEl.createDiv({ cls: 'praetor-active-input-slot' });
   }
 
   private attachNavRowContentToInputFooter(): void {
@@ -510,7 +510,7 @@ export class ClaudianView extends ItemView {
     const tabCount = this.tabManager.getTabCount();
     const showTabBar = tabCount >= 2;
 
-    this.tabBarContainerEl.toggleClass('claudian-hidden', !showTabBar);
+    this.tabBarContainerEl.toggleClass('praetor-hidden', !showTabBar);
 
     this.updateNewTabButtonVisibility();
   }
@@ -519,7 +519,7 @@ export class ClaudianView extends ItemView {
     if (!this.newTabButtonEl || !this.tabManager) return;
 
     const canCreateTab = this.tabManager.canCreateTab();
-    this.newTabButtonEl.toggleClass('claudian-hidden', !canCreateTab);
+    this.newTabButtonEl.toggleClass('praetor-hidden', !canCreateTab);
     if (canCreateTab) {
       this.newTabButtonEl.removeAttribute('aria-disabled');
       this.newTabButtonEl.removeAttribute('aria-hidden');

@@ -63,7 +63,7 @@ describe('daemon config pairing', () => {
       remoteAddress: '100.64.1.20',
     })).toEqual({
       ok: false,
-      reason: 'device not paired; open pairing in Claudian Praetor settings on your Mac',
+      reason: 'device not paired; open pairing in Praetor settings on your Mac',
     });
   });
 
