@@ -6,7 +6,6 @@ describe('built-in ProviderModule catalog', () => {
       'claude',
       'codex',
       'grok',
-      'opencode',
     ]);
     for (const module of BUILT_IN_PROVIDER_MODULES) {
       expect(module.workspace.initialize).toEqual(expect.any(Function));

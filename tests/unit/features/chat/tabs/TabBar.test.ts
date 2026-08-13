@@ -106,9 +106,9 @@ describe('TabBar', () => {
       const callbacks = createMockCallbacks();
       const tabBar = new TabBar(containerEl, callbacks);
 
-      tabBar.update([createTabBarItem({ providerId: 'opencode' })]);
+      tabBar.update([createTabBarItem({ providerId: 'grok' })]);
 
-      expect(containerEl._children[0].getAttribute('data-provider')).toBe('opencode');
+      expect(containerEl._children[0].getAttribute('data-provider')).toBe('grok');
     });
 
     it('should toggle between index and title labels on double click', () => {

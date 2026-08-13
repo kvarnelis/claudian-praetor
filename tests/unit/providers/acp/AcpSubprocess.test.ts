@@ -40,14 +40,14 @@ describe('AcpSubprocess', () => {
   it('spawns ACP runtimes directly on non-Windows commands', () => {
     const subprocess = new AcpSubprocess({
       args: ['acp', '--cwd=/vault'],
-      command: '/opt/opencode/bin/opencode',
+      command: '/opt/grok/bin/grok',
       cwd: '/vault',
       env: { PATH: '/usr/bin' },
     });
 
     subprocess.start();
 
-    expect(mockSpawn).toHaveBeenCalledWith('/opt/opencode/bin/opencode', ['acp', '--cwd=/vault'], expect.objectContaining({
+    expect(mockSpawn).toHaveBeenCalledWith('/opt/grok/bin/grok', ['acp', '--cwd=/vault'], expect.objectContaining({
       cwd: '/vault',
       stdio: 'pipe',
       windowsHide: true,
@@ -58,7 +58,7 @@ describe('AcpSubprocess', () => {
     Object.defineProperty(process, 'platform', { value: 'win32' });
     const subprocess = new AcpSubprocess({
       args: ['acp', '--cwd=C:\\Vault'],
-      command: 'C:\\Users\\R&D\\AppData\\Roaming\\npm\\opencode.cmd',
+      command: 'C:\\Users\\R&D\\AppData\\Roaming\\npm\\grok.cmd',
       cwd: 'C:\\Vault',
       env: { PATH: 'C:\\Windows\\System32' },
     });
@@ -67,7 +67,7 @@ describe('AcpSubprocess', () => {
 
     expect(mockSpawn).toHaveBeenCalledWith(
       process.env.ComSpec || process.env.comspec || 'cmd.exe',
-      ['/d', '/s', '/c', '""C:\\Users\\R&D\\AppData\\Roaming\\npm\\opencode.cmd" acp "--cwd=C:\\Vault""'],
+      ['/d', '/s', '/c', '""C:\\Users\\R&D\\AppData\\Roaming\\npm\\grok.cmd" acp "--cwd=C:\\Vault""'],
       expect.objectContaining({
         cwd: 'C:\\Vault',
         windowsHide: true,
@@ -80,7 +80,7 @@ describe('AcpSubprocess', () => {
     Object.defineProperty(process, 'platform', { value: 'win32' });
     const subprocess = new AcpSubprocess({
       args: ['acp', '--cwd=C:\\Vault'],
-      command: 'C:\\Users\\R&D\\AppData\\Roaming\\npm\\opencode.cmd',
+      command: 'C:\\Users\\R&D\\AppData\\Roaming\\npm\\grok.cmd',
       cwd: 'C:\\Vault',
       env: { PATH: 'C:\\Windows\\System32' },
     });
@@ -107,7 +107,7 @@ describe('AcpSubprocess', () => {
     jest.useFakeTimers();
     const subprocess = new AcpSubprocess({
       args: ['acp', '--cwd=/vault'],
-      command: 'opencode',
+      command: 'grok',
       cwd: '/vault',
       env: {},
     });

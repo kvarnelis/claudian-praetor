@@ -45,10 +45,10 @@ const stagedObsidianRules = {
   'obsidianmd/ui/sentence-case': [
     obsidianRuleSeverity,
     {
-      ignoreWords: ["Claude's Codex", 'Codex', 'OpenCode', 'WSL'],
-      brands: [...DEFAULT_BRANDS, "Claude's Codex", 'Codex', 'OpenCode'],
+      ignoreWords: ["Claude's Codex", 'Codex', 'WSL'],
+      brands: [...DEFAULT_BRANDS, "Claude's Codex", 'Codex'],
       acronyms: [...DEFAULT_ACRONYMS, 'TOML', 'WSL'],
-      ignoreRegex: ['\\.(?:claude|codex|opencode)/'],
+      ignoreRegex: ['\\.(?:claude|codex)/'],
       enforceCamelCaseLower: true,
     },
   ],

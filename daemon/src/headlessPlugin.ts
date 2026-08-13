@@ -32,7 +32,6 @@ import { ProviderWorkspaceRegistry } from '../../src/core/providers/ProviderWork
 import type { ProviderCliResolutionContext, ProviderId } from '../../src/core/providers/types';
 import type { ClaudesCodexSettings } from '../../src/core/types';
 import type ClaudesCodexPlugin from '../../src/main';
-import { OPENCODE_PLAN_MODE_ID, OPENCODE_SAFE_MODE_ID } from '../../src/providers/opencode/modes';
 import type { NodeVaultApp } from './nodeVaultApp';
 
 const DAEMON_DATA_FILE = 'claudes-codex-daemon-data.json';
@@ -66,16 +65,6 @@ function normalizeLoadedSettings(settings: ClaudesCodexSettings): void {
       }
     }
   }
-  const opencodeConfig = settings.providerConfigs?.opencode;
-  if (
-    opencodeConfig
-    && typeof opencodeConfig === 'object'
-    && !Array.isArray(opencodeConfig)
-    && opencodeConfig.selectedMode === OPENCODE_PLAN_MODE_ID
-  ) {
-    opencodeConfig.selectedMode = OPENCODE_SAFE_MODE_ID;
-  }
-
   ProviderSettingsCoordinator.projectActiveProviderState(
     settings as unknown as Record<string, unknown>,
   );

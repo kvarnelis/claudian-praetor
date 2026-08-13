@@ -3,7 +3,6 @@
 import {
   createProviderIconSvg,
   OPENAI_PROVIDER_ICON,
-  OPENCODE_PROVIDER_ICON,
 } from '@/shared/icons';
 
 describe('createProviderIconSvg', () => {
@@ -26,18 +25,5 @@ describe('createProviderIconSvg', () => {
     expect(path?.getAttribute('fill')).toBe('currentColor');
   });
 
-  it('renders composite provider icons with theme variants', () => {
-    const svg = createProviderIconSvg(OPENCODE_PROVIDER_ICON, {
-      dataProvider: 'opencode',
-      height: 18,
-      parent: document.body,
-      width: 18,
-    });
-
-    expect(svg.getAttribute('data-provider')).toBe('opencode');
-    expect(svg.getAttribute('viewBox')).toBe(OPENCODE_PROVIDER_ICON.viewBox);
-    expect(svg.querySelector('.claudes-codex-provider-icon-variant--light')).not.toBeNull();
-    expect(svg.querySelector('.claudes-codex-provider-icon-variant--dark')).not.toBeNull();
-  });
 
 });

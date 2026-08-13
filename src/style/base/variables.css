@@ -6,8 +6,6 @@
   --claudes-codex-brand-claude-rgb: 217, 119, 87;
   --claudes-codex-brand-codex: #d0d0d0;
   --claudes-codex-brand-codex-rgb: 208, 208, 208;
-  --claudes-codex-brand-opencode: #B8B8B8;
-  --claudes-codex-brand-opencode-rgb: 184, 184, 184;
   --claudes-codex-error: #dc3545;
   --claudes-codex-error-rgb: 220, 53, 69;
   --claudes-codex-compact: #5bc0de;
@@ -16,8 +14,6 @@
 body.theme-light .claudes-codex-container {
   --claudes-codex-brand-codex: #000000;
   --claudes-codex-brand-codex-rgb: 0, 0, 0;
-  --claudes-codex-brand-opencode: #707070;
-  --claudes-codex-brand-opencode-rgb: 112, 112, 112;
 }
 
 /* Active-provider alias for single-provider surfaces. */
@@ -29,9 +25,4 @@ body.theme-light .claudes-codex-container {
 .claudes-codex-container[data-provider="codex"] {
   --claudes-codex-brand: var(--claudes-codex-brand-codex);
   --claudes-codex-brand-rgb: var(--claudes-codex-brand-codex-rgb);
-}
-
-.claudes-codex-container[data-provider="opencode"] {
-  --claudes-codex-brand: var(--claudes-codex-brand-opencode);
-  --claudes-codex-brand-rgb: var(--claudes-codex-brand-opencode-rgb);
 }

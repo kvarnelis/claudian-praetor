@@ -47,6 +47,5 @@ Tabs stay cold until the first send. Keep runtime warmup explicit and provider-o
 - Plan mode is provider-specific:
   - Claude uses provider/runtime events for enter and exit.
   - Codex uses `collaborationMode` plus post-stream metadata.
-  - OpenCode maps managed modes to shared permission modes.
 - Bang-bash mode bypasses provider runtimes and executes a local shell command directly. It is available only when the enabled provider exposes it in `ProviderChatUIConfig`.
 - Forking is provider-owned under the hood. Use runtime and provider history contracts instead of reconstructing provider session IDs in feature code.

@@ -3,7 +3,6 @@ import { ProviderWorkspaceRegistry } from '../core/providers/ProviderWorkspaceRe
 import { claudeProviderRegistration } from './claude/registration';
 import { codexProviderRegistration } from './codex/registration';
 import { grokProviderRegistration } from './grok/app/GrokWorkspaceServices';
-import { opencodeProviderRegistration } from './opencode/registration';
 
 let builtInProvidersRegistered = false;
 
@@ -11,7 +10,6 @@ export const BUILT_IN_PROVIDER_MODULES = [
   claudeProviderRegistration,
   codexProviderRegistration,
   grokProviderRegistration,
-  opencodeProviderRegistration,
 ] as const;
 
 export function registerBuiltInProviders(): void {

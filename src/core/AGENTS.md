@@ -58,4 +58,3 @@ const cliResolver = ProviderWorkspaceRegistry.getCliResolver(providerId);
 - Command discovery differs by provider:
   - Claude merges runtime-discovered commands with vault commands and skills.
   - Codex skills come from `CodexSkillCatalog` and do not depend on runtime command discovery.
-  - OpenCode exposes runtime commands through its provider protocol.

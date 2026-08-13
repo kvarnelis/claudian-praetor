@@ -74,11 +74,11 @@ describe('ProviderWorkspaceRegistry', () => {
       loadCommands: jest.fn().mockResolvedValue([]),
     };
 
-    ProviderWorkspaceRegistry.setServices('opencode', {
+    ProviderWorkspaceRegistry.setServices('grok', {
       runtimeCommandLoader: runtimeCommandLoader as any,
     });
 
-    expect(ProviderWorkspaceRegistry.getRuntimeCommandLoader('opencode')).toBe(runtimeCommandLoader);
+    expect(ProviderWorkspaceRegistry.getRuntimeCommandLoader('grok')).toBe(runtimeCommandLoader);
   });
 
   it('returns the tab warmup policy for a provider', () => {
@@ -86,11 +86,11 @@ describe('ProviderWorkspaceRegistry', () => {
       resolveMode: jest.fn().mockReturnValue('commands'),
     };
 
-    ProviderWorkspaceRegistry.setServices('opencode', {
+    ProviderWorkspaceRegistry.setServices('grok', {
       tabWarmupPolicy: tabWarmupPolicy as any,
     });
 
-    expect(ProviderWorkspaceRegistry.getTabWarmupPolicy('opencode')).toBe(tabWarmupPolicy);
+    expect(ProviderWorkspaceRegistry.getTabWarmupPolicy('grok')).toBe(tabWarmupPolicy);
   });
 
   it('deduplicates concurrent provider initialization', async () => {

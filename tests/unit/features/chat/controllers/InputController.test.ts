@@ -2624,7 +2624,7 @@ describe('InputController - Message Queue', () => {
         const approvalPromise = controller.handleApprovalRequest(
           'External Directory',
           { filepath: '/tmp/outside' },
-          'OpenCode wants to access a path outside the working directory.',
+          'Grok wants to access a path outside the working directory.',
           {
             decisionOptions: [
               { label: 'Allow once', value: 'approval-allow-once', decision: 'allow' },
@@ -2787,7 +2787,7 @@ describe('InputController - Message Queue', () => {
       });
 
       deps = createMockDeps({
-        getAuxiliaryModel: () => 'opencode:openai/gpt-5.4',
+        getAuxiliaryModel: () => 'grok:openai/gpt-5.4',
         getInstructionRefineService: () => mockInstructionRefineService as any,
       });
       deps.plugin.settings.systemPrompt = '';
@@ -2797,7 +2797,7 @@ describe('InputController - Message Queue', () => {
       await controller.handleInstructionSubmit('add logging');
 
       expect(mockInstructionRefineService.setModelOverride).toHaveBeenCalledWith(
-        'opencode:openai/gpt-5.4',
+        'grok:openai/gpt-5.4',
       );
     });
 

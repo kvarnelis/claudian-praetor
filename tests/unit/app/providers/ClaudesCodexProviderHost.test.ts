@@ -62,14 +62,14 @@ describe('ClaudesCodexProviderHost', () => {
     });
     const host = new ClaudesCodexProviderHost(plugin);
 
-    await host.recycleProviderRuntimes('opencode');
+    await host.recycleProviderRuntimes('grok');
 
     expect(trace).toEqual([
-      'first:recycle:opencode',
-      'first:invalidate:opencode',
+      'first:recycle:grok',
+      'first:invalidate:grok',
       'first:refresh',
-      'second:recycle:opencode',
-      'second:invalidate:opencode',
+      'second:recycle:grok',
+      'second:invalidate:grok',
       'second:refresh',
     ]);
   });

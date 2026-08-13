@@ -4,6 +4,7 @@ import { TEST_CODEX_CATALOG } from '@test/helpers/codexModels';
 
 import type { VaultFileAdapter } from '@/core/storage/VaultFileAdapter';
 import { ProviderRegistry } from '@/core/providers/ProviderRegistry';
+import { ProviderSettingsCoordinator } from '@/core/providers/ProviderSettingsCoordinator';
 import { getClaudeProviderSettings } from '@/providers/claude/settings';
 import {
   LEGACY_CLAUDES_CODEX_SETTINGS_PATH,
@@ -15,7 +16,6 @@ import {
   getCodexProviderSettings,
   updateCodexProviderSettings,
 } from '@/providers/codex/settings';
-import { getOpencodeProviderSettings } from '@/providers/opencode/settings';
 
 const mockGetHostnameKey = jest.fn(() => 'host-a');
 const mockGetLegacyHostnameKey = jest.fn(() => 'legacy-host');
@@ -77,6 +77,38 @@ describe('ClaudesCodexSettingsStorage', () => {
       const writtenContent = JSON.parse(mockAdapter.write.mock.calls.at(-1)![1]);
       expect(writtenContent.userName).toBe('Existing user');
       expect(writtenContent.providerConfigs.pi).toEqual(piConfig);
+    });
+
+    it('ignores removed OpenCode settings and legacy modes without deleting them', async () => {
+      const opencodeConfig = {
+        enabled: true,
+        selectedMode: 'plan',
+        availableModes: [
+          { id: 'praetor-yolo', name: 'yolo' },
+          { id: 'praetor-safe', name: 'safe' },
+        ],
+        customSetting: 'keep-me',
+      };
+      mockAdapter.exists.mockResolvedValue(true);
+      mockAdapter.read.mockResolvedValue(JSON.stringify({
+        settingsProvider: 'opencode',
+        userName: 'Existing user',
+        providerConfigs: { opencode: opencodeConfig },
+      }));
+
+      const result = await storage.load();
+      const didNormalize = ProviderSettingsCoordinator.normalizeProviderSelection(result);
+
+      expect(didNormalize).toBe(true);
+      expect(result.settingsProvider).toBe('claude');
+      expect(ProviderRegistry.getEnabledProviderIds(result)).not.toContain('opencode');
+      expect(result.userName).toBe('Existing user');
+      expect(result.providerConfigs.opencode).toEqual(opencodeConfig);
+
+      await storage.save(result);
+      const writtenContent = JSON.parse(mockAdapter.write.mock.calls.at(-1)![1]);
+      expect(writtenContent.userName).toBe('Existing user');
+      expect(writtenContent.providerConfigs.opencode).toEqual(opencodeConfig);
     });
 
     it('should return defaults when file does not exist', async () => {
@@ -290,7 +322,6 @@ describe('ClaudesCodexSettingsStorage', () => {
       const result = await storage.load();
       const claudeSettings = getClaudeProviderSettings(result);
       const codexSettings = getCodexProviderSettings(result);
-      const opencodeSettings = getOpencodeProviderSettings(result);
       const persistedOpencodeConfig = result.providerConfigs.opencode as Record<string, unknown>;
       const persistedPiConfig = result.providerConfigs.pi as Record<string, unknown>;
       const writtenContent = JSON.parse(mockAdapter.write.mock.calls[0][1]);
@@ -313,12 +344,8 @@ describe('ClaudesCodexSettingsStorage', () => {
         'device:current': 'Ubuntu',
         'host-b': 'Debian',
       });
-      expect(opencodeSettings.cliPathsByHost).toEqual({
-        'device:current': '/custom/opencode-a',
-        'host-b': '/custom/opencode-b',
-      });
       expect(persistedOpencodeConfig.cliPathsByHost).toEqual({
-        'device:current': '/custom/opencode-a',
+        'host-a': '/custom/opencode-a',
         'host-b': '/custom/opencode-b',
       });
       expect(persistedPiConfig.cliPathsByHost).toEqual({
@@ -334,7 +361,7 @@ describe('ClaudesCodexSettingsStorage', () => {
         'host-b': '/custom/codex-b',
       });
       expect(writtenContent.providerConfigs.opencode.cliPathsByHost).toEqual({
-        'device:current': '/custom/opencode-a',
+        'host-a': '/custom/opencode-a',
         'host-b': '/custom/opencode-b',
       });
       expect(writtenContent.providerConfigs.pi.cliPathsByHost).toEqual({

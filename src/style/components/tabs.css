@@ -109,9 +109,6 @@ body.claudes-codex-mobile .claudes-codex-tab-badge-close:active {
   border-color: var(--claudes-codex-brand-codex, #d0d0d0);
 }
 
-.claudes-codex-tab-badge-streaming[data-provider="opencode"] {
-  border-color: var(--claudes-codex-brand-opencode, #C8C8C8);
-}
 
 
 .claudes-codex-tab-badge-attention {

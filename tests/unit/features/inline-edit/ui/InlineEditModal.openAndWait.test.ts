@@ -329,18 +329,18 @@ describe('InlineEditModal - openAndWait', () => {
         settings: {
           hiddenProviderCommands: {
             claude: [],
-            opencode: [],
+            grok: [],
           },
         },
         getConversationSync: jest.fn().mockReturnValue(null),
         getView: jest.fn().mockReturnValue({
           getActiveTab: jest.fn().mockReturnValue({
             conversationId: null,
-            draftModel: 'opencode:openai/gpt-5.4',
-            providerId: 'opencode',
+            draftModel: 'grok:openai/gpt-5.4',
+            providerId: 'grok',
             service: {
-              getAuxiliaryModel: jest.fn().mockReturnValue('opencode:openai/gpt-5.4'),
-              providerId: 'opencode',
+              getAuxiliaryModel: jest.fn().mockReturnValue('grok:openai/gpt-5.4'),
+              providerId: 'grok',
             },
           }),
         }),
@@ -398,8 +398,8 @@ describe('InlineEditModal - openAndWait', () => {
       const resultPromise = modal.openAndWait();
       await Promise.resolve();
 
-      expect(providerSpy).toHaveBeenCalledWith(plugin, 'opencode');
-      expect(inlineEditService.setModelOverride).toHaveBeenCalledWith('opencode:openai/gpt-5.4');
+      expect(providerSpy).toHaveBeenCalledWith(plugin, 'grok');
+      expect(inlineEditService.setModelOverride).toHaveBeenCalledWith('grok:openai/gpt-5.4');
 
       widgetRef.reject();
       await expect(resultPromise).resolves.toEqual({ decision: 'reject' });
@@ -441,14 +441,14 @@ describe('InlineEditModal - openAndWait', () => {
         .mockReturnValue(inlineEditService as any);
       const conversation = {
         id: 'conv-1',
-        providerId: 'opencode',
-        selectedModel: 'opencode:anthropic/claude-sonnet-4',
+        providerId: 'grok',
+        selectedModel: 'grok-build',
       };
       const plugin = {
         settings: {
           hiddenProviderCommands: {
             claude: [],
-            opencode: [],
+            grok: [],
           },
         },
         getConversationSync: jest.fn().mockReturnValue(conversation),
@@ -456,7 +456,7 @@ describe('InlineEditModal - openAndWait', () => {
           getActiveTab: jest.fn().mockReturnValue({
             conversationId: 'conv-1',
             draftModel: null,
-            providerId: 'opencode',
+            providerId: 'grok',
             service: null,
           }),
         }),
@@ -514,8 +514,8 @@ describe('InlineEditModal - openAndWait', () => {
       const resultPromise = modal.openAndWait();
       await Promise.resolve();
 
-      expect(providerSpy).toHaveBeenCalledWith(plugin, 'opencode');
-      expect(inlineEditService.setModelOverride).toHaveBeenCalledWith('opencode:anthropic/claude-sonnet-4');
+      expect(providerSpy).toHaveBeenCalledWith(plugin, 'grok');
+      expect(inlineEditService.setModelOverride).toHaveBeenCalledWith('grok-build');
 
       widgetRef.reject();
       await expect(resultPromise).resolves.toEqual({ decision: 'reject' });

@@ -1100,79 +1100,6 @@ describe('Tab - Service Initialization', () => {
       expect(plugin.saveSettings).not.toHaveBeenCalled();
     });
 
-    it('maps shared permission mode selections onto managed OpenCode modes', async () => {
-      const plugin = createMockPlugin({
-        settings: {
-          excludedTags: [],
-          model: 'claude-sonnet-4-5',
-          thinkingBudget: 'low',
-          effortLevel: 'high',
-          permissionMode: 'yolo',
-          keyboardNavigation: {
-            scrollUpKey: 'k',
-            scrollDownKey: 'j',
-            focusInputKey: 'i',
-          },
-          persistentExternalContextPaths: [],
-          settingsProvider: 'claude',
-          providerConfigs: {
-            opencode: {
-              availableModes: [
-                { id: 'claudes-codex-yolo', name: 'YOLO' },
-                { id: 'claudes-codex-safe', name: 'Safe' },
-                { id: 'plan', name: 'Plan' },
-              ],
-              enabled: true,
-              selectedMode: 'claudes-codex-yolo',
-            },
-          },
-          savedProviderEffort: {
-            claude: 'high',
-            opencode: 'default',
-          },
-          savedProviderModel: {
-            claude: 'claude-sonnet-4-5',
-            opencode: 'opencode:openai/gpt-5',
-          },
-          savedProviderPermissionMode: {
-            claude: 'yolo',
-          },
-        },
-      });
-
-      const tab = createTab(createMockOptions({
-        plugin,
-        conversation: {
-          id: 'conv-opencode-settings',
-          providerId: 'opencode',
-          title: 'OpenCode conversation',
-          messages: [],
-          sessionId: null,
-          createdAt: Date.now(),
-          updatedAt: Date.now(),
-        },
-      }));
-
-      initializeTabUI(tab, plugin);
-      expect(mockPermissionToggle.setVisible).toHaveBeenLastCalledWith(true);
-
-      const toolbarModule = jest.requireMock('@/features/chat/ui/InputToolbar') as {
-        createInputToolbar: jest.Mock;
-      };
-      const toolbarCallbacks = toolbarModule.createInputToolbar.mock.calls.at(-1)?.[1];
-
-      await toolbarCallbacks.onPermissionModeChange('normal');
-
-      expect(plugin.settings.providerConfigs.opencode.selectedMode).toBe('claudes-codex-safe');
-      expect(plugin.settings.savedProviderPermissionMode).toEqual(expect.objectContaining({
-        claude: 'yolo',
-        opencode: 'normal',
-      }));
-      expect(plugin.settings.permissionMode).toBe('yolo');
-      expect(plugin.saveSettings).toHaveBeenCalled();
-      expect(mockPermissionToggle.updateDisplay).toHaveBeenCalled();
-    });
-
     it('does not update plan-mode UI before the serialized settings mutation completes', async () => {
       const plugin = createMockPlugin();
       let releaseMutation!: () => void;
@@ -4087,13 +4014,13 @@ describe('Tab - Blank Tab Draft Model Change', () => {
     expect(settled).toBe(true);
   });
 
-  it('does not trigger provider warmup when a blank-tab model switch stays on OpenCode', async () => {
+  it('does not trigger provider warmup when a blank-tab model switch stays on Grok', async () => {
     jest.spyOn(ProviderRegistry, 'createInstructionRefineService').mockReturnValue({ cancel: jest.fn(), resetConversation: jest.fn() } as any);
     jest.spyOn(ProviderRegistry, 'createTitleGenerationService').mockReturnValue({ cancel: jest.fn() } as any);
     jest.spyOn(ProviderRegistry, 'getTaskResultInterpreter').mockReturnValue({} as any);
     jest.spyOn(ProviderRegistry, 'resolveProviderForModel').mockImplementation((model: string) => {
-      if (model.startsWith('opencode:')) {
-        return 'opencode';
+      if (model.startsWith('grok:')) {
+        return 'grok';
       }
       if (model.startsWith('gpt-') || /^o\d/.test(model)) {
         return 'codex';
@@ -4103,17 +4030,17 @@ describe('Tab - Blank Tab Draft Model Change', () => {
 
     const plugin = createMockPlugin();
     plugin.settings.providerConfigs = {
-      opencode: {
+      grok: {
         enabled: true,
       },
     };
     plugin.settings.savedProviderModel = {
       ...plugin.settings.savedProviderModel,
-      opencode: 'opencode:openai/gpt-5',
+      grok: 'grok:openai/gpt-5',
     };
 
     const tab = createTab(createMockOptions({
-      draftModel: 'opencode:openai/gpt-5',
+      draftModel: 'grok:openai/gpt-5',
       plugin,
     }));
 
@@ -4129,14 +4056,14 @@ describe('Tab - Blank Tab Draft Model Change', () => {
     const toolbarCallbacks = toolbarModule.createInputToolbar.mock.calls.at(-1)?.[1];
 
     let settled = false;
-    const changePromise = toolbarCallbacks.onModelChange('opencode:anthropic/claude-sonnet-4')
+    const changePromise = toolbarCallbacks.onModelChange('grok:anthropic/claude-sonnet-4')
       .then(() => { settled = true; });
 
     await Promise.resolve();
     await Promise.resolve();
 
-    expect(tab.providerId).toBe('opencode');
-    expect(tab.draftModel).toBe('opencode:anthropic/claude-sonnet-4');
+    expect(tab.providerId).toBe('grok');
+    expect(tab.draftModel).toBe('grok:anthropic/claude-sonnet-4');
     expect(onProviderChanged).not.toHaveBeenCalled();
 
     await changePromise;

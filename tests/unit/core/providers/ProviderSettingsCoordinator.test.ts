@@ -648,57 +648,6 @@ describe('ProviderSettingsCoordinator', () => {
       expect(settings.serviceTier).toBe('fast');
     });
 
-    it('derives OpenCode permission mode from the managed selected mode when no provider snapshot exists yet', () => {
-      const settings: Record<string, unknown> = {
-        settingsProvider: 'claude',
-        permissionMode: 'yolo',
-        providerConfigs: {
-          opencode: {
-            enabled: true,
-            selectedMode: 'claudes-codex-safe',
-          },
-        },
-        model: 'haiku',
-        effortLevel: 'high',
-        serviceTier: 'default',
-        thinkingBudget: 'off',
-        savedProviderModel: {},
-        savedProviderEffort: {},
-        savedProviderServiceTier: {},
-        savedProviderThinkingBudget: {},
-        savedProviderPermissionMode: {},
-      };
-
-      ProviderSettingsCoordinator.projectProviderState(settings, 'opencode');
-
-      expect(settings.permissionMode).toBe('normal');
-    });
-
-    it('prefers the active OpenCode selected mode over a stale top-level permission projection', () => {
-      const settings: Record<string, unknown> = {
-        settingsProvider: 'opencode',
-        permissionMode: 'normal',
-        providerConfigs: {
-          opencode: {
-            enabled: true,
-            selectedMode: 'build',
-          },
-        },
-        model: 'haiku',
-        effortLevel: 'high',
-        serviceTier: 'default',
-        thinkingBudget: 'off',
-        savedProviderModel: {},
-        savedProviderEffort: {},
-        savedProviderServiceTier: {},
-        savedProviderThinkingBudget: {},
-        savedProviderPermissionMode: {},
-      };
-
-      ProviderSettingsCoordinator.projectProviderState(settings, 'opencode');
-
-      expect(settings.permissionMode).toBe('yolo');
-    });
   });
 
   describe('provider-scoped reconciliation', () => {
