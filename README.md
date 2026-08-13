@@ -1,73 +1,109 @@
-# Claudian Praetor
+# Praetor
 
 ![GitHub release](https://img.shields.io/github/v/release/kvarnelis/claudian-praetor)
 ![License](https://img.shields.io/github/license/kvarnelis/claudian-praetor)
 
-A personal fork of **[Claudian](https://github.com/YishenTu/claudian)** by **[Yishen Tu](https://github.com/YishenTu)**. Claudian is his project and does all the real work — embedding Claude Code, Codex, and other AI coding agents in Obsidian, with your vault as their working directory. This fork adds a few things on top and tracks his releases.
+Praetor embeds coding agents directly in Obsidian. Claude Code, Codex, Grok,
+OpenCode, and Pi can work with the active vault through a shared sidebar chat,
+while provider-native sessions, models, permissions, and tools remain under
+each provider's control.
 
-**Currently synced with upstream Claudian `main` at `178c73a6` (2026-07-14), including release `2.0.34`.**
+Praetor includes multi-tab conversations, streaming responses and tool calls,
+conversation history, plan and permission controls, diffs, file and image
+context, slash commands, skills, MCP servers, subagents, inline editing, live
+model discovery, and an optional theme-native interface. Its mobile remote mode
+lets an iPhone or iPad use Claude, Codex, or Grok running on a Mac over a private
+Tailscale connection.
 
-> For what the plugin actually does and how to use it — the chat, file edits, providers, skills, MCP, plan mode — see **[Claudian](https://github.com/YishenTu/claudian)**. That's the source of truth. This README only covers what's different in the fork.
-
-## What this fork adds
-
-- **Mobile remote mode** — drive the agents running on your Mac from Obsidian on an iPhone or iPad, over a private [Tailscale](https://tailscale.com/download) connection. It's peer-to-peer (no cloud relay); your vault and prompts never leave your own devices. [Setup below](#mobile-remote-mode).
-- **Grok provider** — adds Grok to Claudian's built-in set (Claude, Codex, OpenCode, Pi).
-- **Live model lists** — the Claude, Codex, and Grok model pickers read their models directly from your installed CLIs at runtime, so they always show exactly what each CLI supports and pick up new models on their own. No hardcoded list to keep updated.
-- **Date-based versioning** — this fork versions by date (e.g. `2026.7.2`) to stay clearly distinct from upstream's numbering.
-- **Theme-native appearance** — an opt-in setting lets the chat inherit the current Obsidian theme's sidebar typography and colors.
+Praetor is maintained as an independent project. It does not track Claudian
+releases and has no upstream-merge schedule.
 
 ## Install
 
-Claudian Praetor isn't in the Obsidian community directory — install it via BRAT or a GitHub release. Requires Obsidian **1.7.2+**.
+Praetor requires Obsidian 1.7.2 or later and is not in the Obsidian community
+plugin directory.
 
-### BRAT (recommended)
+### BRAT
 
-1. Install the [BRAT](https://github.com/TfTHacker/obsidian42-brat) plugin.
-2. Add the beta plugin repository `kvarnelis/claudian-praetor`.
-3. Enable **Claudian Praetor** under Community plugins.
+1. Install [BRAT](https://github.com/TfTHacker/obsidian42-brat).
+2. Add `kvarnelis/claudian-praetor` as a beta plugin repository.
+3. Enable **Praetor** under Community plugins.
+
+The GitHub repository keeps the historical name `kvarnelis/claudian-praetor`
+for now, but the Obsidian plugin id and install folder are both `praetor`.
+
+If you previously installed Claudian Praetor, follow [MIGRATION.md](MIGRATION.md)
+instead of enabling both plugins together.
 
 ### Manual
 
-Download `main.js`, `manifest.json`, `styles.css`, and `praetord.cjs` from the [latest release](https://github.com/kvarnelis/claudian-praetor/releases/latest) into `<vault>/.obsidian/plugins/claudian-praetor/`, then enable the plugin.
+Download `main.js`, `manifest.json`, `styles.css`, and `praetord.cjs` from the
+[latest release](https://github.com/kvarnelis/claudian-praetor/releases/latest)
+into `<vault>/.obsidian/plugins/praetor/`, then enable **Praetor**.
+
+## Core workflow
+
+- Open Praetor from the ribbon or command palette and choose a provider.
+- Start several independent conversations in tabs and resume provider-native
+  history when supported.
+- Attach vault files, images, selections, canvas context, or configured external
+  context to a turn.
+- Review streamed tool calls, plans, edits, diffs, todos, and subagent results.
+- Use inline edit from an active Markdown note to insert or replace text.
+- Configure provider models, reasoning controls, permissions, commands, skills,
+  MCP servers, environment variables, and CLI locations in Praetor settings.
+
+Provider capabilities differ by design. A control appears only when its
+provider supports that behavior.
 
 ## Mobile remote mode
 
-Runs the agents on your Mac and lets you drive them from a phone or iPad. There's **no cloud service** in the loop — it's peer-to-peer over [Tailscale](https://tailscale.com/download) (a private WireGuard mesh), so your vault and prompts never touch a third-party relay. Available remotely for **Claude, Codex, and Grok**.
+Mobile remote mode runs provider sessions, credentials, vault access, and tool
+execution on a desktop Mac while the Obsidian interface runs on an iPhone or
+iPad. The devices communicate over Tailscale; `praetord` binds to the Mac's
+Tailscale address rather than the public internet or general LAN interface.
 
-### How it works
+### Mac host
 
-- Your Mac runs a small WebSocket daemon, `praetord`, listening on `ws://<your-Mac's-tailscale-IP>:8423`.
-- It **binds only to the Tailscale interface** (the `100.x.y.z` CGNAT address) — not `0.0.0.0` — so it's invisible to your LAN and the public internet.
-- Mobile devices pair with the Mac during a short pairing window. Pairing is stored locally in `~/.config/claudian-praetor/daemon.json`; no bearer token is synced through Obsidian.
-- The transport is plaintext `ws://`, which is fine here because **Tailscale/WireGuard already encrypts the whole tunnel end to end**, and only devices signed into your tailnet can reach it. Keep Tailscale connected on both devices whenever you use mobile remote mode, even at home.
+1. Install and connect [Tailscale](https://tailscale.com/download) on the Mac.
+2. In **Praetor settings -> Mobile daemon**, enable **Host mobile daemon on this Mac**.
+3. Praetor starts `praetord` on port `8423` and stores its configuration under
+   `~/.config/claudian-praetor/` for compatibility with existing deployments.
+4. Choose **Pair iPhone or iPad** when adding a device. Pairing remains open for
+   five minutes.
 
-### On the Mac (host)
+### iPhone or iPad
 
-1. Install and connect [Tailscale](https://tailscale.com/download), signed into your account. Confirm it has a `100.x.y.z` IP.
-2. Open **Claudian Praetor settings → Mobile daemon** and enable **Host mobile daemon on this Mac**.
-3. That one toggle does everything: detects the Tailscale IP, writes `~/.config/claudian-praetor/daemon.json`, starts `praetord` on port `8423`, and publishes the `ws://` URL into plugin data for Obsidian Sync.
-4. When adding a phone or iPad, click **Pair iPhone or iPad**. Pairing stays open for five minutes.
+1. Install Praetor through BRAT and connect Tailscale to the same tailnet.
+2. Let Obsidian Sync carry the remote Mac URL, or enter the URL in Praetor's
+   remote daemon setting.
+3. Open Praetor while the Mac pairing window is active.
+4. Choose a remote Claude, Codex, or Grok provider.
 
-The host toggle and paired-device list are stored only on that Mac, so your other synced desktops won't start hosting and paired devices are not copied between Macs.
+The Mac must remain awake with Obsidian running. Do not expose `praetord`
+publicly: its `ws://` transport relies on Tailscale for encryption and access
+control. See [daemon/README.md](daemon/README.md) for deployment details.
 
-### On the phone/iPad (client)
+## Data compatibility
 
-1. Install Claudian Praetor via BRAT, and install/connect [Tailscale](https://tailscale.com/download) on the device, signed into the **same account** as the Mac.
-2. Keep Tailscale connected. This is what makes the Mac reachable away from home, and the daemon is intentionally bound to the Tailscale address.
-3. Let Obsidian Sync carry the published URL from the Mac, or paste it in **Remote Mac daemon** settings (`ws://100.x.y.z:8423`).
-4. While the Mac's pairing window is open, open Claudian Praetor on mobile. The device pairs automatically on first connection.
-5. Open the chat and pick a remote provider — Claude, Codex, or Grok.
+Praetor intentionally continues using `.claudian/`, `.claude/`, `.codex/`, and
+the other existing provider-native vault paths. Renaming them would strand
+settings, sessions, commands, skills, and history. The old paths are a data
+compatibility contract, not residual product identity.
 
-### If it won't connect
+On first run, Praetor also copies the old Claudian Praetor plugin `data.json`
+into its own plugin data when Praetor has no saved data. It never moves,
+rewrites, or deletes the old file. See [MIGRATION.md](MIGRATION.md).
 
-Confirm Tailscale is on and connected on **both** devices, the Mac is awake with Obsidian loaded, and hosting is enabled. The daemon only publishes and works once the Mac has its `100.x` Tailscale IP. The daemon log is at `~/.config/claudian-praetor/praetord.log`.
+## Credits / origins
 
-Two things worth knowing:
+Praetor is built on [Claudian](https://github.com/YishenTu/claudian) by
+[Yishen Tu](https://github.com/YishenTu), released under the MIT License. That
+project supplied the foundation and substantial portions of the code in this
+repository. Praetor is now maintained independently by
+[Kazys Varnelis](https://github.com/kvarnelis) and no longer tracks Claudian
+upstream releases. Independence does not erase Claudian's authorship.
 
-- The Mac must be **awake and running Obsidian** — there's no always-on cloud instance; the agents literally run on your Mac.
-- If you wanted *cloud* hosting (a public URL reachable without Tailscale), that isn't a feature — and you shouldn't expose `praetord` publicly, since it's plaintext `ws://` and relies on Tailscale for encryption and reachability.
+## License
 
-## Credits
-
-MIT. **Claudian and all of its core functionality are the work of [Yishen Tu](https://github.com/YishenTu)** — please support [the upstream project](https://github.com/YishenTu/claudian). This fork is maintained by [kvarnelis](https://github.com/kvarnelis).
+MIT. See [LICENSE](LICENSE).
