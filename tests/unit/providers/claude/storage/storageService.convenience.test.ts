@@ -172,7 +172,7 @@ describe('StorageService convenience methods', () => {
   });
 
   describe('updatePraetorSettings', () => {
-    it('updates partial claudian settings', async () => {
+    it('updates partial Praetor settings', async () => {
       const { plugin, files } = createMockPlugin({
         initialFiles: {
           '.claudian/claudian-settings.json': praetorSettingsJson,
@@ -189,7 +189,7 @@ describe('StorageService convenience methods', () => {
   });
 
   describe('savePraetorSettings', () => {
-    it('saves full claudian settings', async () => {
+    it('saves full Praetor settings', async () => {
       const { plugin, files } = createMockPlugin({
         initialFiles: {
           '.claudian/claudian-settings.json': praetorSettingsJson,
@@ -208,7 +208,7 @@ describe('StorageService convenience methods', () => {
   });
 
   describe('loadPraetorSettings', () => {
-    it('loads claudian settings', async () => {
+    it('loads Praetor settings', async () => {
       const { plugin } = createMockPlugin({
         initialFiles: {
           '.claudian/claudian-settings.json': praetorSettingsJson,

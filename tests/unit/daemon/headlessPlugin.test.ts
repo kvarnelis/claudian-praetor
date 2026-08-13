@@ -20,7 +20,7 @@ describe('daemon headless plugin', () => {
   let vaultPath: string;
 
   beforeEach(() => {
-    vaultPath = mkdtempSync(path.join(os.tmpdir(), 'claudian-praetor-headless-'));
+    vaultPath = mkdtempSync(path.join(os.tmpdir(), 'praetor-headless-'));
     registerBuiltInProviders();
     mockDiscoverModels.mockResolvedValue({
       kind: 'completed',

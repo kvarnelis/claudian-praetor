@@ -10,7 +10,7 @@ describe('daemon config pairing', () => {
   let configPath: string;
 
   beforeEach(() => {
-    tempRoot = mkdtempSync(path.join(os.tmpdir(), 'claudian-praetor-daemon-'));
+    tempRoot = mkdtempSync(path.join(os.tmpdir(), 'praetor-daemon-'));
     vaultPath = path.join(tempRoot, 'vault');
     configPath = path.join(tempRoot, 'daemon.json');
     mkdirSync(vaultPath);
