@@ -3,6 +3,8 @@
 ![GitHub release](https://img.shields.io/github/v/release/kvarnelis/claudian-praetor)
 ![License](https://img.shields.io/github/license/kvarnelis/claudian-praetor)
 
+![Preview](assets/Preview.png)
+
 Pocket Codex embeds coding agents directly in Obsidian. Claude Code, Codex, and
 Grok can work with the active vault through a shared sidebar chat,
 while provider-native sessions, models, permissions, and tools remain under
