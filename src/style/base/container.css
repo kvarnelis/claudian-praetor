@@ -1,4 +1,4 @@
-.claudes-codex-container {
+.pocket-codex-container {
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -7,14 +7,14 @@
   font-family: var(--font-text);
 }
 
-.claudes-codex-provider-icon-variant--dark {
+.pocket-codex-provider-icon-variant--dark {
   display: none;
 }
 
-body.theme-dark .claudes-codex-provider-icon-variant--light {
+body.theme-dark .pocket-codex-provider-icon-variant--light {
   display: none;
 }
 
-body.theme-dark .claudes-codex-provider-icon-variant--dark {
+body.theme-dark .pocket-codex-provider-icon-variant--dark {
   display: inline;
 }

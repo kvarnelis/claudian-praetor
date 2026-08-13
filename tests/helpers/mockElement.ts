@@ -69,25 +69,25 @@ export interface MockElement {
 }
 
 const CLASS_DISPLAY: Record<string, string> = {
-  'claudes-codex-context-meter': 'flex',
-  'claudes-codex-mcp-selector': 'flex',
-  'claudes-codex-mode-selector': 'flex',
-  'claudes-codex-permission-toggle': 'flex',
-  'claudes-codex-service-tier-toggle': 'flex',
-  'claudes-codex-status-panel-bash': 'block',
-  'claudes-codex-status-panel-bash-content': 'block',
-  'claudes-codex-status-panel-bash-entry-content': 'block',
-  'claudes-codex-status-panel-content': 'block',
-  'claudes-codex-status-panel-todos': 'block',
-  'claudes-codex-tab-content': 'flex',
-  'claudes-codex-thinking-budget': 'flex',
-  'claudes-codex-thinking-effort': 'flex',
+  'pocket-codex-context-meter': 'flex',
+  'pocket-codex-mcp-selector': 'flex',
+  'pocket-codex-mode-selector': 'flex',
+  'pocket-codex-permission-toggle': 'flex',
+  'pocket-codex-service-tier-toggle': 'flex',
+  'pocket-codex-status-panel-bash': 'block',
+  'pocket-codex-status-panel-bash-content': 'block',
+  'pocket-codex-status-panel-bash-entry-content': 'block',
+  'pocket-codex-status-panel-content': 'block',
+  'pocket-codex-status-panel-todos': 'block',
+  'pocket-codex-tab-content': 'flex',
+  'pocket-codex-thinking-budget': 'flex',
+  'pocket-codex-thinking-effort': 'flex',
 };
 
 const DISPLAY_CLASSES = new Set([
-  'claudes-codex-hidden',
-  'claudes-codex-visible-block',
-  'claudes-codex-visible-flex',
+  'pocket-codex-hidden',
+  'pocket-codex-visible-block',
+  'pocket-codex-visible-flex',
   ...Object.keys(CLASS_DISPLAY),
 ]);
 
@@ -101,9 +101,9 @@ export function createMockEl(tag = 'div'): any {
   let textContent = '';
 
   const resolveDisplay = (): string | null => {
-    if (classes.has('claudes-codex-hidden')) return 'none';
-    if (classes.has('claudes-codex-visible-flex')) return 'flex';
-    if (classes.has('claudes-codex-visible-block')) return 'block';
+    if (classes.has('pocket-codex-hidden')) return 'none';
+    if (classes.has('pocket-codex-visible-flex')) return 'flex';
+    if (classes.has('pocket-codex-visible-block')) return 'block';
 
     for (const [cls, display] of Object.entries(CLASS_DISPLAY)) {
       if (classes.has(cls)) return display;

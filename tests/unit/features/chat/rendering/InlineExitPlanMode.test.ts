@@ -24,16 +24,16 @@ function fireKeyDown(root: any, key: string, isComposing = false): void {
 }
 
 function findRoot(container: any): any {
-  return container.querySelector('.claudes-codex-plan-approval-inline');
+  return container.querySelector('.pocket-codex-plan-approval-inline');
 }
 
 function findItems(root: any): any[] {
-  return root.querySelectorAll('claudes-codex-ask-item');
+  return root.querySelectorAll('pocket-codex-ask-item');
 }
 
 describe('InlineExitPlanMode', () => {
   it('resolves with approve-new-session and includes plan content when readable', () => {
-    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'claudes-codex-'));
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'pocket-codex-'));
     const plansDir = path.join(tmpDir, '.claude', 'plans');
     fs.mkdirSync(plansDir, { recursive: true });
     const planFilePath = path.join(plansDir, 'plan.md');
@@ -60,7 +60,7 @@ describe('InlineExitPlanMode', () => {
     const root = findRoot(container);
     expect(root).toBeTruthy();
     expect(root.getEventListenerCount('keydown')).toBe(1);
-    expect(container.querySelector('.claudes-codex-plan-permissions-list')).toBeTruthy();
+    expect(container.querySelector('.pocket-codex-plan-permissions-list')).toBeTruthy();
     expect(renderContent).toHaveBeenCalled();
 
     fireKeyDown(root, 'Enter');
@@ -90,7 +90,7 @@ describe('InlineExitPlanMode', () => {
 
     const root = findRoot(container);
     expect(root).toBeTruthy();
-    expect(container.querySelector('.claudes-codex-plan-read-error')).toBeTruthy();
+    expect(container.querySelector('.pocket-codex-plan-read-error')).toBeTruthy();
 
     fireKeyDown(root, 'Enter');
     expect(resolve).toHaveBeenCalledWith({
@@ -116,7 +116,7 @@ describe('InlineExitPlanMode', () => {
 
     const root = findRoot(container);
     expect(root).toBeTruthy();
-    expect(container.querySelector('.claudes-codex-plan-read-error')).toBeTruthy();
+    expect(container.querySelector('.pocket-codex-plan-read-error')).toBeTruthy();
 
     fireKeyDown(root, 'Enter');
     expect(resolve).toHaveBeenCalledWith({
@@ -157,7 +157,7 @@ describe('InlineExitPlanMode', () => {
 
     const items = findItems(root);
     const feedbackRow = items[2];
-    const feedbackInput = feedbackRow.querySelector('claudes-codex-ask-custom-text');
+    const feedbackInput = feedbackRow.querySelector('pocket-codex-ask-custom-text');
 
     expect(resolve).not.toHaveBeenCalled();
 
@@ -180,7 +180,7 @@ describe('InlineExitPlanMode', () => {
     widget.render();
 
     const root = findRoot(container);
-    const feedbackInput = findItems(root)[2].querySelector('claudes-codex-ask-custom-text');
+    const feedbackInput = findItems(root)[2].querySelector('pocket-codex-ask-custom-text');
     feedbackInput.value = 'composing text';
     feedbackInput.dispatchEvent('focus');
 

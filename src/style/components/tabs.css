@@ -1,4 +1,4 @@
-.claudes-codex-tab-bar-container {
+.pocket-codex-tab-bar-container {
   display: flex;
   align-items: center;
   flex: 1 1 auto;
@@ -7,7 +7,7 @@
   max-width: 100%;
 }
 
-.claudes-codex-tab-badges {
+.pocket-codex-tab-badges {
   display: flex;
   align-items: center;
   gap: 4px;
@@ -21,11 +21,11 @@
   -ms-overflow-style: none;
 }
 
-.claudes-codex-tab-badges::-webkit-scrollbar {
+.pocket-codex-tab-badges::-webkit-scrollbar {
   display: none;
 }
 
-.claudes-codex-tab-badge {
+.pocket-codex-tab-badge {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -48,7 +48,7 @@
   transition: border-color 0.15s ease, color 0.15s ease, background 0.15s ease;
 }
 
-.claudes-codex-tab-badge-expanded {
+.pocket-codex-tab-badge-expanded {
   flex: 0 0 auto;
   justify-content: flex-start;
   width: auto;
@@ -56,25 +56,25 @@
   padding: 0 8px;
 }
 
-.claudes-codex-tab-badge:hover {
+.pocket-codex-tab-badge:hover {
   background: var(--background-modifier-hover);
   color: var(--text-normal);
 }
 
 /* Per-tab close control. Hidden on desktop (right-click closes); shown on touch
    where there is no right-click. Badge grows to a pill to fit number + ×. */
-.claudes-codex-tab-badge-close {
+.pocket-codex-tab-badge-close {
   display: none;
 }
 
-body.claudes-codex-mobile .claudes-codex-tab-badge {
+body.pocket-codex-mobile .pocket-codex-tab-badge {
   width: auto;
   min-width: 24px;
   padding: 0 4px;
   gap: 3px;
 }
 
-body.claudes-codex-mobile .claudes-codex-tab-badge-close {
+body.pocket-codex-mobile .pocket-codex-tab-badge-close {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -87,39 +87,39 @@ body.claudes-codex-mobile .claudes-codex-tab-badge-close {
   background: var(--background-modifier-border);
 }
 
-body.claudes-codex-mobile .claudes-codex-tab-badge-close:active {
+body.pocket-codex-mobile .pocket-codex-tab-badge-close:active {
   background: var(--background-modifier-error);
   color: var(--text-on-accent);
 }
 
-.claudes-codex-tab-badge-active {
+.pocket-codex-tab-badge-active {
   border-color: var(--interactive-accent);
   color: var(--text-normal);
 }
 
-.claudes-codex-tab-badge-streaming {
-  border-color: var(--claudes-codex-brand, #da7756);
+.pocket-codex-tab-badge-streaming {
+  border-color: var(--pocket-codex-brand, #da7756);
 }
 
-.claudes-codex-tab-badge-streaming[data-provider="claude"] {
-  border-color: var(--claudes-codex-brand-claude, #D97757);
+.pocket-codex-tab-badge-streaming[data-provider="claude"] {
+  border-color: var(--pocket-codex-brand-claude, #D97757);
 }
 
-.claudes-codex-tab-badge-streaming[data-provider="codex"] {
-  border-color: var(--claudes-codex-brand-codex, #d0d0d0);
+.pocket-codex-tab-badge-streaming[data-provider="codex"] {
+  border-color: var(--pocket-codex-brand-codex, #d0d0d0);
 }
 
 
 
-.claudes-codex-tab-badge-attention {
+.pocket-codex-tab-badge-attention {
   border-color: var(--text-error);
 }
 
-.claudes-codex-tab-badge-idle {
+.pocket-codex-tab-badge-idle {
   border-color: var(--background-modifier-border);
 }
 
-.claudes-codex-tab-content-container {
+.pocket-codex-tab-content-container {
   display: flex;
   flex-direction: column;
   flex: 1;
@@ -127,7 +127,7 @@ body.claudes-codex-mobile .claudes-codex-tab-badge-close:active {
   overflow: hidden;
 }
 
-.claudes-codex-tab-content {
+.pocket-codex-tab-content {
   position: relative; /* For scroll-to-bottom button positioning */
   display: flex;
   flex-direction: column;

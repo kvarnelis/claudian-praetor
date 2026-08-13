@@ -4,20 +4,20 @@
  * Tablet only. Obsidian's right sidebar slides over the editor on mobile and
  * never pins; here we override the *actual* drawer + root elements (marked by
  * MobileDock) so the drawer becomes a fixed-width right column and the editor
- * shrinks to sit beside it. Width is tunable via --claudes-codex-dock-width.
+ * shrinks to sit beside it. Width is tunable via --pocket-codex-dock-width.
  */
-body.claudes-codex-ipad-docked {
-  --claudes-codex-dock-width: 46vw;
+body.pocket-codex-ipad-docked {
+  --pocket-codex-dock-width: 46vw;
 }
 
 /* Dock the right drawer: stop the slide-over transform, fix it to a flush
    column (no rounded corners / shadow / inset — those are the leftover
    "floating popup" look). */
-body.claudes-codex-ipad-docked.is-tablet .claudes-codex-dock-drawer {
+body.pocket-codex-ipad-docked.is-tablet .pocket-codex-dock-drawer {
   transform: none !important;
-  width: var(--claudes-codex-dock-width) !important;
-  min-width: var(--claudes-codex-dock-width) !important;
-  max-width: var(--claudes-codex-dock-width) !important;
+  width: var(--pocket-codex-dock-width) !important;
+  min-width: var(--pocket-codex-dock-width) !important;
+  max-width: var(--pocket-codex-dock-width) !important;
   left: auto !important;
   right: 0 !important;
   margin: 0 !important;
@@ -27,17 +27,17 @@ body.claudes-codex-ipad-docked.is-tablet .claudes-codex-dock-drawer {
 }
 
 /* Flatten any rounded/elevated inner container Obsidian gives the mobile drawer. */
-body.claudes-codex-ipad-docked.is-tablet .claudes-codex-dock-drawer > * {
+body.pocket-codex-ipad-docked.is-tablet .pocket-codex-dock-drawer > * {
   border-radius: 0 !important;
   box-shadow: none !important;
 }
 
 /* Draggable divider between editor and dock; positioned at the boundary. */
-.claudes-codex-dock-handle {
+.pocket-codex-dock-handle {
   position: fixed;
   top: 0;
   bottom: 0;
-  right: var(--claudes-codex-dock-width, 46vw);
+  right: var(--pocket-codex-dock-width, 46vw);
   width: 18px;
   transform: translateX(50%);
   z-index: 30;
@@ -48,7 +48,7 @@ body.claudes-codex-ipad-docked.is-tablet .claudes-codex-dock-drawer > * {
   justify-content: center;
 }
 
-.claudes-codex-dock-handle::before {
+.pocket-codex-dock-handle::before {
   content: '';
   width: 4px;
   height: 52px;
@@ -56,22 +56,22 @@ body.claudes-codex-ipad-docked.is-tablet .claudes-codex-dock-drawer > * {
   background: var(--background-modifier-border);
 }
 
-.claudes-codex-dock-handle:active::before {
+.pocket-codex-dock-handle:active::before {
   background: var(--interactive-accent);
 }
 
 /* Make room: shrink the editor area to the remaining width (handles both
    flex-child and positioned layouts). */
-body.claudes-codex-ipad-docked.is-tablet .claudes-codex-dock-root {
-  flex: 1 1 calc(100vw - var(--claudes-codex-dock-width)) !important;
-  width: calc(100vw - var(--claudes-codex-dock-width)) !important;
-  max-width: calc(100vw - var(--claudes-codex-dock-width)) !important;
+body.pocket-codex-ipad-docked.is-tablet .pocket-codex-dock-root {
+  flex: 1 1 calc(100vw - var(--pocket-codex-dock-width)) !important;
+  width: calc(100vw - var(--pocket-codex-dock-width)) !important;
+  max-width: calc(100vw - var(--pocket-codex-dock-width)) !important;
   left: 0 !important;
   right: auto !important;
 }
 
 /* Kill the dimming scrim so the editor stays interactive beside the chat. */
-body.claudes-codex-ipad-docked.is-tablet .workspace-drawer-backdrop {
+body.pocket-codex-ipad-docked.is-tablet .workspace-drawer-backdrop {
   opacity: 0 !important;
   pointer-events: none !important;
 }

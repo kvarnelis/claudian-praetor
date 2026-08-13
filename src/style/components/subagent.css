@@ -1,24 +1,24 @@
-.claudes-codex-subagent-list {
+.pocket-codex-subagent-list {
   margin: 8px 0;
 }
 
-.claudes-codex-text-block+.claudes-codex-subagent-list {
+.pocket-codex-text-block+.pocket-codex-subagent-list {
   margin-top: 8px;
 }
 
-.claudes-codex-subagent-list+.claudes-codex-text-block {
+.pocket-codex-subagent-list+.pocket-codex-text-block {
   margin-top: 8px;
 }
 
-.claudes-codex-tool-call+.claudes-codex-subagent-list {
+.pocket-codex-tool-call+.pocket-codex-subagent-list {
   margin-top: 8px;
 }
 
-.claudes-codex-subagent-list+.claudes-codex-tool-call {
+.pocket-codex-subagent-list+.pocket-codex-tool-call {
   margin-top: 8px;
 }
 
-.claudes-codex-subagent-header {
+.pocket-codex-subagent-header {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -27,19 +27,19 @@
   overflow: hidden;
 }
 
-.claudes-codex-subagent-icon {
+.pocket-codex-subagent-icon {
   display: flex;
   align-items: center;
   color: var(--interactive-accent);
   flex-shrink: 0;
 }
 
-.claudes-codex-subagent-icon svg {
+.pocket-codex-subagent-icon svg {
   width: 16px;
   height: 16px;
 }
 
-.claudes-codex-subagent-label {
+.pocket-codex-subagent-label {
   flex: 1;
   font-family: var(--font-monospace);
   font-size: 13px;
@@ -47,41 +47,41 @@
   color: var(--text-normal);
 }
 
-.claudes-codex-subagent-status {
+.pocket-codex-subagent-status {
   display: flex;
   align-items: center;
   flex-shrink: 0;
 }
 
-.claudes-codex-subagent-status svg {
+.pocket-codex-subagent-status svg {
   width: 14px;
   height: 14px;
 }
 
-.claudes-codex-subagent-status.status-running {
+.pocket-codex-subagent-status.status-running {
   color: var(--text-accent);
 }
 
-.claudes-codex-subagent-status.status-completed {
+.pocket-codex-subagent-status.status-completed {
   color: var(--color-green);
 }
 
-.claudes-codex-subagent-status.status-error {
+.pocket-codex-subagent-status.status-error {
   color: var(--color-red);
 }
 
-.claudes-codex-subagent-content {
+.pocket-codex-subagent-content {
   padding: 4px 0;
   padding-inline-start: 16px;
   margin-inline-start: 7px;
   border-inline-start: 2px solid var(--background-modifier-border);
 }
 
-.claudes-codex-subagent-section {
+.pocket-codex-subagent-section {
   margin: 2px 0 6px;
 }
 
-.claudes-codex-subagent-section-header {
+.pocket-codex-subagent-section-header {
   display: flex;
   align-items: center;
   gap: 6px;
@@ -93,21 +93,21 @@
   padding: 2px 0;
 }
 
-.claudes-codex-subagent-section-header:hover {
+.pocket-codex-subagent-section-header:hover {
   color: var(--text-normal);
 }
 
-.claudes-codex-subagent-section-title {
+.pocket-codex-subagent-section-title {
   flex: 1;
   min-width: 0;
 }
 
-.claudes-codex-subagent-section-body {
+.pocket-codex-subagent-section-body {
   padding-inline-start: 6px;
 }
 
-.claudes-codex-subagent-prompt-text,
-.claudes-codex-subagent-result-output {
+.pocket-codex-subagent-prompt-text,
+.pocket-codex-subagent-result-output {
   font-family: var(--font-monospace);
   font-size: 12px;
   line-height: 1.4;
@@ -116,22 +116,22 @@
   word-break: break-word;
 }
 
-.claudes-codex-subagent-result-output {
+.pocket-codex-subagent-result-output {
   max-height: 220px;
   overflow-y: auto;
 }
 
-.claudes-codex-subagent-tools {
+.pocket-codex-subagent-tools {
   display: flex;
   flex-direction: column;
   gap: 4px;
 }
 
-.claudes-codex-subagent-tool-item {
+.pocket-codex-subagent-tool-item {
   display: block;
 }
 
-.claudes-codex-subagent-tool-header {
+.pocket-codex-subagent-tool-header {
   display: flex;
   align-items: center;
   gap: 6px;
@@ -140,23 +140,23 @@
   padding: 2px 0;
 }
 
-.claudes-codex-subagent-tool-header:hover {
+.pocket-codex-subagent-tool-header:hover {
   opacity: 0.85;
 }
 
-.claudes-codex-subagent-tool-icon {
+.pocket-codex-subagent-tool-icon {
   display: flex;
   align-items: center;
   color: var(--text-accent);
   flex-shrink: 0;
 }
 
-.claudes-codex-subagent-tool-icon svg {
+.pocket-codex-subagent-tool-icon svg {
   width: 13px;
   height: 13px;
 }
 
-.claudes-codex-subagent-tool-name {
+.pocket-codex-subagent-tool-name {
   font-family: var(--font-monospace);
   font-size: 12px;
   color: var(--text-normal);
@@ -164,7 +164,7 @@
   flex-shrink: 0;
 }
 
-.claudes-codex-subagent-tool-summary {
+.pocket-codex-subagent-tool-summary {
   font-family: var(--font-monospace);
   font-size: 12px;
   color: var(--text-muted);
@@ -175,35 +175,35 @@
   min-width: 0;
 }
 
-.claudes-codex-subagent-tool-status {
+.pocket-codex-subagent-tool-status {
   display: flex;
   align-items: center;
   flex-shrink: 0;
 }
 
-.claudes-codex-subagent-tool-status svg {
+.pocket-codex-subagent-tool-status svg {
   width: 12px;
   height: 12px;
 }
 
-.claudes-codex-subagent-tool-status.status-running {
+.pocket-codex-subagent-tool-status.status-running {
   color: var(--text-accent);
 }
 
-.claudes-codex-subagent-tool-status.status-completed {
+.pocket-codex-subagent-tool-status.status-completed {
   color: var(--color-green);
 }
 
-.claudes-codex-subagent-tool-status.status-error,
-.claudes-codex-subagent-tool-status.status-blocked {
+.pocket-codex-subagent-tool-status.status-error,
+.pocket-codex-subagent-tool-status.status-blocked {
   color: var(--color-red);
 }
 
-.claudes-codex-subagent-tool-content {
+.pocket-codex-subagent-tool-content {
   padding: 2px 0 2px 16px;
 }
 
-.claudes-codex-subagent-tool-empty {
+.pocket-codex-subagent-tool-empty {
   color: var(--text-faint);
   font-style: italic;
   font-family: var(--font-monospace);
@@ -211,7 +211,7 @@
   padding: 2px 0;
 }
 
-.claudes-codex-subagent-status-text {
+.pocket-codex-subagent-status-text {
   font-size: 11px;
   font-family: var(--font-monospace);
   color: var(--text-muted);
@@ -219,30 +219,30 @@
   padding-inline-start: 8px;
 }
 
-.claudes-codex-subagent-list.async .claudes-codex-subagent-icon {
+.pocket-codex-subagent-list.async .pocket-codex-subagent-icon {
   color: var(--interactive-accent);
 }
 
-.claudes-codex-subagent-list.async.pending .claudes-codex-subagent-status-text {
+.pocket-codex-subagent-list.async.pending .pocket-codex-subagent-status-text {
   color: var(--text-muted);
 }
 
-.claudes-codex-subagent-list.async.running .claudes-codex-subagent-status-text {
+.pocket-codex-subagent-list.async.running .pocket-codex-subagent-status-text {
   color: var(--text-accent);
 }
 
-.claudes-codex-subagent-list.async.awaiting .claudes-codex-subagent-status-text {
+.pocket-codex-subagent-list.async.awaiting .pocket-codex-subagent-status-text {
   color: var(--color-yellow);
 }
 
-.claudes-codex-subagent-list.async.completed .claudes-codex-subagent-status-text {
+.pocket-codex-subagent-list.async.completed .pocket-codex-subagent-status-text {
   color: var(--color-green);
 }
 
-.claudes-codex-subagent-list.async.error .claudes-codex-subagent-status-text {
+.pocket-codex-subagent-list.async.error .pocket-codex-subagent-status-text {
   color: var(--color-red);
 }
 
-.claudes-codex-subagent-list.async.orphaned .claudes-codex-subagent-status-text {
+.pocket-codex-subagent-list.async.orphaned .pocket-codex-subagent-status-text {
   color: var(--color-orange);
 }

@@ -1,12 +1,12 @@
 /* External Context Selector */
-.claudes-codex-external-context-selector {
+.pocket-codex-external-context-selector {
   position: relative;
   display: flex;
   align-items: center;
   margin-left: 8px;
 }
 
-.claudes-codex-external-context-icon-wrapper {
+.pocket-codex-external-context-icon-wrapper {
   position: relative;
   display: flex;
   align-items: center;
@@ -14,7 +14,7 @@
   cursor: pointer;
 }
 
-.claudes-codex-external-context-icon {
+.pocket-codex-external-context-icon {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -24,37 +24,37 @@
   transition: color 0.15s ease;
 }
 
-.claudes-codex-external-context-icon-wrapper:hover .claudes-codex-external-context-icon {
+.pocket-codex-external-context-icon-wrapper:hover .pocket-codex-external-context-icon {
   color: var(--text-normal);
 }
 
-.claudes-codex-external-context-icon.active {
-  color: var(--claudes-codex-brand);
+.pocket-codex-external-context-icon.active {
+  color: var(--pocket-codex-brand);
   animation: external-context-glow 2s ease-in-out infinite;
 }
 
-.claudes-codex-external-context-icon svg {
+.pocket-codex-external-context-icon svg {
   width: 16px;
   height: 16px;
 }
 
-.claudes-codex-external-context-badge {
+.pocket-codex-external-context-badge {
   position: absolute;
   top: 0;
   right: 0;
   font-size: 9px;
   font-weight: 600;
-  color: var(--claudes-codex-brand);
+  color: var(--pocket-codex-brand);
   opacity: 0;
   transition: opacity 0.15s ease;
   pointer-events: none;
 }
 
-.claudes-codex-external-context-badge.visible {
+.pocket-codex-external-context-badge.visible {
   opacity: 1;
 }
 
-.claudes-codex-external-context-dropdown {
+.pocket-codex-external-context-dropdown {
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
@@ -72,12 +72,12 @@
   z-index: 100;
 }
 
-.claudes-codex-external-context-selector:hover .claudes-codex-external-context-dropdown {
+.pocket-codex-external-context-selector:hover .pocket-codex-external-context-dropdown {
   opacity: 1;
   visibility: visible;
 }
 
-.claudes-codex-external-context-header {
+.pocket-codex-external-context-header {
   padding: 10px 12px;
   font-size: 12px;
   font-weight: 600;
@@ -85,12 +85,12 @@
   border-bottom: 1px solid var(--background-modifier-border);
 }
 
-.claudes-codex-external-context-list {
+.pocket-codex-external-context-list {
   max-height: 200px;
   overflow-y: auto;
 }
 
-.claudes-codex-external-context-empty {
+.pocket-codex-external-context-empty {
   padding: 16px 12px;
   text-align: center;
   color: var(--text-muted);
@@ -98,7 +98,7 @@
   font-style: italic;
 }
 
-.claudes-codex-external-context-item {
+.pocket-codex-external-context-item {
   display: flex;
   align-items: center;
   padding: 8px 12px;
@@ -106,11 +106,11 @@
   border-bottom: 1px solid var(--background-modifier-border-focus);
 }
 
-.claudes-codex-external-context-item:last-child {
+.pocket-codex-external-context-item:last-child {
   border-bottom: none;
 }
 
-.claudes-codex-external-context-text {
+.pocket-codex-external-context-text {
   flex: 1;
   font-size: 12px;
   font-family: var(--font-monospace);
@@ -120,7 +120,7 @@
   white-space: nowrap;
 }
 
-.claudes-codex-external-context-lock {
+.pocket-codex-external-context-lock {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -133,26 +133,26 @@
   transition: all 0.15s ease;
 }
 
-.claudes-codex-external-context-lock:hover {
+.pocket-codex-external-context-lock:hover {
   background: var(--background-modifier-hover);
   opacity: 0.8;
 }
 
-.claudes-codex-external-context-lock.locked {
-  color: var(--claudes-codex-brand);
+.pocket-codex-external-context-lock.locked {
+  color: var(--pocket-codex-brand);
   opacity: 0.9;
 }
 
-.claudes-codex-external-context-lock.locked:hover {
+.pocket-codex-external-context-lock.locked:hover {
   opacity: 1;
 }
 
-.claudes-codex-external-context-lock svg {
+.pocket-codex-external-context-lock svg {
   width: 12px;
   height: 12px;
 }
 
-.claudes-codex-external-context-remove {
+.pocket-codex-external-context-remove {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -165,13 +165,13 @@
   transition: all 0.15s ease;
 }
 
-.claudes-codex-external-context-remove:hover {
-  background: rgba(var(--claudes-codex-error-rgb), 0.15);
-  color: var(--claudes-codex-error);
+.pocket-codex-external-context-remove:hover {
+  background: rgba(var(--pocket-codex-error-rgb), 0.15);
+  color: var(--pocket-codex-error);
   opacity: 1;
 }
 
-.claudes-codex-external-context-remove svg {
+.pocket-codex-external-context-remove svg {
   width: 14px;
   height: 14px;
 }

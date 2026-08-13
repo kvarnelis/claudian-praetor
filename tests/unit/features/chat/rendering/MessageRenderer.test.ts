@@ -114,9 +114,9 @@ describe('MessageRenderer', () => {
 
     expect(emptySpy).toHaveBeenCalled();
     expect(renderStoredSpy).toHaveBeenCalledTimes(1);
-    expect(welcomeEl.hasClass('claudes-codex-welcome')).toBe(true);
-    expect(welcomeEl.children[0].hasClass('claudes-codex-welcome-brand')).toBe(true);
-    expect(welcomeEl.children[0].textContent).toBe("Claude's Codex");
+    expect(welcomeEl.hasClass('pocket-codex-welcome')).toBe(true);
+    expect(welcomeEl.children[0].hasClass('pocket-codex-welcome-brand')).toBe(true);
+    expect(welcomeEl.children[0].textContent).toBe("Pocket Codex");
     expect(welcomeEl.children[1].textContent).toBe('Hello');
   });
 
@@ -127,7 +127,7 @@ describe('MessageRenderer', () => {
     const welcomeEl = renderer.renderMessages([], () => 'Welcome!');
 
     expect(renderStoredSpy).not.toHaveBeenCalled();
-    expect(welcomeEl.hasClass('claudes-codex-welcome')).toBe(true);
+    expect(welcomeEl.hasClass('pocket-codex-welcome')).toBe(true);
   });
 
   // ============================================
@@ -152,12 +152,12 @@ describe('MessageRenderer', () => {
     // Should create assistant-style message with interrupt content
     expect(messagesEl.children.length).toBe(1);
     const msgEl = messagesEl.children[0];
-    expect(msgEl.hasClass('claudes-codex-message-assistant')).toBe(true);
+    expect(msgEl.hasClass('pocket-codex-message-assistant')).toBe(true);
     // Check the content contains interrupt styling
     const contentEl = msgEl.children[0];
     const textEl = contentEl.children[0];
     const interruptedEl = textEl.children[0];
-    expect(interruptedEl.hasClass('claudes-codex-interrupted')).toBe(true);
+    expect(interruptedEl.hasClass('pocket-codex-interrupted')).toBe(true);
     expect(interruptedEl.textContent).toBe('Interrupted');
   });
 
@@ -179,13 +179,13 @@ describe('MessageRenderer', () => {
     // Should create an assistant message (not a bare interrupt marker)
     expect(messagesEl.children.length).toBe(1);
     const msgEl = messagesEl.children[0];
-    expect(msgEl.hasClass('claudes-codex-message-assistant')).toBe(true);
+    expect(msgEl.hasClass('pocket-codex-message-assistant')).toBe(true);
 
     // The content div should have both content rendering and an interrupt indicator
     const contentEl = msgEl.children[0];
     const lastChild = contentEl.children[contentEl.children.length - 1];
     const interruptedEl = lastChild.children[0];
-    expect(interruptedEl.hasClass('claudes-codex-interrupted')).toBe(true);
+    expect(interruptedEl.hasClass('pocket-codex-interrupted')).toBe(true);
     expect(interruptedEl.textContent).toBe('Interrupted');
   });
 
@@ -194,7 +194,7 @@ describe('MessageRenderer', () => {
     const messagesEl = createMockEl();
     const { renderer } = createRenderer(messagesEl);
     const legacyMarker =
-      `<span class="claudes-codex-interrupted">Interrupted</span> <span class="claudes-codex-interrupted-hint">· What should Claude's Codex do instead?</span>`;
+      `<span class="pocket-codex-interrupted">Interrupted</span> <span class="pocket-codex-interrupted-hint">· What should Pocket Codex do instead?</span>`;
     const interruptMsg: ChatMessage = {
       id: 'interrupt-legacy-1',
       role: 'assistant',
@@ -213,7 +213,7 @@ describe('MessageRenderer', () => {
     );
     const contentEl = messagesEl.children[0].children[0];
     const indicatorEl = contentEl.children[contentEl.children.length - 1];
-    expect(indicatorEl.children[0].hasClass('claudes-codex-interrupted')).toBe(true);
+    expect(indicatorEl.children[0].hasClass('pocket-codex-interrupted')).toBe(true);
     expect(indicatorEl.children[0].textContent).toBe('Interrupted');
   });
 
@@ -235,10 +235,10 @@ describe('MessageRenderer', () => {
     // Should create a bare interrupt marker (same as Claude-style)
     expect(messagesEl.children.length).toBe(1);
     const msgEl = messagesEl.children[0];
-    expect(msgEl.hasClass('claudes-codex-message-assistant')).toBe(true);
+    expect(msgEl.hasClass('pocket-codex-message-assistant')).toBe(true);
     const contentEl = msgEl.children[0];
     const textEl = contentEl.children[0];
-    expect(textEl.children[0].hasClass('claudes-codex-interrupted')).toBe(true);
+    expect(textEl.children[0].hasClass('pocket-codex-interrupted')).toBe(true);
   });
 
   it('skips rebuilt context messages', () => {
@@ -274,7 +274,7 @@ describe('MessageRenderer', () => {
 
     expect(messagesEl.children.length).toBe(1);
     const msgEl = messagesEl.children[0];
-    expect(msgEl.hasClass('claudes-codex-message-user')).toBe(true);
+    expect(msgEl.hasClass('pocket-codex-message-user')).toBe(true);
   });
 
   it('renders user message with displayContent instead of content', () => {
@@ -331,7 +331,7 @@ describe('MessageRenderer', () => {
     expect(renderer.renderMessageImages).toHaveBeenCalled();
     // Only the images container, no message bubble
     const bubbles = messagesEl.children.filter(
-      (c: any) => c.hasClass('claudes-codex-message')
+      (c: any) => c.hasClass('pocket-codex-message')
     );
     expect(bubbles.length).toBe(0);
   });
@@ -373,7 +373,7 @@ describe('MessageRenderer', () => {
 
     renderer.renderStoredMessage(allMessages[1], allMessages, 1);
 
-    expect(messagesEl.querySelector('.claudes-codex-message-rewind-btn')).not.toBeNull();
+    expect(messagesEl.querySelector('.pocket-codex-message-rewind-btn')).not.toBeNull();
   });
 
   it('adds rewind but not fork for a completed first user message', () => {
@@ -397,8 +397,8 @@ describe('MessageRenderer', () => {
 
     renderer.renderStoredMessage(allMessages[0], allMessages, 0);
 
-    expect(messagesEl.querySelector('.claudes-codex-message-rewind-btn')).not.toBeNull();
-    expect(messagesEl.querySelector('.claudes-codex-message-fork-btn')).toBeNull();
+    expect(messagesEl.querySelector('.pocket-codex-message-rewind-btn')).not.toBeNull();
+    expect(messagesEl.querySelector('.pocket-codex-message-fork-btn')).toBeNull();
     expect((renderer as any).liveMessageEls.has('u1')).toBe(false);
   });
 
@@ -418,7 +418,7 @@ describe('MessageRenderer', () => {
 
     renderer.renderStoredMessage(msg);
 
-    expect(messagesEl.querySelector('.claudes-codex-message-rewind-btn')).toBeNull();
+    expect(messagesEl.querySelector('.pocket-codex-message-rewind-btn')).toBeNull();
   });
 
   it('shows rewind mode menu for eligible streamed user messages', async () => {
@@ -444,7 +444,7 @@ describe('MessageRenderer', () => {
 
     renderer.refreshActionButtons(userMsg, allMessages, 1);
 
-    const btn = messagesEl.querySelector('.claudes-codex-message-rewind-btn');
+    const btn = messagesEl.querySelector('.pocket-codex-message-rewind-btn');
     expect(btn).not.toBeNull();
 
     btn!.click();
@@ -488,8 +488,8 @@ describe('MessageRenderer', () => {
       { id: 'a1', role: 'assistant', content: 'response', timestamp: 2, assistantMessageId: 'resp-a' },
     ], 0);
 
-    expect(messagesEl.querySelector('.claudes-codex-message-rewind-btn')).not.toBeNull();
-    expect(messagesEl.querySelector('.claudes-codex-message-fork-btn')).toBeNull();
+    expect(messagesEl.querySelector('.pocket-codex-message-rewind-btn')).not.toBeNull();
+    expect(messagesEl.querySelector('.pocket-codex-message-fork-btn')).toBeNull();
   });
 
   // ============================================
@@ -887,8 +887,8 @@ describe('MessageRenderer', () => {
 
     // Find the footer element
     const msgEl = messagesEl.children[0];
-    const contentEl = msgEl.children[0]; // claudes-codex-message-content
-    const footerEl = contentEl.children.find((c: any) => c.hasClass('claudes-codex-response-footer'));
+    const contentEl = msgEl.children[0]; // pocket-codex-message-content
+    const footerEl = contentEl.children.find((c: any) => c.hasClass('pocket-codex-response-footer'));
     expect(footerEl).toBeDefined();
     const durationSpan = footerEl!.children[0];
     expect(durationSpan.textContent).toContain('Baked');
@@ -915,7 +915,7 @@ describe('MessageRenderer', () => {
 
     const msgEl = messagesEl.children[0];
     const contentEl = msgEl.children[0];
-    const footerEl = contentEl.children.find((c: any) => c.hasClass('claudes-codex-response-footer'));
+    const footerEl = contentEl.children.find((c: any) => c.hasClass('pocket-codex-response-footer'));
     expect(footerEl).toBeUndefined();
   });
 
@@ -939,7 +939,7 @@ describe('MessageRenderer', () => {
 
     const msgEl = messagesEl.children[0];
     const contentEl = msgEl.children[0];
-    const footerEl = contentEl.children.find((c: any) => c.hasClass('claudes-codex-response-footer'));
+    const footerEl = contentEl.children.find((c: any) => c.hasClass('pocket-codex-response-footer'));
     expect(footerEl).toBeDefined();
     expect(footerEl!.children[0].textContent).toContain('Baked');
   });
@@ -1252,7 +1252,7 @@ describe('MessageRenderer', () => {
 
     const msgEl = renderer.addMessage(msg);
 
-    expect(msgEl.hasClass('claudes-codex-message-user')).toBe(true);
+    expect(msgEl.hasClass('pocket-codex-message-user')).toBe(true);
   });
 
   it('addMessage stores a truncated first-line table-of-contents title for user messages', () => {
@@ -1329,7 +1329,7 @@ describe('MessageRenderer', () => {
 
     const msgEl = renderer.addMessage(msg);
 
-    expect(msgEl.hasClass('claudes-codex-message-assistant')).toBe(true);
+    expect(msgEl.hasClass('pocket-codex-message-assistant')).toBe(true);
   });
 
   // ============================================
@@ -1368,7 +1368,7 @@ describe('MessageRenderer', () => {
     // Should create images container with 2 image wrappers
     expect(containerEl.children.length).toBe(1);
     const imagesContainer = containerEl.children[0];
-    expect(imagesContainer.hasClass('claudes-codex-message-images')).toBe(true);
+    expect(imagesContainer.hasClass('pocket-codex-message-images')).toBe(true);
     expect(imagesContainer.children.length).toBe(2);
   });
 
@@ -1409,7 +1409,7 @@ describe('MessageRenderer', () => {
 
     try {
       renderer.showFullImage(image);
-      expect(mockBody.createDiv).toHaveBeenCalledWith({ cls: 'claudes-codex-image-modal-overlay' });
+      expect(mockBody.createDiv).toHaveBeenCalledWith({ cls: 'pocket-codex-image-modal-overlay' });
     } finally {
       (globalThis as any).document = origDocument;
     }
@@ -1427,7 +1427,7 @@ describe('MessageRenderer', () => {
 
     expect(textEl.children.length).toBe(1);
     const copyBtn = textEl.children[0];
-    expect(copyBtn.hasClass('claudes-codex-text-copy-btn')).toBe(true);
+    expect(copyBtn.hasClass('pocket-codex-text-copy-btn')).toBe(true);
   });
 
   // ============================================
@@ -1606,7 +1606,7 @@ describe('MessageRenderer', () => {
       renderer.addTextCopyButton(textEl, 'markdown content');
 
       const copyBtn = textEl.children[0];
-      expect(copyBtn.hasClass('claudes-codex-text-copy-btn')).toBe(true);
+      expect(copyBtn.hasClass('pocket-codex-text-copy-btn')).toBe(true);
 
       // Simulate click
       const clickHandlers = copyBtn._eventListeners.get('click');
@@ -1661,7 +1661,7 @@ describe('MessageRenderer', () => {
     const welcomeEl = renderer.renderMessages(messages, () => 'Good morning!');
 
     expect(welcomeEl).toBeDefined();
-    expect(welcomeEl!.hasClass('claudes-codex-welcome')).toBe(true);
+    expect(welcomeEl!.hasClass('pocket-codex-welcome')).toBe(true);
   });
 
   it('renderMessages should store table-of-contents title from displayContent before content', () => {
@@ -1681,7 +1681,7 @@ describe('MessageRenderer', () => {
 
     renderer.renderMessages(messages, () => 'Hello');
 
-    const msgEl = messagesEl.querySelector('.claudes-codex-message-user');
+    const msgEl = messagesEl.querySelector('.pocket-codex-message-user');
     expect(msgEl?.getAttribute('data-toc-title')).toBe('Visible slash command');
   });
 
@@ -1708,7 +1708,7 @@ describe('MessageRenderer', () => {
     const welcomeEl = renderer.renderMessages([], () => 'Welcome');
 
     expect(welcomeEl).toBeDefined();
-    expect(welcomeEl!.hasClass('claudes-codex-welcome')).toBe(true);
+    expect(welcomeEl!.hasClass('pocket-codex-welcome')).toBe(true);
   });
 
   // ============================================
@@ -1923,10 +1923,10 @@ describe('MessageRenderer', () => {
         renderer.showFullImage(image);
 
         // The overlay has a modal child, which has a close button child
-        const modalEl = overlayEl.children[0]; // claudes-codex-image-modal
+        const modalEl = overlayEl.children[0]; // pocket-codex-image-modal
         // Children: img (index 0), closeBtn (index 1)
         const closeBtn = modalEl.children[1];
-        expect(closeBtn.hasClass('claudes-codex-image-modal-close')).toBe(true);
+        expect(closeBtn.hasClass('pocket-codex-image-modal-close')).toBe(true);
 
         const removeSpy = jest.spyOn(overlayEl, 'remove');
         closeBtn.click();
@@ -1998,7 +1998,7 @@ describe('MessageRenderer', () => {
       await renderer.renderContent(el, '**broken markdown**');
 
       const errorDiv = el.children.find(
-        (c: any) => c.hasClass('claudes-codex-render-error')
+        (c: any) => c.hasClass('pocket-codex-render-error')
       );
       expect(errorDiv).toBeDefined();
       expect(errorDiv!.textContent).toBe('Failed to render message content.');
@@ -2127,7 +2127,7 @@ describe('MessageRenderer', () => {
 
       await renderer.renderContent(el, '```js\nconsole.log("hello")\n```');
 
-      // The pre should be wrapped in a claudes-codex-code-wrapper
+      // The pre should be wrapped in a pocket-codex-code-wrapper
       // Due to mock limitations, check that querySelectorAll was called on el
       // The actual wrapping logic runs on real DOM, but the mock captures calls
       expect(MarkdownRenderer.renderMarkdown).toHaveBeenCalled();
@@ -2141,7 +2141,7 @@ describe('MessageRenderer', () => {
       // Mock renderMarkdown to create an already-wrapped pre element
       (MarkdownRenderer.renderMarkdown as jest.Mock).mockImplementationOnce(
         async (_md: string, container: any) => {
-          const wrapper = container.createDiv({ cls: 'claudes-codex-code-wrapper' });
+          const wrapper = container.createDiv({ cls: 'pocket-codex-code-wrapper' });
           wrapper.createEl('pre');
         }
       );

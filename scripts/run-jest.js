@@ -3,7 +3,7 @@ const os = require('os');
 const path = require('path');
 
 const jestPath = require.resolve('jest/bin/jest');
-const localStorageFile = path.join(os.tmpdir(), 'claudes-codex-localstorage');
+const localStorageFile = path.join(os.tmpdir(), 'pocket-codex-localstorage');
 
 const result = spawnSync(
   process.execPath,

@@ -1,12 +1,12 @@
 /* Drop overlay - inside input wrapper */
-.claudes-codex-drop-overlay {
+.pocket-codex-drop-overlay {
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(var(--claudes-codex-brand-rgb), 0.08);
-  border: 2px dashed var(--claudes-codex-brand);
+  background: rgba(var(--pocket-codex-brand-rgb), 0.08);
+  border: 2px dashed var(--pocket-codex-brand);
   border-radius: 6px;
   display: none;
   align-items: center;
@@ -15,23 +15,23 @@
   pointer-events: none;
 }
 
-.claudes-codex-drop-overlay.visible {
+.pocket-codex-drop-overlay.visible {
   display: flex;
 }
 
-.claudes-codex-drop-content {
+.pocket-codex-drop-content {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 4px;
-  color: var(--claudes-codex-brand);
+  color: var(--pocket-codex-brand);
 }
 
-.claudes-codex-drop-content svg {
+.pocket-codex-drop-content svg {
   opacity: 0.7;
 }
 
-.claudes-codex-drop-content span {
+.pocket-codex-drop-content span {
   font-size: 12px;
   font-weight: 500;
 }
@@ -39,7 +39,7 @@
 /* Images in Messages (displayed above user bubble) */
 
 /* Images container - right-aligned above user message */
-.claudes-codex-message-images {
+.pocket-codex-message-images {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
@@ -49,7 +49,7 @@
 }
 
 /* Individual image in message - standardized size */
-.claudes-codex-message-image {
+.pocket-codex-message-image {
   width: 120px;
   height: 120px;
   border-radius: 8px;
@@ -60,12 +60,12 @@
   border: 1px solid var(--background-modifier-border);
 }
 
-.claudes-codex-message-image:hover {
+.pocket-codex-message-image:hover {
   transform: scale(1.03);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-.claudes-codex-message-image img {
+.pocket-codex-message-image img {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -76,22 +76,22 @@
    attach button living inside it. Keep the row visible on mobile so the
    paperclip is always reachable. Obsidian sets `is-tablet` (not `is-mobile`) on
    iPad, so match all three mobile body classes. */
-body.claudes-codex-mobile .claudes-codex-context-row,
-body.is-mobile .claudes-codex-context-row,
-body.is-tablet .claudes-codex-context-row,
-body.is-phone .claudes-codex-context-row {
+body.pocket-codex-mobile .pocket-codex-context-row,
+body.is-mobile .pocket-codex-context-row,
+body.is-tablet .pocket-codex-context-row,
+body.is-phone .pocket-codex-context-row {
   display: flex !important;
 }
 
 /* The attach button now ships on every platform; keep its row open even when
    it holds no chips so the button stays reachable (desktop included). */
-.claudes-codex-context-row.claudes-codex-has-attach-button {
+.pocket-codex-context-row.pocket-codex-has-attach-button {
   display: flex;
 }
 
 /* Mobile-only attach button: opens the native photo/file picker since touch
    devices have no clipboard-image paste or drag-drop into the input. */
-.claudes-codex-image-attach-btn {
+.pocket-codex-image-attach-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -107,19 +107,19 @@ body.is-phone .claudes-codex-context-row {
   -webkit-tap-highlight-color: transparent;
 }
 
-.claudes-codex-image-attach-btn:active {
+.pocket-codex-image-attach-btn:active {
   background: var(--background-modifier-hover);
   color: var(--text-normal);
 }
 
-.claudes-codex-image-attach-btn svg {
+.pocket-codex-image-attach-btn svg {
   width: 14px;
   height: 14px;
 }
 
 /* The attach button lives in the context row above the textarea, which is easy
    to overlook on a phone/tablet. Make it a prominent accent button on mobile. */
-body.claudes-codex-mobile .claudes-codex-image-attach-btn {
+body.pocket-codex-mobile .pocket-codex-image-attach-btn {
   width: 40px;
   height: 40px;
   color: var(--text-on-accent);
@@ -127,7 +127,7 @@ body.claudes-codex-mobile .claudes-codex-image-attach-btn {
   border-color: var(--interactive-accent);
 }
 
-body.claudes-codex-mobile .claudes-codex-image-attach-btn svg {
+body.pocket-codex-mobile .pocket-codex-image-attach-btn svg {
   width: 22px;
   height: 22px;
 }

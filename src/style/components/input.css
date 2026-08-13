@@ -1,35 +1,35 @@
 /* Input area */
-.claudes-codex-input-container {
+.pocket-codex-input-container {
   position: relative;
   padding: 12px 0 0 0;
 }
 
-.claudes-codex-input-footer {
+.pocket-codex-input-footer {
   position: relative;
   flex-shrink: 0;
   padding: 6px 0 0 0;
 }
 
-.claudes-codex-active-input-slot > .claudes-codex-input-composer > .claudes-codex-input-container {
+.pocket-codex-active-input-slot > .pocket-codex-input-composer > .pocket-codex-input-container {
   padding-top: 0;
 }
 
 /* Input wrapper (border container) - flex column so textarea expands when no chips */
-.claudes-codex-input-wrapper {
-  --claudes-codex-input-wrapper-border-color: var(--background-modifier-border);
-  --claudes-codex-input-wrapper-box-shadow: none;
+.pocket-codex-input-wrapper {
+  --pocket-codex-input-wrapper-border-color: var(--background-modifier-border);
+  --pocket-codex-input-wrapper-box-shadow: none;
   position: relative;
   display: flex;
   flex-direction: column;
   min-height: 140px;
-  border: 1px solid var(--claudes-codex-input-wrapper-border-color);
+  border: 1px solid var(--pocket-codex-input-wrapper-border-color);
   border-radius: 6px;
   background: var(--background-primary);
-  box-shadow: var(--claudes-codex-input-wrapper-box-shadow);
+  box-shadow: var(--pocket-codex-input-wrapper-box-shadow);
 }
 
 /* Nav row (tab badges start, action icons end) - above input wrapper */
-.claudes-codex-input-nav-row {
+.pocket-codex-input-nav-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -37,11 +37,11 @@
   min-height: 0;
 }
 
-.claudes-codex-input-nav-row:empty {
+.pocket-codex-input-nav-row:empty {
   display: none;
 }
 
-.claudes-codex-input-nav-content {
+.pocket-codex-input-nav-content {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -49,7 +49,7 @@
   min-width: 0;
 }
 
-.claudes-codex-input-nav-actions {
+.pocket-codex-input-nav-actions {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -57,7 +57,7 @@
   margin-inline-start: auto;
 }
 
-.claudes-codex-input-nav-btn {
+.pocket-codex-input-nav-btn {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -72,32 +72,32 @@
   transition: color 0.15s ease, background 0.15s ease;
 }
 
-.claudes-codex-input-nav-btn:hover {
+.pocket-codex-input-nav-btn:hover {
   color: var(--text-normal);
   background: var(--background-modifier-hover);
 }
 
-.claudes-codex-input-nav-btn svg {
+.pocket-codex-input-nav-btn svg {
   width: 16px;
   height: 16px;
 }
 
-.claudes-codex-copy-last-interaction-btn.copied {
+.pocket-codex-copy-last-interaction-btn.copied {
   color: var(--text-accent);
   font-size: 11px;
   font-family: var(--font-monospace);
 }
 
-.claudes-codex-new-tab-btn svg {
+.pocket-codex-new-tab-btn svg {
   width: 16.8px;
   height: 16.8px;
 }
 
-.claudes-codex-input-wrapper textarea.claudes-codex-input {
+.pocket-codex-input-wrapper textarea.pocket-codex-input {
   width: 100%;
   flex: 1 1 0;
-  min-height: var(--claudes-codex-textarea-min-height, 60px);
-  max-height: var(--claudes-codex-textarea-max-height, none);
+  min-height: var(--pocket-codex-textarea-min-height, 60px);
+  max-height: var(--pocket-codex-textarea-max-height, none);
   resize: none;
   padding: 8px 10px 10px 10px;
   border: none;
@@ -112,20 +112,20 @@
   unicode-bidi: plaintext; /* Proper BiDi text handling for mixed RTL/LTR */
 }
 
-.claudes-codex-input-wrapper textarea.claudes-codex-input:hover,
-.claudes-codex-input-wrapper textarea.claudes-codex-input:focus {
+.pocket-codex-input-wrapper textarea.pocket-codex-input:hover,
+.pocket-codex-input-wrapper textarea.pocket-codex-input:focus {
   outline: none;
   border: none;
   background: transparent;
   box-shadow: none;
 }
 
-.claudes-codex-input-wrapper textarea.claudes-codex-input::placeholder {
+.pocket-codex-input-wrapper textarea.pocket-codex-input::placeholder {
   color: var(--text-muted);
 }
 
 /* Input toolbar */
-.claudes-codex-input-toolbar {
+.pocket-codex-input-toolbar {
   display: flex;
   align-items: center;
   justify-content: flex-start;
@@ -138,13 +138,13 @@
 }
 
 /* Hide secondary text when the full toolbar would wrap. */
-.claudes-codex-input-toolbar--compact .claudes-codex-thinking-effort > .claudes-codex-thinking-label-text,
-.claudes-codex-input-toolbar--compact .claudes-codex-context-meter-percent {
+.pocket-codex-input-toolbar--compact .pocket-codex-thinking-effort > .pocket-codex-thinking-label-text,
+.pocket-codex-input-toolbar--compact .pocket-codex-context-meter-percent {
   display: none;
 }
 
 /* Composer queue status row (queued follow-up preview + steer action) */
-.claudes-codex-input-queue-row {
+.pocket-codex-input-queue-row {
   display: none;
   font-size: 12px;
   color: var(--text-muted);
@@ -154,7 +154,7 @@
   padding: 0 2px 8px 2px;
 }
 
-.claudes-codex-queue-indicator-text {
+.pocket-codex-queue-indicator-text {
   min-width: 0;
   flex: 1 1 auto;
   white-space: nowrap;
@@ -162,14 +162,14 @@
   text-overflow: ellipsis;
 }
 
-.claudes-codex-queue-indicator-actions {
+.pocket-codex-queue-indicator-actions {
   flex: 0 0 auto;
   display: flex;
   align-items: center;
   gap: 4px;
 }
 
-.claudes-codex-queue-indicator-action {
+.pocket-codex-queue-indicator-action {
   flex: 0 0 auto;
   padding: 1px 8px;
   border: 0;
@@ -179,17 +179,17 @@
   cursor: pointer;
 }
 
-.claudes-codex-queue-indicator-action:hover {
+.pocket-codex-queue-indicator-action:hover {
   text-decoration: underline;
 }
 
-.claudes-codex-queue-indicator-action[disabled] {
+.pocket-codex-queue-indicator-action[disabled] {
   color: var(--text-faint);
   cursor: default;
   text-decoration: none;
 }
 
-.claudes-codex-queue-indicator-icon-action {
+.pocket-codex-queue-indicator-icon-action {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -204,29 +204,29 @@
   cursor: pointer;
 }
 
-.claudes-codex-queue-indicator-icon-action:hover {
+.pocket-codex-queue-indicator-icon-action:hover {
   background: var(--background-modifier-hover);
   color: var(--text-normal);
 }
 
-.claudes-codex-queue-indicator-icon-action svg {
+.pocket-codex-queue-indicator-icon-action svg {
   width: 14px;
   height: 14px;
 }
 
 /* Light blue border when instruction mode is active */
-.claudes-codex-input-wrapper.claudes-codex-input-instruction-mode {
-  --claudes-codex-input-wrapper-border-color: #60a5fa;
-  --claudes-codex-input-wrapper-box-shadow: 0 0 0 1px #60a5fa;
+.pocket-codex-input-wrapper.pocket-codex-input-instruction-mode {
+  --pocket-codex-input-wrapper-border-color: #60a5fa;
+  --pocket-codex-input-wrapper-box-shadow: 0 0 0 1px #60a5fa;
 }
 
 /* Pink border when bash mode is active */
-.claudes-codex-input-wrapper.claudes-codex-input-bang-bash-mode {
-  --claudes-codex-input-wrapper-border-color: #f472b6;
-  --claudes-codex-input-wrapper-box-shadow: 0 0 0 1px #f472b6;
+.pocket-codex-input-wrapper.pocket-codex-input-bang-bash-mode {
+  --pocket-codex-input-wrapper-border-color: #f472b6;
+  --pocket-codex-input-wrapper-box-shadow: 0 0 0 1px #f472b6;
 }
 
 /* Monospace input while in bash mode */
-.claudes-codex-input-wrapper.claudes-codex-input-bang-bash-mode .claudes-codex-input {
+.pocket-codex-input-wrapper.pocket-codex-input-bang-bash-mode .pocket-codex-input {
   font-family: var(--font-monospace);
 }

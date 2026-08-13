@@ -29,7 +29,7 @@ export class McpStorage {
         return [];
       }
 
-      const claudesCodexMeta = file._claudian?.servers ?? {};
+      const pocketCodexMeta = file._claudian?.servers ?? {};
       const servers: ManagedMcpServer[] = [];
 
       for (const [name, config] of Object.entries(file.mcpServers)) {
@@ -37,7 +37,7 @@ export class McpStorage {
           continue;
         }
 
-        const meta = claudesCodexMeta[name] ?? {};
+        const meta = pocketCodexMeta[name] ?? {};
         const disabledTools = Array.isArray(meta.disabledTools)
           ? meta.disabledTools.filter((tool) => typeof tool === 'string')
           : undefined;
@@ -62,7 +62,7 @@ export class McpStorage {
 
   async save(servers: ManagedMcpServer[]): Promise<void> {
     const mcpServers: Record<string, McpServerConfig> = {};
-    const claudesCodexServers: Record<
+    const pocketCodexServers: Record<
       string,
       { enabled?: boolean; contextSaving?: boolean; disabledTools?: string[]; description?: string }
     > = {};
@@ -70,7 +70,7 @@ export class McpStorage {
     for (const server of servers) {
       mcpServers[server.name] = server.config;
 
-      // Only store Claude's Codex metadata if different from defaults
+      // Only store Pocket Codex metadata if different from defaults
       const meta: {
         enabled?: boolean;
         contextSaving?: boolean;
@@ -95,7 +95,7 @@ export class McpStorage {
       }
 
       if (Object.keys(meta).length > 0) {
-        claudesCodexServers[server.name] = meta;
+        pocketCodexServers[server.name] = meta;
       }
     }
 
@@ -116,15 +116,15 @@ export class McpStorage {
     const file: Record<string, unknown> = existing ? { ...existing } : {};
     file.mcpServers = mcpServers;
 
-    const existingClaudesCodex =
+    const existingPocketCodex =
       existing && typeof existing._claudian === 'object'
         ? (existing._claudian as Record<string, unknown>)
         : null;
 
-    if (Object.keys(claudesCodexServers).length > 0) {
-      file._claudian = { ...(existingClaudesCodex ?? {}), servers: claudesCodexServers };
-    } else if (existingClaudesCodex) {
-      const rest = { ...existingClaudesCodex };
+    if (Object.keys(pocketCodexServers).length > 0) {
+      file._claudian = { ...(existingPocketCodex ?? {}), servers: pocketCodexServers };
+    } else if (existingPocketCodex) {
+      const rest = { ...existingPocketCodex };
       delete rest.servers;
       if (Object.keys(rest).length > 0) {
         file._claudian = rest;

@@ -1,5 +1,5 @@
 /**
- * Claude's Codex - Claude Agent SDK wrapper
+ * Pocket Codex - Claude Agent SDK wrapper
  *
  * Handles communication with Claude via the Agent SDK. Manages streaming,
  * session persistence and permission modes.
@@ -59,7 +59,7 @@ import type {
   StreamChunk,
   ToolCallInfo,
 } from '../../../core/types';
-import type { ClaudesCodexSettings,PermissionMode } from '../../../core/types/settings';
+import type { PermissionMode,PocketCodexSettings } from '../../../core/types/settings';
 import { stripCurrentNoteContext } from '../../../utils/context';
 import { getEnhancedPath, getMissingNodeError, parseEnvironmentVariables } from '../../../utils/env';
 import { getVaultPath } from '../../../utils/path';
@@ -790,7 +790,7 @@ export class ClaudeChatRuntime implements ChatRuntime {
   /**
    * Builds the base query options context from current state.
    */
-  private getScopedSettings(): ClaudesCodexSettings {
+  private getScopedSettings(): PocketCodexSettings {
     const settings = ProviderSettingsCoordinator.getProviderSettingsSnapshot(
       this.plugin.settings,
       this.providerId,

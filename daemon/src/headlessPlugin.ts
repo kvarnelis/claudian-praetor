@@ -1,5 +1,5 @@
 /**
- * Headless ClaudesCodexPlugin shim: just enough plugin surface for provider
+ * Headless PocketCodexPlugin shim: just enough plugin surface for provider
  * registries, workspace services, and chat runtimes to operate outside
  * Obsidian. Every member NOT explicitly provided throws loudly via a Proxy
  * trap so missing surface is discovered instead of silently undefined.
@@ -8,7 +8,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 
-import { DEFAULT_CLAUDES_CODEX_SETTINGS } from '../../src/app/settings/defaultSettings';
+import { DEFAULT_POCKET_CODEX_SETTINGS } from '../../src/app/settings/defaultSettings';
 import {
   SettingsCoordinator,
   type ConditionalSettingsMutation,
@@ -16,8 +16,8 @@ import {
 } from '../../src/app/settings/SettingsCoordinator';
 import { SharedStorageService } from '../../src/app/storage/SharedStorageService';
 import {
-  CLAUDES_CODEX_SETTINGS_PATH,
-  CLAUDES_CODEX_STORAGE_PATH,
+  POCKET_CODEX_SETTINGS_PATH,
+  POCKET_CODEX_STORAGE_PATH,
 } from '../../src/core/bootstrap/StoragePaths';
 import {
   type EnvironmentScope,
@@ -30,11 +30,11 @@ import type { ProviderHost } from '../../src/core/providers/ProviderHost';
 import { ProviderSettingsCoordinator } from '../../src/core/providers/ProviderSettingsCoordinator';
 import { ProviderWorkspaceRegistry } from '../../src/core/providers/ProviderWorkspaceRegistry';
 import type { ProviderCliResolutionContext, ProviderId } from '../../src/core/providers/types';
-import type { ClaudesCodexSettings } from '../../src/core/types';
-import type ClaudesCodexPlugin from '../../src/main';
+import type { PocketCodexSettings } from '../../src/core/types';
+import type PocketCodexPlugin from '../../src/main';
 import type { NodeVaultApp } from './nodeVaultApp';
 
-const DAEMON_DATA_FILE = 'claudes-codex-daemon-data.json';
+const DAEMON_DATA_FILE = 'pocket-codex-daemon-data.json';
 const SETTINGS_WATCH_DEBOUNCE_MS = 500;
 
 interface SettingsWatcher {
@@ -42,14 +42,14 @@ interface SettingsWatcher {
 }
 
 export interface HeadlessPluginHandle {
-  plugin: ClaudesCodexPlugin;
-  settings: ClaudesCodexSettings;
+  plugin: PocketCodexPlugin;
+  settings: PocketCodexSettings;
   storage: SharedStorageService;
   dispose(): void;
 }
 
 /** Mirrors the load-time normalization in main.ts loadSettings() (essentials only). */
-function normalizeLoadedSettings(settings: ClaudesCodexSettings): void {
+function normalizeLoadedSettings(settings: PocketCodexSettings): void {
   // Plan mode is ephemeral; never boot stuck in it.
   if (settings.permissionMode === 'plan') {
     settings.permissionMode = 'normal';
@@ -77,7 +77,7 @@ export async function createHeadlessPlugin(options: {
 }): Promise<HeadlessPluginHandle> {
   const { app, vaultPath } = options;
   const log = options.log ?? ((message: string) => console.error(message));
-  const dataFilePath = path.join(vaultPath, CLAUDES_CODEX_STORAGE_PATH, DAEMON_DATA_FILE);
+  const dataFilePath = path.join(vaultPath, POCKET_CODEX_STORAGE_PATH, DAEMON_DATA_FILE);
 
   const loadData = async (): Promise<unknown> => {
     try {
@@ -94,11 +94,11 @@ export async function createHeadlessPlugin(options: {
   // SharedStorageService only touches plugin.app + loadData/saveData.
   const storageHost = { app, loadData, saveData };
   const storage = new SharedStorageService(storageHost as never);
-  const { claudesCodex } = await storage.initialize();
+  const { pocketCodex } = await storage.initialize();
 
-  const settings: ClaudesCodexSettings = {
-    ...DEFAULT_CLAUDES_CODEX_SETTINGS,
-    ...claudesCodex,
+  const settings: PocketCodexSettings = {
+    ...DEFAULT_POCKET_CODEX_SETTINGS,
+    ...pocketCodex,
   };
   normalizeLoadedSettings(settings);
 
@@ -109,7 +109,7 @@ export async function createHeadlessPlugin(options: {
     ProviderSettingsCoordinator.persistProjectedProviderState(
       settings as unknown as Record<string, unknown>,
     );
-    await storage.saveClaudesCodexSettings(settings);
+    await storage.savePocketCodexSettings(settings);
   };
   const settingsCoordinator = new SettingsCoordinator(settings, persistSettings);
 
@@ -121,10 +121,10 @@ export async function createHeadlessPlugin(options: {
     loadData,
     saveData,
     saveSettings: (): Promise<void> => settingsCoordinator.persistCurrent(),
-    mutateSettings: (mutation: SettingsMutation<ClaudesCodexSettings>): Promise<void> =>
+    mutateSettings: (mutation: SettingsMutation<PocketCodexSettings>): Promise<void> =>
       settingsCoordinator.mutate(mutation),
     mutateSettingsConditionally: (
-      mutation: ConditionalSettingsMutation<ClaudesCodexSettings>,
+      mutation: ConditionalSettingsMutation<PocketCodexSettings>,
     ): Promise<void> => settingsCoordinator.mutateConditionally(mutation),
     getResolvedProviderCliPath: async (
       providerId: ProviderId,
@@ -205,15 +205,15 @@ export async function createHeadlessPlugin(options: {
       if (prop === 'then') {
         return undefined;
       }
-      throw new Error(`claudes-codexd shim: ClaudesCodexPlugin.${String(prop)} is not implemented`);
+      throw new Error(`pocket-codexd shim: PocketCodexPlugin.${String(prop)} is not implemented`);
     },
-  }) as unknown as ClaudesCodexPlugin;
+  }) as unknown as PocketCodexPlugin;
 
   const watcher = watchSettingsFile(vaultPath, async () => {
     try {
-      const reloaded = await storage.claudesCodexSettings.load();
-      const next: ClaudesCodexSettings = {
-        ...DEFAULT_CLAUDES_CODEX_SETTINGS,
+      const reloaded = await storage.pocketCodexSettings.load();
+      const next: PocketCodexSettings = {
+        ...DEFAULT_POCKET_CODEX_SETTINGS,
         ...reloaded,
       };
       normalizeLoadedSettings(next);
@@ -225,9 +225,9 @@ export async function createHeadlessPlugin(options: {
         Object.assign(settings, next);
         return false;
       });
-      log('[claudes-codexd] settings reloaded from vault');
+      log('[pocket-codexd] settings reloaded from vault');
     } catch (err) {
-      log(`[claudes-codexd] settings reload failed: ${err instanceof Error ? err.message : String(err)}`);
+      log(`[pocket-codexd] settings reload failed: ${err instanceof Error ? err.message : String(err)}`);
     }
   });
 
@@ -250,8 +250,8 @@ function watchSettingsFile(
   vaultPath: string,
   onChange: () => Promise<void>,
 ): SettingsWatcher | null {
-  const settingsDir = path.join(vaultPath, CLAUDES_CODEX_STORAGE_PATH);
-  const settingsFileName = path.basename(CLAUDES_CODEX_SETTINGS_PATH);
+  const settingsDir = path.join(vaultPath, POCKET_CODEX_STORAGE_PATH);
+  const settingsFileName = path.basename(POCKET_CODEX_SETTINGS_PATH);
   let timer: ReturnType<typeof setTimeout> | null = null;
   let reloading = false;
   let pendingReload = false;

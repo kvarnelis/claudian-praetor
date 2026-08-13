@@ -177,7 +177,7 @@ export class CodexAuxQueryRunner {
     this.transport.start();
 
     const initializeResult = await this.transport.request<InitializeResult>('initialize', {
-      clientInfo: { name: 'claudes-codex-aux', version: '1.0.0' },
+      clientInfo: { name: 'pocket-codex-aux', version: '1.0.0' },
       capabilities: { experimentalApi: true },
     });
 

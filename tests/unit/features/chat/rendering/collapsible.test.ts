@@ -24,7 +24,7 @@ describe('collapsible', () => {
       setupCollapsible(wrapper, header, content, state);
 
       expect(state.isExpanded).toBe(false);
-      expect(content.hasClass('claudes-codex-hidden')).toBe(true);
+      expect(content.hasClass('pocket-codex-hidden')).toBe(true);
       expect(header.getAttribute('aria-expanded')).toBe('false');
       expect(wrapper.hasClass('expanded')).toBe(false);
     });
@@ -33,7 +33,7 @@ describe('collapsible', () => {
       setupCollapsible(wrapper, header, content, state, { initiallyExpanded: true });
 
       expect(state.isExpanded).toBe(true);
-      expect(content.hasClass('claudes-codex-hidden')).toBe(false);
+      expect(content.hasClass('pocket-codex-hidden')).toBe(false);
       expect(header.getAttribute('aria-expanded')).toBe('true');
       expect(wrapper.hasClass('expanded')).toBe(true);
     });
@@ -48,14 +48,14 @@ describe('collapsible', () => {
       clickHandlers[0]();
       expect(state.isExpanded).toBe(true);
       expect(wrapper.hasClass('expanded')).toBe(true);
-      expect(content.hasClass('claudes-codex-hidden')).toBe(false);
+      expect(content.hasClass('pocket-codex-hidden')).toBe(false);
       expect(header.getAttribute('aria-expanded')).toBe('true');
 
       // Collapse
       clickHandlers[0]();
       expect(state.isExpanded).toBe(false);
       expect(wrapper.hasClass('expanded')).toBe(false);
-      expect(content.hasClass('claudes-codex-hidden')).toBe(true);
+      expect(content.hasClass('pocket-codex-hidden')).toBe(true);
       expect(header.getAttribute('aria-expanded')).toBe('false');
     });
 
@@ -144,7 +144,7 @@ describe('collapsible', () => {
 
       expect(state.isExpanded).toBe(false);
       expect(wrapper.hasClass('expanded')).toBe(false);
-      expect(content.hasClass('claudes-codex-hidden')).toBe(true);
+      expect(content.hasClass('pocket-codex-hidden')).toBe(true);
       expect(header.getAttribute('aria-expanded')).toBe('false');
     });
 
@@ -152,7 +152,7 @@ describe('collapsible', () => {
       collapseElement(wrapper, header, content, state);
 
       expect(state.isExpanded).toBe(false);
-      expect(content.hasClass('claudes-codex-hidden')).toBe(true);
+      expect(content.hasClass('pocket-codex-hidden')).toBe(true);
     });
   });
 });

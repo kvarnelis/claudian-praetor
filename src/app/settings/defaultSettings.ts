@@ -1,9 +1,9 @@
 import { getDefaultHiddenProviderCommands } from '../../core/providers/commands/hiddenCommands';
 import { DEFAULT_REASONING_VALUE } from '../../core/providers/reasoning';
-import { type ClaudesCodexSettings } from '../../core/types/settings';
+import { type PocketCodexSettings } from '../../core/types/settings';
 import { getBuiltInProviderDefaultConfigs } from '../../providers/defaultProviderConfigs';
 
-export const DEFAULT_CLAUDES_CODEX_SETTINGS: ClaudesCodexSettings = {
+export const DEFAULT_POCKET_CODEX_SETTINGS: PocketCodexSettings = {
   userName: '',
 
   permissionMode: 'yolo',

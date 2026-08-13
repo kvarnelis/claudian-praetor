@@ -85,16 +85,16 @@ export function renderDiffContent(
   // New file creation: all lines are inserts — cap display to avoid large DOM
   const allInserts = diffLines.length > 0 && diffLines.every(l => l.type === 'insert');
   if (allInserts && diffLines.length > NEW_FILE_DISPLAY_CAP) {
-    const hunkEl = containerEl.createDiv({ cls: 'claudes-codex-diff-hunk' });
+    const hunkEl = containerEl.createDiv({ cls: 'pocket-codex-diff-hunk' });
     for (const line of diffLines.slice(0, NEW_FILE_DISPLAY_CAP)) {
-      const lineEl = hunkEl.createDiv({ cls: 'claudes-codex-diff-line claudes-codex-diff-insert' });
-      const prefixEl = lineEl.createSpan({ cls: 'claudes-codex-diff-prefix' });
+      const lineEl = hunkEl.createDiv({ cls: 'pocket-codex-diff-line pocket-codex-diff-insert' });
+      const prefixEl = lineEl.createSpan({ cls: 'pocket-codex-diff-prefix' });
       prefixEl.setText('+');
-      const contentEl = lineEl.createSpan({ cls: 'claudes-codex-diff-text' });
+      const contentEl = lineEl.createSpan({ cls: 'pocket-codex-diff-text' });
       contentEl.setText(line.text || ' ');
     }
     const remaining = diffLines.length - NEW_FILE_DISPLAY_CAP;
-    const separator = containerEl.createDiv({ cls: 'claudes-codex-diff-separator' });
+    const separator = containerEl.createDiv({ cls: 'pocket-codex-diff-separator' });
     separator.setText(`... ${remaining} more lines`);
     return;
   }
@@ -103,7 +103,7 @@ export function renderDiffContent(
 
   if (hunks.length === 0) {
     // No changes
-    const noChanges = containerEl.createDiv({ cls: 'claudes-codex-diff-no-changes' });
+    const noChanges = containerEl.createDiv({ cls: 'pocket-codex-diff-no-changes' });
     noChanges.setText('No changes');
     return;
   }
@@ -111,23 +111,23 @@ export function renderDiffContent(
   hunks.forEach((hunk, hunkIndex) => {
     // Add separator between hunks
     if (hunkIndex > 0) {
-      const separator = containerEl.createDiv({ cls: 'claudes-codex-diff-separator' });
+      const separator = containerEl.createDiv({ cls: 'pocket-codex-diff-separator' });
       separator.setText('...');
     }
 
     // Render hunk lines
-    const hunkEl = containerEl.createDiv({ cls: 'claudes-codex-diff-hunk' });
+    const hunkEl = containerEl.createDiv({ cls: 'pocket-codex-diff-hunk' });
 
     for (const line of hunk.lines) {
-      const lineEl = hunkEl.createDiv({ cls: `claudes-codex-diff-line claudes-codex-diff-${line.type}` });
+      const lineEl = hunkEl.createDiv({ cls: `pocket-codex-diff-line pocket-codex-diff-${line.type}` });
 
       // Line prefix
       const prefix = line.type === 'insert' ? '+' : line.type === 'delete' ? '-' : ' ';
-      const prefixEl = lineEl.createSpan({ cls: 'claudes-codex-diff-prefix' });
+      const prefixEl = lineEl.createSpan({ cls: 'pocket-codex-diff-prefix' });
       prefixEl.setText(prefix);
 
       // Line content
-      const contentEl = lineEl.createSpan({ cls: 'claudes-codex-diff-text' });
+      const contentEl = lineEl.createSpan({ cls: 'pocket-codex-diff-text' });
       contentEl.setText(line.text || ' '); // Show space for empty lines
     }
   });

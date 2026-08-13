@@ -1,13 +1,13 @@
 /* MCP Server Settings */
-.claudes-codex-mcp-settings-desc {
+.pocket-codex-mcp-settings-desc {
   margin-bottom: 12px;
 }
 
-.claudes-codex-mcp-container {
+.pocket-codex-mcp-container {
   margin-top: 8px;
 }
 
-.claudes-codex-mcp-header {
+.pocket-codex-mcp-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -15,17 +15,17 @@
   padding: 0 12px;
 }
 
-.claudes-codex-mcp-label {
+.pocket-codex-mcp-label {
   font-size: var(--font-ui-small);
   color: var(--text-muted);
   font-weight: var(--font-medium);
 }
 
-.claudes-codex-mcp-add-container {
+.pocket-codex-mcp-add-container {
   position: relative;
 }
 
-.claudes-codex-add-mcp-btn {
+.pocket-codex-add-mcp-btn {
   padding: 4px 12px;
   border-radius: 4px;
   background: var(--interactive-accent);
@@ -35,11 +35,11 @@
   border: none;
 }
 
-.claudes-codex-add-mcp-btn:hover {
+.pocket-codex-add-mcp-btn:hover {
   background: var(--interactive-accent-hover);
 }
 
-.claudes-codex-mcp-add-dropdown {
+.pocket-codex-mcp-add-dropdown {
   display: none;
   position: absolute;
   top: 100%;
@@ -54,11 +54,11 @@
   overflow: hidden;
 }
 
-.claudes-codex-mcp-add-dropdown.is-visible {
+.pocket-codex-mcp-add-dropdown.is-visible {
   display: block;
 }
 
-.claudes-codex-mcp-add-option {
+.pocket-codex-mcp-add-option {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -68,22 +68,22 @@
   color: var(--text-normal);
 }
 
-.claudes-codex-mcp-add-option:hover {
+.pocket-codex-mcp-add-option:hover {
   background: var(--background-modifier-hover);
 }
 
-.claudes-codex-mcp-add-option-icon {
+.pocket-codex-mcp-add-option-icon {
   display: flex;
   align-items: center;
   color: var(--text-muted);
 }
 
-.claudes-codex-mcp-add-option-icon svg {
+.pocket-codex-mcp-add-option-icon svg {
   width: 16px;
   height: 16px;
 }
 
-.claudes-codex-mcp-empty {
+.pocket-codex-mcp-empty {
   padding: 16px;
   text-align: center;
   color: var(--text-muted);
@@ -92,13 +92,13 @@
   border-radius: 6px;
 }
 
-.claudes-codex-mcp-list {
+.pocket-codex-mcp-list {
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
-.claudes-codex-mcp-item {
+.pocket-codex-mcp-item {
   display: flex;
   align-items: flex-start;
   gap: 10px;
@@ -108,15 +108,15 @@
   transition: background 0.15s ease;
 }
 
-.claudes-codex-mcp-item:hover {
+.pocket-codex-mcp-item:hover {
   background: var(--background-modifier-hover);
 }
 
-.claudes-codex-mcp-item-disabled {
+.pocket-codex-mcp-item-disabled {
   opacity: 0.6;
 }
 
-.claudes-codex-mcp-status {
+.pocket-codex-mcp-status {
   width: 8px;
   height: 8px;
   border-radius: 50%;
@@ -124,31 +124,31 @@
   flex-shrink: 0;
 }
 
-.claudes-codex-mcp-status-enabled {
+.pocket-codex-mcp-status-enabled {
   background: var(--color-green);
 }
 
-.claudes-codex-mcp-status-disabled {
+.pocket-codex-mcp-status-disabled {
   background: var(--text-muted);
 }
 
-.claudes-codex-mcp-info {
+.pocket-codex-mcp-info {
   flex: 1;
   min-width: 0;
 }
 
-.claudes-codex-mcp-name-row {
+.pocket-codex-mcp-name-row {
   display: flex;
   align-items: center;
   gap: 8px;
   flex-wrap: wrap;
 }
 
-.claudes-codex-mcp-name {
+.pocket-codex-mcp-name {
   font-weight: 600;
 }
 
-.claudes-codex-mcp-type-badge {
+.pocket-codex-mcp-type-badge {
   font-size: 10px;
   padding: 2px 6px;
   background: var(--background-modifier-border);
@@ -157,7 +157,7 @@
   text-transform: uppercase;
 }
 
-.claudes-codex-mcp-context-saving-badge {
+.pocket-codex-mcp-context-saving-badge {
   font-size: 11px;
   padding: 2px 6px;
   background: var(--interactive-accent);
@@ -166,7 +166,7 @@
   font-weight: 600;
 }
 
-.claudes-codex-mcp-preview {
+.pocket-codex-mcp-preview {
   font-size: 12px;
   color: var(--text-muted);
   margin-top: 4px;
@@ -175,13 +175,13 @@
   white-space: nowrap;
 }
 
-.claudes-codex-mcp-actions {
+.pocket-codex-mcp-actions {
   display: flex;
   gap: 4px;
   flex-shrink: 0;
 }
 
-.claudes-codex-mcp-action-btn {
+.pocket-codex-mcp-action-btn {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -196,16 +196,16 @@
   transition: background 0.15s ease, color 0.15s ease;
 }
 
-.claudes-codex-mcp-action-btn:hover {
+.pocket-codex-mcp-action-btn:hover {
   background: var(--background-modifier-hover);
   color: var(--text-normal);
 }
 
-.claudes-codex-mcp-action-btn svg {
+.pocket-codex-mcp-action-btn svg {
   width: 14px;
   height: 14px;
 }
 
-.claudes-codex-mcp-delete-btn:hover {
+.pocket-codex-mcp-delete-btn:hover {
   color: var(--text-error);
 }

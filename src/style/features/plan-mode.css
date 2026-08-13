@@ -1,12 +1,12 @@
 /* Plan Mode - inline cards for EnterPlanMode / ExitPlanMode */
 
-.claudes-codex-plan-approval-inline {
+.pocket-codex-plan-approval-inline {
   font-family: var(--font-monospace);
   font-size: 12px;
   outline: none;
 }
 
-.claudes-codex-plan-inline-title {
+.pocket-codex-plan-inline-title {
   font-weight: 700;
   color: var(--text-muted);
   padding: 6px 10px 0;
@@ -14,7 +14,7 @@
 
 /* ── Plan content preview ────────────────────────── */
 
-.claudes-codex-plan-content-preview {
+.pocket-codex-plan-content-preview {
   max-height: 300px;
   overflow-y: auto;
   margin: 6px 10px 8px;
@@ -27,46 +27,46 @@
   color: var(--text-normal);
 }
 
-.claudes-codex-plan-content-preview::-webkit-scrollbar {
+.pocket-codex-plan-content-preview::-webkit-scrollbar {
   width: 4px;
 }
 
-.claudes-codex-plan-content-preview::-webkit-scrollbar-thumb {
+.pocket-codex-plan-content-preview::-webkit-scrollbar-thumb {
   background: var(--background-modifier-border);
   border-radius: 2px;
 }
 
-.claudes-codex-plan-content-preview p {
+.pocket-codex-plan-content-preview p {
   margin: 0 0 6px;
 }
 
-.claudes-codex-plan-content-preview p:last-child {
+.pocket-codex-plan-content-preview p:last-child {
   margin-bottom: 0;
 }
 
-.claudes-codex-plan-content-preview h1,
-.claudes-codex-plan-content-preview h2,
-.claudes-codex-plan-content-preview h3,
-.claudes-codex-plan-content-preview h4 {
+.pocket-codex-plan-content-preview h1,
+.pocket-codex-plan-content-preview h2,
+.pocket-codex-plan-content-preview h3,
+.pocket-codex-plan-content-preview h4 {
   margin: 8px 0 4px;
   font-size: 13px;
 }
 
-.claudes-codex-plan-content-preview ul,
-.claudes-codex-plan-content-preview ol {
+.pocket-codex-plan-content-preview ul,
+.pocket-codex-plan-content-preview ol {
   margin: 2px 0 6px;
   padding-left: 18px;
 }
 
-.claudes-codex-plan-content-preview li {
+.pocket-codex-plan-content-preview li {
   margin: 0;
 }
 
-.claudes-codex-plan-content-preview code {
+.pocket-codex-plan-content-preview code {
   font-size: 11px;
 }
 
-.claudes-codex-plan-content-text {
+.pocket-codex-plan-content-text {
   white-space: pre-wrap;
   word-break: break-word;
   font-family: var(--font-monospace);
@@ -74,30 +74,30 @@
 
 /* ── Permissions list ──────────────────────────── */
 
-.claudes-codex-plan-permissions {
+.pocket-codex-plan-permissions {
   padding: 4px 10px 8px;
 }
 
-.claudes-codex-plan-permissions-label {
+.pocket-codex-plan-permissions-label {
   color: var(--text-muted);
   font-weight: 600;
   margin-bottom: 4px;
 }
 
-.claudes-codex-plan-permissions-list {
+.pocket-codex-plan-permissions-list {
   margin: 0;
   padding-left: 18px;
   color: var(--text-normal);
   line-height: 1.5;
 }
 
-.claudes-codex-plan-permissions-list li {
+.pocket-codex-plan-permissions-list li {
   margin: 0;
 }
 
 /* ── Plan mode input border ──────────────────────── */
 
-.claudes-codex-input-wrapper.claudes-codex-input-plan-mode {
-  --claudes-codex-input-wrapper-border-color: rgb(92, 148, 140);
-  --claudes-codex-input-wrapper-box-shadow: 0 0 0 1px rgb(92, 148, 140);
+.pocket-codex-input-wrapper.pocket-codex-input-plan-mode {
+  --pocket-codex-input-wrapper-border-color: rgb(92, 148, 140);
+  --pocket-codex-input-wrapper-box-shadow: 0 0 0 1px rgb(92, 148, 140);
 }

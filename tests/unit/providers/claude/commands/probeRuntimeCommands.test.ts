@@ -1,6 +1,6 @@
 import * as sdkModule from '@anthropic-ai/claude-agent-sdk';
 
-import type ClaudesCodexPlugin from '@/main';
+import type PocketCodexPlugin from '@/main';
 import { probeRuntimeCommands } from '@/providers/claude/commands/probeRuntimeCommands';
 
 const sdkMock = sdkModule as unknown as {
@@ -20,13 +20,13 @@ jest.mock('@/utils/env', () => ({
   findNodeExecutable: jest.fn().mockReturnValue('/usr/bin/node'),
 }));
 
-function createMockPlugin(settings: Record<string, unknown> = {}): ClaudesCodexPlugin {
+function createMockPlugin(settings: Record<string, unknown> = {}): PocketCodexPlugin {
   return {
     app: {},
     settings,
     getResolvedProviderCliPath: jest.fn().mockReturnValue('/mock/claude'),
     getActiveEnvironmentVariables: jest.fn().mockReturnValue(''),
-  } as unknown as ClaudesCodexPlugin;
+  } as unknown as PocketCodexPlugin;
 }
 
 describe('probeRuntimeCommands', () => {

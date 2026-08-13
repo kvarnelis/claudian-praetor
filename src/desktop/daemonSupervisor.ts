@@ -6,14 +6,14 @@ import * as os from 'os';
 import * as path from 'path';
 
 import { DEFAULT_CONFIG_PATH, loadConfig, openPairingWindow } from '../../daemon/src/config';
-import type ClaudesCodexPlugin from '../main';
+import type PocketCodexPlugin from '../main';
 import { DEFAULT_DAEMON_PORT } from '../remote/protocol';
 import { findNodeExecutable, getEnhancedPath } from '../utils/env';
 
 /**
- * Desktop-only auto-start for the Claude's Codex daemon (the Claude-Anywhere model).
+ * Desktop-only auto-start for the Pocket Codex daemon (the Claude-Anywhere model).
  *
- * When enabled on this specific machine, the desktop plugin spawns claudes-codexd
+ * When enabled on this specific machine, the desktop plugin spawns pocket-codexd
  * (bundled alongside the plugin) so mobile clients have something to reach.
  * The enablement flag is intentionally local-only; the generated URL is
  * published separately to plugin data.json so Obsidian Sync can carry it to iOS.
@@ -96,7 +96,7 @@ export class DaemonSupervisor {
   private child: ChildProcess | null = null;
   private disposed = false;
 
-  constructor(private readonly plugin: ClaudesCodexPlugin) {}
+  constructor(private readonly plugin: PocketCodexPlugin) {}
 
   /**
    * Spawn the daemon if it isn't already running. Safe to call repeatedly.
@@ -107,7 +107,7 @@ export class DaemonSupervisor {
    */
   async start(options: { retry?: boolean } = {}): Promise<DaemonStartResult> {
     if (!Platform.isDesktopApp) {
-      return { status: 'error', message: "The Claude's Codex daemon can only run in the desktop app." };
+      return { status: 'error', message: "The Pocket Codex daemon can only run in the desktop app." };
     }
 
     const attempts = options.retry === false ? 1 : 6;
@@ -120,7 +120,7 @@ export class DaemonSupervisor {
       } catch (error) {
         return {
           status: 'error',
-          message: `Failed to launch the Claude's Codex daemon: ${errorMessage(error)}`,
+          message: `Failed to launch the Pocket Codex daemon: ${errorMessage(error)}`,
           configPath: DEFAULT_CONFIG_PATH,
         };
       }
@@ -177,7 +177,7 @@ export class DaemonSupervisor {
       },
     );
     child.on('error', () => {
-      new Notice("Claude's Codex: failed to launch the daemon — check the daemon log.", 8000);
+      new Notice("Pocket Codex: failed to launch the daemon — check the daemon log.", 8000);
     });
     child.unref();
     this.child = child;
@@ -258,12 +258,12 @@ export class DaemonSupervisor {
   private daemonScriptPath(): string {
     const basePath = this.vaultPath() ?? '';
     const configDir = this.plugin.app.vault.configDir;
-    return path.join(basePath, configDir, 'plugins', this.plugin.manifest.id, 'claudes-codexd.cjs');
+    return path.join(basePath, configDir, 'plugins', this.plugin.manifest.id, 'pocket-codexd.cjs');
   }
 
   private openLogFile(): number | null {
     try {
-      return openSync(path.join(os.homedir(), '.config', 'claudian-praetor', 'claudes-codexd.log'), 'a');
+      return openSync(path.join(os.homedir(), '.config', 'claudian-praetor', 'pocket-codexd.log'), 'a');
     } catch {
       return null;
     }

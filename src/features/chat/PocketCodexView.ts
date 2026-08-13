@@ -10,7 +10,7 @@ import {
 import { ProviderRegistry } from '../../core/providers/ProviderRegistry';
 import { ProviderSettingsCoordinator } from '../../core/providers/ProviderSettingsCoordinator';
 import { type AppTabManagerState, DEFAULT_CHAT_PROVIDER_ID, type ProviderId } from '../../core/providers/types';
-import { VIEW_TYPE_CLAUDES_CODEX } from '../../core/types';
+import { VIEW_TYPE_POCKET_CODEX } from '../../core/types';
 import {
   cancelScheduledAnimationFrame,
   scheduleAnimationFrame,
@@ -37,7 +37,7 @@ type LoadableView = {
   load: () => Promise<void> | void;
 };
 
-export class ClaudesCodexView extends ItemView {
+export class PocketCodexView extends ItemView {
   private plugin: FeatureHost;
 
   // Tab management
@@ -76,7 +76,7 @@ export class ClaudesCodexView extends ItemView {
     );
 
     // Hover Editor compatibility: Define load as an instance method that can't be
-    // overwritten by prototype patching. Hover Editor patches ClaudesCodexView.prototype.load
+    // overwritten by prototype patching. Hover Editor patches PocketCodexView.prototype.load
     // after our class is defined, but instance methods take precedence over prototype methods.
     const prototype = Object.getPrototypeOf(this) as LoadableView;
     const originalLoad = prototype.load.bind(this);
@@ -99,11 +99,11 @@ export class ClaudesCodexView extends ItemView {
   }
 
   getViewType(): string {
-    return VIEW_TYPE_CLAUDES_CODEX;
+    return VIEW_TYPE_POCKET_CODEX;
   }
 
   getDisplayText(): string {
-    return "Claude's Codex";
+    return "Pocket Codex";
   }
 
   getIcon(): string {
@@ -113,7 +113,7 @@ export class ClaudesCodexView extends ItemView {
   /** Applies appearance preferences that can change while the view is open. */
   refreshAppearance(): void {
     this.viewContainerEl?.toggleClass(
-      'claudes-codex-container--theme-native',
+      'pocket-codex-container--theme-native',
       this.plugin.settings.useThemeNativeAppearance === true,
     );
   }
@@ -157,7 +157,7 @@ export class ClaudesCodexView extends ItemView {
       tab.ui.permissionToggle?.updateDisplay();
       tab.ui.serviceTierToggle?.updateDisplay();
       tab.dom.inputWrapper.toggleClass(
-        'claudes-codex-input-plan-mode',
+        'pocket-codex-input-plan-mode',
         providerSettings.permissionMode === 'plan' && capabilities.supportsPlanMode,
       );
     }
@@ -207,11 +207,11 @@ export class ClaudesCodexView extends ItemView {
 
     this.viewContainerEl = container;
     this.viewContainerEl.empty();
-    this.viewContainerEl.addClass('claudes-codex-container');
+    this.viewContainerEl.addClass('pocket-codex-container');
     this.refreshAppearance();
 
     this.navRowContent = this.buildNavRowContent();
-    this.tabContentEl = this.viewContainerEl.createDiv({ cls: 'claudes-codex-tab-content-container' });
+    this.tabContentEl = this.viewContainerEl.createDiv({ cls: 'pocket-codex-tab-content-container' });
     this.buildInputFooter();
 
     this.tabManager = new TabManager(
@@ -318,9 +318,9 @@ export class ClaudesCodexView extends ItemView {
    * The wrapper is moved to the active tab's nav row on tab switches.
    */
   private buildNavRowContent(): HTMLElement {
-    const wrapper = this.containerEl.createDiv({ cls: 'claudes-codex-input-nav-content' });
+    const wrapper = this.containerEl.createDiv({ cls: 'pocket-codex-input-nav-content' });
 
-    this.tabBarContainerEl = wrapper.createDiv({ cls: 'claudes-codex-tab-bar-container' });
+    this.tabBarContainerEl = wrapper.createDiv({ cls: 'pocket-codex-tab-bar-container' });
     this.tabBar = new TabBar(this.tabBarContainerEl, {
       onTabClick: (tabId) => this.handleTabClick(tabId),
       onTabClose: (tabId) => {
@@ -332,16 +332,16 @@ export class ClaudesCodexView extends ItemView {
       onTitleExpansionChanged: () => this.persistTabState(),
     });
 
-    const navActionsEl = wrapper.createDiv({ cls: 'claudes-codex-input-nav-actions' });
+    const navActionsEl = wrapper.createDiv({ cls: 'pocket-codex-input-nav-actions' });
 
-    this.newTabButtonEl = navActionsEl.createDiv({ cls: 'claudes-codex-input-nav-btn claudes-codex-new-tab-btn' });
+    this.newTabButtonEl = navActionsEl.createDiv({ cls: 'pocket-codex-input-nav-btn pocket-codex-new-tab-btn' });
     setIcon(this.newTabButtonEl, 'square-plus');
     this.newTabButtonEl.setAttribute('aria-label', 'New tab');
     this.newTabButtonEl.addEventListener('click', () => {
       void this.createNewTab().catch((e) => new Notice(`Failed to create tab: ${e instanceof Error ? e.message : String(e)}`, 10_000));
     });
 
-    const newBtn = navActionsEl.createDiv({ cls: 'claudes-codex-input-nav-btn' });
+    const newBtn = navActionsEl.createDiv({ cls: 'pocket-codex-input-nav-btn' });
     setIcon(newBtn, 'square-pen');
     newBtn.setAttribute('aria-label', 'New conversation');
     newBtn.addEventListener('click', () => {
@@ -352,12 +352,12 @@ export class ClaudesCodexView extends ItemView {
     });
 
     // History dropdown
-    const historyContainer = navActionsEl.createDiv({ cls: 'claudes-codex-history-container' });
-    const historyBtn = historyContainer.createDiv({ cls: 'claudes-codex-input-nav-btn' });
+    const historyContainer = navActionsEl.createDiv({ cls: 'pocket-codex-history-container' });
+    const historyBtn = historyContainer.createDiv({ cls: 'pocket-codex-input-nav-btn' });
     setIcon(historyBtn, 'history');
     historyBtn.setAttribute('aria-label', 'Chat history');
 
-    this.historyDropdown = historyContainer.createDiv({ cls: 'claudes-codex-history-menu' });
+    this.historyDropdown = historyContainer.createDiv({ cls: 'pocket-codex-history-menu' });
 
     historyBtn.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -365,7 +365,7 @@ export class ClaudesCodexView extends ItemView {
     });
 
     const copyLastInteractionBtn = navActionsEl.createDiv({
-      cls: 'claudes-codex-input-nav-btn claudes-codex-copy-last-interaction-btn',
+      cls: 'pocket-codex-input-nav-btn pocket-codex-copy-last-interaction-btn',
     });
     setIcon(copyLastInteractionBtn, 'copy');
     copyLastInteractionBtn.setAttribute('aria-label', 'Copy last interaction');
@@ -392,11 +392,11 @@ export class ClaudesCodexView extends ItemView {
   private buildInputFooter(): void {
     if (!this.viewContainerEl) return;
 
-    this.inputFooterEl = this.viewContainerEl.createDiv({ cls: 'claudes-codex-input-footer' });
+    this.inputFooterEl = this.viewContainerEl.createDiv({ cls: 'pocket-codex-input-footer' });
     this.inputNavRowHostEl = this.inputFooterEl.createDiv({
-      cls: 'claudes-codex-input-nav-row claudes-codex-view-input-nav-row',
+      cls: 'pocket-codex-input-nav-row pocket-codex-view-input-nav-row',
     });
-    this.activeInputSlotEl = this.inputFooterEl.createDiv({ cls: 'claudes-codex-active-input-slot' });
+    this.activeInputSlotEl = this.inputFooterEl.createDiv({ cls: 'pocket-codex-active-input-slot' });
   }
 
   private attachNavRowContentToInputFooter(): void {
@@ -510,7 +510,7 @@ export class ClaudesCodexView extends ItemView {
     const tabCount = this.tabManager.getTabCount();
     const showTabBar = tabCount >= 2;
 
-    this.tabBarContainerEl.toggleClass('claudes-codex-hidden', !showTabBar);
+    this.tabBarContainerEl.toggleClass('pocket-codex-hidden', !showTabBar);
 
     this.updateNewTabButtonVisibility();
   }
@@ -519,7 +519,7 @@ export class ClaudesCodexView extends ItemView {
     if (!this.newTabButtonEl || !this.tabManager) return;
 
     const canCreateTab = this.tabManager.canCreateTab();
-    this.newTabButtonEl.toggleClass('claudes-codex-hidden', !canCreateTab);
+    this.newTabButtonEl.toggleClass('pocket-codex-hidden', !canCreateTab);
     if (canCreateTab) {
       this.newTabButtonEl.removeAttribute('aria-disabled');
       this.newTabButtonEl.removeAttribute('aria-hidden');

@@ -87,7 +87,7 @@ describe('CodexWorkspaceDependencyResolver', () => {
   let tempDir: string;
 
   beforeEach(() => {
-    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'claudes-codex-codex-runtime-'));
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'pocket-codex-codex-runtime-'));
   });
 
   afterEach(() => {

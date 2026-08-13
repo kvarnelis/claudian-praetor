@@ -1,19 +1,19 @@
 /* Write/Edit Diff Block - Subagent style */
-.claudes-codex-write-edit-block {
+.pocket-codex-write-edit-block {
   margin: 4px 0;
   background: transparent;
   overflow: hidden;
 }
 
-.claudes-codex-text-block+.claudes-codex-write-edit-block {
+.pocket-codex-text-block+.pocket-codex-write-edit-block {
   margin-top: 8px;
 }
 
-.claudes-codex-write-edit-block+.claudes-codex-text-block {
+.pocket-codex-write-edit-block+.pocket-codex-text-block {
   margin-top: 8px;
 }
 
-.claudes-codex-write-edit-header {
+.pocket-codex-write-edit-header {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -24,20 +24,20 @@
   overflow: hidden;
 }
 
-.claudes-codex-write-edit-icon {
+.pocket-codex-write-edit-icon {
   width: 16px;
   height: 16px;
   color: var(--text-accent);
   flex-shrink: 0;
 }
 
-.claudes-codex-write-edit-icon svg {
+.pocket-codex-write-edit-icon svg {
   width: 16px;
   height: 16px;
 }
 
 /* Two-part header: name (fixed) + summary (flexible) */
-.claudes-codex-write-edit-name {
+.pocket-codex-write-edit-name {
   font-family: var(--font-monospace);
   font-size: 13px;
   font-weight: 400;
@@ -46,7 +46,7 @@
   flex-shrink: 0;
 }
 
-.claudes-codex-write-edit-summary {
+.pocket-codex-write-edit-summary {
   font-family: var(--font-monospace);
   font-size: 13px;
   color: var(--text-muted);
@@ -57,57 +57,57 @@
   min-width: 0;
 }
 
-.claudes-codex-write-edit-stats {
+.pocket-codex-write-edit-stats {
   font-family: var(--font-monospace);
   font-size: 11px;
   flex-shrink: 0;
 }
 
-.claudes-codex-write-edit-stats .added {
+.pocket-codex-write-edit-stats .added {
   color: var(--color-green);
 }
 
-.claudes-codex-write-edit-stats .removed {
+.pocket-codex-write-edit-stats .removed {
   color: var(--color-red);
   margin-left: 4px;
 }
 
-.claudes-codex-write-edit-status {
+.pocket-codex-write-edit-status {
   width: 16px;
   height: 16px;
   flex-shrink: 0;
 }
 
 /* Hide empty status on successful completion so stats align to right edge */
-.claudes-codex-write-edit-block.done .claudes-codex-write-edit-status:empty {
+.pocket-codex-write-edit-block.done .pocket-codex-write-edit-status:empty {
   display: none;
 }
 
-.claudes-codex-write-edit-status svg {
+.pocket-codex-write-edit-status svg {
   width: 16px;
   height: 16px;
 }
 
-.claudes-codex-write-edit-status.status-completed {
+.pocket-codex-write-edit-status.status-completed {
   color: var(--color-green);
 }
 
-.claudes-codex-write-edit-status.status-error,
-.claudes-codex-write-edit-status.status-blocked {
+.pocket-codex-write-edit-status.status-error,
+.pocket-codex-write-edit-status.status-blocked {
   color: var(--color-red);
 }
 
-.claudes-codex-write-edit-content {
+.pocket-codex-write-edit-content {
   padding: 0;
   background: transparent;
   overflow: hidden;
 }
 
-.claudes-codex-write-edit-diff-row {
+.pocket-codex-write-edit-diff-row {
   display: flex;
 }
 
-.claudes-codex-write-edit-diff {
+.pocket-codex-write-edit-diff {
   flex: 1;
   font-family: var(--font-monospace);
   font-size: 12px;
@@ -118,31 +118,31 @@
   overflow-x: auto;
 }
 
-.claudes-codex-write-edit-loading,
-.claudes-codex-write-edit-binary,
-.claudes-codex-write-edit-error,
-.claudes-codex-write-edit-done-text {
+.pocket-codex-write-edit-loading,
+.pocket-codex-write-edit-binary,
+.pocket-codex-write-edit-error,
+.pocket-codex-write-edit-done-text {
   font-family: var(--font-monospace);
   font-size: 12px;
   color: var(--text-muted);
 }
 
-.claudes-codex-write-edit-error {
+.pocket-codex-write-edit-error {
   color: var(--color-red);
 }
 
 /* Diff line styling */
-.claudes-codex-diff-hunk {
+.pocket-codex-diff-hunk {
   margin-bottom: 4px;
 }
 
-.claudes-codex-diff-line {
+.pocket-codex-diff-line {
   display: flex;
   white-space: pre-wrap;
   word-break: break-all;
 }
 
-.claudes-codex-diff-prefix {
+.pocket-codex-diff-prefix {
   flex-shrink: 0;
   width: 16px;
   text-align: center;
@@ -150,36 +150,36 @@
   user-select: none;
 }
 
-.claudes-codex-diff-text {
+.pocket-codex-diff-text {
   flex: 1;
   min-width: 0;
 }
 
 /* Diff colors - NO strikethrough for Write/Edit blocks */
-.claudes-codex-diff-equal {
+.pocket-codex-diff-equal {
   color: var(--text-muted);
 }
 
-.claudes-codex-diff-delete {
+.pocket-codex-diff-delete {
   background: rgba(255, 80, 80, 0.25);
   color: var(--text-normal);
 }
 
-.claudes-codex-diff-delete .claudes-codex-diff-prefix {
+.pocket-codex-diff-delete .pocket-codex-diff-prefix {
   color: var(--color-red);
 }
 
-.claudes-codex-diff-insert {
+.pocket-codex-diff-insert {
   background: rgba(80, 200, 80, 0.25);
   color: var(--text-normal);
 }
 
-.claudes-codex-diff-insert .claudes-codex-diff-prefix {
+.pocket-codex-diff-insert .pocket-codex-diff-prefix {
   color: var(--color-green);
 }
 
 /* Hunk separator */
-.claudes-codex-diff-separator {
+.pocket-codex-diff-separator {
   color: var(--text-muted);
   text-align: center;
   padding: 4px 0;
@@ -190,7 +190,7 @@
   font-size: 11px;
 }
 
-.claudes-codex-diff-no-changes {
+.pocket-codex-diff-no-changes {
   color: var(--text-muted);
   font-style: italic;
   padding: 8px;

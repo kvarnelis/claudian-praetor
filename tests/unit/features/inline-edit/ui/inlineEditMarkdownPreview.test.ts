@@ -107,7 +107,7 @@ describe('renderInlineEditMarkdownPreview', () => {
     });
 
     expect(container.children).toHaveLength(1);
-    expect(container.children[0].hasClass('claudes-codex-inline-markdown-fallback')).toBe(true);
+    expect(container.children[0].hasClass('pocket-codex-inline-markdown-fallback')).toBe(true);
     expect(container.children[0].textContent).toBe('Use $x^2$ here.');
   });
 });

@@ -1,6 +1,6 @@
 import {
-  CLAUDES_CODEX_SETTINGS_PATH,
-  LEGACY_CLAUDES_CODEX_SETTINGS_PATH,
+  LEGACY_POCKET_CODEX_SETTINGS_PATH,
+  POCKET_CODEX_SETTINGS_PATH,
 } from '../../core/bootstrap/StoragePaths';
 import {
   normalizeHiddenCommandList,
@@ -16,20 +16,20 @@ import type { VaultFileAdapter } from '../../core/storage/VaultFileAdapter';
 import {
   CHAT_VIEW_PLACEMENTS,
   type ChatViewPlacement,
-  type ClaudesCodexSettings,
   type EnvironmentScope,
   type EnvSnippet,
   type HiddenProviderCommands,
+  type PocketCodexSettings,
   type ProviderConfigMap,
 } from '../../core/types/settings';
-import { DEFAULT_CLAUDES_CODEX_SETTINGS } from './defaultSettings';
+import { DEFAULT_POCKET_CODEX_SETTINGS } from './defaultSettings';
 
 export {
-  CLAUDES_CODEX_SETTINGS_PATH,
-  LEGACY_CLAUDES_CODEX_SETTINGS_PATH,
+  LEGACY_POCKET_CODEX_SETTINGS_PATH,
+  POCKET_CODEX_SETTINGS_PATH,
 };
 
-export type StoredClaudesCodexSettings = ClaudesCodexSettings;
+export type StoredPocketCodexSettings = PocketCodexSettings;
 
 const LEGACY_STRIPPED_SHARED_SETTING_FIELDS = [
   'activeConversationId',
@@ -84,7 +84,7 @@ function normalizeChatViewPlacement(
     return legacyOpenInMainTab ? 'main-tab' : 'right-sidebar';
   }
 
-  return DEFAULT_CLAUDES_CODEX_SETTINGS.chatViewPlacement;
+  return DEFAULT_POCKET_CODEX_SETTINGS.chatViewPlacement;
 }
 
 function shouldPersistChatViewPlacementMigration(
@@ -270,10 +270,10 @@ function mergeLegacyClaudeHiddenCommands(
   };
 }
 
-export class ClaudesCodexSettingsStorage {
+export class PocketCodexSettingsStorage {
   constructor(private adapter: VaultFileAdapter) {}
 
-  async load(): Promise<StoredClaudesCodexSettings> {
+  async load(): Promise<StoredPocketCodexSettings> {
     const settingsPath = await this.getLoadPath();
     if (!settingsPath) {
       return this.getDefaults();
@@ -334,7 +334,7 @@ export class ClaudesCodexSettingsStorage {
     );
 
     if (
-      settingsPath !== CLAUDES_CODEX_SETTINGS_PATH
+      settingsPath !== POCKET_CODEX_SETTINGS_PATH
       || (
       hasLegacyTopLevelProviderFields(stored)
       || 'show1MModel' in stored
@@ -363,7 +363,7 @@ export class ClaudesCodexSettingsStorage {
     return merged;
   }
 
-  async save(settings: StoredClaudesCodexSettings): Promise<void> {
+  async save(settings: StoredPocketCodexSettings): Promise<void> {
     const { providerConfigs } = projectPersistableProviderConfigs(settings.providerConfigs);
     const content = JSON.stringify(
       stripLegacyFields({
@@ -373,42 +373,42 @@ export class ClaudesCodexSettingsStorage {
       null,
       2,
     );
-    await this.adapter.write(CLAUDES_CODEX_SETTINGS_PATH, content);
+    await this.adapter.write(POCKET_CODEX_SETTINGS_PATH, content);
     await this.deleteLegacyFileIfPresent();
   }
 
   async exists(): Promise<boolean> {
-    if (await this.adapter.exists(CLAUDES_CODEX_SETTINGS_PATH)) {
+    if (await this.adapter.exists(POCKET_CODEX_SETTINGS_PATH)) {
       return true;
     }
 
-    return this.adapter.exists(LEGACY_CLAUDES_CODEX_SETTINGS_PATH);
+    return this.adapter.exists(LEGACY_POCKET_CODEX_SETTINGS_PATH);
   }
 
-  async update(updates: Partial<StoredClaudesCodexSettings>): Promise<void> {
+  async update(updates: Partial<StoredPocketCodexSettings>): Promise<void> {
     const current = await this.load();
     await this.save({ ...current, ...updates });
   }
 
-  private getDefaults(): StoredClaudesCodexSettings {
-    return DEFAULT_CLAUDES_CODEX_SETTINGS;
+  private getDefaults(): StoredPocketCodexSettings {
+    return DEFAULT_POCKET_CODEX_SETTINGS;
   }
 
   private async getLoadPath(): Promise<string | null> {
-    if (await this.adapter.exists(CLAUDES_CODEX_SETTINGS_PATH)) {
-      return CLAUDES_CODEX_SETTINGS_PATH;
+    if (await this.adapter.exists(POCKET_CODEX_SETTINGS_PATH)) {
+      return POCKET_CODEX_SETTINGS_PATH;
     }
 
-    if (await this.adapter.exists(LEGACY_CLAUDES_CODEX_SETTINGS_PATH)) {
-      return LEGACY_CLAUDES_CODEX_SETTINGS_PATH;
+    if (await this.adapter.exists(LEGACY_POCKET_CODEX_SETTINGS_PATH)) {
+      return LEGACY_POCKET_CODEX_SETTINGS_PATH;
     }
 
     return null;
   }
 
   private async deleteLegacyFileIfPresent(): Promise<void> {
-    if (await this.adapter.exists(LEGACY_CLAUDES_CODEX_SETTINGS_PATH)) {
-      await this.adapter.delete(LEGACY_CLAUDES_CODEX_SETTINGS_PATH);
+    if (await this.adapter.exists(LEGACY_POCKET_CODEX_SETTINGS_PATH)) {
+      await this.adapter.delete(LEGACY_POCKET_CODEX_SETTINGS_PATH);
     }
   }
 }

@@ -515,11 +515,11 @@ describe('Tab - Creation', () => {
       expect(tab.id).toMatch(/^tab-/);
     });
 
-    it("should create the welcome container with Claude's Codex branding", () => {
+    it("should create the welcome container with Pocket Codex branding", () => {
       const tab = createTab(createMockOptions());
 
-      expect(tab.dom.welcomeEl?.querySelector('.claudes-codex-welcome-brand')?.textContent)
-        .toBe("Claude's Codex");
+      expect(tab.dom.welcomeEl?.querySelector('.pocket-codex-welcome-brand')?.textContent)
+        .toBe("Pocket Codex");
     });
 
     it('should describe composer actions in the input placeholder', () => {
@@ -1125,7 +1125,7 @@ describe('Tab - Service Initialization', () => {
 
       expect(plugin.settings.permissionMode).toBe('plan');
       expect(tab.ui.permissionToggle!.updateDisplay).toHaveBeenCalledTimes(1);
-      expect(tab.dom.inputWrapper.hasClass('claudes-codex-input-plan-mode')).toBe(true);
+      expect(tab.dom.inputWrapper.hasClass('pocket-codex-input-plan-mode')).toBe(true);
     });
 
     it('renders the in-memory permission mode when persistence fails after mutation', async () => {
@@ -1141,7 +1141,7 @@ describe('Tab - Service Initialization', () => {
 
       expect(plugin.settings.permissionMode).toBe('plan');
       expect(tab.ui.permissionToggle!.updateDisplay).toHaveBeenCalledTimes(1);
-      expect(tab.dom.inputWrapper.hasClass('claudes-codex-input-plan-mode')).toBe(true);
+      expect(tab.dom.inputWrapper.hasClass('pocket-codex-input-plan-mode')).toBe(true);
     });
 
     it('resets to blank state when the new-conversation callback fires', () => {
@@ -1584,7 +1584,7 @@ describe('Tab - Service Callbacks', () => {
       const addMessageSpy = jest.spyOn(tab.state, 'addMessage');
       const addMessage = jest.fn(() => {
         const msgEl = createMockEl();
-        msgEl.createDiv({ cls: 'claudes-codex-message-content' });
+        msgEl.createDiv({ cls: 'pocket-codex-message-content' });
         return msgEl;
       });
       const scrollToBottom = jest.fn();
@@ -3055,11 +3055,11 @@ describe('Tab - Controller Configuration', () => {
       const config = constructorCall[0];
       const inputStyle = tab.dom.inputEl.style as unknown as Record<string, string>;
       tab.dom.inputEl.value = '';
-      inputStyle['--claudes-codex-textarea-min-height'] = '240px';
+      inputStyle['--pocket-codex-textarea-min-height'] = '240px';
 
       config.resetInputHeight();
 
-      expect(inputStyle['--claudes-codex-textarea-min-height'])
+      expect(inputStyle['--pocket-codex-textarea-min-height'])
         .toBe(`${TEXTAREA_BASE_MIN_HEIGHT}px`);
     });
 

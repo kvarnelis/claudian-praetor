@@ -1,5 +1,5 @@
 /**
- * Claude's Codex - Session Utilities
+ * Pocket Codex - Session Utilities
  *
  * Session recovery and history reconstruction.
  */

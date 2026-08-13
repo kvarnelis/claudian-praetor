@@ -39,36 +39,36 @@ export class McpSettingsManager {
   private render() {
     this.containerEl.empty();
 
-    const headerEl = this.containerEl.createDiv({ cls: 'claudes-codex-mcp-header' });
-    headerEl.createSpan({ text: 'MCP Servers', cls: 'claudes-codex-mcp-label' });
+    const headerEl = this.containerEl.createDiv({ cls: 'pocket-codex-mcp-header' });
+    headerEl.createSpan({ text: 'MCP Servers', cls: 'pocket-codex-mcp-label' });
 
-    const addContainer = headerEl.createDiv({ cls: 'claudes-codex-mcp-add-container' });
+    const addContainer = headerEl.createDiv({ cls: 'pocket-codex-mcp-add-container' });
     const addBtn = addContainer.createEl('button', {
-      cls: 'claudes-codex-settings-action-btn',
+      cls: 'pocket-codex-settings-action-btn',
       attr: { 'aria-label': 'Add' },
     });
     setIcon(addBtn, 'plus');
 
-    const dropdown = addContainer.createDiv({ cls: 'claudes-codex-mcp-add-dropdown' });
+    const dropdown = addContainer.createDiv({ cls: 'pocket-codex-mcp-add-dropdown' });
 
-    const stdioOption = dropdown.createDiv({ cls: 'claudes-codex-mcp-add-option' });
-    setIcon(stdioOption.createSpan({ cls: 'claudes-codex-mcp-add-option-icon' }), 'terminal');
+    const stdioOption = dropdown.createDiv({ cls: 'pocket-codex-mcp-add-option' });
+    setIcon(stdioOption.createSpan({ cls: 'pocket-codex-mcp-add-option-icon' }), 'terminal');
     stdioOption.createSpan({ text: 'stdio (local command)' });
     stdioOption.addEventListener('click', () => {
       dropdown.removeClass('is-visible');
       this.openModal(null, 'stdio');
     });
 
-    const httpOption = dropdown.createDiv({ cls: 'claudes-codex-mcp-add-option' });
-    setIcon(httpOption.createSpan({ cls: 'claudes-codex-mcp-add-option-icon' }), 'globe');
+    const httpOption = dropdown.createDiv({ cls: 'pocket-codex-mcp-add-option' });
+    setIcon(httpOption.createSpan({ cls: 'pocket-codex-mcp-add-option-icon' }), 'globe');
     httpOption.createSpan({ text: 'http / sse (remote)' });
     httpOption.addEventListener('click', () => {
       dropdown.removeClass('is-visible');
       this.openModal(null, 'http');
     });
 
-    const importOption = dropdown.createDiv({ cls: 'claudes-codex-mcp-add-option' });
-    setIcon(importOption.createSpan({ cls: 'claudes-codex-mcp-add-option-icon' }), 'clipboard-paste');
+    const importOption = dropdown.createDiv({ cls: 'pocket-codex-mcp-add-option' });
+    setIcon(importOption.createSpan({ cls: 'pocket-codex-mcp-add-option-icon' }), 'clipboard-paste');
     importOption.createSpan({ text: 'Import from clipboard' });
     importOption.addEventListener('click', () => {
       dropdown.removeClass('is-visible');
@@ -85,56 +85,56 @@ export class McpSettingsManager {
     });
 
     if (this.servers.length === 0) {
-      const emptyEl = this.containerEl.createDiv({ cls: 'claudes-codex-mcp-empty' });
+      const emptyEl = this.containerEl.createDiv({ cls: 'pocket-codex-mcp-empty' });
       emptyEl.setText('No mcp servers configured. Click "add" to add one.');
       return;
     }
 
-    const listEl = this.containerEl.createDiv({ cls: 'claudes-codex-mcp-list' });
+    const listEl = this.containerEl.createDiv({ cls: 'pocket-codex-mcp-list' });
     for (const server of this.servers) {
       this.renderServerItem(listEl, server);
     }
   }
 
   private renderServerItem(listEl: HTMLElement, server: ManagedMcpServer) {
-    const itemEl = listEl.createDiv({ cls: 'claudes-codex-mcp-item' });
+    const itemEl = listEl.createDiv({ cls: 'pocket-codex-mcp-item' });
     if (!server.enabled) {
-      itemEl.addClass('claudes-codex-mcp-item-disabled');
+      itemEl.addClass('pocket-codex-mcp-item-disabled');
     }
 
-    const statusEl = itemEl.createDiv({ cls: 'claudes-codex-mcp-status' });
+    const statusEl = itemEl.createDiv({ cls: 'pocket-codex-mcp-status' });
     statusEl.addClass(
-      server.enabled ? 'claudes-codex-mcp-status-enabled' : 'claudes-codex-mcp-status-disabled'
+      server.enabled ? 'pocket-codex-mcp-status-enabled' : 'pocket-codex-mcp-status-disabled'
     );
 
-    const infoEl = itemEl.createDiv({ cls: 'claudes-codex-mcp-info' });
+    const infoEl = itemEl.createDiv({ cls: 'pocket-codex-mcp-info' });
 
-    const nameRow = infoEl.createDiv({ cls: 'claudes-codex-mcp-name-row' });
+    const nameRow = infoEl.createDiv({ cls: 'pocket-codex-mcp-name-row' });
 
-    const nameEl = nameRow.createSpan({ cls: 'claudes-codex-mcp-name' });
+    const nameEl = nameRow.createSpan({ cls: 'pocket-codex-mcp-name' });
     nameEl.setText(server.name);
 
     const serverType = getMcpServerType(server.config);
-    const typeEl = nameRow.createSpan({ cls: 'claudes-codex-mcp-type-badge' });
+    const typeEl = nameRow.createSpan({ cls: 'pocket-codex-mcp-type-badge' });
     typeEl.setText(serverType);
 
     if (server.contextSaving) {
-      const csEl = nameRow.createSpan({ cls: 'claudes-codex-mcp-context-saving-badge' });
+      const csEl = nameRow.createSpan({ cls: 'pocket-codex-mcp-context-saving-badge' });
       csEl.setText('@');
       csEl.setAttribute('title', 'Context-saving: mention with @' + server.name + ' to enable');
     }
 
-    const previewEl = infoEl.createDiv({ cls: 'claudes-codex-mcp-preview' });
+    const previewEl = infoEl.createDiv({ cls: 'pocket-codex-mcp-preview' });
     if (server.description) {
       previewEl.setText(server.description);
     } else {
       previewEl.setText(this.getServerPreview(server, serverType));
     }
 
-    const actionsEl = itemEl.createDiv({ cls: 'claudes-codex-mcp-actions' });
+    const actionsEl = itemEl.createDiv({ cls: 'pocket-codex-mcp-actions' });
 
     const testBtn = actionsEl.createEl('button', {
-      cls: 'claudes-codex-mcp-action-btn',
+      cls: 'pocket-codex-mcp-action-btn',
       attr: { 'aria-label': 'Verify (show tools)' },
     });
     setIcon(testBtn, 'zap');
@@ -143,7 +143,7 @@ export class McpSettingsManager {
     });
 
     const toggleBtn = actionsEl.createEl('button', {
-      cls: 'claudes-codex-mcp-action-btn',
+      cls: 'pocket-codex-mcp-action-btn',
       attr: { 'aria-label': server.enabled ? 'Disable' : 'Enable' },
     });
     setIcon(toggleBtn, server.enabled ? 'toggle-right' : 'toggle-left');
@@ -154,14 +154,14 @@ export class McpSettingsManager {
     });
 
     const editBtn = actionsEl.createEl('button', {
-      cls: 'claudes-codex-mcp-action-btn',
+      cls: 'pocket-codex-mcp-action-btn',
       attr: { 'aria-label': 'Edit' },
     });
     setIcon(editBtn, 'pencil');
     editBtn.addEventListener('click', () => this.openModal(server));
 
     const deleteBtn = actionsEl.createEl('button', {
-      cls: 'claudes-codex-mcp-action-btn claudes-codex-mcp-delete-btn',
+      cls: 'pocket-codex-mcp-action-btn pocket-codex-mcp-delete-btn',
       attr: { 'aria-label': 'Delete' },
     });
     setIcon(deleteBtn, 'trash-2');

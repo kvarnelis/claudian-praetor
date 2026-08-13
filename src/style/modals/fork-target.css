@@ -1,14 +1,14 @@
 /* Fork Target Modal */
-.claudes-codex-fork-target-modal {
+.pocket-codex-fork-target-modal {
   max-width: 340px;
 }
 
-.claudes-codex-fork-target-list {
+.pocket-codex-fork-target-list {
   display: flex;
   flex-direction: column;
 }
 
-.claudes-codex-fork-target-option {
+.pocket-codex-fork-target-option {
   padding: 10px 12px;
   border-radius: 6px;
   cursor: pointer;
@@ -16,6 +16,6 @@
   font-size: 14px;
 }
 
-.claudes-codex-fork-target-option:hover {
+.pocket-codex-fork-target-option:hover {
   background: var(--background-modifier-hover);
 }

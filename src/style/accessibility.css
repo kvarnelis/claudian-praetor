@@ -1,49 +1,49 @@
 /* Accessibility - Focus Visible Styles */
 
 /* outline + offset + border-radius */
-.claudes-codex-tool-header:focus-visible,
-.claudes-codex-thinking-header:focus-visible,
-.claudes-codex-subagent-header:focus-visible,
-.claudes-codex-input-nav-btn:focus-visible,
-.claudes-codex-model-btn:focus-visible,
-.claudes-codex-thinking-current:focus-visible {
+.pocket-codex-tool-header:focus-visible,
+.pocket-codex-thinking-header:focus-visible,
+.pocket-codex-subagent-header:focus-visible,
+.pocket-codex-input-nav-btn:focus-visible,
+.pocket-codex-model-btn:focus-visible,
+.pocket-codex-thinking-current:focus-visible {
   outline: 2px solid var(--interactive-accent);
   outline-offset: 2px;
   border-radius: 4px;
 }
 
 /* outline + offset only */
-.claudes-codex-action-btn:focus-visible,
-.claudes-codex-toggle-switch:focus-visible,
-.claudes-codex-context-chip-main:focus-visible,
-.claudes-codex-context-chip-remove:focus-visible,
-.claudes-codex-context-more:focus-visible,
-.claudes-codex-image-modal-close:focus-visible,
-.claudes-codex-approved-remove-btn:focus-visible,
-.claudes-codex-save-env-btn:focus-visible,
-.claudes-codex-restore-snippet-btn:focus-visible,
-.claudes-codex-edit-snippet-btn:focus-visible,
-.claudes-codex-delete-snippet-btn:focus-visible,
-.claudes-codex-cancel-btn:focus-visible,
-.claudes-codex-save-btn:focus-visible,
-.claudes-codex-code-lang-label:focus-visible {
+.pocket-codex-action-btn:focus-visible,
+.pocket-codex-toggle-switch:focus-visible,
+.pocket-codex-context-chip-main:focus-visible,
+.pocket-codex-context-chip-remove:focus-visible,
+.pocket-codex-context-more:focus-visible,
+.pocket-codex-image-modal-close:focus-visible,
+.pocket-codex-approved-remove-btn:focus-visible,
+.pocket-codex-save-env-btn:focus-visible,
+.pocket-codex-restore-snippet-btn:focus-visible,
+.pocket-codex-edit-snippet-btn:focus-visible,
+.pocket-codex-delete-snippet-btn:focus-visible,
+.pocket-codex-cancel-btn:focus-visible,
+.pocket-codex-save-btn:focus-visible,
+.pocket-codex-code-lang-label:focus-visible {
   outline: 2px solid var(--interactive-accent);
   outline-offset: 2px;
 }
 
-.claudes-codex-inline-preview-action:focus-visible {
+.pocket-codex-inline-preview-action:focus-visible {
   outline: 2px solid var(--interactive-accent);
   outline-offset: 2px;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .claudes-codex-inline-spinner {
+  .pocket-codex-inline-spinner {
     animation: none;
   }
 }
 
 /* outline + negative offset + border-radius */
-.claudes-codex-history-item-content:focus-visible {
+.pocket-codex-history-item-content:focus-visible {
   outline: 2px solid var(--interactive-accent);
   outline-offset: -2px;
   border-radius: 4px;

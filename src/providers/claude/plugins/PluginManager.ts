@@ -114,7 +114,7 @@ export class PluginManager {
 
         const entriesArray = Array.isArray(entries) ? entries : [entries];
         if (!Array.isArray(entries)) {
-          new Notice(`Claude's Codex: plugin "${pluginId}" has malformed entry in installed_plugins.json (expected array, got ${typeof entries})`);
+          new Notice(`Pocket Codex: plugin "${pluginId}" has malformed entry in installed_plugins.json (expected array, got ${typeof entries})`);
         }
         const entry = await selectInstalledPluginEntry(entriesArray, normalizedVaultPath);
         if (!entry) continue;

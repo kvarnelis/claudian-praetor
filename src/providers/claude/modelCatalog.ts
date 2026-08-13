@@ -13,7 +13,7 @@ export interface CliModelOption {
 }
 
 const ONE_M_SUFFIX = '[1m]';
-// Families whose 1M variant is a Claude's Codex-side toggle rather than a CLI-listed model
+// Families whose 1M variant is a Pocket Codex-side toggle rather than a CLI-listed model
 const FAMILIES_WITH_1M_VARIANT = new Set(['opus', 'sonnet']);
 
 let cliModelCatalog: ModelInfo[] | null = null;
@@ -28,7 +28,7 @@ export function clearCliModelCatalog(): void {
 
 /**
  * CLI-reported models mapped to selector options, or null before the first
- * fetch. The CLI lists most-capable-first; Claude's Codex stores ascending capability
+ * fetch. The CLI lists most-capable-first; Pocket Codex stores ascending capability
  * (the dropdown renders reversed), so the order is flipped here. The 'default'
  * pseudo-entry is dropped — the selector semantics are an explicit model
  * choice. For the opus/sonnet family aliases a [1m] variant is synthesized so

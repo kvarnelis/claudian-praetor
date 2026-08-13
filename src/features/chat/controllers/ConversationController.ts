@@ -598,14 +598,14 @@ export class ConversationController {
 
     container.empty();
 
-    const dropdownHeader = container.createDiv({ cls: 'claudes-codex-history-header' });
+    const dropdownHeader = container.createDiv({ cls: 'pocket-codex-history-header' });
     dropdownHeader.createSpan({ text: 'Conversations' });
 
-    const list = container.createDiv({ cls: 'claudes-codex-history-list' });
+    const list = container.createDiv({ cls: 'pocket-codex-history-list' });
     const allConversations = plugin.getConversationList();
 
     if (allConversations.length === 0) {
-      list.createDiv({ cls: 'claudes-codex-history-empty', text: 'No conversations' });
+      list.createDiv({ cls: 'pocket-codex-history-empty', text: 'No conversations' });
       return;
     }
 
@@ -627,7 +627,7 @@ export class ConversationController {
       const isOpen = openState === 'open';
       const item = list.createDiv({
         cls: [
-          'claudes-codex-history-item',
+          'pocket-codex-history-item',
           isCurrent ? 'active' : '',
           isOpen ? 'open' : '',
           isRunning ? 'running' : '',
@@ -640,14 +640,14 @@ export class ConversationController {
         item.setAttribute('data-tab-index', String(conversationStatus.tabIndex));
       }
 
-      const iconEl = item.createDiv({ cls: 'claudes-codex-history-item-icon' });
+      const iconEl = item.createDiv({ cls: 'pocket-codex-history-item-icon' });
       setIcon(iconEl, this.getHistoryItemIcon(openState, isRunning));
 
-      const content = item.createDiv({ cls: 'claudes-codex-history-item-content' });
-      const titleEl = content.createDiv({ cls: 'claudes-codex-history-item-title', text: conv.title });
+      const content = item.createDiv({ cls: 'pocket-codex-history-item-content' });
+      const titleEl = content.createDiv({ cls: 'pocket-codex-history-item-title', text: conv.title });
       titleEl.setAttribute('title', conv.title);
       content.createDiv({
-        cls: 'claudes-codex-history-item-date',
+        cls: 'pocket-codex-history-item-date',
         text: this.getHistoryItemStatusText(conversationStatus, conv.lastResponseAt ?? conv.createdAt),
       });
 
@@ -700,15 +700,15 @@ export class ConversationController {
         this.showHistoryContextMenu(item, conv.id, conv.title, isCurrent, options, e);
       });
 
-      const actions = item.createDiv({ cls: 'claudes-codex-history-item-actions' });
+      const actions = item.createDiv({ cls: 'pocket-codex-history-item-actions' });
 
       // Show regenerate button if title generation failed, or loading indicator if pending
       if (conv.titleGenerationStatus === 'pending') {
-        const loadingEl = actions.createSpan({ cls: 'claudes-codex-action-btn claudes-codex-action-loading' });
+        const loadingEl = actions.createSpan({ cls: 'pocket-codex-action-btn pocket-codex-action-loading' });
         setIcon(loadingEl, 'loader-2');
         loadingEl.setAttribute('aria-label', 'Generating title...');
       } else if (conv.titleGenerationStatus === 'failed') {
-        const regenerateBtn = actions.createEl('button', { cls: 'claudes-codex-action-btn' });
+        const regenerateBtn = actions.createEl('button', { cls: 'pocket-codex-action-btn' });
         setIcon(regenerateBtn, 'refresh-cw');
         regenerateBtn.setAttribute('aria-label', 'Regenerate title');
         regenerateBtn.addEventListener('click', (e) => {
@@ -722,7 +722,7 @@ export class ConversationController {
 
       if (openState === 'closed' && options.onOpenConversationInNewTab) {
         const openInNewTabBtn = actions.createEl('button', {
-          cls: 'claudes-codex-action-btn claudes-codex-open-new-tab-btn',
+          cls: 'pocket-codex-action-btn pocket-codex-open-new-tab-btn',
         });
         setIcon(openInNewTabBtn, 'square-plus');
         openInNewTabBtn.setAttribute('aria-label', 'Open in new tab');
@@ -738,7 +738,7 @@ export class ConversationController {
         });
       }
 
-      const renameBtn = actions.createEl('button', { cls: 'claudes-codex-action-btn' });
+      const renameBtn = actions.createEl('button', { cls: 'pocket-codex-action-btn' });
       setIcon(renameBtn, 'pencil');
       renameBtn.setAttribute('aria-label', 'Rename');
       renameBtn.addEventListener('click', (e) => {
@@ -746,7 +746,7 @@ export class ConversationController {
         this.showRenameInput(item, conv.id, conv.title);
       });
 
-      const deleteBtn = actions.createEl('button', { cls: 'claudes-codex-action-btn claudes-codex-delete-btn' });
+      const deleteBtn = actions.createEl('button', { cls: 'pocket-codex-action-btn pocket-codex-delete-btn' });
       setIcon(deleteBtn, 'trash-2');
       deleteBtn.setAttribute('aria-label', 'Delete');
       deleteBtn.addEventListener('click', (e) => {
@@ -763,7 +763,7 @@ export class ConversationController {
 
     if (visibleConversations.length < conversations.length && !options.signal?.aborted) {
       const loadMoreButton = list.createEl('button', {
-        cls: 'claudes-codex-history-load-more',
+        cls: 'pocket-codex-history-load-more',
         text: `Load more (${conversations.length - visibleConversations.length} remaining)`,
       });
       loadMoreButton.addEventListener('click', () => {
@@ -930,11 +930,11 @@ export class ConversationController {
 
   /** Shows inline rename input for a conversation. */
   private showRenameInput(item: HTMLElement, convId: string, currentTitle: string): void {
-    const titleEl = item.querySelector('.claudes-codex-history-item-title') as HTMLElement;
+    const titleEl = item.querySelector('.pocket-codex-history-item-title') as HTMLElement;
     if (!titleEl) return;
 
     const input = item.createEl('input', {
-      cls: 'claudes-codex-rename-input',
+      cls: 'pocket-codex-rename-input',
       attr: { type: 'text', value: currentTitle },
     });
 
@@ -995,7 +995,7 @@ export class ConversationController {
     // Time-specific greetings
     const getTimeGreetings = (): string[] => {
       if (hour >= 5 && hour < 12) {
-        return [personalize('Good morning'), "Coffee and Claude's Codex time?"];
+        return [personalize('Good morning'), "Coffee and Pocket Codex time?"];
       } else if (hour >= 12 && hour < 18) {
         return [personalize('Good afternoon'), personalize('Hey there'), personalize("How's it going") + '?'];
       } else if (hour >= 18 && hour < 22) {
@@ -1032,9 +1032,9 @@ export class ConversationController {
     if (!welcomeEl) return;
 
     if (this.deps.state.messages.length === 0) {
-      welcomeEl.removeClass('claudes-codex-hidden');
+      welcomeEl.removeClass('pocket-codex-hidden');
     } else {
-      welcomeEl.addClass('claudes-codex-hidden');
+      welcomeEl.addClass('pocket-codex-hidden');
     }
   }
 
@@ -1052,7 +1052,7 @@ export class ConversationController {
     fileCtx?.autoAttachActiveFile();
 
     // Only add greeting if not already present
-    if (!welcomeEl.querySelector('.claudes-codex-welcome-greeting')) {
+    if (!welcomeEl.querySelector('.pocket-codex-welcome-greeting')) {
       renderWelcomeContent(welcomeEl, this.getGreeting());
     }
 
@@ -1137,12 +1137,12 @@ export class ConversationController {
   }
 
   // ============================================
-  // History Dropdown Rendering (for ClaudesCodexView)
+  // History Dropdown Rendering (for PocketCodexView)
   // ============================================
 
   /**
    * Renders the history dropdown content to a provided container.
-   * Used by ClaudesCodexView to render the dropdown with custom selection callback.
+   * Used by PocketCodexView to render the dropdown with custom selection callback.
    */
   renderHistoryDropdown(
     container: HTMLElement,

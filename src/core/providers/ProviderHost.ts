@@ -2,7 +2,7 @@ import type { App } from 'obsidian';
 
 import type { SharedAppStorage } from '../bootstrap/storage';
 import type { ChatRuntime } from '../runtime/ChatRuntime';
-import type { ClaudesCodexSettings } from '../types';
+import type { PocketCodexSettings } from '../types';
 import type { EnvironmentScope } from '../types/settings';
 import type { ProviderCliResolutionContext, ProviderId } from './types';
 
@@ -15,16 +15,16 @@ import type { ProviderCliResolutionContext, ProviderId } from './types';
  */
 export interface ProviderHost {
   readonly app: App;
-  readonly settings: ClaudesCodexSettings;
+  readonly settings: PocketCodexSettings;
   readonly storage: SharedAppStorage;
   readonly manifest?: { version?: string };
 
   saveSettings(): Promise<void>;
   mutateSettings(
-    mutation: (settings: ClaudesCodexSettings) => void | Promise<void>,
+    mutation: (settings: PocketCodexSettings) => void | Promise<void>,
   ): Promise<void>;
   mutateSettingsConditionally(
-    mutation: (settings: ClaudesCodexSettings) => boolean | Promise<boolean>,
+    mutation: (settings: PocketCodexSettings) => boolean | Promise<boolean>,
   ): Promise<void>;
   loadData(): Promise<unknown>;
   saveData(data: unknown): Promise<void>;

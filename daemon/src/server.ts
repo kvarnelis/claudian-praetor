@@ -1,5 +1,5 @@
 /**
- * claudes-codexd WebSocket server: hosts real ChatRuntime instances and speaks the
+ * pocket-codexd WebSocket server: hosts real ChatRuntime instances and speaks the
  * wire protocol in src/remote/protocol.ts.
  *
  * Runtimes survive client disconnects: each runtime host buffers its
@@ -17,13 +17,13 @@ import { ProviderRegistry } from '../../src/core/providers/ProviderRegistry';
 import type { ProviderId } from '../../src/core/providers/types';
 import type { ChatRuntime } from '../../src/core/runtime/ChatRuntime';
 import type { ChatTurnMetadata } from '../../src/core/runtime/types';
-import type { ClaudesCodexSettings, Conversation } from '../../src/core/types';
-import type ClaudesCodexPlugin from '../../src/main';
+import type { PocketCodexSettings, Conversation } from '../../src/core/types';
+import type PocketCodexPlugin from '../../src/main';
 import {
   type ClientMessage,
   generateId,
   type HistoryHydrateParams,
-  CLAUDES_CODEX_PROTOCOL_VERSION,
+  POCKET_CODEX_PROTOCOL_VERSION,
   preparedTurnToWire,
   PROXIED_RUNTIME_METHODS,
   type QueryEvent,
@@ -65,9 +65,9 @@ interface PendingCallback {
   timer: NodeJS.Timeout;
 }
 
-export interface ClaudesCodexServerOptions {
-  plugin: ClaudesCodexPlugin;
-  settings: ClaudesCodexSettings;
+export interface PocketCodexServerOptions {
+  plugin: PocketCodexPlugin;
+  settings: PocketCodexSettings;
   vaultPath: string;
   host: string;
   port: number;
@@ -75,7 +75,7 @@ export interface ClaudesCodexServerOptions {
   log: (message: string) => void;
 }
 
-export class ClaudesCodexServer {
+export class PocketCodexServer {
   private wss: WebSocketServer | null = null;
   private readonly hosts = new Map<string, RuntimeHost>();
   private readonly pendingCallbacks = new Map<number, PendingCallback>();
@@ -83,7 +83,7 @@ export class ClaudesCodexServer {
   private gcTimer: NodeJS.Timeout | null = null;
   private heartbeatTimer: NodeJS.Timeout | null = null;
 
-  constructor(private readonly options: ClaudesCodexServerOptions) {}
+  constructor(private readonly options: PocketCodexServerOptions) {}
 
   start(): Promise<void> {
     const { host, port, log } = this.options;
@@ -107,7 +107,7 @@ export class ClaudesCodexServer {
 
     return new Promise((resolve, reject) => {
       wss.once('listening', () => {
-        log(`[claudes-codexd] listening on ws://${host}:${port}`);
+        log(`[pocket-codexd] listening on ws://${host}:${port}`);
         resolve();
       });
       wss.once('error', reject);
@@ -161,7 +161,7 @@ export class ClaudesCodexServer {
           return;
         }
         clearTimeout(handshakeTimer);
-        if (msg.proto !== CLAUDES_CODEX_PROTOCOL_VERSION) {
+        if (msg.proto !== POCKET_CODEX_PROTOCOL_VERSION) {
           this.send(socket, { t: 'hello.err', error: 'protocol version mismatch' });
           socket.close();
           return;
@@ -181,7 +181,7 @@ export class ClaudesCodexServer {
         meta.authed = true;
         this.send(socket, {
           t: 'hello.ok',
-          proto: CLAUDES_CODEX_PROTOCOL_VERSION,
+          proto: POCKET_CODEX_PROTOCOL_VERSION,
           daemonVersion: DAEMON_VERSION,
           vaultPath: this.options.vaultPath,
           vaultName: path.basename(this.options.vaultPath),
@@ -189,7 +189,7 @@ export class ClaudesCodexServer {
             this.options.settings as unknown as Record<string, unknown>,
           ),
         });
-        log(authorization.paired ? '[claudes-codexd] paired and connected client' : '[claudes-codexd] client connected');
+        log(authorization.paired ? '[pocket-codexd] paired and connected client' : '[pocket-codexd] client connected');
         return;
       }
 
@@ -305,7 +305,7 @@ export class ClaudesCodexServer {
     };
     this.hosts.set(host.runtimeId, host);
     this.wireRuntimeCallbacks(host);
-    this.options.log(`[claudes-codexd] runtime created: ${host.runtimeId} (${providerId})`);
+    this.options.log(`[pocket-codexd] runtime created: ${host.runtimeId} (${providerId})`);
 
     return { runtimeId: host.runtimeId, state: this.snapshot(host, { consume: false }) };
   }
@@ -562,7 +562,7 @@ export class ClaudesCodexServer {
         } catch {
           // disposed anyway
         }
-        this.options.log(`[claudes-codexd] disposed orphaned runtime ${runtimeId}`);
+        this.options.log(`[pocket-codexd] disposed orphaned runtime ${runtimeId}`);
       }
     }
   }

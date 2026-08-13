@@ -19,7 +19,7 @@ class GrokAuxQueryRunner implements AuxQueryRunner {
   async query(config: AuxQueryConfig, prompt: string): Promise<string> {
     const cliPath = await this.plugin.getResolvedProviderCliPath('grok');
     if (!cliPath) {
-      throw new Error("Grok CLI not found. Install Grok Build or set the Grok CLI path in Claude's Codex settings.");
+      throw new Error("Grok CLI not found. Install Grok Build or set the Grok CLI path in Pocket Codex settings.");
     }
 
     this.abortController = config.abortController || new AbortController();

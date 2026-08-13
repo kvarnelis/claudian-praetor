@@ -1,4 +1,4 @@
-import type { ClaudesCodexSettings } from '@/core/types/settings';
+import type { PocketCodexSettings } from '@/core/types/settings';
 import type { QueryOptionsContext } from '@/providers/claude/runtime/ClaudeQueryOptionsBuilder';
 import { QueryOptionsBuilder } from '@/providers/claude/runtime/ClaudeQueryOptionsBuilder';
 import type { PersistentQueryConfig } from '@/providers/claude/runtime/types';
@@ -34,7 +34,7 @@ function createMockPluginManager() {
 }
 
 // Create a mock settings object
-function createMockSettings(overrides: Partial<ClaudesCodexSettings> = {}): ClaudesCodexSettings {
+function createMockSettings(overrides: Partial<PocketCodexSettings> = {}): PocketCodexSettings {
   return {
     permissions: [],
     permissionMode: 'yolo',
@@ -57,7 +57,7 @@ function createMockSettings(overrides: Partial<ClaudesCodexSettings> = {}): Clau
     claudeCliPath: '',
     enableChrome: false,
     ...overrides,
-  } as ClaudesCodexSettings;
+  } as PocketCodexSettings;
 }
 
 function createMockPersistentQueryConfig(

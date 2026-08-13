@@ -143,8 +143,8 @@ describe('utils.ts', () => {
   });
 
   describe('expandHomePath', () => {
-    const envKey = 'CLAUDES_CODEX_TEST_PATH';
-    const envValue = path.join(os.tmpdir(), 'claudes-codex-env');
+    const envKey = 'POCKET_CODEX_TEST_PATH';
+    const envValue = path.join(os.tmpdir(), 'pocket-codex-env');
     let originalValue: string | undefined;
 
     beforeEach(() => {
@@ -183,8 +183,8 @@ describe('utils.ts', () => {
     });
 
     it('should leave unknown environment variables untouched', () => {
-      expect(expandHomePath('%CLAUDES_CODEX_MISSING_VAR%')).toBe('%CLAUDES_CODEX_MISSING_VAR%');
-      expect(expandHomePath('$CLAUDES_CODEX_MISSING_VAR')).toBe('$CLAUDES_CODEX_MISSING_VAR');
+      expect(expandHomePath('%POCKET_CODEX_MISSING_VAR%')).toBe('%POCKET_CODEX_MISSING_VAR%');
+      expect(expandHomePath('$POCKET_CODEX_MISSING_VAR')).toBe('$POCKET_CODEX_MISSING_VAR');
     });
   });
 
@@ -201,12 +201,12 @@ describe('utils.ts', () => {
     });
 
     it('expands environment variables before filesystem use', () => {
-      const envKey = 'CLAUDES_CODEX_FS_TEST_PATH';
+      const envKey = 'POCKET_CODEX_FS_TEST_PATH';
       const originalValue = process.env[envKey];
-      process.env[envKey] = '/tmp/claudes-codex-test';
+      process.env[envKey] = '/tmp/pocket-codex-test';
 
       try {
-        expect(normalizePathForFilesystem(`$${envKey}/notes/file.md`)).toBe('/tmp/claudes-codex-test/notes/file.md');
+        expect(normalizePathForFilesystem(`$${envKey}/notes/file.md`)).toBe('/tmp/pocket-codex-test/notes/file.md');
       } finally {
         if (originalValue === undefined) {
           delete process.env[envKey];
@@ -245,7 +245,7 @@ describe('utils.ts', () => {
     });
 
     it('handles chained home and environment variable expansions', () => {
-      const envKey = 'CLAUDES_CODEX_TEST_SUBDIR';
+      const envKey = 'POCKET_CODEX_TEST_SUBDIR';
       const originalValue = process.env[envKey];
       process.env[envKey] = 'project';
 

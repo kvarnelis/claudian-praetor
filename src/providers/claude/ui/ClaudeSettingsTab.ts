@@ -58,7 +58,7 @@ export const claudeSettingsTabRenderer: ProviderSettingsTabRenderer = {
       .setDesc(cliPathDescription);
 
     const validationEl = container.createDiv({
-      cls: 'claudes-codex-cli-path-validation claudes-codex-setting-validation claudes-codex-setting-validation-error claudes-codex-hidden',
+      cls: 'pocket-codex-cli-path-validation pocket-codex-setting-validation pocket-codex-setting-validation-error pocket-codex-hidden',
     });
 
     const validatePath = (value: string): string | null => {
@@ -81,16 +81,16 @@ export const claudeSettingsTabRenderer: ProviderSettingsTabRenderer = {
       const error = validatePath(value);
       if (error) {
         validationEl.setText(error);
-        validationEl.toggleClass('claudes-codex-hidden', false);
+        validationEl.toggleClass('pocket-codex-hidden', false);
         if (inputEl) {
-          inputEl.toggleClass('claudes-codex-input-error', true);
+          inputEl.toggleClass('pocket-codex-input-error', true);
         }
         return false;
       }
 
-      validationEl.toggleClass('claudes-codex-hidden', true);
+      validationEl.toggleClass('pocket-codex-hidden', true);
       if (inputEl) {
-        inputEl.toggleClass('claudes-codex-input-error', false);
+        inputEl.toggleClass('pocket-codex-input-error', false);
       }
       return true;
     };
@@ -131,7 +131,7 @@ export const claudeSettingsTabRenderer: ProviderSettingsTabRenderer = {
         .onChange(async (value) => {
           await persistCliPath(value);
         });
-      text.inputEl.addClass('claudes-codex-settings-cli-path-input');
+      text.inputEl.addClass('pocket-codex-settings-cli-path-input');
       cliPathInputEl = text.inputEl;
 
       updateCliPathValidation(currentValue, text.inputEl);
@@ -216,7 +216,7 @@ export const claudeSettingsTabRenderer: ProviderSettingsTabRenderer = {
 
     new Setting(container).setName(t('settings.slashCommands.name')).setHeading();
 
-    const slashCommandsDesc = container.createDiv({ cls: 'claudes-codex-sp-settings-desc' });
+    const slashCommandsDesc = container.createDiv({ cls: 'pocket-codex-sp-settings-desc' });
     const descP = slashCommandsDesc.createEl('p', { cls: 'setting-item-description' });
     descP.appendText(t('settings.slashCommands.desc') + ' ');
     descP.createEl('a', {
@@ -224,7 +224,7 @@ export const claudeSettingsTabRenderer: ProviderSettingsTabRenderer = {
       href: 'https://code.claude.com/docs/en/skills',
     });
 
-    const slashCommandsContainer = container.createDiv({ cls: 'claudes-codex-slash-commands-container' });
+    const slashCommandsContainer = container.createDiv({ cls: 'pocket-codex-slash-commands-container' });
     new SlashCommandSettings(
       slashCommandsContainer,
       context.plugin.app,
@@ -241,13 +241,13 @@ export const claudeSettingsTabRenderer: ProviderSettingsTabRenderer = {
 
     new Setting(container).setName(t('settings.subagents.name')).setHeading();
 
-    const agentsDesc = container.createDiv({ cls: 'claudes-codex-sp-settings-desc' });
+    const agentsDesc = container.createDiv({ cls: 'pocket-codex-sp-settings-desc' });
     agentsDesc.createEl('p', {
       text: t('settings.subagents.desc'),
       cls: 'setting-item-description',
     });
 
-    const agentsContainer = container.createDiv({ cls: 'claudes-codex-agents-container' });
+    const agentsContainer = container.createDiv({ cls: 'pocket-codex-agents-container' });
     new AgentSettings(agentsContainer, {
       app: context.plugin.app,
       agentManager: claudeWorkspace.agentManager,
@@ -258,13 +258,13 @@ export const claudeSettingsTabRenderer: ProviderSettingsTabRenderer = {
 
     new Setting(container).setName(t('settings.mcpServers.name')).setHeading();
 
-    const mcpDesc = container.createDiv({ cls: 'claudes-codex-mcp-settings-desc' });
+    const mcpDesc = container.createDiv({ cls: 'pocket-codex-mcp-settings-desc' });
     mcpDesc.createEl('p', {
       text: t('settings.mcpServers.desc'),
       cls: 'setting-item-description',
     });
 
-    const mcpContainer = container.createDiv({ cls: 'claudes-codex-mcp-container' });
+    const mcpContainer = container.createDiv({ cls: 'pocket-codex-mcp-container' });
     new McpSettingsManager(mcpContainer, {
       app: context.plugin.app,
       mcpStorage: claudeWorkspace.mcpStorage,
@@ -279,13 +279,13 @@ export const claudeSettingsTabRenderer: ProviderSettingsTabRenderer = {
 
     new Setting(container).setName(t('settings.plugins.name')).setHeading();
 
-    const pluginsDesc = container.createDiv({ cls: 'claudes-codex-plugin-settings-desc' });
+    const pluginsDesc = container.createDiv({ cls: 'pocket-codex-plugin-settings-desc' });
     pluginsDesc.createEl('p', {
       text: t('settings.plugins.desc'),
       cls: 'setting-item-description',
     });
 
-    const pluginsContainer = container.createDiv({ cls: 'claudes-codex-plugins-container' });
+    const pluginsContainer = container.createDiv({ cls: 'pocket-codex-plugins-container' });
     new PluginSettingsManager(pluginsContainer, {
       pluginManager: claudeWorkspace.pluginManager,
       agentManager: claudeWorkspace.agentManager,
@@ -333,13 +333,13 @@ export const claudeSettingsTabRenderer: ProviderSettingsTabRenderer = {
         toggle
           .setValue(claudeSettings.enableBangBash)
           .onChange(async (value) => {
-            bangBashValidationEl.toggleClass('claudes-codex-hidden', true);
+            bangBashValidationEl.toggleClass('pocket-codex-hidden', true);
             if (value) {
               const { findNodeExecutable, getEnhancedPath } = await import('../../../utils/env');
               const nodePath = findNodeExecutable(getEnhancedPath());
               if (!nodePath) {
                 bangBashValidationEl.setText(t('settings.enableBangBash.validation.noNode'));
-                bangBashValidationEl.toggleClass('claudes-codex-hidden', false);
+                bangBashValidationEl.toggleClass('pocket-codex-hidden', false);
                 toggle.setValue(false);
                 return;
               }
@@ -351,7 +351,7 @@ export const claudeSettingsTabRenderer: ProviderSettingsTabRenderer = {
       );
 
     const bangBashValidationEl = container.createDiv({
-      cls: 'claudes-codex-bang-bash-validation claudes-codex-setting-validation claudes-codex-setting-validation-error claudes-codex-hidden',
+      cls: 'pocket-codex-bang-bash-validation pocket-codex-setting-validation pocket-codex-setting-validation-error pocket-codex-hidden',
     });
   },
 };

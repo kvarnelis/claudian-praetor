@@ -23,7 +23,7 @@ function emptyElement(container: HTMLElement): void {
 }
 
 function appendFallback(container: HTMLElement, markdown: string): void {
-  container.createDiv({ cls: 'claudes-codex-inline-markdown-fallback', text: markdown });
+  container.createDiv({ cls: 'pocket-codex-inline-markdown-fallback', text: markdown });
 }
 
 export async function renderInlineEditMarkdownPreview({

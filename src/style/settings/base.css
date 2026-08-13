@@ -1,13 +1,13 @@
 /* ── Settings tab navigation ── */
 
-.claudes-codex-settings-tabs {
+.pocket-codex-settings-tabs {
   display: flex;
   gap: 2px;
   border-bottom: 1px solid var(--background-modifier-border);
   margin-bottom: 16px;
 }
 
-.claudes-codex-settings-tab {
+.pocket-codex-settings-tab {
   padding: 8px 16px;
   border: none;
   background: transparent;
@@ -20,25 +20,25 @@
   margin-bottom: -1px;
 }
 
-.claudes-codex-settings-tab:hover {
+.pocket-codex-settings-tab:hover {
   color: var(--text-normal);
 }
 
-.claudes-codex-settings-tab--active {
+.pocket-codex-settings-tab--active {
   color: var(--text-normal);
   border-bottom-color: var(--interactive-accent);
 }
 
-.claudes-codex-settings-tab-content {
+.pocket-codex-settings-tab-content {
   display: none;
 }
 
-.claudes-codex-settings-tab-content--active {
+.pocket-codex-settings-tab-content--active {
   display: block;
 }
 
 /* Codex placeholder */
-.claudes-codex-settings-codex-placeholder {
+.pocket-codex-settings-codex-placeholder {
   padding: 40px 20px;
   text-align: center;
   color: var(--text-muted);
@@ -46,39 +46,39 @@
 }
 
 /* Settings page - remove separator lines from setting items */
-.claudes-codex-settings .setting-item {
+.pocket-codex-settings .setting-item {
   border-top: none;
 }
 
 /* Settings section headings (via setHeading()) */
-.claudes-codex-settings .setting-item-heading {
+.pocket-codex-settings .setting-item-heading {
   padding-top: 18px;
   margin-top: 12px;
   border-top: 1px solid var(--background-modifier-border);
 }
 
-.claudes-codex-settings .setting-item-heading:first-child {
+.pocket-codex-settings .setting-item-heading:first-child {
   padding-top: 0;
   margin-top: 0;
   border-top: none;
 }
 
-.claudes-codex-settings .setting-item-heading .setting-item-name {
+.pocket-codex-settings .setting-item-heading .setting-item-name {
   font-size: var(--font-ui-medium);
   font-weight: var(--font-semibold);
   color: var(--text-normal);
 }
 
 /* Custom section descriptions - align with items */
-.claudes-codex-sp-settings-desc,
-.claudes-codex-mcp-settings-desc,
-.claudes-codex-plugin-settings-desc,
-.claudes-codex-approved-desc {
+.pocket-codex-sp-settings-desc,
+.pocket-codex-mcp-settings-desc,
+.pocket-codex-plugin-settings-desc,
+.pocket-codex-approved-desc {
   padding: 0 12px;
 }
 
 /* Unified icon action buttons for settings */
-.claudes-codex-settings-action-btn {
+.pocket-codex-settings-action-btn {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -93,51 +93,51 @@
   transition: background 0.15s ease, color 0.15s ease;
 }
 
-.claudes-codex-settings-action-btn:hover {
+.pocket-codex-settings-action-btn:hover {
   background: var(--background-modifier-hover);
   color: var(--text-normal);
 }
 
-.claudes-codex-settings-action-btn svg {
+.pocket-codex-settings-action-btn svg {
   width: 14px;
   height: 14px;
 }
 
-.claudes-codex-settings-delete-btn:hover {
+.pocket-codex-settings-delete-btn:hover {
   color: var(--text-error);
 }
 
-.claudes-codex-setting-validation {
+.pocket-codex-setting-validation {
   font-size: var(--font-ui-smaller);
   margin-top: -0.5em;
   margin-bottom: 0.5em;
 }
 
-.claudes-codex-setting-validation-error {
+.pocket-codex-setting-validation-error {
   color: var(--text-error);
 }
 
-.claudes-codex-setting-validation-warning {
+.pocket-codex-setting-validation-warning {
   color: var(--text-warning);
 }
 
-.claudes-codex-settings-cli-path-input {
+.pocket-codex-settings-cli-path-input {
   width: 100%;
 }
 
-.claudes-codex-settings-cli-path-input.claudes-codex-input-error {
+.pocket-codex-settings-cli-path-input.pocket-codex-input-error {
   border-color: var(--text-error);
 }
 
 /* Hotkey grid - 3 columns */
-.claudes-codex-hotkey-grid {
+.pocket-codex-hotkey-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 4px 12px;
   padding: 4px 0;
 }
 
-.claudes-codex-hotkey-item {
+.pocket-codex-hotkey-item {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -146,17 +146,17 @@
   border-radius: 6px;
 }
 
-.claudes-codex-hotkey-item:hover {
+.pocket-codex-hotkey-item:hover {
   background: var(--background-modifier-hover);
 }
 
-.claudes-codex-hotkey-name {
+.pocket-codex-hotkey-name {
   flex: 1;
   color: var(--text-normal);
   font-size: var(--font-ui-small);
 }
 
-.claudes-codex-hotkey-badge {
+.pocket-codex-hotkey-badge {
   color: var(--text-muted);
   font-size: var(--font-ui-smaller);
   background: var(--background-modifier-hover);
@@ -166,13 +166,13 @@
 }
 
 /* Media folder input width */
-.claudes-codex-settings-media-input {
+.pocket-codex-settings-media-input {
   width: 200px;
 }
 
 /* ── Shared settings panel layout (used by slash-settings + agent-settings) ── */
 
-.claudes-codex-sp-header {
+.pocket-codex-sp-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -180,18 +180,18 @@
   padding: 0 12px;
 }
 
-.claudes-codex-sp-label {
+.pocket-codex-sp-label {
   font-size: var(--font-ui-small);
   color: var(--text-muted);
   font-weight: var(--font-medium);
 }
 
-.claudes-codex-sp-header-actions {
+.pocket-codex-sp-header-actions {
   display: flex;
   gap: 4px;
 }
 
-.claudes-codex-sp-empty-state {
+.pocket-codex-sp-empty-state {
   padding: 20px;
   text-align: center;
   color: var(--text-muted);
@@ -200,14 +200,14 @@
   margin-top: 8px;
 }
 
-.claudes-codex-sp-list {
+.pocket-codex-sp-list {
   display: flex;
   flex-direction: column;
   gap: 8px;
   margin-top: 8px;
 }
 
-.claudes-codex-sp-item {
+.pocket-codex-sp-item {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
@@ -216,48 +216,48 @@
   border-radius: 6px;
 }
 
-.claudes-codex-sp-item:hover {
+.pocket-codex-sp-item:hover {
   background: var(--background-modifier-hover);
 }
 
-.claudes-codex-sp-info {
+.pocket-codex-sp-info {
   flex: 1;
   min-width: 0;
 }
 
-.claudes-codex-sp-item-header {
+.pocket-codex-sp-item-header {
   display: flex;
   align-items: baseline;
   gap: 8px;
 }
 
-.claudes-codex-sp-item-name {
+.pocket-codex-sp-item-name {
   font-weight: 600;
   font-family: var(--font-monospace);
   color: var(--text-normal);
 }
 
-.claudes-codex-sp-item-desc {
+.pocket-codex-sp-item-desc {
   font-size: 13px;
   color: var(--text-muted);
   margin-top: 2px;
 }
 
-.claudes-codex-sp-item-actions {
+.pocket-codex-sp-item-actions {
   display: flex;
   gap: 4px;
   margin-left: 16px;
   flex-shrink: 0;
 }
 
-.claudes-codex-sp-advanced-section {
+.pocket-codex-sp-advanced-section {
   border: 1px solid var(--background-modifier-border);
   border-radius: 6px;
   padding: 0 12px;
   margin: 8px 0;
 }
 
-.claudes-codex-sp-advanced-summary {
+.pocket-codex-sp-advanced-summary {
   cursor: pointer;
   padding: 8px 0;
   font-size: var(--font-ui-small);
@@ -265,16 +265,16 @@
   font-weight: var(--font-medium);
 }
 
-.claudes-codex-sp-advanced-section[open] .claudes-codex-sp-advanced-summary {
+.pocket-codex-sp-advanced-section[open] .pocket-codex-sp-advanced-summary {
   margin-bottom: 4px;
 }
 
-.claudes-codex-sp-modal .modal-content {
+.pocket-codex-sp-modal .modal-content {
   max-width: 600px;
   width: auto;
 }
 
-.claudes-codex-sp-content-area {
+.pocket-codex-sp-content-area {
   width: 100%;
   font-family: var(--font-monospace);
   font-size: 13px;
@@ -287,12 +287,12 @@
   margin-top: 8px;
 }
 
-.claudes-codex-sp-content-area:focus {
+.pocket-codex-sp-content-area:focus {
   outline: none;
   border-color: var(--interactive-accent);
 }
 
-.claudes-codex-sp-modal-buttons {
+.pocket-codex-sp-modal-buttons {
   display: flex;
   gap: 8px;
   margin-top: 16px;

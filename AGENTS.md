@@ -2,7 +2,7 @@
 
 ## Project
 
-Claude's Codex is an independently maintained Obsidian plugin that embeds provider-backed coding agents in a sidebar and inline-edit flow. Claude is the default provider. Codex and Grok are optional providers that plug into the same conversation model through `Conversation.providerId` and opaque provider-owned `providerState`.
+Pocket Codex is an independently maintained Obsidian plugin that embeds provider-backed coding agents in a sidebar and inline-edit flow. Claude is the default provider. Codex and Grok are optional providers that plug into the same conversation model through `Conversation.providerId` and opaque provider-owned `providerState`.
 
 Do not assume provider parity. Check each provider's `capabilities.ts`, `registration.ts`, and UI config before wiring shared behavior.
 
@@ -65,10 +65,10 @@ The feature layer depends on `core/` contracts, not provider internals. Provider
 
 | Path | Contents |
 | --- | --- |
-| `.claudian/claudian-settings.json` | Shared Claude's Codex settings and provider-specific configuration |
+| `.claudian/claudian-settings.json` | Shared Pocket Codex settings and provider-specific configuration |
 | `.claudian/sessions/*.meta.json` | Provider-neutral session metadata |
 | `.claude/settings.json` | Claude Code-compatible project settings, permissions, and plugin overrides |
-| `.claude/mcp.json` | Claude's Codex-managed MCP servers for Claude |
+| `.claude/mcp.json` | Pocket Codex-managed MCP servers for Claude |
 | `.claude/commands/**/*.md` | Claude slash commands |
 | `.claude/skills/*/SKILL.md` | Claude skills |
 | `.claude/agents/*.md` | Claude vault agents |
@@ -79,7 +79,7 @@ The feature layer depends on `core/` contracts, not provider internals. Provider
 | `~/.codex/sessions/**/*.jsonl` | Codex-native transcripts |
 
 The `.claudian/` names are deliberate compatibility paths inherited from
-Claudian. Do not rename or migrate them: Claude's Codex must continue reading existing
+Claudian. Do not rename or migrate them: Pocket Codex must continue reading existing
 vault settings and sessions in place.
 
 ## Development Rules

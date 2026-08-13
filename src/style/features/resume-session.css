@@ -1,5 +1,5 @@
 /* Resume Session Dropdown */
-.claudes-codex-resume-dropdown {
+.pocket-codex-resume-dropdown {
   display: none;
   position: absolute;
   bottom: 100%;
@@ -17,11 +17,11 @@
   overflow: hidden;
 }
 
-.claudes-codex-resume-dropdown.visible {
+.pocket-codex-resume-dropdown.visible {
   display: block;
 }
 
-.claudes-codex-resume-header {
+.pocket-codex-resume-header {
   padding: 8px 12px;
   font-size: 12px;
   font-weight: 600;
@@ -31,19 +31,19 @@
   border-bottom: 1px solid var(--background-modifier-border);
 }
 
-.claudes-codex-resume-list {
+.pocket-codex-resume-list {
   max-height: 350px;
   overflow-y: auto;
 }
 
-.claudes-codex-resume-empty {
+.pocket-codex-resume-empty {
   padding: 16px;
   text-align: center;
   color: var(--text-muted);
   font-size: 13px;
 }
 
-.claudes-codex-resume-item {
+.pocket-codex-resume-item {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -53,43 +53,43 @@
   transition: background 0.1s ease;
 }
 
-.claudes-codex-resume-item:last-child {
+.pocket-codex-resume-item:last-child {
   border-bottom: none;
 }
 
-.claudes-codex-resume-item:hover,
-.claudes-codex-resume-item.selected {
+.pocket-codex-resume-item:hover,
+.pocket-codex-resume-item.selected {
   background: var(--background-modifier-hover);
 }
 
-.claudes-codex-resume-item.current {
+.pocket-codex-resume-item.current {
   background: var(--background-secondary);
   border-inline-start: 2px solid var(--interactive-accent);
   padding-inline-start: 10px;
 }
 
-.claudes-codex-resume-item-icon {
+.pocket-codex-resume-item-icon {
   display: flex;
   align-items: center;
   color: var(--text-muted);
   flex-shrink: 0;
 }
 
-.claudes-codex-resume-item-icon svg {
+.pocket-codex-resume-item-icon svg {
   width: 16px;
   height: 16px;
 }
 
-.claudes-codex-resume-item.current .claudes-codex-resume-item-icon {
+.pocket-codex-resume-item.current .pocket-codex-resume-item-icon {
   color: var(--interactive-accent);
 }
 
-.claudes-codex-resume-item-content {
+.pocket-codex-resume-item-content {
   flex: 1;
   min-width: 0;
 }
 
-.claudes-codex-resume-item-title {
+.pocket-codex-resume-item-title {
   font-size: 13px;
   font-weight: 500;
   color: var(--text-normal);
@@ -98,22 +98,22 @@
   text-overflow: ellipsis;
 }
 
-.claudes-codex-resume-item-date {
+.pocket-codex-resume-item-date {
   font-size: 11px;
   color: var(--text-faint);
   margin-top: 2px;
 }
 
 /* Scrollbar */
-.claudes-codex-resume-list::-webkit-scrollbar {
+.pocket-codex-resume-list::-webkit-scrollbar {
   width: 6px;
 }
 
-.claudes-codex-resume-list::-webkit-scrollbar-track {
+.pocket-codex-resume-list::-webkit-scrollbar-track {
   background: transparent;
 }
 
-.claudes-codex-resume-list::-webkit-scrollbar-thumb {
+.pocket-codex-resume-list::-webkit-scrollbar-thumb {
   background: var(--background-modifier-border);
   border-radius: 3px;
 }

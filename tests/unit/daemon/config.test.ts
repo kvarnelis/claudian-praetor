@@ -10,7 +10,7 @@ describe('daemon config pairing', () => {
   let configPath: string;
 
   beforeEach(() => {
-    tempRoot = mkdtempSync(path.join(os.tmpdir(), 'claudes-codex-daemon-'));
+    tempRoot = mkdtempSync(path.join(os.tmpdir(), 'pocket-codex-daemon-'));
     vaultPath = path.join(tempRoot, 'vault');
     configPath = path.join(tempRoot, 'daemon.json');
     mkdirSync(vaultPath);
@@ -63,7 +63,7 @@ describe('daemon config pairing', () => {
       remoteAddress: '100.64.1.20',
     })).toEqual({
       ok: false,
-      reason: "device not paired; open pairing in Claude's Codex settings on your Mac",
+      reason: "device not paired; open pairing in Pocket Codex settings on your Mac",
     });
   });
 

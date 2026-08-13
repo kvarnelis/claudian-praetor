@@ -10,20 +10,20 @@ export {
   type SessionMetadata,
   type StreamChunk,
   type UsageInfo,
-  VIEW_TYPE_CLAUDES_CODEX,
+  VIEW_TYPE_POCKET_CODEX,
 } from './chat';
 export { type ProviderId } from './provider';
 
 // Settings and command types
 export {
   type ApprovalDecision,
-  type ClaudesCodexSettings,
   type EnvironmentScope,
   type EnvSnippet,
   type HostnameCliPaths,
   type InstructionRefineResult,
   type KeyboardNavigationSettings,
   type PermissionMode,
+  type PocketCodexSettings,
   type SlashCommand,
 } from './settings';
 

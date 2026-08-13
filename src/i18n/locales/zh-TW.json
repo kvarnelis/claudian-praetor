@@ -70,7 +70,7 @@
     }
   },
   "settings": {
-    "title": "Claude's Codex 設定",
+    "title": "Pocket Codex 設定",
     "tabs": {
       "general": "一般",
       "claude": "Claude",
@@ -84,7 +84,7 @@
     "models": "模型",
     "experimental": "實驗性功能",
     "userName": {
-      "name": "Claude's Codex 應該如何稱呼您？",
+      "name": "Pocket Codex 應該如何稱呼您？",
       "desc": "用於個人化問候的使用者名稱（留空使用通用問候）"
     },
     "excludedTags": {
@@ -158,7 +158,7 @@
     },
     "hiddenSlashCommands": {
       "name": "隱藏命令與技能",
-      "desc": "從下拉選單中隱藏特定的命令與技能。適用於隱藏與 Claude's Codex 無關的 Claude Code 項目。每行輸入一個名稱，無需前導斜線。",
+      "desc": "從下拉選單中隱藏特定的命令與技能。適用於隱藏與 Pocket Codex 無關的 Claude Code 項目。每行輸入一個名稱，無需前導斜線。",
       "placeholder": "commit\nbuild\ntest"
     },
     "mcpServers": {
@@ -279,7 +279,7 @@
     },
     "useThemeNativeAppearance": {
       "name": "符合 Obsidian 側邊欄樣式",
-      "desc": "在 Claude's Codex 中使用目前主題的介面字型、較小字級與柔和的側邊欄顏色。"
+      "desc": "在 Pocket Codex 中使用目前主題的介面字型、較小字級與柔和的側邊欄顏色。"
     },
     "enableAutoScroll": {
       "name": "串流傳輸時自動捲動",
@@ -294,7 +294,7 @@
       "desc": "Write 和 Edit diff 首次出現時以展開狀態顯示。"
     },
     "chatViewPlacement": {
-      "name": "Claude's Codex 開啟位置",
+      "name": "Pocket Codex 開啟位置",
       "desc": "選擇新建聊天面板時的開啟位置",
       "rightSidebar": "右側邊欄",
       "leftSidebar": "左側邊欄",
@@ -321,7 +321,7 @@
       },
       "installationMethod": {
         "name": "安裝方式",
-        "desc": "Claude's Codex 在 Windows 上啟動 Codex 的方式。原生 Windows 使用 Windows 可執行檔路徑；WSL 會在所選發行版內啟動 Linux CLI。",
+        "desc": "Pocket Codex 在 Windows 上啟動 Codex 的方式。原生 Windows 使用 Windows 可執行檔路徑；WSL 會在所選發行版內啟動 Linux CLI。",
         "nativeWindows": "原生 Windows",
         "wsl": "WSL"
       },
@@ -368,7 +368,7 @@
       },
       "mcp": {
         "descBeforeCommand": "Codex 透過自己的 CLI 管理 MCP 伺服器。請使用 ",
-        "descAfterCommand": " 進行設定，它們會在 Claude's Codex 中可用。",
+        "descAfterCommand": " 進行設定，它們會在 Pocket Codex 中可用。",
         "learnMore": "了解更多"
       },
       "environment": {

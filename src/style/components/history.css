@@ -1,9 +1,9 @@
-.claudes-codex-history-container {
+.pocket-codex-history-container {
   position: static;
 }
 
 /* History dropup menu (opens upward since it's at bottom of view) */
-.claudes-codex-history-menu {
+.pocket-codex-history-menu {
   display: none;
   position: absolute;
   bottom: 100%;
@@ -21,11 +21,11 @@
   inset-inline-end: 0;
 }
 
-.claudes-codex-history-menu.visible {
+.pocket-codex-history-menu.visible {
   display: block;
 }
 
-.claudes-codex-history-header {
+.pocket-codex-history-header {
   padding: 8px 12px;
   font-size: 12px;
   font-weight: 600;
@@ -35,19 +35,19 @@
   border-bottom: 1px solid var(--background-modifier-border);
 }
 
-.claudes-codex-history-list {
+.pocket-codex-history-list {
   max-height: 350px;
   overflow-y: auto;
 }
 
-.claudes-codex-history-empty {
+.pocket-codex-history-empty {
   padding: 16px;
   text-align: center;
   color: var(--text-muted);
   font-size: 13px;
 }
 
-.claudes-codex-history-item {
+.pocket-codex-history-item {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -56,86 +56,86 @@
   transition: background 0.15s ease;
 }
 
-.claudes-codex-history-item-icon {
+.pocket-codex-history-item-icon {
   display: flex;
   align-items: center;
   color: var(--text-muted);
   flex-shrink: 0;
 }
 
-.claudes-codex-history-item-icon svg {
+.pocket-codex-history-item-icon svg {
   width: 16px;
   height: 16px;
 }
 
-.claudes-codex-history-item:last-child {
+.pocket-codex-history-item:last-child {
   border-bottom: none;
 }
 
-.claudes-codex-history-item:hover {
+.pocket-codex-history-item:hover {
   background: var(--background-modifier-hover);
 }
 
-.claudes-codex-history-item.active {
+.pocket-codex-history-item.active {
   background: var(--background-modifier-hover);
   border-inline-start: 2px solid var(--interactive-accent);
   padding-inline-start: 10px;
 }
 
-.claudes-codex-history-item.active:hover {
+.pocket-codex-history-item.active:hover {
   background: var(--background-modifier-active-hover, var(--background-modifier-hover));
 }
 
-.claudes-codex-history-item.active .claudes-codex-history-item-icon {
+.pocket-codex-history-item.active .pocket-codex-history-item-icon {
   color: var(--interactive-accent);
 }
 
-.claudes-codex-history-item.active .claudes-codex-history-item-content {
+.pocket-codex-history-item.active .pocket-codex-history-item-content {
   cursor: default;
 }
 
-.claudes-codex-history-item.active .claudes-codex-history-item-date {
+.pocket-codex-history-item.active .pocket-codex-history-item-date {
   color: var(--text-faint);
 }
 
-.claudes-codex-history-item.open {
+.pocket-codex-history-item.open {
   background: var(--background-modifier-hover);
   border-inline-start: 2px solid var(--interactive-accent);
   padding-inline-start: 10px;
 }
 
-.claudes-codex-history-item.open:hover {
+.pocket-codex-history-item.open:hover {
   background: var(--background-modifier-active-hover, var(--background-modifier-hover));
 }
 
-.claudes-codex-history-item.open .claudes-codex-history-item-icon {
+.pocket-codex-history-item.open .pocket-codex-history-item-icon {
   color: var(--interactive-accent);
 }
 
-.claudes-codex-history-item.open .claudes-codex-history-item-date {
+.pocket-codex-history-item.open .pocket-codex-history-item-date {
   color: var(--text-muted);
 }
 
-.claudes-codex-history-item.running .claudes-codex-history-item-icon {
+.pocket-codex-history-item.running .pocket-codex-history-item-icon {
   color: var(--interactive-accent);
 }
 
-.claudes-codex-history-item.running .claudes-codex-history-item-icon svg {
+.pocket-codex-history-item.running .pocket-codex-history-item-icon svg {
   animation: spin 1s linear infinite;
 }
 
-.claudes-codex-history-item.running .claudes-codex-history-item-date {
+.pocket-codex-history-item.running .pocket-codex-history-item-date {
   color: var(--interactive-accent);
   font-weight: 500;
 }
 
-.claudes-codex-history-item-content {
+.pocket-codex-history-item-content {
   flex: 1;
   min-width: 0;
   cursor: pointer;
 }
 
-.claudes-codex-history-item-title {
+.pocket-codex-history-item-title {
   font-size: 13px;
   font-weight: 500;
   color: var(--text-normal);
@@ -144,13 +144,13 @@
   text-overflow: ellipsis;
 }
 
-.claudes-codex-history-item-date {
+.pocket-codex-history-item-date {
   font-size: 11px;
   color: var(--text-faint);
   margin-top: 2px;
 }
 
-.claudes-codex-history-item-actions {
+.pocket-codex-history-item-actions {
   display: flex;
   gap: 4px;
   margin-inline-start: 8px;
@@ -158,15 +158,15 @@
   transition: opacity 0.15s ease;
 }
 
-.claudes-codex-history-item:hover .claudes-codex-history-item-actions {
+.pocket-codex-history-item:hover .pocket-codex-history-item-actions {
   opacity: 1;
 }
 
-.claudes-codex-history-item:focus-within .claudes-codex-history-item-actions {
+.pocket-codex-history-item:focus-within .pocket-codex-history-item-actions {
   opacity: 1;
 }
 
-.claudes-codex-action-btn {
+.pocket-codex-action-btn {
   background: transparent;
   border: none;
   cursor: pointer;
@@ -176,25 +176,25 @@
   transition: background 0.15s ease, color 0.15s ease;
 }
 
-.claudes-codex-action-btn:hover {
+.pocket-codex-action-btn:hover {
   background: var(--background-modifier-hover);
   color: var(--text-normal);
 }
 
-.claudes-codex-action-btn svg {
+.pocket-codex-action-btn svg {
   width: 14px;
   height: 14px;
 }
 
-.claudes-codex-delete-btn:hover {
+.pocket-codex-delete-btn:hover {
   color: var(--color-red);
 }
 
-.claudes-codex-open-new-tab-btn:hover {
+.pocket-codex-open-new-tab-btn:hover {
   color: var(--interactive-accent);
 }
 
-.claudes-codex-rename-input {
+.pocket-codex-rename-input {
   width: 100%;
   padding: 2px 4px;
   font-size: 13px;
@@ -205,13 +205,13 @@
   color: var(--text-normal);
 }
 
-.claudes-codex-rename-input:focus {
+.pocket-codex-rename-input:focus {
   outline: none;
   box-shadow: 0 0 0 2px var(--interactive-accent-hover);
 }
 
 /* Loading indicator for title generation */
-.claudes-codex-action-loading {
+.pocket-codex-action-loading {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -220,7 +220,7 @@
   cursor: default;
 }
 
-.claudes-codex-history-load-more {
+.pocket-codex-history-load-more {
   width: calc(100% - 16px);
   margin: 8px;
   padding: 8px 12px;
@@ -231,7 +231,7 @@
   cursor: pointer;
 }
 
-.claudes-codex-history-load-more:hover {
+.pocket-codex-history-load-more:hover {
   background: var(--background-modifier-hover);
   color: var(--text-normal);
 }

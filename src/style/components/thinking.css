@@ -1,42 +1,42 @@
-.claudes-codex-thinking {
-  color: var(--claudes-codex-brand);
+.pocket-codex-thinking {
+  color: var(--pocket-codex-brand);
   font-style: italic;
   padding: 4px 0;
   text-align: start;
   animation: thinking-pulse 1.5s ease-in-out infinite;
 }
 
-.claudes-codex-thinking.claudes-codex-thinking--compact {
-  color: var(--claudes-codex-compact);
+.pocket-codex-thinking.pocket-codex-thinking--compact {
+  color: var(--pocket-codex-compact);
 }
 
-.claudes-codex-thinking-hint {
+.pocket-codex-thinking-hint {
   color: var(--text-muted);
   font-style: normal;
   font-variant-numeric: tabular-nums;
 }
 
-.claudes-codex-thinking-block {
+.pocket-codex-thinking-block {
   margin: 8px 0;
 }
 
-.claudes-codex-text-block+.claudes-codex-thinking-block {
+.pocket-codex-text-block+.pocket-codex-thinking-block {
   margin-top: 8px;
 }
 
-.claudes-codex-thinking-block+.claudes-codex-text-block {
+.pocket-codex-thinking-block+.pocket-codex-text-block {
   margin-top: 8px;
 }
 
-.claudes-codex-thinking-block+.claudes-codex-tool-call {
+.pocket-codex-thinking-block+.pocket-codex-tool-call {
   margin-top: 8px;
 }
 
-.claudes-codex-tool-call+.claudes-codex-thinking-block {
+.pocket-codex-tool-call+.pocket-codex-thinking-block {
   margin-top: 8px;
 }
 
-.claudes-codex-thinking-header {
+.pocket-codex-thinking-header {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -45,15 +45,15 @@
   overflow: hidden;
 }
 
-.claudes-codex-thinking-label {
+.pocket-codex-thinking-label {
   flex: 1;
   font-size: 13px;
   font-weight: 500;
-  color: var(--claudes-codex-brand);
+  color: var(--pocket-codex-brand);
 }
 
 /* Thinking block content - tree-branch style */
-.claudes-codex-thinking-content {
+.pocket-codex-thinking-content {
   padding: 4px 0;
   padding-inline-start: 24px;
   font-size: 13px;
@@ -65,24 +65,24 @@
   margin-inline-start: 7px;
 }
 
-.claudes-codex-thinking-content p {
+.pocket-codex-thinking-content p {
   margin: 0 0 8px 0;
 }
 
-.claudes-codex-thinking-content p:last-child {
+.pocket-codex-thinking-content p:last-child {
   margin-bottom: 0;
 }
 
-.claudes-codex-thinking-content .claudes-codex-code-wrapper {
+.pocket-codex-thinking-content .pocket-codex-code-wrapper {
   margin: 8px 0;
 }
 
-.claudes-codex-thinking-content .claudes-codex-code-wrapper pre {
+.pocket-codex-thinking-content .pocket-codex-code-wrapper pre {
   padding: 8px 10px;
   border-radius: 4px;
 }
 
-.claudes-codex-thinking-content code {
+.pocket-codex-thinking-content code {
   font-family: var(--font-monospace);
   font-size: 12px;
 }

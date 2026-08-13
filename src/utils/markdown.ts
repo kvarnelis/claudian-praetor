@@ -1,5 +1,5 @@
 /**
- * Claude's Codex - Markdown Utilities
+ * Pocket Codex - Markdown Utilities
  *
  * Markdown manipulation helpers.
  */

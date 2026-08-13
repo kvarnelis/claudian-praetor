@@ -1,6 +1,6 @@
 /**
  * ChatRuntime implementation that proxies a real provider runtime hosted by
- * the Claude's Codex daemon on the user's desktop machine.
+ * the Pocket Codex daemon on the user's desktop machine.
  *
  * Synchronous ChatRuntime methods are served from a local mirror of the
  * server-side runtime state; the mirror is updated by sequence-numbered
@@ -227,7 +227,7 @@ export class RemoteChatRuntime implements ChatRuntime {
         const item = await queue.next();
         if (!item) {
           // Queue closed without an end event: connection died and reattach failed.
-          yield { type: 'error', content: "Lost connection to the Claude's Codex daemon and could not resume the stream." };
+          yield { type: 'error', content: "Lost connection to the Pocket Codex daemon and could not resume the stream." };
           return;
         }
 

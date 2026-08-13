@@ -1,13 +1,13 @@
 /* Plugin Settings */
-.claudes-codex-plugin-settings-desc {
+.pocket-codex-plugin-settings-desc {
   margin-bottom: 12px;
 }
 
-.claudes-codex-plugins-container {
+.pocket-codex-plugins-container {
   margin-top: 8px;
 }
 
-.claudes-codex-plugin-header {
+.pocket-codex-plugin-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -15,13 +15,13 @@
   padding: 0 12px;
 }
 
-.claudes-codex-plugin-label {
+.pocket-codex-plugin-label {
   font-size: var(--font-ui-small);
   color: var(--text-muted);
   font-weight: var(--font-medium);
 }
 
-.claudes-codex-plugin-empty {
+.pocket-codex-plugin-empty {
   padding: 16px;
   text-align: center;
   color: var(--text-muted);
@@ -30,13 +30,13 @@
   border-radius: 6px;
 }
 
-.claudes-codex-plugin-list {
+.pocket-codex-plugin-list {
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
-.claudes-codex-plugin-section-header {
+.pocket-codex-plugin-section-header {
   font-size: 11px;
   color: var(--text-muted);
   text-transform: uppercase;
@@ -44,7 +44,7 @@
   font-weight: 600;
 }
 
-.claudes-codex-plugin-item {
+.pocket-codex-plugin-item {
   display: flex;
   align-items: flex-start;
   gap: 10px;
@@ -54,19 +54,19 @@
   transition: background 0.15s ease;
 }
 
-.claudes-codex-plugin-item:hover {
+.pocket-codex-plugin-item:hover {
   background: var(--background-modifier-hover);
 }
 
-.claudes-codex-plugin-item-disabled {
+.pocket-codex-plugin-item-disabled {
   opacity: 0.6;
 }
 
-.claudes-codex-plugin-item-error {
+.pocket-codex-plugin-item-error {
   opacity: 0.8;
 }
 
-.claudes-codex-plugin-status {
+.pocket-codex-plugin-status {
   width: 8px;
   height: 8px;
   border-radius: 50%;
@@ -74,35 +74,35 @@
   flex-shrink: 0;
 }
 
-.claudes-codex-plugin-status-enabled {
+.pocket-codex-plugin-status-enabled {
   background: var(--color-green);
 }
 
-.claudes-codex-plugin-status-disabled {
+.pocket-codex-plugin-status-disabled {
   background: var(--text-muted);
 }
 
-.claudes-codex-plugin-status-error {
+.pocket-codex-plugin-status-error {
   background: var(--text-error);
 }
 
-.claudes-codex-plugin-info {
+.pocket-codex-plugin-info {
   flex: 1;
   min-width: 0;
 }
 
-.claudes-codex-plugin-name-row {
+.pocket-codex-plugin-name-row {
   display: flex;
   align-items: center;
   gap: 8px;
   flex-wrap: wrap;
 }
 
-.claudes-codex-plugin-name {
+.pocket-codex-plugin-name {
   font-weight: 600;
 }
 
-.claudes-codex-plugin-version-badge {
+.pocket-codex-plugin-version-badge {
   font-size: 10px;
   padding: 2px 6px;
   background: var(--background-modifier-border);
@@ -110,7 +110,7 @@
   color: var(--text-muted);
 }
 
-.claudes-codex-plugin-error-badge {
+.pocket-codex-plugin-error-badge {
   font-size: 10px;
   padding: 2px 6px;
   background: var(--text-error);
@@ -119,7 +119,7 @@
   text-transform: uppercase;
 }
 
-.claudes-codex-plugin-preview {
+.pocket-codex-plugin-preview {
   font-size: 12px;
   color: var(--text-muted);
   margin-top: 4px;
@@ -128,17 +128,17 @@
   white-space: nowrap;
 }
 
-.claudes-codex-plugin-preview-error {
+.pocket-codex-plugin-preview-error {
   color: var(--text-error);
 }
 
-.claudes-codex-plugin-actions {
+.pocket-codex-plugin-actions {
   display: flex;
   gap: 4px;
   flex-shrink: 0;
 }
 
-.claudes-codex-plugin-action-btn {
+.pocket-codex-plugin-action-btn {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -153,12 +153,12 @@
   transition: background 0.15s ease, color 0.15s ease;
 }
 
-.claudes-codex-plugin-action-btn:hover {
+.pocket-codex-plugin-action-btn:hover {
   background: var(--background-modifier-hover);
   color: var(--text-normal);
 }
 
-.claudes-codex-plugin-action-btn svg {
+.pocket-codex-plugin-action-btn svg {
   width: 14px;
   height: 14px;
 }

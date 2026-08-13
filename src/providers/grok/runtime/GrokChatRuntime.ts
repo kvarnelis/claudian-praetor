@@ -60,7 +60,7 @@ function buildGrokAcpPromptText(
   isFollowupTurn: boolean,
 ): string {
   const integrationPrompt = buildGrokSystemPrompt(systemPrompt, isFollowupTurn);
-  return `<claudes_codex_system_prompt>\n${integrationPrompt}\n</claudes_codex_system_prompt>\n\n${buildGrokTurnPrompt(promptText, isFollowupTurn)}`;
+  return `<pocket_codex_system_prompt>\n${integrationPrompt}\n</pocket_codex_system_prompt>\n\n${buildGrokTurnPrompt(promptText, isFollowupTurn)}`;
 }
 
 function buildGrokAcpPromptBlocks(text: string): AcpContentBlock[] {
@@ -476,7 +476,7 @@ export class GrokChatRuntime implements ChatRuntime {
   }
 
   async rewind(_userMessageId: string, _assistantMessageId: string): Promise<ChatRewindResult> {
-    return { canRewind: false, error: "Grok does not support rewind from Claude's Codex yet" };
+    return { canRewind: false, error: "Grok does not support rewind from Pocket Codex yet" };
   }
 
   setApprovalCallback(callback: ApprovalCallback | null): void {
@@ -565,7 +565,7 @@ export class GrokChatRuntime implements ChatRuntime {
 
     this.connection = new AcpClientConnection({
       clientInfo: {
-        name: 'claudes-codex',
+        name: 'pocket-codex',
         version: this.plugin.manifest?.version ?? '0.0.0',
       },
       delegate: {

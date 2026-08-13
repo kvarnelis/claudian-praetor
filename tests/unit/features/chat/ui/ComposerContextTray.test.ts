@@ -35,7 +35,7 @@ describe('ComposerContextTray', () => {
     }]);
 
     expect(containerEl.hasClass('has-content')).toBe(true);
-    expect(containerEl.querySelectorAll('.claudes-codex-context-chip').map((item: any) => item.dataset.contextSlot)).toEqual([
+    expect(containerEl.querySelectorAll('.pocket-codex-context-chip').map((item: any) => item.dataset.contextSlot)).toEqual([
       'current-note',
       'editor-selection',
       'images',
@@ -58,8 +58,8 @@ describe('ComposerContextTray', () => {
       onRemove,
     }]);
 
-    const mainButton = containerEl.querySelector('.claudes-codex-context-chip-main');
-    const removeButton = containerEl.querySelector('.claudes-codex-context-chip-remove');
+    const mainButton = containerEl.querySelector('.pocket-codex-context-chip-main');
+    const removeButton = containerEl.querySelector('.pocket-codex-context-chip-remove');
 
     expect(mainButton?.tagName).toBe('BUTTON');
     expect(removeButton?.tagName).toBe('BUTTON');
@@ -83,22 +83,22 @@ describe('ComposerContextTray', () => {
       onRemove: jest.fn(),
     })));
 
-    const chips = containerEl.querySelectorAll('.claudes-codex-context-chip');
+    const chips = containerEl.querySelectorAll('.pocket-codex-context-chip');
     [0, 0, 38, 76].forEach((offsetTop, index) => {
       Object.defineProperty(chips[index], 'offsetTop', { configurable: true, value: offsetTop });
     });
 
     tray.refreshLayout();
 
-    expect(chips[2].hasClass('claudes-codex-context-chip--overflow-hidden')).toBe(true);
-    expect(chips[3].hasClass('claudes-codex-context-chip--overflow-hidden')).toBe(true);
-    const moreButton = containerEl.querySelector('.claudes-codex-context-more');
+    expect(chips[2].hasClass('pocket-codex-context-chip--overflow-hidden')).toBe(true);
+    expect(chips[3].hasClass('pocket-codex-context-chip--overflow-hidden')).toBe(true);
+    const moreButton = containerEl.querySelector('.pocket-codex-context-more');
     expect(moreButton?.textContent).toBe('+2 more');
 
     moreButton?.click();
 
-    expect(containerEl.hasClass('claudes-codex-context-row--expanded')).toBe(true);
-    expect(chips.every((chip: any) => !chip.hasClass('claudes-codex-context-chip--overflow-hidden'))).toBe(true);
+    expect(containerEl.hasClass('pocket-codex-context-row--expanded')).toBe(true);
+    expect(chips.every((chip: any) => !chip.hasClass('pocket-codex-context-chip--overflow-hidden'))).toBe(true);
     expect(moreButton?.textContent).toBe('Show less');
   });
 
@@ -125,7 +125,7 @@ describe('ComposerContextTray', () => {
       onRemove: jest.fn(),
     }]);
 
-    const chips = containerEl.querySelectorAll('.claudes-codex-context-chip');
+    const chips = containerEl.querySelectorAll('.pocket-codex-context-chip');
     [[4, 24], [0, 32], [4, 24]].forEach(([offsetTop, offsetHeight], index) => {
       Object.defineProperties(chips[index], {
         offsetTop: { configurable: true, value: offsetTop },
@@ -135,7 +135,7 @@ describe('ComposerContextTray', () => {
 
     tray.refreshLayout();
 
-    expect(containerEl.querySelector('.claudes-codex-context-more')?.hasClass('claudes-codex-hidden')).toBe(true);
+    expect(containerEl.querySelector('.pocket-codex-context-more')?.hasClass('pocket-codex-hidden')).toBe(true);
   });
 
   it('removes the tray when the final owner clears its items', () => {

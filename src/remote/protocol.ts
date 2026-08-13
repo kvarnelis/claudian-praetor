@@ -1,5 +1,5 @@
 /**
- * Wire protocol shared by the Claude's Codex daemon (Mac host) and RemoteChatRuntime
+ * Wire protocol shared by the Pocket Codex daemon (Mac host) and RemoteChatRuntime
  * (mobile client). JSON messages over a single WebSocket.
  *
  * This module must stay dependency-light and platform-pure: no Node, no
@@ -14,7 +14,7 @@ import type {
 } from '../core/runtime/types';
 import type { ChatMessage, Conversation, StreamChunk, UsageInfo } from '../core/types';
 
-export const CLAUDES_CODEX_PROTOCOL_VERSION = 1;
+export const POCKET_CODEX_PROTOCOL_VERSION = 1;
 export const DEFAULT_DAEMON_PORT = 8423;
 
 // ---------------------------------------------------------------------------

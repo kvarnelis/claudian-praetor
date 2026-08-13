@@ -1,8 +1,8 @@
-.claudes-codex-tool-call {
+.pocket-codex-tool-call {
   margin: 8px 0;
 }
 
-.claudes-codex-tool-header {
+.pocket-codex-tool-header {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -11,23 +11,23 @@
   overflow: hidden;
 }
 
-.claudes-codex-tool-header:hover {
+.pocket-codex-tool-header:hover {
   opacity: 0.85;
 }
 
-.claudes-codex-tool-icon {
+.pocket-codex-tool-icon {
   display: flex;
   align-items: center;
   color: var(--text-accent);
   flex-shrink: 0;
 }
 
-.claudes-codex-tool-icon svg {
+.pocket-codex-tool-icon svg {
   width: 16px;
   height: 16px;
 }
 
-.claudes-codex-tool-name {
+.pocket-codex-tool-name {
   font-family: var(--font-monospace);
   font-size: 13px;
   font-weight: 400;
@@ -36,7 +36,7 @@
   flex-shrink: 0;
 }
 
-.claudes-codex-tool-summary {
+.pocket-codex-tool-summary {
   font-family: var(--font-monospace);
   font-size: 13px;
   color: var(--text-muted);
@@ -47,15 +47,15 @@
   min-width: 0;
 }
 
-.claudes-codex-tool-summary:empty {
+.pocket-codex-tool-summary:empty {
   display: none;
 }
 
-.claudes-codex-tool-call-bash.expanded .claudes-codex-tool-summary {
+.pocket-codex-tool-call-bash.expanded .pocket-codex-tool-summary {
   display: none;
 }
 
-.claudes-codex-tool-bash-command {
+.pocket-codex-tool-bash-command {
   font-family: var(--font-monospace);
   font-size: 12px;
   line-height: 1.4;
@@ -65,8 +65,8 @@
   padding: 2px 0 4px;
 }
 
-/* Legacy: StatusPanel bash entries still use claudes-codex-tool-label */
-.claudes-codex-tool-label {
+/* Legacy: StatusPanel bash entries still use pocket-codex-tool-label */
+.pocket-codex-tool-label {
   font-family: var(--font-monospace);
   font-size: 13px;
   font-weight: 400;
@@ -76,47 +76,47 @@
   text-overflow: ellipsis;
 }
 
-.claudes-codex-tool-current {
+.pocket-codex-tool-current {
   font-family: var(--font-monospace);
   font-size: 13px;
   color: var(--text-muted);
   white-space: nowrap;
 }
 
-.claudes-codex-tool-current:empty {
+.pocket-codex-tool-current:empty {
   display: none;
 }
 
-.claudes-codex-tool-status {
+.pocket-codex-tool-status {
   display: flex;
   align-items: center;
   flex-shrink: 0;
   margin-left: auto;
 }
 
-.claudes-codex-tool-status svg {
+.pocket-codex-tool-status svg {
   width: 14px;
   height: 14px;
 }
 
-.claudes-codex-tool-status.status-running {
+.pocket-codex-tool-status.status-running {
   color: var(--text-accent);
 }
 
-.claudes-codex-tool-status.status-completed {
+.pocket-codex-tool-status.status-completed {
   color: var(--color-green);
 }
 
-.claudes-codex-tool-status.status-error {
+.pocket-codex-tool-status.status-error {
   color: var(--color-red);
 }
 
-.claudes-codex-tool-status.status-blocked {
+.pocket-codex-tool-status.status-blocked {
   color: var(--color-orange);
 }
 
 /* Tool call content - border style (like thinking block) */
-.claudes-codex-tool-content {
+.pocket-codex-tool-content {
   padding: 4px 0;
   padding-inline-start: 16px;
   margin-inline-start: 7px;
@@ -124,39 +124,39 @@
 }
 
 /* Tool content variants that render inline widgets instead of bordered results */
-.claudes-codex-tool-content-todo,
-.claudes-codex-tool-content-ask {
+.pocket-codex-tool-content-todo,
+.pocket-codex-tool-content-ask {
   border-inline-start: none;
   margin-inline-start: 0;
   padding-inline-start: 0;
 }
 
 /* Expanded content: per-line rendering */
-.claudes-codex-tool-lines {
+.pocket-codex-tool-lines {
   font-family: var(--font-monospace);
   font-size: 12px;
   line-height: 1.4;
   overflow-x: auto;
 }
 
-.claudes-codex-tool-line {
+.pocket-codex-tool-line {
   padding: 1px 0;
   color: var(--text-muted);
   white-space: pre;
 }
 
-.claudes-codex-tool-line-wrap {
+.pocket-codex-tool-line-wrap {
   white-space: pre-wrap;
   word-break: break-word;
 }
 
 /* Hover highlight for file search results */
-.claudes-codex-tool-line.hoverable:hover {
+.pocket-codex-tool-line.hoverable:hover {
   background: var(--background-modifier-hover);
 }
 
 /* Truncation indicator: "... N more lines" */
-.claudes-codex-tool-truncated {
+.pocket-codex-tool-truncated {
   color: var(--text-faint);
   font-style: italic;
   padding: 4px 0;
@@ -165,7 +165,7 @@
 }
 
 /* ToolSearch expanded: icon + tool name rows */
-.claudes-codex-tool-search-item {
+.pocket-codex-tool-search-item {
   display: flex;
   align-items: center;
   gap: 4px;
@@ -175,7 +175,7 @@
   color: var(--text-muted);
 }
 
-.claudes-codex-tool-search-icon {
+.pocket-codex-tool-search-icon {
   display: flex;
   align-items: center;
   flex-shrink: 0;
@@ -184,13 +184,13 @@
   color: var(--text-faint);
 }
 
-.claudes-codex-tool-search-icon svg {
+.pocket-codex-tool-search-icon svg {
   width: 14px;
   height: 14px;
 }
 
 /* Web search links */
-.claudes-codex-tool-link {
+.pocket-codex-tool-link {
   display: flex;
   align-items: flex-start;
   gap: 6px;
@@ -203,11 +203,11 @@
   line-height: 1.4;
 }
 
-.claudes-codex-tool-link:hover {
+.pocket-codex-tool-link:hover {
   color: var(--text-accent);
 }
 
-.claudes-codex-tool-link-icon {
+.pocket-codex-tool-link-icon {
   flex-shrink: 0;
   width: 12px;
   height: 12px;
@@ -215,19 +215,19 @@
   color: var(--text-faint);
 }
 
-.claudes-codex-tool-link-icon svg {
+.pocket-codex-tool-link-icon svg {
   width: 12px;
   height: 12px;
 }
 
-.claudes-codex-tool-link-title {
+.pocket-codex-tool-link-title {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 /* Web search summary section */
-.claudes-codex-tool-web-summary {
+.pocket-codex-tool-web-summary {
   font-family: var(--font-monospace);
   font-size: 12px;
   color: var(--text-muted);
@@ -241,7 +241,7 @@
 }
 
 /* Empty state for file search */
-.claudes-codex-tool-empty {
+.pocket-codex-tool-empty {
   color: var(--text-faint);
   font-style: italic;
   font-family: var(--font-monospace);
@@ -249,12 +249,12 @@
   padding: 4px 0;
 }
 
-.claudes-codex-tool-result-row {
+.pocket-codex-tool-result-row {
   display: flex;
   align-items: flex-start;
 }
 
-.claudes-codex-tool-result-text {
+.pocket-codex-tool-result-text {
   font-family: var(--font-monospace);
   font-size: 12px;
   color: var(--text-muted);
@@ -264,15 +264,15 @@
   flex: 1;
 }
 
-.claudes-codex-tool-result-item {
+.pocket-codex-tool-result-item {
   display: block;
   margin-bottom: 2px;
 }
 
-.claudes-codex-tool-patch-section + .claudes-codex-tool-patch-section {
+.pocket-codex-tool-patch-section + .pocket-codex-tool-patch-section {
   margin-top: 10px;
 }
 
-.claudes-codex-tool-result-item:last-child {
+.pocket-codex-tool-result-item:last-child {
   margin-bottom: 0;
 }

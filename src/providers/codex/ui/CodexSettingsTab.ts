@@ -103,7 +103,7 @@ export const codexSettingsTabRenderer: ProviderSettingsTabRenderer = {
       .setDesc(getCliPathCopy().desc);
 
     const validationEl = container.createDiv({
-      cls: 'claudes-codex-cli-path-validation claudes-codex-setting-validation claudes-codex-setting-validation-error claudes-codex-hidden',
+      cls: 'pocket-codex-cli-path-validation pocket-codex-setting-validation pocket-codex-setting-validation-error pocket-codex-hidden',
     });
 
     const validatePath = (value: string): string | null => {
@@ -133,16 +133,16 @@ export const codexSettingsTabRenderer: ProviderSettingsTabRenderer = {
       const error = validatePath(value);
       if (error) {
         validationEl.setText(error);
-        validationEl.toggleClass('claudes-codex-hidden', false);
+        validationEl.toggleClass('pocket-codex-hidden', false);
         if (inputEl) {
-          inputEl.toggleClass('claudes-codex-input-error', true);
+          inputEl.toggleClass('pocket-codex-input-error', true);
         }
         return false;
       }
 
-      validationEl.toggleClass('claudes-codex-hidden', true);
+      validationEl.toggleClass('pocket-codex-hidden', true);
       if (inputEl) {
-        inputEl.toggleClass('claudes-codex-input-error', false);
+        inputEl.toggleClass('pocket-codex-input-error', false);
       }
       return true;
     };
@@ -160,7 +160,7 @@ export const codexSettingsTabRenderer: ProviderSettingsTabRenderer = {
         updateCliPathValidation(cliPathInputEl.value, cliPathInputEl);
       }
       if (wslDistroSettingEl) {
-        wslDistroSettingEl.toggleClass('claudes-codex-hidden', installationMethod !== 'wsl');
+        wslDistroSettingEl.toggleClass('pocket-codex-hidden', installationMethod !== 'wsl');
       }
       if (wslDistroInputEl) {
         wslDistroInputEl.disabled = installationMethod !== 'wsl';
@@ -196,7 +196,7 @@ export const codexSettingsTabRenderer: ProviderSettingsTabRenderer = {
         .onChange(async (value) => {
           await persistCliPath(value);
         });
-      text.inputEl.addClass('claudes-codex-settings-cli-path-input');
+      text.inputEl.addClass('pocket-codex-settings-cli-path-input');
       cliPathInputEl = text.inputEl;
 
       updateCliPathValidation(currentValue, text.inputEl);
@@ -218,7 +218,7 @@ export const codexSettingsTabRenderer: ProviderSettingsTabRenderer = {
             });
           });
 
-        text.inputEl.addClass('claudes-codex-settings-cli-path-input');
+        text.inputEl.addClass('pocket-codex-settings-cli-path-input');
         text.inputEl.disabled = installationMethod !== 'wsl';
         wslDistroInputEl = text.inputEl;
       });
@@ -285,13 +285,13 @@ export const codexSettingsTabRenderer: ProviderSettingsTabRenderer = {
     if (codexCatalog) {
       new Setting(container).setName(t('settings.codex.skills.name')).setHeading();
 
-      const skillsDesc = container.createDiv({ cls: 'claudes-codex-sp-settings-desc' });
+      const skillsDesc = container.createDiv({ cls: 'pocket-codex-sp-settings-desc' });
       skillsDesc.createEl('p', {
         cls: 'setting-item-description',
         text: t('settings.codex.skills.desc'),
       });
 
-      const skillsContainer = container.createDiv({ cls: 'claudes-codex-slash-commands-container' });
+      const skillsContainer = container.createDiv({ cls: 'pocket-codex-slash-commands-container' });
       new CodexSkillSettings(skillsContainer, codexCatalog, context.plugin.app);
     }
 
@@ -305,13 +305,13 @@ export const codexSettingsTabRenderer: ProviderSettingsTabRenderer = {
 
     new Setting(container).setName(t('settings.codex.subagents.name')).setHeading();
 
-    const subagentDesc = container.createDiv({ cls: 'claudes-codex-sp-settings-desc' });
+    const subagentDesc = container.createDiv({ cls: 'pocket-codex-sp-settings-desc' });
     subagentDesc.createEl('p', {
       cls: 'setting-item-description',
       text: t('settings.codex.subagents.desc'),
     });
 
-    const subagentContainer = container.createDiv({ cls: 'claudes-codex-slash-commands-container' });
+    const subagentContainer = container.createDiv({ cls: 'pocket-codex-slash-commands-container' });
     new CodexSubagentSettings(subagentContainer, codexWorkspace.subagentStorage, context.plugin.app, () => {
       void codexWorkspace.refreshAgentMentions?.();
     });
@@ -319,7 +319,7 @@ export const codexSettingsTabRenderer: ProviderSettingsTabRenderer = {
     // --- MCP Servers ---
 
     new Setting(container).setName(t('settings.mcpServers.name')).setHeading();
-    const mcpNotice = container.createDiv({ cls: 'claudes-codex-mcp-settings-desc' });
+    const mcpNotice = container.createDiv({ cls: 'pocket-codex-mcp-settings-desc' });
     const mcpDesc = mcpNotice.createEl('p', { cls: 'setting-item-description' });
     mcpDesc.appendText(t('settings.codex.mcp.descBeforeCommand'));
     mcpDesc.createEl('code').appendText('codex mcp');

@@ -111,7 +111,7 @@ describe('WriteEditRenderer', () => {
 
       expect(state.isExpanded).toBe(false);
       expect(state.wrapperEl.hasClass('expanded')).toBe(false);
-      expect(state.contentEl.hasClass('claudes-codex-hidden')).toBe(true);
+      expect(state.contentEl.hasClass('pocket-codex-hidden')).toBe(true);
       expect(state.headerEl.getAttribute('aria-expanded')).toBe('false');
       expect(state.headerEl.getAttribute('aria-label')).toContain('click to expand');
     });
@@ -124,7 +124,7 @@ describe('WriteEditRenderer', () => {
 
       expect(state.isExpanded).toBe(true);
       expect(state.wrapperEl.hasClass('expanded')).toBe(true);
-      expect(state.contentEl.hasClass('claudes-codex-hidden')).toBe(false);
+      expect(state.contentEl.hasClass('pocket-codex-hidden')).toBe(false);
       expect(state.headerEl.getAttribute('aria-expanded')).toBe('true');
       expect(state.headerEl.getAttribute('aria-label')).toContain('click to collapse');
     });
@@ -325,11 +325,11 @@ describe('WriteEditRenderer', () => {
       const toolCall = createToolCall({ status: 'completed' });
 
       const block = renderStoredWriteEdit(parentEl, toolCall);
-      const headerEl = block.querySelector('.claudes-codex-write-edit-header');
-      const contentEl = block.querySelector('.claudes-codex-write-edit-content');
+      const headerEl = block.querySelector('.pocket-codex-write-edit-header');
+      const contentEl = block.querySelector('.pocket-codex-write-edit-content');
 
       expect(block.hasClass('expanded')).toBe(false);
-      expect(contentEl?.hasClass('claudes-codex-hidden')).toBe(true);
+      expect(contentEl?.hasClass('pocket-codex-hidden')).toBe(true);
       expect(headerEl?.getAttribute('aria-expanded')).toBe('false');
       expect(headerEl?.getAttribute('aria-label')).toContain('click to expand');
     });
@@ -339,11 +339,11 @@ describe('WriteEditRenderer', () => {
       const toolCall = createToolCall({ status: 'completed' });
 
       const block = renderStoredWriteEdit(parentEl, toolCall, { initiallyExpanded: true });
-      const headerEl = block.querySelector('.claudes-codex-write-edit-header');
-      const contentEl = block.querySelector('.claudes-codex-write-edit-content');
+      const headerEl = block.querySelector('.pocket-codex-write-edit-header');
+      const contentEl = block.querySelector('.pocket-codex-write-edit-content');
 
       expect(block.hasClass('expanded')).toBe(true);
-      expect(contentEl?.hasClass('claudes-codex-hidden')).toBe(false);
+      expect(contentEl?.hasClass('pocket-codex-hidden')).toBe(false);
       expect(headerEl?.getAttribute('aria-expanded')).toBe('true');
       expect(headerEl?.getAttribute('aria-label')).toContain('click to collapse');
     });

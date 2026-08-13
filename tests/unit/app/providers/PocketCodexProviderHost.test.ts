@@ -1,7 +1,7 @@
-import { ClaudesCodexProviderHost } from '@/app/providers/ClaudesCodexProviderHost';
-import type ClaudesCodexPlugin from '@/main';
+import { PocketCodexProviderHost } from '@/app/providers/PocketCodexProviderHost';
+import type PocketCodexPlugin from '@/main';
 
-function createPlugin(overrides: Record<string, unknown> = {}): ClaudesCodexPlugin {
+function createPlugin(overrides: Record<string, unknown> = {}): PocketCodexPlugin {
   return {
     app: {},
     settings: {},
@@ -19,10 +19,10 @@ function createPlugin(overrides: Record<string, unknown> = {}): ClaudesCodexPlug
     getAllViews: jest.fn(() => []),
     getView: jest.fn(() => null),
     ...overrides,
-  } as unknown as ClaudesCodexPlugin;
+  } as unknown as PocketCodexPlugin;
 }
 
-describe('ClaudesCodexProviderHost', () => {
+describe('PocketCodexProviderHost', () => {
   it('delegates provider capabilities without exposing plugin lifecycle APIs', async () => {
     const trace: string[] = [];
     const plugin = createPlugin({
@@ -33,7 +33,7 @@ describe('ClaudesCodexProviderHost', () => {
         return '/usr/bin/codex';
       }),
     });
-    const host = new ClaudesCodexProviderHost(plugin);
+    const host = new PocketCodexProviderHost(plugin);
 
     await host.saveSettings();
     await host.applyEnvironmentVariables('provider:codex', 'OPENAI_API_KEY=test');
@@ -60,7 +60,7 @@ describe('ClaudesCodexProviderHost', () => {
     const plugin = createPlugin({
       getAllViews: jest.fn(() => [createView('first'), createView('second')]),
     });
-    const host = new ClaudesCodexProviderHost(plugin);
+    const host = new PocketCodexProviderHost(plugin);
 
     await host.recycleProviderRuntimes('grok');
 

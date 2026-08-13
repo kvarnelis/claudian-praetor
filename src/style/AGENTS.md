@@ -24,9 +24,9 @@ src/style/
 
 ## Conventions
 
-- Claude's Codex-owned classes use the `.claudes-codex-` prefix.
+- Pocket Codex-owned classes use the `.pocket-codex-` prefix.
 - Shared Obsidian host selectors and generic state classes may remain unprefixed.
-- Prefer BEM-lite names: `.claudes-codex-{block}`, `.claudes-codex-{block}-{element}`, `.claudes-codex-{block}--{modifier}`.
+- Prefer BEM-lite names: `.pocket-codex-{block}`, `.pocket-codex-{block}-{element}`, `.pocket-codex-{block}--{modifier}`.
 - Avoid `!important` unless overriding Obsidian defaults.
 - Use Obsidian CSS variables such as `--background-*`, `--text-*`, and `--interactive-*`.
 - Use `var(--font-monospace)` for code blocks.

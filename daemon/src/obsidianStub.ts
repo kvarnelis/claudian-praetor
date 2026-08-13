@@ -1,6 +1,6 @@
 /**
- * Stand-in for the 'obsidian' module when Claude's Codex sources are bundled into
- * the claudes-codexd daemon (plain Node, no Electron renderer).
+ * Stand-in for the 'obsidian' module when Pocket Codex sources are bundled into
+ * the pocket-codexd daemon (plain Node, no Electron renderer).
  *
  * Only the runtime-reachable surface matters: storage adapters, provider
  * runtimes, and workspace services. UI classes are inert placeholders that
@@ -160,15 +160,15 @@ export function normalizePath(p: string): string {
  * skills, and agents.
  */
 export function parseYaml(_yaml: string): unknown {
-  throw new Error('parseYaml is unavailable in claudes-codexd; callers fall back to plain parsing');
+  throw new Error('parseYaml is unavailable in pocket-codexd; callers fall back to plain parsing');
 }
 
 export function stringifyYaml(_value: unknown): string {
-  throw new Error('stringifyYaml is unavailable in claudes-codexd');
+  throw new Error('stringifyYaml is unavailable in pocket-codexd');
 }
 
 export const requestUrl = async (): Promise<never> => {
-  throw new Error('requestUrl unavailable in claudes-codexd');
+  throw new Error('requestUrl unavailable in pocket-codexd');
 };
 
 export function debounce<T extends (...args: never[]) => unknown>(

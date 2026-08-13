@@ -79,7 +79,7 @@ function buildGrokArgs(options: GrokArgsOptions): string[] {
 function writeGrokPromptFile(prompt: string): string {
   const filePath = path.join(
     os.tmpdir(),
-    `claudes-codex-grok-${Date.now()}-${Math.random().toString(36).slice(2)}.txt`,
+    `pocket-codex-grok-${Date.now()}-${Math.random().toString(36).slice(2)}.txt`,
   );
   fs.writeFileSync(filePath, prompt, 'utf-8');
   return filePath;
@@ -254,16 +254,16 @@ export function resolveLatestGrokHistoryFile(
 export function buildGrokSystemPrompt(baseSystemPrompt: string, isFollowupTurn: boolean): string {
   if (!isFollowupTurn) return baseSystemPrompt;
   return `${baseSystemPrompt}
-## Grok Build Claude's Codex Integration
-The vault"s CLAUDE.md "Startup Greeting" rule applies only to the first assistant reply in a new Claude's Codex conversation. This is a resumed conversation, so do not repeat startup ASCII art, Ajman cat art, NETLAB banners, or dry one-line welcomes. Answer the user"s current message directly using the existing conversation context.`;
+## Grok Build Pocket Codex Integration
+The vault"s CLAUDE.md "Startup Greeting" rule applies only to the first assistant reply in a new Pocket Codex conversation. This is a resumed conversation, so do not repeat startup ASCII art, Ajman cat art, NETLAB banners, or dry one-line welcomes. Answer the user"s current message directly using the existing conversation context.`;
 }
 
 export function buildGrokTurnPrompt(prompt: string, isFollowupTurn: boolean): string {
   if (!isFollowupTurn) return prompt;
-  return `<claudes_codex_followup_reminder>
-This is a follow-up turn in an existing Claude's Codex conversation using Grok Build session resume. Continue the prior conversation and answer the user's current message directly.
-Do not run startup behavior on this turn. Do not include startup ASCII art, Ajman cat art, NETLAB banners, dry one-line welcomes, or first-run/session-start rituals. Do not claim Claude's Codex, Grok Build, or claude-anywhere has no carryover memory between prompts.
-</claudes_codex_followup_reminder>
+  return `<pocket_codex_followup_reminder>
+This is a follow-up turn in an existing Pocket Codex conversation using Grok Build session resume. Continue the prior conversation and answer the user's current message directly.
+Do not run startup behavior on this turn. Do not include startup ASCII art, Ajman cat art, NETLAB banners, dry one-line welcomes, or first-run/session-start rituals. Do not claim Pocket Codex, Grok Build, or claude-anywhere has no carryover memory between prompts.
+</pocket_codex_followup_reminder>
 ${prompt}`;
 }
 

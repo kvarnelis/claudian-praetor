@@ -7,9 +7,9 @@ import type {
   ToolCallInfo
 } from '@/core/types';
 import {
-  VIEW_TYPE_CLAUDES_CODEX
+  VIEW_TYPE_POCKET_CODEX
 } from '@/core/types';
-import type { ClaudesCodexSettings } from '@/core/types/settings';
+import type { PocketCodexSettings } from '@/core/types/settings';
 import { getClaudeProviderSettings } from '@/providers/claude/settings';
 import {
   CONTEXT_WINDOW_1M,
@@ -27,9 +27,9 @@ import {
 } from '@/providers/claude/types/settings';
 
 describe('types.ts', () => {
-  describe('VIEW_TYPE_CLAUDES_CODEX', () => {
+  describe('VIEW_TYPE_POCKET_CODEX', () => {
     it('should be defined as the correct view type', () => {
-      expect(VIEW_TYPE_CLAUDES_CODEX).toBe('claudes-codex-view');
+      expect(VIEW_TYPE_POCKET_CODEX).toBe('pocket-codex-view');
     });
   });
 
@@ -76,9 +76,9 @@ describe('types.ts', () => {
     });
   });
 
-  describe('ClaudesCodexSettings type', () => {
+  describe('PocketCodexSettings type', () => {
     it('should be assignable with valid settings', () => {
-      const settings: ClaudesCodexSettings = {
+      const settings: PocketCodexSettings = {
         userName: '',
         model: 'haiku',
         enableAutoTitleGeneration: true,
@@ -132,7 +132,7 @@ describe('types.ts', () => {
     });
 
     it('should accept custom model strings', () => {
-      const settings: ClaudesCodexSettings = {
+      const settings: PocketCodexSettings = {
         userName: '',
         model: 'anthropic/custom-model-v1',
         enableAutoTitleGeneration: true,
@@ -185,7 +185,7 @@ describe('types.ts', () => {
     });
 
     it('should accept optional lastClaudeModel and lastCustomModel', () => {
-      const settings: ClaudesCodexSettings = {
+      const settings: PocketCodexSettings = {
         userName: '',
         model: 'sonnet',
         enableAutoTitleGeneration: true,

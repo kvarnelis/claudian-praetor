@@ -1,6 +1,6 @@
 /* Context usage meter (inline in toolbar) */
 
-.claudes-codex-context-meter {
+.pocket-codex-context-meter {
   position: relative;
   display: flex;
   align-items: center;
@@ -10,7 +10,7 @@
 }
 
 /* Custom tooltip */
-.claudes-codex-context-meter::after {
+.pocket-codex-context-meter::after {
   content: attr(data-tooltip);
   position: absolute;
   bottom: 100%;
@@ -31,12 +31,12 @@
   z-index: 100;
 }
 
-.claudes-codex-context-meter:hover::after {
+.pocket-codex-context-meter:hover::after {
   opacity: 1;
   visibility: visible;
 }
 
-.claudes-codex-context-meter-gauge {
+.pocket-codex-context-meter-gauge {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -44,33 +44,33 @@
   height: 24px;
 }
 
-.claudes-codex-context-meter-gauge svg {
+.pocket-codex-context-meter-gauge svg {
   width: 16px;
   height: 16px;
 }
 
-.claudes-codex-meter-bg {
+.pocket-codex-meter-bg {
   stroke: var(--background-modifier-border);
 }
 
-.claudes-codex-meter-fill {
-  stroke: var(--claudes-codex-brand);
+.pocket-codex-meter-fill {
+  stroke: var(--pocket-codex-brand);
   transition: stroke-dashoffset 0.3s ease, stroke 0.3s ease;
 }
 
-.claudes-codex-context-meter-percent {
+.pocket-codex-context-meter-percent {
   font-size: 11px;
-  color: var(--claudes-codex-brand);
+  color: var(--pocket-codex-brand);
   min-width: 24px;
   text-align: end;
   transition: color 0.3s ease;
 }
 
 /* Warning state (> 80%) - pale red */
-.claudes-codex-context-meter.warning .claudes-codex-meter-fill {
+.pocket-codex-context-meter.warning .pocket-codex-meter-fill {
   stroke: #E57373;
 }
 
-.claudes-codex-context-meter.warning .claudes-codex-context-meter-percent {
+.pocket-codex-context-meter.warning .pocket-codex-context-meter-percent {
   color: #E57373;
 }

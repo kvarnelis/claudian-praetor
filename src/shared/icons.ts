@@ -76,7 +76,7 @@ export function createProviderIconSvg(
   svg.setAttribute('viewBox', icon.viewBox);
   svg.setAttribute('fill', 'none');
   svg.setAttribute('aria-hidden', 'true');
-  svg.classList.add('claudes-codex-provider-icon');
+  svg.classList.add('pocket-codex-provider-icon');
 
   if (options.width !== undefined) {
     svg.setAttribute('width', String(options.width));

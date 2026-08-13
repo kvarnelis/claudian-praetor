@@ -2,11 +2,11 @@ import type { ProviderHost } from '../../core/providers/ProviderHost';
 import type { ProviderCliResolutionContext, ProviderId } from '../../core/providers/types';
 import type { ChatRuntime } from '../../core/runtime/ChatRuntime';
 import type { EnvironmentScope } from '../../core/types/settings';
-import type ClaudesCodexPlugin from '../../main';
+import type PocketCodexPlugin from '../../main';
 
 /** Delegates provider-facing capabilities to the application composition root. */
-export class ClaudesCodexProviderHost implements ProviderHost {
-  constructor(private readonly plugin: ClaudesCodexPlugin) {}
+export class PocketCodexProviderHost implements ProviderHost {
+  constructor(private readonly plugin: PocketCodexPlugin) {}
 
   get app() {
     return this.plugin.app;

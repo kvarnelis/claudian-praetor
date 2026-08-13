@@ -17,7 +17,7 @@ describe('createProviderIconSvg', () => {
     expect(svg.getAttribute('viewBox')).toBe(OPENAI_PROVIDER_ICON.viewBox);
     expect(svg.getAttribute('width')).toBe('12');
     expect(svg.getAttribute('height')).toBe('12');
-    expect(svg.classList.contains('claudes-codex-provider-icon')).toBe(true);
+    expect(svg.classList.contains('pocket-codex-provider-icon')).toBe(true);
     expect(svg.classList.contains('test-icon')).toBe(true);
 
     const path = svg.querySelector('path');

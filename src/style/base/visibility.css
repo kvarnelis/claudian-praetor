@@ -2,14 +2,14 @@
  * Visibility utilities are imported late so they can override component display
  * defaults without importance flags.
  */
-.claudes-codex-hidden.claudes-codex-hidden {
+.pocket-codex-hidden.pocket-codex-hidden {
   display: none;
 }
 
-.claudes-codex-visible-block.claudes-codex-visible-block {
+.pocket-codex-visible-block.pocket-codex-visible-block {
   display: block;
 }
 
-.claudes-codex-visible-flex.claudes-codex-visible-flex {
+.pocket-codex-visible-flex.pocket-codex-visible-flex {
   display: flex;
 }

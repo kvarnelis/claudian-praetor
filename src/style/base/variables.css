@@ -1,28 +1,28 @@
 /* Brand & semantic color tokens */
-.claudes-codex-container {
-  --claudes-codex-brand: #D97757;
-  --claudes-codex-brand-rgb: 217, 119, 87;
-  --claudes-codex-brand-claude: #D97757;
-  --claudes-codex-brand-claude-rgb: 217, 119, 87;
-  --claudes-codex-brand-codex: #d0d0d0;
-  --claudes-codex-brand-codex-rgb: 208, 208, 208;
-  --claudes-codex-error: #dc3545;
-  --claudes-codex-error-rgb: 220, 53, 69;
-  --claudes-codex-compact: #5bc0de;
+.pocket-codex-container {
+  --pocket-codex-brand: #D97757;
+  --pocket-codex-brand-rgb: 217, 119, 87;
+  --pocket-codex-brand-claude: #D97757;
+  --pocket-codex-brand-claude-rgb: 217, 119, 87;
+  --pocket-codex-brand-codex: #d0d0d0;
+  --pocket-codex-brand-codex-rgb: 208, 208, 208;
+  --pocket-codex-error: #dc3545;
+  --pocket-codex-error-rgb: 220, 53, 69;
+  --pocket-codex-compact: #5bc0de;
 }
 
-body.theme-light .claudes-codex-container {
-  --claudes-codex-brand-codex: #000000;
-  --claudes-codex-brand-codex-rgb: 0, 0, 0;
+body.theme-light .pocket-codex-container {
+  --pocket-codex-brand-codex: #000000;
+  --pocket-codex-brand-codex-rgb: 0, 0, 0;
 }
 
 /* Active-provider alias for single-provider surfaces. */
-.claudes-codex-container[data-provider="claude"] {
-  --claudes-codex-brand: var(--claudes-codex-brand-claude);
-  --claudes-codex-brand-rgb: var(--claudes-codex-brand-claude-rgb);
+.pocket-codex-container[data-provider="claude"] {
+  --pocket-codex-brand: var(--pocket-codex-brand-claude);
+  --pocket-codex-brand-rgb: var(--pocket-codex-brand-claude-rgb);
 }
 
-.claudes-codex-container[data-provider="codex"] {
-  --claudes-codex-brand: var(--claudes-codex-brand-codex);
-  --claudes-codex-brand-rgb: var(--claudes-codex-brand-codex-rgb);
+.pocket-codex-container[data-provider="codex"] {
+  --pocket-codex-brand: var(--pocket-codex-brand-codex);
+  --pocket-codex-brand-rgb: var(--pocket-codex-brand-codex-rgb);
 }

@@ -55,9 +55,9 @@ export class InlineAskUserQuestion {
   }
 
   render(): void {
-    this.rootEl = this.containerEl.createDiv({ cls: 'claudes-codex-ask-question-inline' });
+    this.rootEl = this.containerEl.createDiv({ cls: 'pocket-codex-ask-question-inline' });
 
-    const titleEl = this.rootEl.createDiv({ cls: 'claudes-codex-ask-inline-title' });
+    const titleEl = this.rootEl.createDiv({ cls: 'pocket-codex-ask-inline-title' });
     titleEl.setText(this.config.title);
 
     if (this.config.headerEl) {
@@ -81,10 +81,10 @@ export class InlineAskUserQuestion {
     }
 
     if (!this.config.immediateSelect) {
-      this.tabBar = this.rootEl.createDiv({ cls: 'claudes-codex-ask-tab-bar' });
+      this.tabBar = this.rootEl.createDiv({ cls: 'pocket-codex-ask-tab-bar' });
       this.renderTabBar();
     }
-    this.contentArea = this.rootEl.createDiv({ cls: 'claudes-codex-ask-content' });
+    this.contentArea = this.rootEl.createDiv({ cls: 'pocket-codex-ask-content' });
     this.renderTabContent();
 
     this.rootEl.setAttribute('tabindex', '0');
@@ -188,9 +188,9 @@ export class InlineAskUserQuestion {
 
     for (let idx = 0; idx < this.questions.length; idx++) {
       const answered = this.isQuestionAnswered(idx);
-      const tab = this.tabBar.createSpan({ cls: 'claudes-codex-ask-tab' });
-      tab.createSpan({ text: this.questions[idx].header, cls: 'claudes-codex-ask-tab-label' });
-      tab.createSpan({ text: answered ? ' \u2713' : '', cls: 'claudes-codex-ask-tab-tick' });
+      const tab = this.tabBar.createSpan({ cls: 'pocket-codex-ask-tab' });
+      tab.createSpan({ text: this.questions[idx].header, cls: 'pocket-codex-ask-tab-label' });
+      tab.createSpan({ text: answered ? ' \u2713' : '', cls: 'pocket-codex-ask-tab-tick' });
       tab.setAttribute('title', this.questions[idx].question);
 
       if (idx === this.activeTabIndex) tab.addClass('is-active');
@@ -200,9 +200,9 @@ export class InlineAskUserQuestion {
     }
 
     const allAnswered = this.questions.every((_, i) => this.isQuestionAnswered(i));
-    const submitTab = this.tabBar.createSpan({ cls: 'claudes-codex-ask-tab' });
-    submitTab.createSpan({ text: allAnswered ? '\u2713 ' : '', cls: 'claudes-codex-ask-tab-submit-check' });
-    submitTab.createSpan({ text: 'Submit', cls: 'claudes-codex-ask-tab-label' });
+    const submitTab = this.tabBar.createSpan({ cls: 'pocket-codex-ask-tab' });
+    submitTab.createSpan({ text: allAnswered ? '\u2713 ' : '', cls: 'pocket-codex-ask-tab-submit-check' });
+    submitTab.createSpan({ text: 'Submit', cls: 'pocket-codex-ask-tab-label' });
     if (this.activeTabIndex === this.questions.length) submitTab.addClass('is-active');
     submitTab.addEventListener('click', () => this.switchTab(this.questions.length));
     this.tabElements.push(submitTab);
@@ -243,10 +243,10 @@ export class InlineAskUserQuestion {
 
     this.contentArea.createDiv({
       text: q.question,
-      cls: 'claudes-codex-ask-question-text',
+      cls: 'pocket-codex-ask-question-text',
     });
 
-    const listEl = this.contentArea.createDiv({ cls: 'claudes-codex-ask-list' });
+    const listEl = this.contentArea.createDiv({ cls: 'pocket-codex-ask-list' });
 
     for (let optIdx = 0; optIdx < q.options.length; optIdx++) {
       const option = q.options[optIdx];
@@ -254,27 +254,27 @@ export class InlineAskUserQuestion {
       const optionValue = this.getOptionValue(option);
       const isSelected = selected.has(optionValue);
 
-      const row = listEl.createDiv({ cls: 'claudes-codex-ask-item' });
+      const row = listEl.createDiv({ cls: 'pocket-codex-ask-item' });
       if (isFocused) row.addClass('is-focused');
       if (isSelected) row.addClass('is-selected');
 
-      row.createSpan({ text: isFocused ? '\u203A' : '\u00A0', cls: 'claudes-codex-ask-cursor' });
-      row.createSpan({ text: `${optIdx + 1}. `, cls: 'claudes-codex-ask-item-num' });
+      row.createSpan({ text: isFocused ? '\u203A' : '\u00A0', cls: 'pocket-codex-ask-cursor' });
+      row.createSpan({ text: `${optIdx + 1}. `, cls: 'pocket-codex-ask-item-num' });
 
       if (isMulti) {
         this.renderMultiSelectCheckbox(row, isSelected);
       }
 
-      const labelBlock = row.createDiv({ cls: 'claudes-codex-ask-item-content' });
-      const labelRow = labelBlock.createDiv({ cls: 'claudes-codex-ask-label-row' });
-      labelRow.createSpan({ text: option.label, cls: 'claudes-codex-ask-item-label' });
+      const labelBlock = row.createDiv({ cls: 'pocket-codex-ask-item-content' });
+      const labelRow = labelBlock.createDiv({ cls: 'pocket-codex-ask-label-row' });
+      labelRow.createSpan({ text: option.label, cls: 'pocket-codex-ask-item-label' });
 
       if (!isMulti && isSelected) {
-        labelRow.createSpan({ text: ' \u2713', cls: 'claudes-codex-ask-check-mark' });
+        labelRow.createSpan({ text: ' \u2713', cls: 'pocket-codex-ask-check-mark' });
       }
 
       if (option.description) {
-        labelBlock.createDiv({ text: option.description, cls: 'claudes-codex-ask-item-desc' });
+        labelBlock.createDiv({ text: option.description, cls: 'pocket-codex-ask-item-desc' });
       }
 
       row.addEventListener('click', () => {
@@ -292,18 +292,18 @@ export class InlineAskUserQuestion {
       const customText = this.customInputs.get(idx) ?? '';
       const hasCustomText = customText.trim().length > 0;
 
-      const customRow = listEl.createDiv({ cls: 'claudes-codex-ask-item claudes-codex-ask-custom-item' });
+      const customRow = listEl.createDiv({ cls: 'pocket-codex-ask-item pocket-codex-ask-custom-item' });
       if (customFocused) customRow.addClass('is-focused');
 
-      customRow.createSpan({ text: customFocused ? '\u203A' : '\u00A0', cls: 'claudes-codex-ask-cursor' });
-      customRow.createSpan({ text: `${customIdx + 1}. `, cls: 'claudes-codex-ask-item-num' });
+      customRow.createSpan({ text: customFocused ? '\u203A' : '\u00A0', cls: 'pocket-codex-ask-cursor' });
+      customRow.createSpan({ text: `${customIdx + 1}. `, cls: 'pocket-codex-ask-item-num' });
 
       if (isMulti) {
         this.renderMultiSelectCheckbox(customRow, hasCustomText);
       }
 
       const inputEl = customRow.createEl('input', {
-        cls: 'claudes-codex-ask-custom-text',
+        cls: 'pocket-codex-ask-custom-text',
         value: customText,
       });
       inputEl.setAttribute('type', q.isSecret ? 'password' : 'text');
@@ -335,47 +335,47 @@ export class InlineAskUserQuestion {
 
     this.contentArea.createDiv({
       text: this.config.immediateSelect ? HINTS_TEXT_IMMEDIATE : HINTS_TEXT,
-      cls: 'claudes-codex-ask-hints',
+      cls: 'pocket-codex-ask-hints',
     });
   }
 
   private renderSubmitTab(): void {
     this.contentArea.createDiv({
       text: 'Review your answers',
-      cls: 'claudes-codex-ask-review-title',
+      cls: 'pocket-codex-ask-review-title',
     });
 
-    const reviewEl = this.contentArea.createDiv({ cls: 'claudes-codex-ask-review' });
+    const reviewEl = this.contentArea.createDiv({ cls: 'pocket-codex-ask-review' });
 
     for (let idx = 0; idx < this.questions.length; idx++) {
       const q = this.questions[idx];
       const answerText = this.getAnswerText(idx);
 
-      const pairEl = reviewEl.createDiv({ cls: 'claudes-codex-ask-review-pair' });
-      pairEl.createDiv({ text: `${idx + 1}.`, cls: 'claudes-codex-ask-review-num' });
-      const bodyEl = pairEl.createDiv({ cls: 'claudes-codex-ask-review-body' });
-      bodyEl.createDiv({ text: q.question, cls: 'claudes-codex-ask-review-q-text' });
+      const pairEl = reviewEl.createDiv({ cls: 'pocket-codex-ask-review-pair' });
+      pairEl.createDiv({ text: `${idx + 1}.`, cls: 'pocket-codex-ask-review-num' });
+      const bodyEl = pairEl.createDiv({ cls: 'pocket-codex-ask-review-body' });
+      bodyEl.createDiv({ text: q.question, cls: 'pocket-codex-ask-review-q-text' });
       bodyEl.createDiv({
         text: answerText || 'Not answered',
-        cls: answerText ? 'claudes-codex-ask-review-a-text' : 'claudes-codex-ask-review-empty',
+        cls: answerText ? 'pocket-codex-ask-review-a-text' : 'pocket-codex-ask-review-empty',
       });
       pairEl.addEventListener('click', () => this.switchTab(idx));
     }
 
     this.contentArea.createDiv({
       text: 'Ready to submit your answers?',
-      cls: 'claudes-codex-ask-review-prompt',
+      cls: 'pocket-codex-ask-review-prompt',
     });
 
-    const actionsEl = this.contentArea.createDiv({ cls: 'claudes-codex-ask-list' });
+    const actionsEl = this.contentArea.createDiv({ cls: 'pocket-codex-ask-list' });
     const allAnswered = this.questions.every((_, i) => this.isQuestionAnswered(i));
 
-    const submitRow = actionsEl.createDiv({ cls: 'claudes-codex-ask-item' });
+    const submitRow = actionsEl.createDiv({ cls: 'pocket-codex-ask-item' });
     if (this.focusedItemIndex === 0) submitRow.addClass('is-focused');
     if (!allAnswered) submitRow.addClass('is-disabled');
-    submitRow.createSpan({ text: this.focusedItemIndex === 0 ? '\u203A' : '\u00A0', cls: 'claudes-codex-ask-cursor' });
-    submitRow.createSpan({ text: '1. ', cls: 'claudes-codex-ask-item-num' });
-    submitRow.createSpan({ text: 'Submit answers', cls: 'claudes-codex-ask-item-label' });
+    submitRow.createSpan({ text: this.focusedItemIndex === 0 ? '\u203A' : '\u00A0', cls: 'pocket-codex-ask-cursor' });
+    submitRow.createSpan({ text: '1. ', cls: 'pocket-codex-ask-item-num' });
+    submitRow.createSpan({ text: 'Submit answers', cls: 'pocket-codex-ask-item-label' });
     submitRow.addEventListener('click', () => {
       this.focusedItemIndex = 0;
       this.updateFocusIndicator();
@@ -383,11 +383,11 @@ export class InlineAskUserQuestion {
     });
     this.currentItems.push(submitRow);
 
-    const cancelRow = actionsEl.createDiv({ cls: 'claudes-codex-ask-item' });
+    const cancelRow = actionsEl.createDiv({ cls: 'pocket-codex-ask-item' });
     if (this.focusedItemIndex === 1) cancelRow.addClass('is-focused');
-    cancelRow.createSpan({ text: this.focusedItemIndex === 1 ? '\u203A' : '\u00A0', cls: 'claudes-codex-ask-cursor' });
-    cancelRow.createSpan({ text: '2. ', cls: 'claudes-codex-ask-item-num' });
-    cancelRow.createSpan({ text: 'Cancel', cls: 'claudes-codex-ask-item-label' });
+    cancelRow.createSpan({ text: this.focusedItemIndex === 1 ? '\u203A' : '\u00A0', cls: 'pocket-codex-ask-cursor' });
+    cancelRow.createSpan({ text: '2. ', cls: 'pocket-codex-ask-item-num' });
+    cancelRow.createSpan({ text: 'Cancel', cls: 'pocket-codex-ask-item-label' });
     cancelRow.addEventListener('click', () => {
       this.focusedItemIndex = 1;
       this.handleResolve(null);
@@ -396,7 +396,7 @@ export class InlineAskUserQuestion {
 
     this.contentArea.createDiv({
       text: HINTS_TEXT,
-      cls: 'claudes-codex-ask-hints',
+      cls: 'pocket-codex-ask-hints',
     });
   }
 
@@ -447,7 +447,7 @@ export class InlineAskUserQuestion {
   private renderMultiSelectCheckbox(parent: HTMLElement, checked: boolean): void {
     parent.createSpan({
       text: checked ? '[\u2713] ' : '[ ] ',
-      cls: `claudes-codex-ask-check${checked ? ' is-checked' : ''}`,
+      cls: `pocket-codex-ask-check${checked ? ' is-checked' : ''}`,
     });
   }
 
@@ -463,16 +463,16 @@ export class InlineAskUserQuestion {
       item.toggleClass('is-selected', isSelected);
 
       if (isMulti) {
-        const checkSpan = item.querySelector('.claudes-codex-ask-check');
+        const checkSpan = item.querySelector('.pocket-codex-ask-check');
         if (checkSpan) {
           checkSpan.textContent = isSelected ? '[\u2713] ' : '[ ] ';
           checkSpan.toggleClass('is-checked', isSelected);
         }
       } else {
-        const labelRow = item.querySelector('.claudes-codex-ask-label-row');
-        const existingMark = item.querySelector('.claudes-codex-ask-check-mark');
+        const labelRow = item.querySelector('.pocket-codex-ask-label-row');
+        const existingMark = item.querySelector('.pocket-codex-ask-check-mark');
         if (isSelected && !existingMark && labelRow) {
-          labelRow.createSpan({ text: ' \u2713', cls: 'claudes-codex-ask-check-mark' });
+          labelRow.createSpan({ text: ' \u2713', cls: 'pocket-codex-ask-check-mark' });
         } else if (!isSelected && existingMark) {
           existingMark.remove();
         }
@@ -483,7 +483,7 @@ export class InlineAskUserQuestion {
   private updateFocusIndicator(): void {
     for (let i = 0; i < this.currentItems.length; i++) {
       const item = this.currentItems[i];
-      const cursor = item.querySelector('.claudes-codex-ask-cursor');
+      const cursor = item.querySelector('.pocket-codex-ask-cursor');
       if (i === this.focusedItemIndex) {
         item.addClass('is-focused');
         if (cursor) cursor.textContent = '\u203A';
@@ -498,14 +498,14 @@ export class InlineAskUserQuestion {
   private updateTabIndicators(): void {
     for (let idx = 0; idx < this.questions.length; idx++) {
       const tab = this.tabElements[idx];
-      const tick = tab.querySelector('.claudes-codex-ask-tab-tick');
+      const tick = tab.querySelector('.pocket-codex-ask-tab-tick');
       const answered = this.isQuestionAnswered(idx);
       tab.toggleClass('is-answered', answered);
       if (tick) tick.textContent = answered ? ' \u2713' : '';
     }
     const submitTab = this.tabElements[this.questions.length];
     if (submitTab) {
-      const submitCheck = submitTab.querySelector('.claudes-codex-ask-tab-submit-check');
+      const submitCheck = submitTab.querySelector('.pocket-codex-ask-tab-submit-check');
       const allAnswered = this.questions.every((_, i) => this.isQuestionAnswered(i));
       if (submitCheck) submitCheck.textContent = allAnswered ? '\u2713 ' : '';
     }
@@ -641,7 +641,7 @@ export class InlineAskUserQuestion {
         } else if (this.canShowCustomInputForQuestion(q)) {
           this.isInputFocused = true;
           const customRow = this.currentItems[this.focusedItemIndex];
-          const input = customRow?.querySelector('.claudes-codex-ask-custom-text') as HTMLInputElement;
+          const input = customRow?.querySelector('.pocket-codex-ask-custom-text') as HTMLInputElement;
           input?.focus();
         }
         break;

@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 /**
- * Minimal claudes-codexd protocol client for end-to-end testing.
+ * Minimal pocket-codexd protocol client for end-to-end testing.
  *
  *   node daemon/test-client.mjs --url ws://127.0.0.1:8423 \
- *     [--provider claude] [--model haiku] [--prompt "Reply with exactly: CLAUDES-CODEX-OK"]
+ *     [--provider claude] [--model haiku] [--prompt "Reply with exactly: POCKET-CODEX-OK"]
  */
 
 const args = {};
@@ -13,7 +13,7 @@ for (let i = 2; i < process.argv.length; i += 2) {
 const url = args.url ?? 'ws://127.0.0.1:8423';
 const provider = args.provider ?? 'claude';
 const model = args.model ?? 'haiku';
-const prompt = args.prompt ?? 'Reply with exactly: CLAUDES-CODEX-OK';
+const prompt = args.prompt ?? 'Reply with exactly: POCKET-CODEX-OK';
 if (!url) {
   console.error('usage: test-client.mjs --url ws://host:port [--provider claude] [--model haiku] [--prompt ...]');
   process.exit(2);
@@ -104,7 +104,7 @@ ws.onmessage = async (event) => {
         clearTimeout(deadline);
         const trimmed = accumulated.trim();
         if (trimmed.length > 0) {
-          console.log(`\nPASS: streamed ${trimmed.length} chars${trimmed.includes('CLAUDES-CODEX-OK') ? ' (marker found)' : ''}`);
+          console.log(`\nPASS: streamed ${trimmed.length} chars${trimmed.includes('POCKET-CODEX-OK') ? ' (marker found)' : ''}`);
           process.exit(0);
         } else {
           console.error('\nFAIL: stream ended with no text');

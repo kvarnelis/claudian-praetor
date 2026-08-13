@@ -20,7 +20,7 @@ describe('daemon headless plugin', () => {
   let vaultPath: string;
 
   beforeEach(() => {
-    vaultPath = mkdtempSync(path.join(os.tmpdir(), 'claudes-codex-headless-'));
+    vaultPath = mkdtempSync(path.join(os.tmpdir(), 'pocket-codex-headless-'));
     registerBuiltInProviders();
     mockDiscoverModels.mockResolvedValue({
       kind: 'completed',

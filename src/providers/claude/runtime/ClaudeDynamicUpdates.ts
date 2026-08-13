@@ -8,7 +8,7 @@ import type { McpServerManager } from '../../../core/mcp/McpServerManager';
 import type {
   ChatRuntimeQueryOptions,
 } from '../../../core/runtime/types';
-import type { ClaudesCodexSettings,PermissionMode } from '../../../core/types/settings';
+import type { PermissionMode,PocketCodexSettings } from '../../../core/types/settings';
 import { toClaudeRuntimeModelId } from '../modelSelection';
 import {
   resolveEffortLevel,
@@ -25,7 +25,7 @@ export interface ClaudeDynamicUpdateDeps {
   mutateCurrentConfig: (mutate: (config: PersistentQueryConfig) => void) => void;
   getVaultPath: () => string | null;
   getCliPath: () => Promise<string | null>;
-  getScopedSettings: () => ClaudesCodexSettings;
+  getScopedSettings: () => PocketCodexSettings;
   getPermissionMode: () => PermissionMode;
   resolveSDKPermissionMode: (mode: PermissionMode) => SDKPermissionMode;
   mcpManager: McpServerManager;

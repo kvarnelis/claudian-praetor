@@ -294,13 +294,13 @@ export class StreamController {
         // If already rendered, update the header name + summary
         const toolEl = state.toolCallElements.get(chunk.id);
         if (toolEl) {
-          const nameEl = toolEl.querySelector('.claudes-codex-tool-name')
-            ?? toolEl.querySelector('.claudes-codex-write-edit-name');
+          const nameEl = toolEl.querySelector('.pocket-codex-tool-name')
+            ?? toolEl.querySelector('.pocket-codex-write-edit-name');
           if (nameEl) {
             nameEl.setText(getToolName(existingToolCall.name, existingToolCall.input));
           }
-          const summaryEl = toolEl.querySelector('.claudes-codex-tool-summary')
-            ?? toolEl.querySelector('.claudes-codex-write-edit-summary');
+          const summaryEl = toolEl.querySelector('.pocket-codex-tool-summary')
+            ?? toolEl.querySelector('.pocket-codex-write-edit-summary');
           if (summaryEl) {
             summaryEl.setText(getToolSummary(existingToolCall.name, existingToolCall.input));
           }
@@ -706,7 +706,7 @@ export class StreamController {
     this.hideThinkingIndicator();
 
     if (!state.currentTextEl) {
-      state.currentTextEl = state.currentContentEl.createDiv({ cls: 'claudes-codex-text-block' });
+      state.currentTextEl = state.currentContentEl.createDiv({ cls: 'pocket-codex-text-block' });
       state.currentTextContent = '';
     }
 
@@ -1460,14 +1460,14 @@ export class StreamController {
       if (!state.currentContentEl || state.thinkingEl || state.currentThinkingState) return;
 
       const cls = overrideCls
-        ? `claudes-codex-thinking ${overrideCls}`
-        : 'claudes-codex-thinking';
+        ? `pocket-codex-thinking ${overrideCls}`
+        : 'pocket-codex-thinking';
       state.thinkingEl = state.currentContentEl.createDiv({ cls });
       const text = overrideText || FLAVOR_TEXTS[Math.floor(Math.random() * FLAVOR_TEXTS.length)];
       state.thinkingEl.createSpan({ text });
 
       // Create timer span with initial value
-      const timerSpan = state.thinkingEl.createSpan({ cls: 'claudes-codex-thinking-hint' });
+      const timerSpan = state.thinkingEl.createSpan({ cls: 'pocket-codex-thinking-hint' });
       const updateTimer = () => {
         if (!state.responseStartTime) return;
         // Check if element is still connected to DOM (prevents orphaned interval updates)
@@ -1522,8 +1522,8 @@ export class StreamController {
     const { state } = this.deps;
     if (!state.currentContentEl) return;
     this.hideThinkingIndicator();
-    const el = state.currentContentEl.createDiv({ cls: 'claudes-codex-compact-boundary' });
-    el.createSpan({ cls: 'claudes-codex-compact-boundary-label', text: 'Conversation compacted' });
+    const el = state.currentContentEl.createDiv({ cls: 'pocket-codex-compact-boundary' });
+    el.createSpan({ cls: 'pocket-codex-compact-boundary-label', text: 'Conversation compacted' });
   }
 
   // ============================================

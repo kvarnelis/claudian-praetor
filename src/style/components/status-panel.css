@@ -1,25 +1,25 @@
 /* Status Panel - persistent bottom panel for todos and command output */
 
-.claudes-codex-status-panel-container {
+.pocket-codex-status-panel-container {
   flex-shrink: 0;
   padding: 0 14px;
 }
 
-.claudes-codex-status-panel {
+.pocket-codex-status-panel {
   padding-top: 0;
 }
 
-.claudes-codex-status-panel--visible {
+.pocket-codex-status-panel--visible {
   padding-top: 12px;
 }
 
 /* Todo Section */
 
-.claudes-codex-status-panel-todos {
+.pocket-codex-status-panel-todos {
   margin-top: 4px;
 }
 
-.claudes-codex-status-panel-header {
+.pocket-codex-status-panel-header {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -30,35 +30,35 @@
   overflow: hidden;
 }
 
-.claudes-codex-status-panel-header:hover {
+.pocket-codex-status-panel-header:hover {
   background: var(--background-modifier-hover);
 }
 
-.claudes-codex-status-panel-header:focus-visible {
+.pocket-codex-status-panel-header:focus-visible {
   outline: 2px solid var(--interactive-accent);
   outline-offset: 2px;
 }
 
-.claudes-codex-status-panel-icon {
+.pocket-codex-status-panel-icon {
   display: flex;
   align-items: center;
   color: var(--text-accent);
   flex-shrink: 0;
 }
 
-.claudes-codex-status-panel-icon svg {
+.pocket-codex-status-panel-icon svg {
   width: 16px;
   height: 16px;
 }
 
-.claudes-codex-status-panel-label {
+.pocket-codex-status-panel-label {
   font-family: var(--font-monospace);
   font-size: 13px;
   font-weight: 500;
   color: var(--text-normal);
 }
 
-.claudes-codex-status-panel-current {
+.pocket-codex-status-panel-current {
   flex: 1;
   font-family: var(--font-monospace);
   font-size: 13px;
@@ -68,44 +68,44 @@
   white-space: nowrap;
 }
 
-.claudes-codex-status-panel-status {
+.pocket-codex-status-panel-status {
   display: flex;
   align-items: center;
   flex-shrink: 0;
 }
 
-.claudes-codex-status-panel-status svg {
+.pocket-codex-status-panel-status svg {
   width: 14px;
   height: 14px;
 }
 
-.claudes-codex-status-panel-status.status-completed {
+.pocket-codex-status-panel-status.status-completed {
   color: var(--color-green);
 }
 
-.claudes-codex-status-panel-content {
+.pocket-codex-status-panel-content {
   padding: 2px 0;
 }
 
-/* Individual todo item - shared by status panel and inline tool via .claudes-codex-todo-list-container */
-.claudes-codex-todo-list-container .claudes-codex-todo-item {
+/* Individual todo item - shared by status panel and inline tool via .pocket-codex-todo-list-container */
+.pocket-codex-todo-list-container .pocket-codex-todo-item {
   display: flex;
   align-items: flex-start;
   padding: 1px 0;
 }
 
-.claudes-codex-todo-list-container .claudes-codex-todo-status-icon {
+.pocket-codex-todo-list-container .pocket-codex-todo-status-icon {
   display: flex;
   align-items: center;
   flex-shrink: 0;
 }
 
-.claudes-codex-todo-list-container .claudes-codex-todo-status-icon svg {
+.pocket-codex-todo-list-container .pocket-codex-todo-status-icon svg {
   width: 12px;
   height: 12px;
 }
 
-.claudes-codex-todo-list-container .claudes-codex-todo-text {
+.pocket-codex-todo-list-container .pocket-codex-todo-text {
   font-family: var(--font-monospace);
   font-size: 12px;
   line-height: 1.4;
@@ -113,55 +113,55 @@
   padding-left: 12px;
 }
 
-.claudes-codex-todo-list-container .claudes-codex-todo-pending .claudes-codex-todo-status-icon {
+.pocket-codex-todo-list-container .pocket-codex-todo-pending .pocket-codex-todo-status-icon {
   color: var(--text-normal);
 }
 
-.claudes-codex-todo-list-container .claudes-codex-todo-pending .claudes-codex-todo-status-icon svg {
+.pocket-codex-todo-list-container .pocket-codex-todo-pending .pocket-codex-todo-status-icon svg {
   transform: scale(2);
 }
 
-.claudes-codex-todo-list-container .claudes-codex-todo-pending .claudes-codex-todo-text {
+.pocket-codex-todo-list-container .pocket-codex-todo-pending .pocket-codex-todo-text {
   color: var(--text-normal);
 }
 
-.claudes-codex-todo-list-container .claudes-codex-todo-in_progress .claudes-codex-todo-status-icon {
+.pocket-codex-todo-list-container .pocket-codex-todo-in_progress .pocket-codex-todo-status-icon {
   color: var(--interactive-accent);
 }
 
-.claudes-codex-todo-list-container .claudes-codex-todo-in_progress .claudes-codex-todo-status-icon svg {
+.pocket-codex-todo-list-container .pocket-codex-todo-in_progress .pocket-codex-todo-status-icon svg {
   transform: scale(2);
 }
 
-.claudes-codex-todo-list-container .claudes-codex-todo-in_progress .claudes-codex-todo-text {
+.pocket-codex-todo-list-container .pocket-codex-todo-in_progress .pocket-codex-todo-text {
   color: var(--text-normal);
 }
 
-.claudes-codex-todo-list-container .claudes-codex-todo-completed .claudes-codex-todo-status-icon {
+.pocket-codex-todo-list-container .pocket-codex-todo-completed .pocket-codex-todo-status-icon {
   color: var(--color-green);
 }
 
-.claudes-codex-todo-list-container .claudes-codex-todo-completed .claudes-codex-todo-text {
+.pocket-codex-todo-list-container .pocket-codex-todo-completed .pocket-codex-todo-text {
   color: var(--text-muted);
 }
 
 /* Bash Output Section */
 
-.claudes-codex-status-panel-bash {
+.pocket-codex-status-panel-bash {
   margin-bottom: 4px;
 }
 
-.claudes-codex-status-panel-bash-header {
+.pocket-codex-status-panel-bash-header {
   padding: 4px 0;
 }
 
-.claudes-codex-status-panel-bash-actions {
+.pocket-codex-status-panel-bash-actions {
   display: flex;
   align-items: center;
   gap: 6px;
 }
 
-.claudes-codex-status-panel-bash-action {
+.pocket-codex-status-panel-bash-action {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -171,35 +171,35 @@
   color: var(--text-muted);
 }
 
-.claudes-codex-status-panel-bash-action:hover {
+.pocket-codex-status-panel-bash-action:hover {
   background: var(--background-modifier-hover);
   color: var(--text-normal);
 }
 
-.claudes-codex-status-panel-bash-content {
+.pocket-codex-status-panel-bash-content {
   padding-top: 2px;
   max-height: min(40vh, 320px);
   overflow-y: auto;
   overscroll-behavior: contain;
 }
 
-.claudes-codex-status-panel-bash-entry {
+.pocket-codex-status-panel-bash-entry {
   margin: 4px 0;
 }
 
-.claudes-codex-status-panel-bash-entry .claudes-codex-tool-icon svg {
+.pocket-codex-status-panel-bash-entry .pocket-codex-tool-icon svg {
   width: 14px;
   height: 14px;
   position: relative;
   top: -1px;
 }
 
-.claudes-codex-status-panel-bash-entry .claudes-codex-tool-call {
+.pocket-codex-status-panel-bash-entry .pocket-codex-tool-call {
   margin: 0;
 }
 
 /* Keep bash output blocks from growing without bound */
-.claudes-codex-status-panel-bash-entry .claudes-codex-tool-result-text {
+.pocket-codex-status-panel-bash-entry .pocket-codex-tool-result-text {
   max-height: 200px;
   overflow-y: auto;
   word-break: break-word;

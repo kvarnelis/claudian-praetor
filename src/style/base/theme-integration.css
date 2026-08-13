@@ -1,15 +1,15 @@
-.claudes-codex-container--theme-native {
+.pocket-codex-container--theme-native {
   /* Right-side themes can remap secondary; the ribbon token retains their sidebar surface. */
   background-color: var(--ribbon-background, var(--background-primary-alt, var(--background-secondary)));
   font-family: var(--font-interface);
 }
 
-.claudes-codex-container--theme-native .claudes-codex-message-content {
+.pocket-codex-container--theme-native .pocket-codex-message-content {
   color: var(--nav-item-color, var(--text-muted));
   font-size: var(--font-ui-small, 13px);
 }
 
-.claudes-codex-container--theme-native .claudes-codex-message-user {
+.pocket-codex-container--theme-native .pocket-codex-message-user {
   align-self: flex-end;
   padding: 0;
   /* Breathing room between the prompt text and its own right-hand rule. */
@@ -21,7 +21,7 @@
   text-align: end;
 }
 
-.claudes-codex-container--theme-native .claudes-codex-input-wrapper textarea.claudes-codex-input {
+.pocket-codex-container--theme-native .pocket-codex-input-wrapper textarea.pocket-codex-input {
   color: var(--text-normal);
   font-size: var(--font-ui-small, 13px);
 }

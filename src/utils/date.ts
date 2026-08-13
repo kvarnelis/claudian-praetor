@@ -1,5 +1,5 @@
 /**
- * Claude's Codex - Date Utilities
+ * Pocket Codex - Date Utilities
  *
  * Date formatting helpers for system prompts.
  */

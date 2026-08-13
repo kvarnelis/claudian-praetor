@@ -1,5 +1,5 @@
 /**
- * Claude's Codex - Context Utilities
+ * Pocket Codex - Context Utilities
  *
  * Note and context file formatting for prompts.
  */

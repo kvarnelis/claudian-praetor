@@ -36,7 +36,7 @@ export class EnvSnippetModal extends Modal {
     const { contentEl } = this;
     this.setTitle(this.snippet ? t('settings.envSnippets.modal.titleEdit') : t('settings.envSnippets.modal.titleSave'));
 
-    this.modalEl.addClass('claudes-codex-env-snippet-modal');
+    this.modalEl.addClass('pocket-codex-env-snippet-modal');
 
     let nameEl: HTMLInputElement;
     let descEl: HTMLInputElement;
@@ -109,11 +109,11 @@ export class EnvSnippetModal extends Modal {
       const uniqueModelIds = ProviderRegistry.getCustomModelIds(envVars);
 
       if (uniqueModelIds.size === 0) {
-        contextLimitsContainer.addClass('claudes-codex-hidden');
+        contextLimitsContainer.addClass('pocket-codex-hidden');
         return;
       }
 
-      contextLimitsContainer.removeClass('claudes-codex-hidden');
+      contextLimitsContainer.removeClass('pocket-codex-hidden');
 
       const existingLimits = this.snippet?.contextLimits ?? this.plugin.settings.customContextLimits ?? {};
       const existingAliases = this.snippet?.modelAliases ?? this.plugin.settings.customModelAliases ?? {};
@@ -128,14 +128,14 @@ export class EnvSnippetModal extends Modal {
       });
 
       for (const modelId of uniqueModelIds) {
-        const row = contextLimitsContainer.createDiv({ cls: 'claudes-codex-snippet-limit-row' });
-        row.createSpan({ text: modelId, cls: 'claudes-codex-snippet-limit-model' });
-        row.createSpan({ cls: 'claudes-codex-snippet-limit-spacer' });
+        const row = contextLimitsContainer.createDiv({ cls: 'pocket-codex-snippet-limit-row' });
+        row.createSpan({ text: modelId, cls: 'pocket-codex-snippet-limit-model' });
+        row.createSpan({ cls: 'pocket-codex-snippet-limit-spacer' });
 
         const aliasInput = row.createEl('input', {
           type: 'text',
           placeholder: t('settings.customModelAliases.placeholder'),
-          cls: 'claudes-codex-snippet-alias-input',
+          cls: 'pocket-codex-snippet-alias-input',
         });
         aliasInput.value = existingAliases[modelId] ?? '';
         aliasInput.setAttribute('aria-label', `Alias for ${modelId}`);
@@ -145,7 +145,7 @@ export class EnvSnippetModal extends Modal {
         const input = row.createEl('input', {
           type: 'text',
           placeholder: '200k',
-          cls: 'claudes-codex-snippet-limit-input',
+          cls: 'pocket-codex-snippet-limit-input',
         });
         input.value = existingLimits[modelId] ? formatContextLimit(existingLimits[modelId]) : '';
         input.setAttribute('aria-label', `Context window for ${modelId}`);
@@ -181,23 +181,23 @@ export class EnvSnippetModal extends Modal {
         text.inputEl.rows = 8;
         text.inputEl.addEventListener('blur', () => renderContextLimitFields());
       });
-    envVarsSetting.settingEl.addClass('claudes-codex-env-snippet-setting');
-    envVarsSetting.controlEl.addClass('claudes-codex-env-snippet-control');
+    envVarsSetting.settingEl.addClass('pocket-codex-env-snippet-setting');
+    envVarsSetting.controlEl.addClass('pocket-codex-env-snippet-control');
 
-    contextLimitsContainer = contentEl.createDiv({ cls: 'claudes-codex-snippet-context-limits' });
+    contextLimitsContainer = contentEl.createDiv({ cls: 'pocket-codex-snippet-context-limits' });
     renderContextLimitFields();
 
-    const buttonContainer = contentEl.createDiv({ cls: 'claudes-codex-snippet-buttons' });
+    const buttonContainer = contentEl.createDiv({ cls: 'pocket-codex-snippet-buttons' });
 
     const cancelBtn = buttonContainer.createEl('button', {
       text: t('settings.envSnippets.modal.cancel'),
-      cls: 'claudes-codex-cancel-btn'
+      cls: 'pocket-codex-cancel-btn'
     });
     cancelBtn.addEventListener('click', () => this.close());
 
     const saveBtn = buttonContainer.createEl('button', {
       text: this.snippet ? t('settings.envSnippets.modal.update') : t('settings.envSnippets.modal.save'),
-      cls: 'claudes-codex-save-btn'
+      cls: 'pocket-codex-save-btn'
     });
     saveBtn.addEventListener('click', () => saveSnippet());
 
@@ -233,11 +233,11 @@ export class EnvSnippetManager {
   private render() {
     this.containerEl.empty();
 
-    const headerEl = this.containerEl.createDiv({ cls: 'claudes-codex-snippet-header' });
-    headerEl.createSpan({ text: t('settings.envSnippets.name'), cls: 'claudes-codex-snippet-label' });
+    const headerEl = this.containerEl.createDiv({ cls: 'pocket-codex-snippet-header' });
+    headerEl.createSpan({ text: t('settings.envSnippets.name'), cls: 'pocket-codex-snippet-label' });
 
     const saveBtn = headerEl.createEl('button', {
-      cls: 'claudes-codex-settings-action-btn',
+      cls: 'pocket-codex-settings-action-btn',
       attr: { 'aria-label': t('settings.envSnippets.addBtn') },
     });
     setIcon(saveBtn, 'plus');
@@ -248,30 +248,30 @@ export class EnvSnippetManager {
     const snippets = this.plugin.settings.envSnippets.filter((snippet) => this.shouldDisplaySnippet(snippet));
 
     if (snippets.length === 0) {
-      const emptyEl = this.containerEl.createDiv({ cls: 'claudes-codex-snippet-empty' });
+      const emptyEl = this.containerEl.createDiv({ cls: 'pocket-codex-snippet-empty' });
       emptyEl.setText(t('settings.envSnippets.noSnippets'));
       return;
     }
 
-    const listEl = this.containerEl.createDiv({ cls: 'claudes-codex-snippet-list' });
+    const listEl = this.containerEl.createDiv({ cls: 'pocket-codex-snippet-list' });
 
     for (const snippet of snippets) {
-      const itemEl = listEl.createDiv({ cls: 'claudes-codex-snippet-item' });
+      const itemEl = listEl.createDiv({ cls: 'pocket-codex-snippet-item' });
 
-      const infoEl = itemEl.createDiv({ cls: 'claudes-codex-snippet-info' });
+      const infoEl = itemEl.createDiv({ cls: 'pocket-codex-snippet-info' });
 
-      const nameEl = infoEl.createDiv({ cls: 'claudes-codex-snippet-name' });
+      const nameEl = infoEl.createDiv({ cls: 'pocket-codex-snippet-name' });
       nameEl.setText(snippet.name);
 
       if (snippet.description) {
-        const descEl = infoEl.createDiv({ cls: 'claudes-codex-snippet-description' });
+        const descEl = infoEl.createDiv({ cls: 'pocket-codex-snippet-description' });
         descEl.setText(snippet.description);
       }
 
-      const actionsEl = itemEl.createDiv({ cls: 'claudes-codex-snippet-actions' });
+      const actionsEl = itemEl.createDiv({ cls: 'pocket-codex-snippet-actions' });
 
       const restoreBtn = actionsEl.createEl('button', {
-        cls: 'claudes-codex-settings-action-btn',
+        cls: 'pocket-codex-settings-action-btn',
         attr: { 'aria-label': 'Insert' },
       });
       setIcon(restoreBtn, 'clipboard-paste');
@@ -286,7 +286,7 @@ export class EnvSnippetManager {
       });
 
       const editBtn = actionsEl.createEl('button', {
-        cls: 'claudes-codex-settings-action-btn',
+        cls: 'pocket-codex-settings-action-btn',
         attr: { 'aria-label': 'Edit' },
       });
       setIcon(editBtn, 'pencil');
@@ -295,7 +295,7 @@ export class EnvSnippetManager {
       });
 
       const deleteBtn = actionsEl.createEl('button', {
-        cls: 'claudes-codex-settings-action-btn claudes-codex-settings-delete-btn',
+        cls: 'pocket-codex-settings-action-btn pocket-codex-settings-delete-btn',
         attr: { 'aria-label': 'Delete' },
       });
       setIcon(deleteBtn, 'trash-2');
@@ -377,7 +377,7 @@ export class EnvSnippetManager {
     });
 
     this.onContextLimitsChange?.();
-    const view = this.plugin.app.workspace.getLeavesOfType('claudes-codex-view')[0]?.view as {
+    const view = this.plugin.app.workspace.getLeavesOfType('pocket-codex-view')[0]?.view as {
       refreshModelSelector?(): void;
     } | undefined;
     view?.refreshModelSelector?.();
@@ -429,7 +429,7 @@ export class EnvSnippetManager {
   }
 
   private syncTextareaValue(scope: EnvironmentScope, value: string): void {
-    const selector = `.claudes-codex-settings-env-textarea[data-env-scope="${scope}"]`;
+    const selector = `.pocket-codex-settings-env-textarea[data-env-scope="${scope}"]`;
     const envTextarea = (this.containerEl.ownerDocument ?? window.document).querySelector<HTMLTextAreaElement>(selector);
     if (envTextarea) {
       envTextarea.value = value;

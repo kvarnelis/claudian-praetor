@@ -84,7 +84,7 @@ export function createClaudeApprovalCallback(
     if (toolName === TOOL_ASK_USER_QUESTION && askUserQuestionCallback) {
       try {
         // The SDK's JSDoc says "Other will be provided automatically" but
-        // the SDK doesn't inject isOther into the canUseTool input. Claude's Codex
+        // the SDK doesn't inject isOther into the canUseTool input. Pocket Codex
         // intercepts at canUseTool and renders its own UI, so we must inject
         // isOther here to match the Claude Code CLI's built-in behavior.
         const questions = input.questions;

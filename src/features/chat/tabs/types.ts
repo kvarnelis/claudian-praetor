@@ -55,9 +55,9 @@ export const MIN_TABS = 3;
 export const MAX_TABS = 10;
 
 /**
- * Minimal interface for the ClaudesCodexView methods used by TabManager and Tab.
+ * Minimal interface for the PocketCodexView methods used by TabManager and Tab.
  * Extends Component for Obsidian integration (event handling, cleanup).
- * Avoids circular dependency by not importing ClaudesCodexView directly.
+ * Avoids circular dependency by not importing PocketCodexView directly.
  */
 export interface TabManagerViewHost extends Component {
   /** Reference to the workspace leaf for revealing the view. */

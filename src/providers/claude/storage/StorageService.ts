@@ -1,9 +1,9 @@
 import type { App } from 'obsidian';
 import { Notice } from 'obsidian';
 
-import { ClaudesCodexSettingsStorage, type StoredClaudesCodexSettings } from '../../../app/settings/ClaudesCodexSettingsStorage';
+import { PocketCodexSettingsStorage, type StoredPocketCodexSettings } from '../../../app/settings/PocketCodexSettingsStorage';
 import { SESSIONS_PATH, SessionStorage } from '../../../core/bootstrap/SessionStorage';
-import { CLAUDES_CODEX_STORAGE_PATH } from '../../../core/bootstrap/StoragePaths';
+import { POCKET_CODEX_STORAGE_PATH } from '../../../core/bootstrap/StoragePaths';
 import { normalizeTabManagerState } from '../../../core/bootstrap/tabManagerState';
 import type { AppTabManagerState } from '../../../core/providers/types';
 import { VaultFileAdapter } from '../../../core/storage/VaultFileAdapter';
@@ -29,7 +29,7 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 
 export interface CombinedSettings {
   cc: CCSettings;
-  claudesCodex: StoredClaudesCodexSettings;
+  pocketCodex: StoredPocketCodexSettings;
 }
 
 interface StorageServicePlugin {
@@ -40,7 +40,7 @@ interface StorageServicePlugin {
 
 export class StorageService {
   readonly ccSettings: CCSettingsStorage;
-  readonly claudesCodexSettings: ClaudesCodexSettingsStorage;
+  readonly pocketCodexSettings: PocketCodexSettingsStorage;
   readonly commands: SlashCommandStorage;
   readonly skills: SkillStorage;
   readonly sessions: SessionStorage;
@@ -56,7 +56,7 @@ export class StorageService {
     this.app = plugin.app;
     this.adapter = adapter ?? new VaultFileAdapter(this.app);
     this.ccSettings = new CCSettingsStorage(this.adapter);
-    this.claudesCodexSettings = new ClaudesCodexSettingsStorage(this.adapter);
+    this.pocketCodexSettings = new PocketCodexSettingsStorage(this.adapter);
     this.commands = new SlashCommandStorage(this.adapter);
     this.skills = new SkillStorage(this.adapter);
     this.sessions = new SessionStorage(this.adapter);
@@ -68,14 +68,14 @@ export class StorageService {
     await this.ensureDirectories();
 
     const cc = await this.ccSettings.load();
-    const claudesCodex = await this.claudesCodexSettings.load();
+    const pocketCodex = await this.pocketCodexSettings.load();
 
-    return { cc, claudesCodex };
+    return { cc, pocketCodex };
   }
 
   async ensureDirectories(): Promise<void> {
     await this.adapter.ensureFolder(CLAUDE_PATH);
-    await this.adapter.ensureFolder(CLAUDES_CODEX_STORAGE_PATH);
+    await this.adapter.ensureFolder(POCKET_CODEX_STORAGE_PATH);
     await this.adapter.ensureFolder(COMMANDS_PATH);
     await this.adapter.ensureFolder(SKILLS_PATH);
     await this.adapter.ensureFolder(SESSIONS_PATH);
@@ -112,16 +112,16 @@ export class StorageService {
     return this.ccSettings.removeRule(createPermissionRule(rule));
   }
 
-  async updateClaudesCodexSettings(updates: Partial<StoredClaudesCodexSettings>): Promise<void> {
-    return this.claudesCodexSettings.update(updates);
+  async updatePocketCodexSettings(updates: Partial<StoredPocketCodexSettings>): Promise<void> {
+    return this.pocketCodexSettings.update(updates);
   }
 
-  async saveClaudesCodexSettings(settings: StoredClaudesCodexSettings): Promise<void> {
-    return this.claudesCodexSettings.save(settings);
+  async savePocketCodexSettings(settings: StoredPocketCodexSettings): Promise<void> {
+    return this.pocketCodexSettings.save(settings);
   }
 
-  async loadClaudesCodexSettings(): Promise<StoredClaudesCodexSettings> {
-    return this.claudesCodexSettings.load();
+  async loadPocketCodexSettings(): Promise<StoredPocketCodexSettings> {
+    return this.pocketCodexSettings.load();
   }
 
   async getTabManagerState(): Promise<TabManagerPersistedState | null> {

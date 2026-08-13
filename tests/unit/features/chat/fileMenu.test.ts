@@ -1,11 +1,11 @@
 import { Menu, TFile, TFolder } from 'obsidian';
 
 import {
-  addFileToClaudesCodex,
+  addFileToPocketCodex,
   registerFileMenu,
 } from '@/features/chat/fileMenu';
 
-describe("Claude's Codex file menu", () => {
+describe("Pocket Codex file menu", () => {
   function createFile(path: string): TFile {
     const file = new TFile();
     file.path = path;
@@ -46,7 +46,7 @@ describe("Claude's Codex file menu", () => {
     (Menu as typeof Menu & { instances: Menu[] }).instances.length = 0;
   });
 
-  it("registers an Add to Claude's Codex item for files", () => {
+  it("registers an Add to Pocket Codex item for files", () => {
     const { eventRef, getFileMenuHandler, host } = createHost();
 
     registerFileMenu(host as never);
@@ -55,7 +55,7 @@ describe("Claude's Codex file menu", () => {
 
     expect(host.registerEvent).toHaveBeenCalledWith(eventRef);
     expect((menu as any).items).toHaveLength(1);
-    expect((menu as any).items[0].title).toBe("Add to Claude's Codex");
+    expect((menu as any).items[0].title).toBe("Add to Pocket Codex");
   });
 
   it('does not add the action for folders', () => {
@@ -68,11 +68,11 @@ describe("Claude's Codex file menu", () => {
     expect((menu as any).items).toHaveLength(0);
   });
 
-  it("reveals Claude's Codex and appends the vault-relative mention", async () => {
+  it("reveals Pocket Codex and appends the vault-relative mention", async () => {
     const { appendToActiveInput, host } = createHost();
     const file = createFile('projects/My Plan.md');
 
-    await addFileToClaudesCodex(host as never, file);
+    await addFileToPocketCodex(host as never, file);
 
     expect(host.activateView).toHaveBeenCalledTimes(1);
     expect(host.getView).toHaveBeenCalledTimes(1);

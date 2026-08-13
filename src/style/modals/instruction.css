@@ -1,22 +1,22 @@
 /* Instruction Mode */
 
 /* Instruction Confirm Modal */
-.claudes-codex-instruction-modal {
+.pocket-codex-instruction-modal {
   max-width: 500px;
 }
 
-.claudes-codex-instruction-section {
+.pocket-codex-instruction-section {
   margin-bottom: 16px;
 }
 
-.claudes-codex-instruction-label {
+.pocket-codex-instruction-label {
   font-size: 12px;
   font-weight: 500;
   color: var(--text-muted);
   margin-bottom: 6px;
 }
 
-.claudes-codex-instruction-original {
+.pocket-codex-instruction-original {
   padding: 10px 12px;
   background: var(--background-secondary);
   border-radius: 6px;
@@ -26,7 +26,7 @@
   white-space: pre-wrap;
 }
 
-.claudes-codex-instruction-refined {
+.pocket-codex-instruction-refined {
   padding: 12px;
   background: var(--background-primary-alt);
   border: 1px solid var(--background-modifier-border);
@@ -37,7 +37,7 @@
   white-space: pre-wrap;
 }
 
-.claudes-codex-instruction-clarification {
+.pocket-codex-instruction-clarification {
   padding: 12px;
   background: var(--background-primary-alt);
   border: 1px solid var(--background-modifier-border);
@@ -48,11 +48,11 @@
   white-space: pre-wrap;
 }
 
-.claudes-codex-instruction-edit-container {
+.pocket-codex-instruction-edit-container {
   margin-top: 6px;
 }
 
-.claudes-codex-instruction-edit-textarea {
+.pocket-codex-instruction-edit-textarea {
   width: 100%;
   padding: 10px 12px;
   font-size: 14px;
@@ -65,12 +65,12 @@
   min-height: 80px;
 }
 
-.claudes-codex-instruction-edit-textarea:focus {
+.pocket-codex-instruction-edit-textarea:focus {
   outline: none;
   border-color: var(--interactive-accent);
 }
 
-.claudes-codex-instruction-response-textarea {
+.pocket-codex-instruction-response-textarea {
   width: 100%;
   padding: 10px 12px;
   font-size: 14px;
@@ -83,19 +83,19 @@
   min-height: 60px;
 }
 
-.claudes-codex-instruction-response-textarea:focus {
+.pocket-codex-instruction-response-textarea:focus {
   outline: none;
   border-color: var(--interactive-accent);
 }
 
-.claudes-codex-instruction-buttons {
+.pocket-codex-instruction-buttons {
   display: flex;
   gap: 8px;
   justify-content: flex-end;
   margin-top: 16px;
 }
 
-.claudes-codex-instruction-btn {
+.pocket-codex-instruction-btn {
   padding: 8px 16px;
   font-size: 13px;
   border: none;
@@ -104,35 +104,35 @@
   font-weight: 500;
 }
 
-.claudes-codex-instruction-reject-btn {
+.pocket-codex-instruction-reject-btn {
   background: var(--background-modifier-border);
   color: var(--text-normal);
 }
 
-.claudes-codex-instruction-reject-btn:hover {
+.pocket-codex-instruction-reject-btn:hover {
   background: var(--background-modifier-border-hover);
 }
 
-.claudes-codex-instruction-edit-btn {
+.pocket-codex-instruction-edit-btn {
   background: var(--background-modifier-border);
   color: var(--text-normal);
 }
 
-.claudes-codex-instruction-edit-btn:hover {
+.pocket-codex-instruction-edit-btn:hover {
   background: var(--background-modifier-border-hover);
 }
 
-.claudes-codex-instruction-accept-btn {
+.pocket-codex-instruction-accept-btn {
   background: var(--interactive-accent);
   color: var(--text-on-accent);
 }
 
-.claudes-codex-instruction-accept-btn:hover {
+.pocket-codex-instruction-accept-btn:hover {
   opacity: 0.9;
 }
 
 /* Instruction loading state */
-.claudes-codex-instruction-loading {
+.pocket-codex-instruction-loading {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -141,21 +141,21 @@
   color: var(--text-muted);
 }
 
-.claudes-codex-instruction-spinner {
+.pocket-codex-instruction-spinner {
   width: 18px;
   height: 18px;
   border: 2px solid var(--background-modifier-border);
   border-top-color: var(--interactive-accent);
   border-radius: 50%;
-  animation: claudes-codex-spin 0.8s linear infinite;
+  animation: pocket-codex-spin 0.8s linear infinite;
 }
 
 /* Instruction modal content sections */
-.claudes-codex-instruction-content-section {
+.pocket-codex-instruction-content-section {
   margin: 8px 0;
 }
 
-.claudes-codex-instruction-clarification-section,
-.claudes-codex-instruction-confirmation-section {
+.pocket-codex-instruction-clarification-section,
+.pocket-codex-instruction-confirmation-section {
   margin-top: 8px;
 }

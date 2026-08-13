@@ -69,7 +69,7 @@ function openHotkeySettings(app: App): void {
       return;
     }
 
-    searchEl.value = "Claude's Codex";
+    searchEl.value = "Pocket Codex";
     tab.updateHotkeyVisibility?.();
   }, 100);
 }
@@ -94,18 +94,18 @@ function addHotkeySettingRow(
   translationPrefix: string,
 ): void {
   const hotkey = getHotkeyForCommand(app, commandId);
-  const item = containerEl.createDiv({ cls: 'claudes-codex-hotkey-item' });
+  const item = containerEl.createDiv({ cls: 'pocket-codex-hotkey-item' });
   item.createSpan({
-    cls: 'claudes-codex-hotkey-name',
+    cls: 'pocket-codex-hotkey-name',
     text: t(`${translationPrefix}.name` as TranslationKey),
   });
   if (hotkey) {
-    item.createSpan({ cls: 'claudes-codex-hotkey-badge', text: hotkey });
+    item.createSpan({ cls: 'pocket-codex-hotkey-badge', text: hotkey });
   }
   item.addEventListener('click', () => openHotkeySettings(app));
 }
 
-export class ClaudesCodexSettingTab extends PluginSettingTab {
+export class PocketCodexSettingTab extends PluginSettingTab {
   plugin: FeatureHost;
   private activeTab: SettingsTabId = 'general';
   private refreshTitleModelOptions: (() => void) | null = null;
@@ -118,7 +118,7 @@ export class ClaudesCodexSettingTab extends PluginSettingTab {
 
   /**
    * Declarative settings definitions for Obsidian 1.13.0+ settings search.
-   * Claude's Codex still builds its settings imperatively in display(); this empty
+   * Pocket Codex still builds its settings imperatively in display(); this empty
    * array satisfies the contract so the tab is registered in search.
    */
   getSettingDefinitions(): SettingDefinitionItem[] {
@@ -129,7 +129,7 @@ export class ClaudesCodexSettingTab extends PluginSettingTab {
     const displayGeneration = ++this.displayGeneration;
     const { containerEl } = this;
     containerEl.empty();
-    containerEl.addClass('claudes-codex-settings');
+    containerEl.addClass('pocket-codex-settings');
     this.refreshTitleModelOptions = null;
 
     setLocale(this.plugin.settings.locale as Locale);
@@ -140,7 +140,7 @@ export class ClaudesCodexSettingTab extends PluginSettingTab {
       this.activeTab = 'general';
     }
 
-    const tabBar = containerEl.createDiv({ cls: 'claudes-codex-settings-tabs' });
+    const tabBar = containerEl.createDiv({ cls: 'pocket-codex-settings-tabs' });
     const tabButtons = new Map<SettingsTabId, HTMLButtonElement>();
     const tabContents = new Map<SettingsTabId, HTMLDivElement>();
     const renderedProviderTabs = new Set<ProviderId>();
@@ -157,7 +157,7 @@ export class ClaudesCodexSettingTab extends PluginSettingTab {
       }
       content.empty();
       content.createDiv({
-        cls: 'claudes-codex-settings-provider-loading',
+        cls: 'pocket-codex-settings-provider-loading',
         text: `Loading ${ProviderRegistry.getProviderDisplayName(providerId)} settings...`,
       });
 
@@ -203,7 +203,7 @@ export class ClaudesCodexSettingTab extends PluginSettingTab {
         content.empty();
         const message = error instanceof Error ? error.message : 'Unknown error';
         content.createDiv({
-          cls: 'claudes-codex-setting-validation claudes-codex-setting-validation-error',
+          cls: 'pocket-codex-setting-validation pocket-codex-setting-validation-error',
           text: `Could not load provider settings: ${message}`,
         });
       }
@@ -214,14 +214,14 @@ export class ClaudesCodexSettingTab extends PluginSettingTab {
         ? t('settings.tabs.general')
         : ProviderRegistry.getProviderDisplayName(id);
       const button = tabBar.createEl('button', {
-        cls: `claudes-codex-settings-tab${id === this.activeTab ? ' claudes-codex-settings-tab--active' : ''}`,
+        cls: `pocket-codex-settings-tab${id === this.activeTab ? ' pocket-codex-settings-tab--active' : ''}`,
         text: label,
       });
       button.addEventListener('click', () => {
         this.activeTab = id;
         for (const tabId of tabIds) {
-          tabButtons.get(tabId)?.toggleClass('claudes-codex-settings-tab--active', tabId === id);
-          tabContents.get(tabId)?.toggleClass('claudes-codex-settings-tab-content--active', tabId === id);
+          tabButtons.get(tabId)?.toggleClass('pocket-codex-settings-tab--active', tabId === id);
+          tabContents.get(tabId)?.toggleClass('pocket-codex-settings-tab-content--active', tabId === id);
         }
         if (id !== 'general') {
           void renderProviderTab(id);
@@ -232,7 +232,7 @@ export class ClaudesCodexSettingTab extends PluginSettingTab {
 
     for (const id of tabIds) {
       const content = containerEl.createDiv({
-        cls: `claudes-codex-settings-tab-content${id === this.activeTab ? ' claudes-codex-settings-tab-content--active' : ''}`,
+        cls: `pocket-codex-settings-tab-content${id === this.activeTab ? ' pocket-codex-settings-tab-content--active' : ''}`,
       });
       tabContents.set(id, content);
     }
@@ -268,16 +268,16 @@ export class ClaudesCodexSettingTab extends PluginSettingTab {
           });
       });
 
-    // --- Mobile daemon (Claude's Codex) ---
+    // --- Mobile daemon (Pocket Codex) ---
     // The Mac host toggle and paired-client list are local-only so they cannot
     // confuse other synced Macs. Only the Tailscale URL is synced to mobile.
 
     if (Platform.isDesktopApp) {
       new Setting(container).setName('Mobile daemon').setHeading();
 
-      const daemonNotice = container.createDiv({ cls: 'claudes-codex-sp-settings-desc' });
+      const daemonNotice = container.createDiv({ cls: 'pocket-codex-sp-settings-desc' });
       const daemonDesc = daemonNotice.createEl('p', { cls: 'setting-item-description' });
-      daemonDesc.appendText("Host Claude's Codex on this Mac for iPhone and iPad. Install and sign in to Tailscale on the Mac and mobile device; Claude's Codex binds to the private Tailscale address and should not be exposed to the public internet. Only the URL syncs. Device pairing stays local to this Mac. ");
+      daemonDesc.appendText("Host Pocket Codex on this Mac for iPhone and iPad. Install and sign in to Tailscale on the Mac and mobile device; Pocket Codex binds to the private Tailscale address and should not be exposed to the public internet. Only the URL syncs. Device pairing stays local to this Mac. ");
       daemonDesc.createEl('a', { text: 'Install Tailscale', href: 'https://tailscale.com/download' });
       const daemonStatus = daemonNotice.createEl('p', { cls: 'setting-item-description' });
       daemonStatus.setText('Tailscale status: checking...');
@@ -295,7 +295,7 @@ export class ClaudesCodexSettingTab extends PluginSettingTab {
 
       new Setting(container)
         .setName('Host mobile daemon on this Mac')
-        .setDesc('Starts the bundled claudes-codexd daemon on this Mac and publishes its Tailscale URL for synced mobile devices. The checkbox itself is local-only.')
+        .setDesc('Starts the bundled pocket-codexd daemon on this Mac and publishes its Tailscale URL for synced mobile devices. The checkbox itself is local-only.')
         .addToggle((toggle) => {
           toggle
             .setValue(this.plugin.isLocalDaemonHostEnabled())
@@ -321,7 +321,7 @@ export class ClaudesCodexSettingTab extends PluginSettingTab {
 
       new Setting(container)
         .setName('Pair iPhone or iPad')
-        .setDesc("Opens pairing for five minutes. On the mobile device, keep Tailscale connected and open Claude's Codex to complete pairing.")
+        .setDesc("Opens pairing for five minutes. On the mobile device, keep Tailscale connected and open Pocket Codex to complete pairing.")
         .addButton((button) => {
           button
             .setButtonText('Open pairing')
@@ -340,9 +340,9 @@ export class ClaudesCodexSettingTab extends PluginSettingTab {
     } else {
       new Setting(container).setName('Pair with Mac').setHeading();
 
-      const daemonNotice = container.createDiv({ cls: 'claudes-codex-sp-settings-desc' });
+      const daemonNotice = container.createDiv({ cls: 'pocket-codex-sp-settings-desc' });
       const daemonDesc = daemonNotice.createEl('p', { cls: 'setting-item-description' });
-      daemonDesc.appendText("Claude's Codex on mobile connects to Claude's Codex running on your Mac over Tailscale. Sign in to Tailscale on both devices, then on the Mac open Claude's Codex settings and choose Pair iPhone or iPad. The URL can sync through Obsidian Sync; no token is needed. ");
+      daemonDesc.appendText("Pocket Codex on mobile connects to Pocket Codex running on your Mac over Tailscale. Sign in to Tailscale on both devices, then on the Mac open Pocket Codex settings and choose Pair iPhone or iPad. The URL can sync through Obsidian Sync; no token is needed. ");
       daemonDesc.createEl('a', { text: 'Install Tailscale', href: 'https://tailscale.com/download' });
 
       const saveRemoteDaemonField = async (patch: { url?: string }): Promise<void> => {
@@ -353,7 +353,7 @@ export class ClaudesCodexSettingTab extends PluginSettingTab {
 
       new Setting(container)
         .setName('Daemon URL')
-        .setDesc('WebSocket URL of claudes-codexd on your Mac, e.g. ws://100.x.y.z:8423.')
+        .setDesc('WebSocket URL of pocket-codexd on your Mac, e.g. ws://100.x.y.z:8423.')
         .addText((text) => {
           text
             .setPlaceholder('ws://100.0.0.0:8423')
@@ -389,12 +389,12 @@ export class ClaudesCodexSettingTab extends PluginSettingTab {
       .setDesc(t('settings.maxTabs.desc'));
 
     const maxTabsWarningEl = container.createDiv({
-      cls: 'claudes-codex-max-tabs-warning claudes-codex-setting-validation claudes-codex-setting-validation-warning claudes-codex-hidden',
+      cls: 'pocket-codex-max-tabs-warning pocket-codex-setting-validation pocket-codex-setting-validation-warning pocket-codex-hidden',
     });
     maxTabsWarningEl.setText(t('settings.maxTabs.warning'));
 
     const updateMaxTabsWarning = (value: number): void => {
-      maxTabsWarningEl.toggleClass('claudes-codex-hidden', value <= 5);
+      maxTabsWarningEl.toggleClass('pocket-codex-hidden', value <= 5);
     };
 
     maxTabsSetting.addSlider((slider) => {
@@ -585,7 +585,7 @@ export class ClaudesCodexSettingTab extends PluginSettingTab {
               settings.mediaFolder = value.trim();
             });
           });
-        text.inputEl.addClass('claudes-codex-settings-media-input');
+        text.inputEl.addClass('pocket-codex-settings-media-input');
         text.inputEl.addEventListener('blur', () => {
           void this.restartServiceForPromptChange();
         });
@@ -667,12 +667,12 @@ export class ClaudesCodexSettingTab extends PluginSettingTab {
 
     new Setting(container).setName(t('settings.hotkeys')).setHeading();
 
-    const hotkeyGrid = container.createDiv({ cls: 'claudes-codex-hotkey-grid' });
-    addHotkeySettingRow(hotkeyGrid, this.app, 'claudes-codex:inline-edit', 'settings.inlineEditHotkey');
-    addHotkeySettingRow(hotkeyGrid, this.app, 'claudes-codex:open-view', 'settings.openChatHotkey');
-    addHotkeySettingRow(hotkeyGrid, this.app, 'claudes-codex:new-session', 'settings.newSessionHotkey');
-    addHotkeySettingRow(hotkeyGrid, this.app, 'claudes-codex:new-tab', 'settings.newTabHotkey');
-    addHotkeySettingRow(hotkeyGrid, this.app, 'claudes-codex:close-current-tab', 'settings.closeTabHotkey');
+    const hotkeyGrid = container.createDiv({ cls: 'pocket-codex-hotkey-grid' });
+    addHotkeySettingRow(hotkeyGrid, this.app, 'pocket-codex:inline-edit', 'settings.inlineEditHotkey');
+    addHotkeySettingRow(hotkeyGrid, this.app, 'pocket-codex:open-view', 'settings.openChatHotkey');
+    addHotkeySettingRow(hotkeyGrid, this.app, 'pocket-codex:new-session', 'settings.newSessionHotkey');
+    addHotkeySettingRow(hotkeyGrid, this.app, 'pocket-codex:new-tab', 'settings.newTabHotkey');
+    addHotkeySettingRow(hotkeyGrid, this.app, 'pocket-codex:close-current-tab', 'settings.closeTabHotkey');
 
     // --- Environment ---
 
@@ -735,30 +735,30 @@ export class ClaudesCodexSettingTab extends PluginSettingTab {
       return;
     }
 
-    const headerEl = container.createDiv({ cls: 'claudes-codex-context-limits-header' });
+    const headerEl = container.createDiv({ cls: 'pocket-codex-context-limits-header' });
     headerEl.createSpan({
       text: t('settings.customModelOverrides.name'),
-      cls: 'claudes-codex-context-limits-label',
+      cls: 'pocket-codex-context-limits-label',
     });
 
-    const descEl = container.createDiv({ cls: 'claudes-codex-context-limits-desc' });
+    const descEl = container.createDiv({ cls: 'pocket-codex-context-limits-desc' });
     descEl.setText(t('settings.customModelOverrides.desc'));
 
-    const listEl = container.createDiv({ cls: 'claudes-codex-context-limits-list' });
+    const listEl = container.createDiv({ cls: 'pocket-codex-context-limits-list' });
 
     for (const modelId of uniqueModelIds) {
       const currentValue = this.plugin.settings.customContextLimits?.[modelId];
       const currentAlias = this.plugin.settings.customModelAliases?.[modelId] ?? '';
 
-      const itemEl = listEl.createDiv({ cls: 'claudes-codex-context-limits-item' });
-      const nameEl = itemEl.createDiv({ cls: 'claudes-codex-context-limits-model' });
+      const itemEl = listEl.createDiv({ cls: 'pocket-codex-context-limits-item' });
+      const nameEl = itemEl.createDiv({ cls: 'pocket-codex-context-limits-model' });
       nameEl.setText(modelId);
 
-      const inputWrapper = itemEl.createDiv({ cls: 'claudes-codex-context-limits-input-wrapper' });
+      const inputWrapper = itemEl.createDiv({ cls: 'pocket-codex-context-limits-input-wrapper' });
       const aliasInputEl = inputWrapper.createEl('input', {
         type: 'text',
         placeholder: t('settings.customModelAliases.placeholder'),
-        cls: 'claudes-codex-context-alias-input',
+        cls: 'pocket-codex-context-alias-input',
         value: currentAlias,
       });
       aliasInputEl.setAttribute('aria-label', `Alias for ${modelId}`);
@@ -767,12 +767,12 @@ export class ClaudesCodexSettingTab extends PluginSettingTab {
       const inputEl = inputWrapper.createEl('input', {
         type: 'text',
         placeholder: '200k',
-        cls: 'claudes-codex-context-limits-input',
+        cls: 'pocket-codex-context-limits-input',
         value: currentValue ? formatContextLimit(currentValue) : '',
       });
       inputEl.setAttribute('aria-label', `Context window for ${modelId}`);
 
-      const validationEl = inputWrapper.createDiv({ cls: 'claudes-codex-context-limit-validation claudes-codex-hidden' });
+      const validationEl = inputWrapper.createDiv({ cls: 'pocket-codex-context-limit-validation pocket-codex-hidden' });
 
       const saveAlias = async (): Promise<void> => {
         const existing = this.plugin.settings.customModelAliases[modelId] ?? '';
@@ -799,19 +799,19 @@ export class ClaudesCodexSettingTab extends PluginSettingTab {
         const trimmed = inputEl.value.trim();
 
         if (!trimmed) {
-          validationEl.toggleClass('claudes-codex-hidden', true);
-          inputEl.classList.remove('claudes-codex-input-error');
+          validationEl.toggleClass('pocket-codex-hidden', true);
+          inputEl.classList.remove('pocket-codex-input-error');
         } else {
           const parsed = parseContextLimit(trimmed);
           if (parsed === null) {
             validationEl.setText(t('settings.customContextLimits.invalid'));
-            validationEl.toggleClass('claudes-codex-hidden', false);
-            inputEl.classList.add('claudes-codex-input-error');
+            validationEl.toggleClass('pocket-codex-hidden', false);
+            inputEl.classList.add('pocket-codex-input-error');
             return;
           }
 
-          validationEl.toggleClass('claudes-codex-hidden', true);
-          inputEl.classList.remove('claudes-codex-input-error');
+          validationEl.toggleClass('pocket-codex-hidden', true);
+          inputEl.classList.remove('pocket-codex-input-error');
         }
         await this.plugin.mutateSettings((settings) => {
           settings.customContextLimits ??= {};

@@ -318,21 +318,21 @@ export class TabManager implements TabManagerInterface {
             );
             StartupProfiler.recordCount(
               'restored-message-dom-count',
-              tab.dom.messagesEl.querySelectorAll('.claudes-codex-message').length,
+              tab.dom.messagesEl.querySelectorAll('.pocket-codex-message').length,
             );
             const thinkingPanelCount = tab.dom.messagesEl
-              .querySelectorAll('.claudes-codex-thinking-block').length;
+              .querySelectorAll('.pocket-codex-thinking-block').length;
             StartupProfiler.recordCount('restored-thinking-panel-count', thinkingPanelCount);
             StartupProfiler.recordCount('deferred-thinking-markdown-count', thinkingPanelCount);
             StartupProfiler.recordCount(
               'restored-text-block-count',
-              tab.dom.messagesEl.querySelectorAll('.claudes-codex-text-block').length,
+              tab.dom.messagesEl.querySelectorAll('.pocket-codex-text-block').length,
             );
             StartupProfiler.recordCount(
               'restored-visible-tool-row-count',
-              tab.dom.messagesEl.querySelectorAll('.claudes-codex-tool-call').length
-                + tab.dom.messagesEl.querySelectorAll('.claudes-codex-write-edit-block').length
-                + tab.dom.messagesEl.querySelectorAll('.claudes-codex-subagent-list').length,
+              tab.dom.messagesEl.querySelectorAll('.pocket-codex-tool-call').length
+                + tab.dom.messagesEl.querySelectorAll('.pocket-codex-write-edit-block').length
+                + tab.dom.messagesEl.querySelectorAll('.pocket-codex-subagent-list').length,
             );
           } finally {
             if (span) {
@@ -470,21 +470,21 @@ export class TabManager implements TabManagerInterface {
     const messagesEl = tab.dom.messagesEl;
     messagesEl.empty();
 
-    const statusEl = messagesEl.createDiv({ cls: 'claudes-codex-tab-hydration' });
+    const statusEl = messagesEl.createDiv({ cls: 'pocket-codex-tab-hydration' });
     if (!error) {
       statusEl.createDiv({
-        cls: 'claudes-codex-tab-hydration-loading',
+        cls: 'pocket-codex-tab-hydration-loading',
         text: 'Loading conversation…',
       });
       return;
     }
 
     statusEl.createDiv({
-      cls: 'claudes-codex-tab-hydration-error',
+      cls: 'pocket-codex-tab-hydration-error',
       text: error instanceof Error ? error.message : 'Failed to load conversation',
     });
     const retryButton = statusEl.createEl('button', {
-      cls: 'mod-cta claudes-codex-tab-hydration-retry',
+      cls: 'mod-cta pocket-codex-tab-hydration-retry',
       text: 'Retry',
     });
     retryButton.addEventListener('click', () => {

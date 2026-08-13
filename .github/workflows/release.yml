@@ -45,7 +45,7 @@ jobs:
             main.js
             manifest.json
             styles.css
-            daemon/dist/claudes-codexd.cjs
+            daemon/dist/pocket-codexd.cjs
 
       - name: Get previous tag
         id: prev_tag
@@ -78,4 +78,4 @@ jobs:
             main.js
             manifest.json
             styles.css
-            daemon/dist/claudes-codexd.cjs
+            daemon/dist/pocket-codexd.cjs

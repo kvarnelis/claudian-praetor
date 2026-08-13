@@ -120,10 +120,10 @@ function resolveCodexServiceTier(
 }
 
 const LEGACY_WORKSPACE_DEPENDENCY_NOTICE =
-  "This conversation was created before Claude's Codex added Codex workspace dependency tools. It can continue for other tasks, but skills that require load_workspace_dependencies are unavailable in this thread. Start a new conversation to use them.";
+  "This conversation was created before Pocket Codex added Codex workspace dependency tools. It can continue for other tasks, but skills that require load_workspace_dependencies are unavailable in this thread. Start a new conversation to use them.";
 
 const LEGACY_WORKSPACE_DEPENDENCY_INSTRUCTIONS =
-  "This thread predates Claude's Codex client-hosted workspace dependency tools. If the user requests a skill that requires load_workspace_dependencies, explain that they must start a new conversation in Claude's Codex. Do not emulate the tool, search for dependency paths, or install replacement dependencies.";
+  "This thread predates Pocket Codex client-hosted workspace dependency tools. If the user requests a skill that requires load_workspace_dependencies, explain that they must start a new conversation in Pocket Codex. Do not emulate the tool, search for dependency paths, or install replacement dependencies.";
 
 export class CodexChatRuntime implements ChatRuntime {
   readonly providerId: ProviderId = 'codex';
@@ -1290,7 +1290,7 @@ export class CodexChatRuntime implements ChatRuntime {
 
     try {
       if (images && images.length > 0) {
-        tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'claudes-codex-codex-images-'));
+        tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'pocket-codex-codex-images-'));
         for (let i = 0; i < images.length; i++) {
           const img = images[i];
           if (!img.mediaType.startsWith('image/')) continue;

@@ -9,7 +9,7 @@ import { fileURLToPath } from 'node:url';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const mainPath = path.join(root, 'main.js');
 const requiredArtifacts = ['main.js', 'manifest.json', 'styles.css'];
-// Claude's Codex pins Claude Agent SDK 0.3.212, whose self-contained renderer-safe
+// Pocket Codex pins Claude Agent SDK 0.3.212, whose self-contained renderer-safe
 // bundle is ~388 KB larger than upstream's 0.3.209 bundle. Keep a hard ceiling
 // while measuring cold evaluation separately; bundle bytes are not a timing proxy.
 const mainBudgetBytes = 3_300_000;

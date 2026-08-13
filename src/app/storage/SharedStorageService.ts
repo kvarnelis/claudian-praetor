@@ -6,14 +6,14 @@ import type { SharedAppStorage } from '../../core/bootstrap/storage';
 import { normalizeTabManagerState } from '../../core/bootstrap/tabManagerState';
 import type { AppTabManagerState } from '../../core/providers/types';
 import { VaultFileAdapter } from '../../core/storage/VaultFileAdapter';
-import { ClaudesCodexSettingsStorage, type StoredClaudesCodexSettings } from '../settings/ClaudesCodexSettingsStorage';
+import { PocketCodexSettingsStorage, type StoredPocketCodexSettings } from '../settings/PocketCodexSettingsStorage';
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return !!value && typeof value === 'object' && !Array.isArray(value);
 }
 
 export class SharedStorageService implements SharedAppStorage {
-  readonly claudesCodexSettings: ClaudesCodexSettingsStorage;
+  readonly pocketCodexSettings: PocketCodexSettingsStorage;
   readonly sessions: SessionStorage;
 
   private adapter: VaultFileAdapter;
@@ -23,17 +23,17 @@ export class SharedStorageService implements SharedAppStorage {
   constructor(plugin: Plugin) {
     this.plugin = plugin;
     this.adapter = new VaultFileAdapter(plugin.app);
-    this.claudesCodexSettings = new ClaudesCodexSettingsStorage(this.adapter);
+    this.pocketCodexSettings = new PocketCodexSettingsStorage(this.adapter);
     this.sessions = new SessionStorage(this.adapter);
   }
 
-  async initialize(): Promise<{ claudesCodex: Record<string, unknown> }> {
-    const claudesCodex = await this.claudesCodexSettings.load();
-    return { claudesCodex };
+  async initialize(): Promise<{ pocketCodex: Record<string, unknown> }> {
+    const pocketCodex = await this.pocketCodexSettings.load();
+    return { pocketCodex };
   }
 
-  async saveClaudesCodexSettings(settings: Record<string, unknown>): Promise<void> {
-    await this.claudesCodexSettings.save(settings as StoredClaudesCodexSettings);
+  async savePocketCodexSettings(settings: Record<string, unknown>): Promise<void> {
+    await this.pocketCodexSettings.save(settings as StoredPocketCodexSettings);
   }
 
   async setTabManagerState(state: AppTabManagerState): Promise<void> {

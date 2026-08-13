@@ -1,39 +1,39 @@
 /* MCP Server Modal */
-.claudes-codex-mcp-modal .modal-content {
+.pocket-codex-mcp-modal .modal-content {
   width: 480px;
   max-width: 90vw;
 }
 
-.claudes-codex-mcp-type-fields {
+.pocket-codex-mcp-type-fields {
   margin: 12px 0;
   padding: 12px;
   background: var(--background-secondary);
   border-radius: 6px;
 }
 
-.claudes-codex-mcp-type-fields .setting-item {
+.pocket-codex-mcp-type-fields .setting-item {
   padding: 8px 0;
   border-top: none;
 }
 
-.claudes-codex-mcp-type-fields .setting-item:first-child {
+.pocket-codex-mcp-type-fields .setting-item:first-child {
   padding-top: 0;
 }
 
-.claudes-codex-mcp-cmd-setting,
-.claudes-codex-mcp-env-setting {
+.pocket-codex-mcp-cmd-setting,
+.pocket-codex-mcp-env-setting {
   flex-direction: column;
   align-items: flex-start;
 }
 
-.claudes-codex-mcp-cmd-setting .setting-item-control,
-.claudes-codex-mcp-env-setting .setting-item-control {
+.pocket-codex-mcp-cmd-setting .setting-item-control,
+.pocket-codex-mcp-env-setting .setting-item-control {
   width: 100%;
   margin-top: 8px;
 }
 
-.claudes-codex-mcp-cmd-textarea,
-.claudes-codex-mcp-env-textarea {
+.pocket-codex-mcp-cmd-textarea,
+.pocket-codex-mcp-env-textarea {
   width: 100%;
   min-height: 50px;
   resize: vertical;
@@ -45,13 +45,13 @@
   background: var(--background-primary);
 }
 
-.claudes-codex-mcp-cmd-textarea:focus,
-.claudes-codex-mcp-env-textarea:focus {
+.pocket-codex-mcp-cmd-textarea:focus,
+.pocket-codex-mcp-env-textarea:focus {
   border-color: var(--interactive-accent);
   outline: none;
 }
 
-.claudes-codex-mcp-buttons {
+.pocket-codex-mcp-buttons {
   display: flex;
   justify-content: flex-end;
   gap: 8px;
@@ -59,21 +59,21 @@
 }
 
 /* MCP Test Modal */
-.claudes-codex-mcp-test-modal {
+.pocket-codex-mcp-test-modal {
   width: 500px;
   max-width: 90vw;
 }
 
-.claudes-codex-mcp-test-modal .modal-content {
+.pocket-codex-mcp-test-modal .modal-content {
   padding: 0 20px 20px 20px;
 }
 
-.claudes-codex-mcp-test-modal .modal-title {
+.pocket-codex-mcp-test-modal .modal-title {
   padding: 20px 20px 12px 20px;
   margin: 0 -20px;
 }
 
-.claudes-codex-mcp-test-loading {
+.pocket-codex-mcp-test-loading {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -82,18 +82,18 @@
   color: var(--text-muted);
 }
 
-.claudes-codex-mcp-test-spinner {
+.pocket-codex-mcp-test-spinner {
   width: 20px;
   height: 20px;
-  animation: claudes-codex-spin 1s linear infinite;
+  animation: pocket-codex-spin 1s linear infinite;
 }
 
-.claudes-codex-mcp-test-spinner svg {
+.pocket-codex-mcp-test-spinner svg {
   width: 100%;
   height: 100%;
 }
 
-.claudes-codex-mcp-test-status {
+.pocket-codex-mcp-test-status {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -103,29 +103,29 @@
   margin-bottom: 12px;
 }
 
-.claudes-codex-mcp-test-icon {
+.pocket-codex-mcp-test-icon {
   display: flex;
   align-items: center;
 }
 
-.claudes-codex-mcp-test-icon svg {
+.pocket-codex-mcp-test-icon svg {
   width: 20px;
   height: 20px;
 }
 
-.claudes-codex-mcp-test-icon.success {
+.pocket-codex-mcp-test-icon.success {
   color: var(--color-green);
 }
 
-.claudes-codex-mcp-test-icon.error {
+.pocket-codex-mcp-test-icon.error {
   color: var(--text-error);
 }
 
-.claudes-codex-mcp-test-text {
+.pocket-codex-mcp-test-text {
   font-weight: 500;
 }
 
-.claudes-codex-mcp-test-error {
+.pocket-codex-mcp-test-error {
   padding: 10px 12px;
   background: rgba(var(--color-red-rgb), 0.1);
   border: 1px solid var(--text-error);
@@ -135,18 +135,18 @@
   margin-bottom: 12px;
 }
 
-.claudes-codex-mcp-test-tools {
+.pocket-codex-mcp-test-tools {
   margin-bottom: 16px;
 }
 
-.claudes-codex-mcp-test-tools-header {
+.pocket-codex-mcp-test-tools-header {
   font-weight: 600;
   font-size: 13px;
   margin-bottom: 8px;
   color: var(--text-muted);
 }
 
-.claudes-codex-mcp-test-tools-list {
+.pocket-codex-mcp-test-tools-list {
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -154,67 +154,67 @@
   overflow-y: auto;
 }
 
-.claudes-codex-mcp-test-tool {
+.pocket-codex-mcp-test-tool {
   padding: 10px 12px;
   background: var(--background-secondary);
   border-radius: 6px;
 }
 
-.claudes-codex-mcp-test-tool-header {
+.pocket-codex-mcp-test-tool-header {
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
-.claudes-codex-mcp-test-tool-icon {
+.pocket-codex-mcp-test-tool-icon {
   display: flex;
   align-items: center;
   color: var(--text-muted);
 }
 
-.claudes-codex-mcp-test-tool-icon svg {
+.pocket-codex-mcp-test-tool-icon svg {
   width: 14px;
   height: 14px;
 }
 
-.claudes-codex-mcp-test-tool-name {
+.pocket-codex-mcp-test-tool-name {
   font-weight: 500;
   font-size: 13px;
 }
 
-.claudes-codex-mcp-test-tool-toggle {
+.pocket-codex-mcp-test-tool-toggle {
   margin-left: auto;
 }
 
-.claudes-codex-mcp-test-tool-toggle .checkbox-container {
+.pocket-codex-mcp-test-tool-toggle .checkbox-container {
   display: flex;
   align-items: center;
 }
 
-.claudes-codex-mcp-test-tool-disabled {
+.pocket-codex-mcp-test-tool-disabled {
   opacity: 0.75;
 }
 
-.claudes-codex-mcp-test-tool-disabled .claudes-codex-mcp-test-tool-name {
+.pocket-codex-mcp-test-tool-disabled .pocket-codex-mcp-test-tool-name {
   text-decoration: line-through;
   color: var(--text-muted);
 }
 
-.claudes-codex-mcp-toggle-all-btn {
+.pocket-codex-mcp-toggle-all-btn {
   margin-right: 8px;
 }
 
-.claudes-codex-mcp-toggle-all-btn.is-destructive {
+.pocket-codex-mcp-toggle-all-btn.is-destructive {
   background: rgba(var(--color-red-rgb), 0.1);
   border-color: rgba(var(--color-red-rgb), 0.3);
   color: var(--text-error);
 }
 
-.claudes-codex-mcp-toggle-all-btn.is-destructive:hover {
+.pocket-codex-mcp-toggle-all-btn.is-destructive:hover {
   background: rgba(var(--color-red-rgb), 0.2);
 }
 
-.claudes-codex-mcp-test-tool-desc {
+.pocket-codex-mcp-test-tool-desc {
   font-size: 12px;
   color: var(--text-muted);
   margin-top: 4px;
@@ -224,7 +224,7 @@
   overflow: hidden;
 }
 
-.claudes-codex-mcp-test-no-tools {
+.pocket-codex-mcp-test-no-tools {
   padding: 16px;
   text-align: center;
   color: var(--text-muted);
@@ -234,7 +234,7 @@
   margin-bottom: 16px;
 }
 
-.claudes-codex-mcp-test-buttons {
+.pocket-codex-mcp-test-buttons {
   display: flex;
   justify-content: center;
   margin-top: 16px;

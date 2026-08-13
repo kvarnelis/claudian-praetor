@@ -63,14 +63,14 @@ describe('todoUtils', () => {
       expect(setIcon).toHaveBeenCalledTimes(3);
 
       // First item: completed
-      expect(container._children[0].hasClass('claudes-codex-todo-completed')).toBe(true);
+      expect(container._children[0].hasClass('pocket-codex-todo-completed')).toBe(true);
       expect(setIcon).toHaveBeenCalledWith(expect.anything(), 'check');
 
       // Second item: in_progress shows activeForm
-      expect(container._children[1].hasClass('claudes-codex-todo-in_progress')).toBe(true);
+      expect(container._children[1].hasClass('pocket-codex-todo-in_progress')).toBe(true);
 
       // Third item: pending
-      expect(container._children[2].hasClass('claudes-codex-todo-pending')).toBe(true);
+      expect(container._children[2].hasClass('pocket-codex-todo-pending')).toBe(true);
     });
 
     it('should clear container before rendering', () => {

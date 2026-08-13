@@ -316,27 +316,27 @@ export class SlashCommandDropdown {
     this.dropdownEl.empty();
 
     if (this.filteredItems.length === 0) {
-      const emptyEl = this.dropdownEl.createDiv({ cls: 'claudes-codex-slash-empty' });
+      const emptyEl = this.dropdownEl.createDiv({ cls: 'pocket-codex-slash-empty' });
       emptyEl.setText('No matching commands');
     } else {
       for (let i = 0; i < this.filteredItems.length; i++) {
         const item = this.filteredItems[i];
-        const itemEl = this.dropdownEl.createDiv({ cls: 'claudes-codex-slash-item' });
+        const itemEl = this.dropdownEl.createDiv({ cls: 'pocket-codex-slash-item' });
 
         if (i === this.selectedIndex) {
           itemEl.addClass('selected');
         }
 
-        const nameEl = itemEl.createSpan({ cls: 'claudes-codex-slash-name' });
+        const nameEl = itemEl.createSpan({ cls: 'pocket-codex-slash-name' });
         nameEl.setText(`${item.displayPrefix}${item.name}`);
 
         if (item.argumentHint) {
-          const hintEl = itemEl.createSpan({ cls: 'claudes-codex-slash-hint' });
+          const hintEl = itemEl.createSpan({ cls: 'pocket-codex-slash-hint' });
           hintEl.setText(normalizeArgumentHint(item.argumentHint));
         }
 
         if (item.description) {
-          const descEl = itemEl.createDiv({ cls: 'claudes-codex-slash-desc' });
+          const descEl = itemEl.createDiv({ cls: 'pocket-codex-slash-desc' });
           descEl.setText(item.description);
         }
 
@@ -362,10 +362,10 @@ export class SlashCommandDropdown {
   private createDropdownElement(): HTMLElement {
     if (this.isFixed) {
       return this.containerEl.createDiv({
-        cls: 'claudes-codex-slash-dropdown claudes-codex-slash-dropdown-fixed',
+        cls: 'pocket-codex-slash-dropdown pocket-codex-slash-dropdown-fixed',
       });
     } else {
-      return this.containerEl.createDiv({ cls: 'claudes-codex-slash-dropdown' });
+      return this.containerEl.createDiv({ cls: 'pocket-codex-slash-dropdown' });
     }
   }
 
@@ -374,9 +374,9 @@ export class SlashCommandDropdown {
 
     const inputRect = this.inputEl.getBoundingClientRect();
     this.dropdownEl.setCssProps({
-      '--claudes-codex-fixed-dropdown-bottom': `${window.innerHeight - inputRect.top + 4}px`,
-      '--claudes-codex-fixed-dropdown-left': `${inputRect.left}px`,
-      '--claudes-codex-fixed-dropdown-width': `${Math.max(inputRect.width, 280)}px`,
+      '--pocket-codex-fixed-dropdown-bottom': `${window.innerHeight - inputRect.top + 4}px`,
+      '--pocket-codex-fixed-dropdown-left': `${inputRect.left}px`,
+      '--pocket-codex-fixed-dropdown-width': `${Math.max(inputRect.width, 280)}px`,
     });
   }
 
@@ -387,7 +387,7 @@ export class SlashCommandDropdown {
   }
 
   private updateSelection(): void {
-    const items = this.dropdownEl?.querySelectorAll('.claudes-codex-slash-item');
+    const items = this.dropdownEl?.querySelectorAll('.pocket-codex-slash-item');
     items?.forEach((item, index) => {
       if (index === this.selectedIndex) {
         item.addClass('selected');

@@ -45,7 +45,7 @@ export class CodexSkillModal extends Modal {
 
   onOpen() {
     this.setTitle(this.existing ? t('settings.codexSkills.modal.titleEdit') : t('settings.codexSkills.modal.titleAdd'));
-    this.modalEl.addClass('claudes-codex-sp-modal');
+    this.modalEl.addClass('pocket-codex-sp-modal');
 
     const { contentEl } = this;
 
@@ -82,7 +82,7 @@ export class CodexSkillModal extends Modal {
       .setDesc(t('settings.codexSkills.modal.instructionsDesc'));
 
     const contentArea = contentEl.createEl('textarea', {
-      cls: 'claudes-codex-sp-content-area',
+      cls: 'pocket-codex-sp-content-area',
       attr: { rows: '10', placeholder: t('settings.codexSkills.modal.instructionsPlaceholder') },
     });
     contentArea.value = this.existing?.content || '';
@@ -131,17 +131,17 @@ export class CodexSkillModal extends Modal {
     };
     this._triggerSave = doSave;
 
-    const buttonContainer = contentEl.createDiv({ cls: 'claudes-codex-sp-modal-buttons' });
+    const buttonContainer = contentEl.createDiv({ cls: 'pocket-codex-sp-modal-buttons' });
 
     const cancelBtn = buttonContainer.createEl('button', {
       text: t('common.cancel'),
-      cls: 'claudes-codex-cancel-btn',
+      cls: 'pocket-codex-cancel-btn',
     });
     cancelBtn.addEventListener('click', () => this.close());
 
     const saveBtn = buttonContainer.createEl('button', {
       text: t('common.save'),
-      cls: 'claudes-codex-save-btn',
+      cls: 'pocket-codex-save-btn',
     });
     saveBtn.addEventListener('click', () => {
       void doSave();
@@ -185,55 +185,55 @@ export class CodexSkillSettings {
       this.entries = [];
     }
 
-    const headerEl = this.containerEl.createDiv({ cls: 'claudes-codex-sp-header' });
-    headerEl.createSpan({ text: t('settings.codexSkills.header'), cls: 'claudes-codex-sp-label' });
+    const headerEl = this.containerEl.createDiv({ cls: 'pocket-codex-sp-header' });
+    headerEl.createSpan({ text: t('settings.codexSkills.header'), cls: 'pocket-codex-sp-label' });
 
-    const actionsEl = headerEl.createDiv({ cls: 'claudes-codex-sp-header-actions' });
+    const actionsEl = headerEl.createDiv({ cls: 'pocket-codex-sp-header-actions' });
     const refreshBtn = actionsEl.createEl('button', {
-      cls: 'claudes-codex-settings-action-btn',
+      cls: 'pocket-codex-settings-action-btn',
       attr: { 'aria-label': t('common.refresh') },
     });
     setIcon(refreshBtn, 'refresh-cw');
     refreshBtn.addEventListener('click', () => { void this.refresh(); });
 
     const addBtn = actionsEl.createEl('button', {
-      cls: 'claudes-codex-settings-action-btn',
+      cls: 'pocket-codex-settings-action-btn',
       attr: { 'aria-label': t('common.add') },
     });
     setIcon(addBtn, 'plus');
     addBtn.addEventListener('click', () => this.openModal(null));
 
     if (this.entries.length === 0) {
-      const emptyEl = this.containerEl.createDiv({ cls: 'claudes-codex-sp-empty-state' });
+      const emptyEl = this.containerEl.createDiv({ cls: 'pocket-codex-sp-empty-state' });
       emptyEl.setText(t('settings.codexSkills.noSkills'));
       return;
     }
 
-    const listEl = this.containerEl.createDiv({ cls: 'claudes-codex-sp-list' });
+    const listEl = this.containerEl.createDiv({ cls: 'pocket-codex-sp-list' });
     for (const entry of this.entries) {
       this.renderItem(listEl, entry);
     }
   }
 
   private renderItem(listEl: HTMLElement, entry: ProviderCommandEntry): void {
-    const itemEl = listEl.createDiv({ cls: 'claudes-codex-sp-item' });
-    const infoEl = itemEl.createDiv({ cls: 'claudes-codex-sp-info' });
+    const itemEl = listEl.createDiv({ cls: 'pocket-codex-sp-item' });
+    const infoEl = itemEl.createDiv({ cls: 'pocket-codex-sp-info' });
 
-    const headerRow = infoEl.createDiv({ cls: 'claudes-codex-sp-item-header' });
-    const nameEl = headerRow.createSpan({ cls: 'claudes-codex-sp-item-name' });
+    const headerRow = infoEl.createDiv({ cls: 'pocket-codex-sp-item-header' });
+    const nameEl = headerRow.createSpan({ cls: 'pocket-codex-sp-item-name' });
     nameEl.setText(`$${entry.name}`);
-    headerRow.createSpan({ text: t('settings.codexSkills.skillBadge'), cls: 'claudes-codex-slash-item-badge' });
+    headerRow.createSpan({ text: t('settings.codexSkills.skillBadge'), cls: 'pocket-codex-slash-item-badge' });
 
     if (entry.description) {
-      const descEl = infoEl.createDiv({ cls: 'claudes-codex-sp-item-desc' });
+      const descEl = infoEl.createDiv({ cls: 'pocket-codex-sp-item-desc' });
       descEl.setText(entry.description);
     }
 
-    const actionsEl = itemEl.createDiv({ cls: 'claudes-codex-sp-item-actions' });
+    const actionsEl = itemEl.createDiv({ cls: 'pocket-codex-sp-item-actions' });
 
     if (entry.isEditable) {
       const editBtn = actionsEl.createEl('button', {
-        cls: 'claudes-codex-settings-action-btn',
+        cls: 'pocket-codex-settings-action-btn',
         attr: { 'aria-label': t('common.edit') },
       });
       setIcon(editBtn, 'pencil');
@@ -242,7 +242,7 @@ export class CodexSkillSettings {
 
     if (entry.isDeletable) {
       const deleteBtn = actionsEl.createEl('button', {
-        cls: 'claudes-codex-settings-action-btn claudes-codex-settings-delete-btn',
+        cls: 'pocket-codex-settings-action-btn pocket-codex-settings-delete-btn',
         attr: { 'aria-label': t('common.delete') },
       });
       setIcon(deleteBtn, 'trash-2');

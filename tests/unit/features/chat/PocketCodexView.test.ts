@@ -1,7 +1,7 @@
 import { createMockEl } from '@test/helpers/mockElement';
 import { Platform, Scope } from 'obsidian';
 
-import { ClaudesCodexView } from '@/features/chat/ClaudesCodexView';
+import { PocketCodexView } from '@/features/chat/PocketCodexView';
 
 const MockScope = Scope as typeof Scope & { instances: Scope[] };
 
@@ -13,7 +13,7 @@ function createViewHarness(options: {
   view: any;
 } {
   const newTabButtonEl = createMockEl();
-  const view = Object.create(ClaudesCodexView.prototype) as any;
+  const view = Object.create(PocketCodexView.prototype) as any;
 
   view.plugin = {
     settings: {},
@@ -28,26 +28,26 @@ function createViewHarness(options: {
   return { newTabButtonEl, view };
 }
 
-describe('ClaudesCodexView tab controls', () => {
+describe('PocketCodexView tab controls', () => {
   it('hides the new-tab button when the tab manager is at capacity', () => {
     const { newTabButtonEl, view } = createViewHarness({ canCreateTab: false });
 
     view.refreshTabControls();
 
-    expect(newTabButtonEl.hasClass('claudes-codex-hidden')).toBe(true);
+    expect(newTabButtonEl.hasClass('pocket-codex-hidden')).toBe(true);
     expect(newTabButtonEl.getAttribute('aria-disabled')).toBe('true');
     expect(newTabButtonEl.getAttribute('aria-hidden')).toBe('true');
   });
 
   it('shows the new-tab button when another tab can be created', () => {
     const { newTabButtonEl, view } = createViewHarness({ canCreateTab: true });
-    newTabButtonEl.addClass('claudes-codex-hidden');
+    newTabButtonEl.addClass('pocket-codex-hidden');
     newTabButtonEl.setAttribute('aria-disabled', 'true');
     newTabButtonEl.setAttribute('aria-hidden', 'true');
 
     view.refreshTabControls();
 
-    expect(newTabButtonEl.hasClass('claudes-codex-hidden')).toBe(false);
+    expect(newTabButtonEl.hasClass('pocket-codex-hidden')).toBe(false);
     expect(newTabButtonEl.getAttribute('aria-disabled')).toBeNull();
     expect(newTabButtonEl.getAttribute('aria-hidden')).toBeNull();
   });
@@ -55,7 +55,7 @@ describe('ClaudesCodexView tab controls', () => {
   it('keeps tab controls in the view-owned input row', () => {
     const navRowContent = createMockEl();
     const inputNavRowHostEl = createMockEl();
-    const view = Object.create(ClaudesCodexView.prototype) as any;
+    const view = Object.create(PocketCodexView.prototype) as any;
 
     view.containerEl = createMockEl();
     view.navRowContent = navRowContent;
@@ -90,7 +90,7 @@ describe('ClaudesCodexView tab controls', () => {
         inputContainerEl: createMockEl(),
       },
     };
-    const view = Object.create(ClaudesCodexView.prototype) as any;
+    const view = Object.create(PocketCodexView.prototype) as any;
 
     view.activeInputSlotEl = activeInputSlotEl;
     view.tabManager = {
@@ -111,16 +111,16 @@ describe('ClaudesCodexView tab controls', () => {
   it('preserves active pending prompt siblings during same-tab input updates', () => {
     const activeInputSlotEl = createMockEl();
     const inputComposerEl = activeInputSlotEl.createDiv();
-    const pendingPromptEl = inputComposerEl.createDiv({ cls: 'claudes-codex-ask-question-inline' });
+    const pendingPromptEl = inputComposerEl.createDiv({ cls: 'pocket-codex-ask-question-inline' });
     const tab = {
       id: 'tab-1',
       dom: {
         contentEl: createMockEl(),
         inputComposerEl,
-        inputContainerEl: inputComposerEl.createDiv({ cls: 'claudes-codex-input-container' }),
+        inputContainerEl: inputComposerEl.createDiv({ cls: 'pocket-codex-input-container' }),
       },
     };
-    const view = Object.create(ClaudesCodexView.prototype) as any;
+    const view = Object.create(PocketCodexView.prototype) as any;
 
     Object.defineProperty(inputComposerEl, 'parentElement', {
       configurable: true,
@@ -142,7 +142,7 @@ describe('ClaudesCodexView tab controls', () => {
   it('clears the stable input slot when no tab is active', () => {
     const activeInputSlotEl = createMockEl();
     const staleInputEl = activeInputSlotEl.createDiv();
-    const view = Object.create(ClaudesCodexView.prototype) as any;
+    const view = Object.create(PocketCodexView.prototype) as any;
 
     view.activeInputTabId = 'tab-1';
     view.activeInputSlotEl = activeInputSlotEl;
@@ -158,7 +158,7 @@ describe('ClaudesCodexView tab controls', () => {
 
   it('toggles the history dropdown when the history button is clicked', () => {
     const historyDropdown = createMockEl();
-    const view = Object.create(ClaudesCodexView.prototype) as any;
+    const view = Object.create(PocketCodexView.prototype) as any;
 
     view.historyDropdown = historyDropdown;
     view.tabManager = {
@@ -177,7 +177,7 @@ describe('ClaudesCodexView tab controls', () => {
   it('defers hidden history rendering and coalesces invalidations until the dropdown opens', () => {
     const historyDropdown = createMockEl();
     const renderHistoryDropdown = jest.fn();
-    const view = Object.create(ClaudesCodexView.prototype) as any;
+    const view = Object.create(PocketCodexView.prototype) as any;
 
     view.historyDropdown = historyDropdown;
     view.historyDropdownDirty = true;
@@ -213,7 +213,7 @@ describe('ClaudesCodexView tab controls', () => {
   });
 
   it('persists expanded title tab ids with the tab layout snapshot', () => {
-    const view = Object.create(ClaudesCodexView.prototype) as any;
+    const view = Object.create(PocketCodexView.prototype) as any;
 
     view.tabManager = {
       getPersistedState: jest.fn().mockReturnValue({
@@ -244,7 +244,7 @@ describe('ClaudesCodexView tab controls', () => {
       activeTabId: 'tab-1',
       expandedTitleTabIds: ['tab-1'],
     };
-    const view = Object.create(ClaudesCodexView.prototype) as any;
+    const view = Object.create(PocketCodexView.prototype) as any;
 
     view.plugin = {
       storage: {
@@ -269,7 +269,7 @@ describe('ClaudesCodexView tab controls', () => {
   });
 });
 
-describe('ClaudesCodexView composer input', () => {
+describe('PocketCodexView composer input', () => {
   function createComposerHarness(existingContent: string): {
     inputEl: HTMLTextAreaElement;
     inputHandler: jest.Mock;
@@ -283,7 +283,7 @@ describe('ClaudesCodexView composer input', () => {
     inputEl.focus = jest.fn();
     inputEl.addEventListener('input', inputHandler);
 
-    const view = Object.create(ClaudesCodexView.prototype) as any;
+    const view = Object.create(PocketCodexView.prototype) as any;
     view.tabManager = {
       getActiveTab: jest.fn().mockReturnValue({ dom: { inputEl } }),
     };
@@ -313,7 +313,7 @@ describe('ClaudesCodexView composer input', () => {
   });
 
   it('returns false when there is no active composer', () => {
-    const view = Object.create(ClaudesCodexView.prototype) as any;
+    const view = Object.create(PocketCodexView.prototype) as any;
     view.tabManager = {
       getActiveTab: jest.fn().mockReturnValue(null),
     };
@@ -322,10 +322,10 @@ describe('ClaudesCodexView composer input', () => {
   });
 });
 
-describe('ClaudesCodexView shutdown', () => {
+describe('PocketCodexView shutdown', () => {
   it('disposes view resources when the final tab-state flush fails', async () => {
     const error = new Error('disk full');
-    const view = Object.create(ClaudesCodexView.prototype) as any;
+    const view = Object.create(PocketCodexView.prototype) as any;
     const destroy = jest.fn().mockResolvedValue(undefined);
     const tabBarDestroy = jest.fn();
     const persistenceDispose = jest.fn();
@@ -355,7 +355,7 @@ describe('ClaudesCodexView shutdown', () => {
   });
 });
 
-describe('ClaudesCodexView Escape handling', () => {
+describe('PocketCodexView Escape handling', () => {
   beforeEach(() => {
     MockScope.instances.length = 0;
   });
@@ -370,7 +370,7 @@ describe('ClaudesCodexView Escape handling', () => {
     const cancelStreaming = jest.fn();
     const eventRefs: unknown[] = [];
     const parentScope = new Scope();
-    const view = Object.create(ClaudesCodexView.prototype) as any;
+    const view = Object.create(PocketCodexView.prototype) as any;
 
     view.app = { scope: parentScope };
     view.containerEl = createMockEl();
@@ -431,7 +431,7 @@ describe('ClaudesCodexView Escape handling', () => {
     });
     const eventRefs: unknown[] = [];
     const parentScope = new Scope();
-    const view = Object.create(ClaudesCodexView.prototype) as any;
+    const view = Object.create(PocketCodexView.prototype) as any;
 
     view.app = { scope: parentScope };
     view.containerEl = createMockEl();

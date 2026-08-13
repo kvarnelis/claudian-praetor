@@ -84,12 +84,12 @@ describe('ToolCallRenderer', () => {
       const toolCallElements = new Map<string, HTMLElement>();
 
       const toolEl = renderToolCall(parentEl, toolCall, toolCallElements, { initiallyExpanded: true });
-      const header = toolEl.querySelector('.claudes-codex-tool-header');
-      const content = toolEl.querySelector('.claudes-codex-tool-content');
+      const header = toolEl.querySelector('.pocket-codex-tool-header');
+      const content = toolEl.querySelector('.pocket-codex-tool-content');
 
       expect(toolCall.isExpanded).toBe(true);
       expect(toolEl.hasClass('expanded')).toBe(true);
-      expect(content?.hasClass('claudes-codex-hidden')).toBe(false);
+      expect(content?.hasClass('pocket-codex-hidden')).toBe(false);
       expect(header?.getAttribute('aria-expanded')).toBe('true');
     });
   });
@@ -123,7 +123,7 @@ describe('ToolCallRenderer', () => {
       });
 
       const toolEl = renderStoredToolCall(parentEl, toolCall);
-      const answerEls = toolEl.querySelectorAll('.claudes-codex-ask-review-a-text');
+      const answerEls = toolEl.querySelectorAll('.pocket-codex-ask-review-a-text');
 
       expect(answerEls).toHaveLength(1);
       expect(answerEls[0].textContent).toBe('Blue');
@@ -139,7 +139,7 @@ describe('ToolCallRenderer', () => {
       });
 
       const toolEl = renderStoredToolCall(parentEl, toolCall);
-      const answerEls = toolEl.querySelectorAll('.claudes-codex-ask-review-a-text');
+      const answerEls = toolEl.querySelectorAll('.pocket-codex-ask-review-a-text');
 
       expect(answerEls).toHaveLength(1);
       expect(answerEls[0].textContent).toBe('Blue');
@@ -163,9 +163,9 @@ describe('ToolCallRenderer', () => {
       });
 
       const toolEl = renderStoredToolCall(parentEl, toolCall);
-      const labelEls = toolEl.querySelectorAll('.claudes-codex-ask-item-label');
-      const descEls = toolEl.querySelectorAll('.claudes-codex-ask-item-desc');
-      const checkEls = toolEl.querySelectorAll('.claudes-codex-ask-check');
+      const labelEls = toolEl.querySelectorAll('.pocket-codex-ask-item-label');
+      const descEls = toolEl.querySelectorAll('.pocket-codex-ask-item-desc');
+      const checkEls = toolEl.querySelectorAll('.pocket-codex-ask-check');
 
       expect(Array.from(labelEls, el => el.textContent)).toEqual(['Non-blocking', 'Blocking']);
       expect(Array.from(descEls, el => el.textContent)).toEqual(['Generate title later.', 'Wait for title first.']);
@@ -186,7 +186,7 @@ describe('ToolCallRenderer', () => {
       toolCall.result = 'Success';
       updateToolCallResult('tool-1', toolCall, toolCallElements);
 
-      const statusEl = toolEl.querySelector('.claudes-codex-tool-status');
+      const statusEl = toolEl.querySelector('.pocket-codex-tool-status');
       expect(statusEl?.hasClass('status-completed')).toBe(true);
     });
 
@@ -205,7 +205,7 @@ describe('ToolCallRenderer', () => {
 
       updateToolCallResult('ask-1', toolCall, toolCallElements);
 
-      const promptEl = toolEl.querySelector('.claudes-codex-ask-review-prompt');
+      const promptEl = toolEl.querySelector('.pocket-codex-ask-review-prompt');
       expect(promptEl?.textContent).toBe('Answer submitted successfully.');
     });
   });
@@ -539,7 +539,7 @@ describe('ToolCallRenderer', () => {
       });
 
       const toolEl = renderStoredToolCall(parentEl, toolCall);
-      const lines = Array.from(toolEl.querySelectorAll('.claudes-codex-tool-line')).map(line => line.textContent);
+      const lines = Array.from(toolEl.querySelectorAll('.pocket-codex-tool-line')).map(line => line.textContent);
 
       expect(lines).toContain('Query: obsidian plugin API');
       expect(lines).toContain('Alt query: obsidian docs');
@@ -559,13 +559,13 @@ describe('ToolCallRenderer', () => {
       });
 
       const toolEl = renderStoredToolCall(parentEl, toolCall);
-      const links = toolEl.querySelectorAll('.claudes-codex-tool-link');
-      const lines = Array.from(toolEl.querySelectorAll('.claudes-codex-tool-line')).map(line => line.textContent);
+      const links = toolEl.querySelectorAll('.pocket-codex-tool-link');
+      const lines = Array.from(toolEl.querySelectorAll('.pocket-codex-tool-line')).map(line => line.textContent);
 
       expect(lines).toContain('Open page');
       expect(links).toHaveLength(1);
       expect(links[0].getAttribute('href')).toBe('https://example.com/docs');
-      expect(links[0].querySelector('.claudes-codex-tool-link-title')?.textContent).toBe('https://example.com/docs');
+      expect(links[0].querySelector('.pocket-codex-tool-link-title')?.textContent).toBe('https://example.com/docs');
     });
   });
 
@@ -589,12 +589,12 @@ describe('ToolCallRenderer', () => {
       });
 
       const toolEl = renderStoredToolCall(parentEl, toolCall);
-      const headers = Array.from(toolEl.querySelectorAll('.claudes-codex-tool-patch-header')).map(el => el.textContent);
-      const statusEl = toolEl.querySelector('.claudes-codex-tool-status');
-      const diffTexts = Array.from(toolEl.querySelectorAll('.claudes-codex-diff-text')).map(el => el.textContent);
+      const headers = Array.from(toolEl.querySelectorAll('.pocket-codex-tool-patch-header')).map(el => el.textContent);
+      const statusEl = toolEl.querySelector('.pocket-codex-tool-status');
+      const diffTexts = Array.from(toolEl.querySelectorAll('.pocket-codex-diff-text')).map(el => el.textContent);
 
       expect(headers).toHaveLength(0);
-      expect(statusEl?.hasClass('claudes-codex-write-edit-stats')).toBe(true);
+      expect(statusEl?.hasClass('pocket-codex-write-edit-stats')).toBe(true);
       expect(statusEl?.querySelector('.added')?.textContent).toBe('+1');
       expect(statusEl?.querySelector('.removed')?.textContent).toBe('-1');
       expect(statusEl?.getAttribute('aria-label')).toBe('Changes: +1 -1');
@@ -622,11 +622,11 @@ describe('ToolCallRenderer', () => {
       });
 
       const toolEl = renderStoredToolCall(parentEl, toolCall);
-      const header = toolEl.querySelector('.claudes-codex-tool-header');
-      const content = toolEl.querySelector('.claudes-codex-tool-content');
+      const header = toolEl.querySelector('.pocket-codex-tool-header');
+      const content = toolEl.querySelector('.pocket-codex-tool-content');
 
       expect(toolEl.hasClass('expanded')).toBe(false);
-      expect(content?.hasClass('claudes-codex-hidden')).toBe(true);
+      expect(content?.hasClass('pocket-codex-hidden')).toBe(true);
       expect(header?.getAttribute('aria-expanded')).toBe('false');
     });
 
@@ -649,11 +649,11 @@ describe('ToolCallRenderer', () => {
       });
 
       const toolEl = renderStoredToolCall(parentEl, toolCall, { initiallyExpanded: true });
-      const header = toolEl.querySelector('.claudes-codex-tool-header');
-      const content = toolEl.querySelector('.claudes-codex-tool-content');
+      const header = toolEl.querySelector('.pocket-codex-tool-header');
+      const content = toolEl.querySelector('.pocket-codex-tool-content');
 
       expect(toolEl.hasClass('expanded')).toBe(true);
-      expect(content?.hasClass('claudes-codex-hidden')).toBe(false);
+      expect(content?.hasClass('pocket-codex-hidden')).toBe(false);
       expect(header?.getAttribute('aria-expanded')).toBe('true');
     });
 
@@ -675,12 +675,12 @@ describe('ToolCallRenderer', () => {
       });
 
       const toolEl = renderStoredToolCall(parentEl, toolCall);
-      const headers = Array.from(toolEl.querySelectorAll('.claudes-codex-tool-patch-header')).map(el => el.textContent);
-      const statusEl = toolEl.querySelector('.claudes-codex-tool-status');
-      const diffTexts = Array.from(toolEl.querySelectorAll('.claudes-codex-diff-text')).map(el => el.textContent);
+      const headers = Array.from(toolEl.querySelectorAll('.pocket-codex-tool-patch-header')).map(el => el.textContent);
+      const statusEl = toolEl.querySelector('.pocket-codex-tool-status');
+      const diffTexts = Array.from(toolEl.querySelectorAll('.pocket-codex-diff-text')).map(el => el.textContent);
 
       expect(headers).toHaveLength(0);
-      expect(statusEl?.hasClass('claudes-codex-write-edit-stats')).toBe(true);
+      expect(statusEl?.hasClass('pocket-codex-write-edit-stats')).toBe(true);
       expect(statusEl?.querySelector('.added')?.textContent).toBe('+1');
       expect(statusEl?.querySelector('.removed')?.textContent).toBe('-1');
       expect(setIcon).not.toHaveBeenCalledWith(expect.anything(), 'check');
@@ -711,7 +711,7 @@ describe('ToolCallRenderer', () => {
       });
 
       const toolEl = renderStoredToolCall(parentEl, toolCall);
-      const statusEl = toolEl.querySelector('.claudes-codex-tool-status');
+      const statusEl = toolEl.querySelector('.pocket-codex-tool-status');
 
       expect(statusEl?.querySelector('.added')?.textContent).toBe('+3');
       expect(statusEl?.querySelector('.removed')?.textContent).toBe('-2');
@@ -736,10 +736,10 @@ describe('ToolCallRenderer', () => {
       });
 
       const toolEl = renderStoredToolCall(parentEl, toolCall);
-      const statusEl = toolEl.querySelector('.claudes-codex-tool-status');
+      const statusEl = toolEl.querySelector('.pocket-codex-tool-status');
 
       expect(statusEl?.hasClass('status-error')).toBe(true);
-      expect(statusEl?.hasClass('claudes-codex-write-edit-stats')).toBe(false);
+      expect(statusEl?.hasClass('pocket-codex-write-edit-stats')).toBe(false);
       expect(setIcon).toHaveBeenCalledWith(expect.anything(), 'x');
     });
 
@@ -770,10 +770,10 @@ describe('ToolCallRenderer', () => {
 
       updateToolCallResult('patch-1', toolCall, toolCallElements);
 
-      const statusEl = toolEl.querySelector('.claudes-codex-tool-status');
-      const diffTexts = Array.from(toolEl.querySelectorAll('.claudes-codex-diff-text')).map(el => el.textContent);
+      const statusEl = toolEl.querySelector('.pocket-codex-tool-status');
+      const diffTexts = Array.from(toolEl.querySelectorAll('.pocket-codex-diff-text')).map(el => el.textContent);
 
-      expect(statusEl?.hasClass('claudes-codex-write-edit-stats')).toBe(true);
+      expect(statusEl?.hasClass('pocket-codex-write-edit-stats')).toBe(true);
       expect(statusEl?.querySelector('.added')?.textContent).toBe('+1');
       expect(statusEl?.querySelector('.removed')?.textContent).toBe('-1');
       expect(setIcon).not.toHaveBeenCalledWith(expect.anything(), 'check');
@@ -793,7 +793,7 @@ describe('ToolCallRenderer', () => {
       });
 
       const toolEl = renderStoredToolCall(parentEl, toolCall);
-      const lines = Array.from(toolEl.querySelectorAll('.claudes-codex-tool-line')).map(el => el.textContent);
+      const lines = Array.from(toolEl.querySelectorAll('.pocket-codex-tool-line')).map(el => el.textContent);
 
       expect(lines).toContain('src/main.ts');
       expect(lines).not.toContain('update: src/main.ts');
@@ -837,8 +837,8 @@ describe('ToolCallRenderer', () => {
         ],
       };
       renderTodoWriteResult(container as unknown as HTMLElement, input);
-      expect(container.hasClass('claudes-codex-todo-panel-content')).toBe(true);
-      expect(container.hasClass('claudes-codex-todo-list-container')).toBe(true);
+      expect(container.hasClass('pocket-codex-todo-panel-content')).toBe(true);
+      expect(container.hasClass('pocket-codex-todo-list-container')).toBe(true);
     });
 
     it('should show fallback text when no todos array', () => {
@@ -878,7 +878,7 @@ describe('ToolCallRenderer', () => {
       };
       updateToolCallResult('todo-1', toolCall, toolCallElements);
 
-      const statusEl = parentEl.querySelector('.claudes-codex-tool-status');
+      const statusEl = parentEl.querySelector('.pocket-codex-tool-status');
       expect(statusEl?.hasClass('status-completed')).toBe(true);
     });
 

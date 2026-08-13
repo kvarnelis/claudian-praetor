@@ -11,7 +11,7 @@ import {
   type SystemPromptSettings,
 } from '../../../core/prompt/mainAgent';
 import type { AppPluginManager } from '../../../core/providers/types';
-import type { ClaudesCodexSettings,PermissionMode } from '../../../core/types/settings';
+import type { PermissionMode,PocketCodexSettings } from '../../../core/types/settings';
 import { toClaudeRuntimeModelId } from '../modelSelection';
 import {
   type ClaudeSafeMode,
@@ -31,7 +31,7 @@ import {
 export interface QueryOptionsContext {
   vaultPath: string;
   cliPath: string;
-  settings: ClaudesCodexSettings;
+  settings: PocketCodexSettings;
   customEnv: Record<string, string>;
   enhancedPath: string;
   mcpManager: McpServerManager;
@@ -295,7 +295,7 @@ export class QueryOptionsBuilder {
 
   private static applyThinking(
     options: Options,
-    settings: ClaudesCodexSettings,
+    settings: PocketCodexSettings,
     model: string
   ): void {
     const effortLevel = resolveEffortLevel(model, settings.effortLevel);

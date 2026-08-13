@@ -1,5 +1,5 @@
 /**
- * Claude's Codex - External Context Utilities
+ * Pocket Codex - External Context Utilities
  *
  * Utilities for external context validation, normalization, and conflict detection.
  */

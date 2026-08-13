@@ -7,10 +7,10 @@ import { ProviderSettingsCoordinator } from '@/core/providers/ProviderSettingsCo
 import type { VaultFileAdapter } from '@/core/storage/VaultFileAdapter';
 import { getClaudeProviderSettings } from '@/providers/claude/settings';
 import {
-  CLAUDES_CODEX_SETTINGS_PATH,
-  ClaudesCodexSettingsStorage,
-  LEGACY_CLAUDES_CODEX_SETTINGS_PATH,
-} from '@/providers/claude/storage/ClaudesCodexSettingsStorage';
+  LEGACY_POCKET_CODEX_SETTINGS_PATH,
+  POCKET_CODEX_SETTINGS_PATH,
+  PocketCodexSettingsStorage,
+} from '@/providers/claude/storage/PocketCodexSettingsStorage';
 import { DEFAULT_SETTINGS } from '@/providers/claude/types/settings';
 import {
   getCodexProviderSettings,
@@ -34,8 +34,8 @@ const mockAdapter = {
   delete: jest.fn(),
 } as unknown as jest.Mocked<VaultFileAdapter>;
 
-describe('ClaudesCodexSettingsStorage', () => {
-  let storage: ClaudesCodexSettingsStorage;
+describe('PocketCodexSettingsStorage', () => {
+  let storage: PocketCodexSettingsStorage;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -47,7 +47,7 @@ describe('ClaudesCodexSettingsStorage', () => {
     mockAdapter.delete.mockResolvedValue(undefined);
     mockGetHostnameKey.mockReturnValue('host-a');
     mockGetLegacyHostnameKey.mockReturnValue('legacy-host');
-    storage = new ClaudesCodexSettingsStorage(mockAdapter);
+    storage = new PocketCodexSettingsStorage(mockAdapter);
   });
 
   afterEach(() => {
@@ -126,10 +126,10 @@ describe('ClaudesCodexSettingsStorage', () => {
 
     it('loads legacy .claude settings and migrates them to .claudian', async () => {
       mockAdapter.exists.mockImplementation(async (path: string) => (
-        path === LEGACY_CLAUDES_CODEX_SETTINGS_PATH
+        path === LEGACY_POCKET_CODEX_SETTINGS_PATH
       ));
       mockAdapter.read.mockImplementation(async (path: string) => {
-        if (path === LEGACY_CLAUDES_CODEX_SETTINGS_PATH) {
+        if (path === LEGACY_POCKET_CODEX_SETTINGS_PATH) {
           return JSON.stringify({
             model: 'claude-opus-4-5',
             userName: 'MigratedUser',
@@ -143,10 +143,10 @@ describe('ClaudesCodexSettingsStorage', () => {
       expect(result.model).toBe('claude-opus-4-5');
       expect(result.userName).toBe('MigratedUser');
       expect(mockAdapter.write).toHaveBeenCalledWith(
-        CLAUDES_CODEX_SETTINGS_PATH,
+        POCKET_CODEX_SETTINGS_PATH,
         expect.any(String),
       );
-      expect(mockAdapter.delete).toHaveBeenCalledWith(LEGACY_CLAUDES_CODEX_SETTINGS_PATH);
+      expect(mockAdapter.delete).toHaveBeenCalledWith(LEGACY_POCKET_CODEX_SETTINGS_PATH);
     });
 
     it('should parse valid JSON and merge with defaults', async () => {
@@ -709,7 +709,7 @@ describe('ClaudesCodexSettingsStorage', () => {
       await storage.save(settings);
 
       expect(mockAdapter.write).toHaveBeenCalledWith(
-        CLAUDES_CODEX_SETTINGS_PATH,
+        POCKET_CODEX_SETTINGS_PATH,
         expect.any(String)
       );
       const writtenContent = JSON.parse(mockAdapter.write.mock.calls[0][1]);
@@ -796,16 +796,16 @@ describe('ClaudesCodexSettingsStorage', () => {
 
     it('deletes the legacy settings file after writing the new path', async () => {
       mockAdapter.exists.mockImplementation(async (path: string) => (
-        path === LEGACY_CLAUDES_CODEX_SETTINGS_PATH
+        path === LEGACY_POCKET_CODEX_SETTINGS_PATH
       ));
 
       await storage.save(DEFAULT_SETTINGS);
 
       expect(mockAdapter.write).toHaveBeenCalledWith(
-        CLAUDES_CODEX_SETTINGS_PATH,
+        POCKET_CODEX_SETTINGS_PATH,
         expect.any(String),
       );
-      expect(mockAdapter.delete).toHaveBeenCalledWith(LEGACY_CLAUDES_CODEX_SETTINGS_PATH);
+      expect(mockAdapter.delete).toHaveBeenCalledWith(LEGACY_POCKET_CODEX_SETTINGS_PATH);
     });
 
     it('should throw on write error', async () => {
@@ -818,25 +818,25 @@ describe('ClaudesCodexSettingsStorage', () => {
   describe('exists', () => {
     it('should return true when the new file exists', async () => {
       mockAdapter.exists.mockImplementation(async (path: string) => (
-        path === CLAUDES_CODEX_SETTINGS_PATH
+        path === POCKET_CODEX_SETTINGS_PATH
       ));
 
       const result = await storage.exists();
 
       expect(result).toBe(true);
-      expect(mockAdapter.exists).toHaveBeenCalledWith(CLAUDES_CODEX_SETTINGS_PATH);
+      expect(mockAdapter.exists).toHaveBeenCalledWith(POCKET_CODEX_SETTINGS_PATH);
     });
 
     it('should return true when only the legacy file exists', async () => {
       mockAdapter.exists.mockImplementation(async (path: string) => (
-        path === LEGACY_CLAUDES_CODEX_SETTINGS_PATH
+        path === LEGACY_POCKET_CODEX_SETTINGS_PATH
       ));
 
       const result = await storage.exists();
 
       expect(result).toBe(true);
-      expect(mockAdapter.exists).toHaveBeenCalledWith(CLAUDES_CODEX_SETTINGS_PATH);
-      expect(mockAdapter.exists).toHaveBeenCalledWith(LEGACY_CLAUDES_CODEX_SETTINGS_PATH);
+      expect(mockAdapter.exists).toHaveBeenCalledWith(POCKET_CODEX_SETTINGS_PATH);
+      expect(mockAdapter.exists).toHaveBeenCalledWith(LEGACY_POCKET_CODEX_SETTINGS_PATH);
     });
 
     it('should return false when file does not exist', async () => {

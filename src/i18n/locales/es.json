@@ -70,7 +70,7 @@
     }
   },
   "settings": {
-    "title": "Configuración de Claude's Codex",
+    "title": "Configuración de Pocket Codex",
     "tabs": {
       "general": "General",
       "claude": "Claude",
@@ -84,7 +84,7 @@
     "models": "Modelos",
     "experimental": "Experimental",
     "userName": {
-      "name": "¿Cómo debería Claude's Codex llamarte?",
+      "name": "¿Cómo debería Pocket Codex llamarte?",
       "desc": "Tu nombre para saludos personalizados (dejar vacío para saludos genéricos)"
     },
     "excludedTags": {
@@ -158,7 +158,7 @@
     },
     "hiddenSlashCommands": {
       "name": "Comandos y habilidades ocultos",
-      "desc": "Oculta comandos y habilidades específicos del menú desplegable. Útil para ocultar entradas de Claude Code que no son relevantes para Claude's Codex. Ingresa los nombres sin la barra inicial, uno por línea.",
+      "desc": "Oculta comandos y habilidades específicos del menú desplegable. Útil para ocultar entradas de Claude Code que no son relevantes para Pocket Codex. Ingresa los nombres sin la barra inicial, uno por línea.",
       "placeholder": "commit\nbuild\ntest"
     },
     "mcpServers": {
@@ -279,7 +279,7 @@
     },
     "useThemeNativeAppearance": {
       "name": "Adaptar al estilo de la barra lateral de Obsidian",
-      "desc": "Usar en Claude's Codex la fuente de interfaz, el texto más pequeño y el color atenuado de la barra lateral del tema actual."
+      "desc": "Usar en Pocket Codex la fuente de interfaz, el texto más pequeño y el color atenuado de la barra lateral del tema actual."
     },
     "enableAutoScroll": {
       "name": "Desplazamiento automático durante streaming",
@@ -294,7 +294,7 @@
       "desc": "Mostrar los diffs de Write y Edit expandidos cuando aparecen por primera vez."
     },
     "chatViewPlacement": {
-      "name": "Abrir Claude's Codex en",
+      "name": "Abrir Pocket Codex en",
       "desc": "Elige dónde se abre el panel de chat cuando se crea",
       "rightSidebar": "Barra lateral derecha",
       "leftSidebar": "Barra lateral izquierda",
@@ -321,7 +321,7 @@
       },
       "installationMethod": {
         "name": "Método de instalación",
-        "desc": "Cómo debe iniciar Claude's Codex Codex en Windows. Windows nativo usa una ruta de ejecutable de Windows. WSL inicia la CLI de Linux dentro de una distribución seleccionada.",
+        "desc": "Cómo debe iniciar Pocket Codex Codex en Windows. Windows nativo usa una ruta de ejecutable de Windows. WSL inicia la CLI de Linux dentro de una distribución seleccionada.",
         "nativeWindows": "Windows nativo",
         "wsl": "WSL"
       },
@@ -368,7 +368,7 @@
       },
       "mcp": {
         "descBeforeCommand": "Codex gestiona servidores MCP mediante su propia CLI. Configúralos con ",
-        "descAfterCommand": " y estarán disponibles en Claude's Codex. ",
+        "descAfterCommand": " y estarán disponibles en Pocket Codex. ",
         "learnMore": "Más información"
       },
       "environment": {

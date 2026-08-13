@@ -69,7 +69,7 @@ describe('StorageService convenience methods', () => {
     },
   });
 
-  const claudesCodexSettingsJson = JSON.stringify({
+  const pocketCodexSettingsJson = JSON.stringify({
     userName: 'Test',
     model: 'haiku',
     permissionMode: 'yolo',
@@ -171,53 +171,53 @@ describe('StorageService convenience methods', () => {
     });
   });
 
-  describe('updateClaudesCodexSettings', () => {
-    it("updates partial Claude's Codex settings", async () => {
+  describe('updatePocketCodexSettings', () => {
+    it("updates partial Pocket Codex settings", async () => {
       const { plugin, files } = createMockPlugin({
         initialFiles: {
-          '.claudian/claudian-settings.json': claudesCodexSettingsJson,
+          '.claudian/claudian-settings.json': pocketCodexSettingsJson,
         },
       });
       const storage = new StorageService(plugin);
       await storage.initialize();
 
-      await storage.updateClaudesCodexSettings({ userName: 'NewUser' });
+      await storage.updatePocketCodexSettings({ userName: 'NewUser' });
 
       const saved = JSON.parse(files.get('.claudian/claudian-settings.json')!) as Record<string, unknown>;
       expect(saved.userName).toBe('NewUser');
     });
   });
 
-  describe('saveClaudesCodexSettings', () => {
-    it("saves full Claude's Codex settings", async () => {
+  describe('savePocketCodexSettings', () => {
+    it("saves full Pocket Codex settings", async () => {
       const { plugin, files } = createMockPlugin({
         initialFiles: {
-          '.claudian/claudian-settings.json': claudesCodexSettingsJson,
+          '.claudian/claudian-settings.json': pocketCodexSettingsJson,
         },
       });
       const storage = new StorageService(plugin);
       await storage.initialize();
 
-      const existing = await storage.loadClaudesCodexSettings();
+      const existing = await storage.loadPocketCodexSettings();
       existing.userName = 'FullSave';
-      await storage.saveClaudesCodexSettings(existing);
+      await storage.savePocketCodexSettings(existing);
 
       const saved = JSON.parse(files.get('.claudian/claudian-settings.json')!) as Record<string, unknown>;
       expect(saved.userName).toBe('FullSave');
     });
   });
 
-  describe('loadClaudesCodexSettings', () => {
-    it("loads Claude's Codex settings", async () => {
+  describe('loadPocketCodexSettings', () => {
+    it("loads Pocket Codex settings", async () => {
       const { plugin } = createMockPlugin({
         initialFiles: {
-          '.claudian/claudian-settings.json': claudesCodexSettingsJson,
+          '.claudian/claudian-settings.json': pocketCodexSettingsJson,
         },
       });
       const storage = new StorageService(plugin);
       await storage.initialize();
 
-      const settings = await storage.loadClaudesCodexSettings();
+      const settings = await storage.loadPocketCodexSettings();
       expect(settings.userName).toBe('Test');
       expect(settings.model).toBe('haiku');
     });
@@ -225,7 +225,7 @@ describe('StorageService convenience methods', () => {
     it('migrates legacy settings into .claudian during initialization', async () => {
       const { plugin, files } = createMockPlugin({
         initialFiles: {
-          '.claude/claudian-settings.json': claudesCodexSettingsJson,
+          '.claude/claudian-settings.json': pocketCodexSettingsJson,
         },
       });
       const storage = new StorageService(plugin);

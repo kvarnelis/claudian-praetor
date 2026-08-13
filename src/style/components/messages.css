@@ -1,5 +1,5 @@
 /* Messages wrapper (for scroll-to-bottom button positioning) */
-.claudes-codex-messages-wrapper {
+.pocket-codex-messages-wrapper {
   position: relative;
   flex: 1;
   min-height: 0;
@@ -8,7 +8,7 @@
   overflow: hidden;
 }
 
-.claudes-codex-messages {
+.pocket-codex-messages {
   flex: 1;
   overflow-y: auto;
   /* Right gutter keeps message content (and the theme-native prompt rule) off
@@ -20,12 +20,12 @@
 }
 
 /* Focusable messages panel for vim-style navigation */
-.claudes-codex-messages-focusable:focus {
+.pocket-codex-messages-focusable:focus {
   outline: none;
 }
 
 /* Welcome message - claude.ai style */
-.claudes-codex-welcome {
+.pocket-codex-welcome {
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -37,7 +37,7 @@
   min-height: 200px;
 }
 
-.claudes-codex-welcome-text {
+.pocket-codex-welcome-text {
   font-family: 'Copernicus', 'Tiempos Headline', 'Tiempos', Georgia, 'Times New Roman', serif;
   font-size: 28px;
   font-weight: 300;
@@ -45,14 +45,14 @@
   letter-spacing: -0.01em;
 }
 
-.claudes-codex-message {
+.pocket-codex-message {
   padding: 10px 14px;
   border-radius: 8px;
   max-width: 95%;
   word-wrap: break-word;
 }
 
-.claudes-codex-message-user {
+.pocket-codex-message-user {
   position: relative;
   background: rgba(0, 0, 0, 0.3);
   align-self: flex-end;
@@ -60,12 +60,12 @@
 }
 
 /* Text selection in user messages - visible highlight */
-.claudes-codex-message-user ::selection {
+.pocket-codex-message-user ::selection {
   background: rgba(255, 255, 255, 0.35);
   color: inherit;
 }
 
-.claudes-codex-message-assistant {
+.pocket-codex-message-assistant {
   background: transparent;
   align-self: stretch;
   width: 100%;
@@ -74,27 +74,27 @@
   text-align: start;
 }
 
-.claudes-codex-message-content {
+.pocket-codex-message-content {
   line-height: 1.5;
   user-select: text;
   -webkit-user-select: text;
   unicode-bidi: plaintext; /* Proper BiDi text handling for mixed RTL/LTR */
 }
 
-.claudes-codex-interrupted {
+.pocket-codex-interrupted {
   color: #d45d5d;
 }
 
-.claudes-codex-interrupted-hint {
+.pocket-codex-interrupted-hint {
   color: var(--text-muted);
 }
 
-.claudes-codex-text-block {
+.pocket-codex-text-block {
   position: relative;
   margin: 0;
 }
 
-.claudes-codex-text-copy-btn {
+.pocket-codex-text-copy-btn {
   position: absolute;
   bottom: 0;
   inset-inline-end: 0;
@@ -109,93 +109,93 @@
   gap: 4px;
 }
 
-.claudes-codex-text-copy-btn svg {
+.pocket-codex-text-copy-btn svg {
   width: 16px;
   height: 16px;
 }
 
-.claudes-codex-text-block:hover .claudes-codex-text-copy-btn {
+.pocket-codex-text-block:hover .pocket-codex-text-copy-btn {
   opacity: 1;
 }
 
-.claudes-codex-text-copy-btn:hover {
+.pocket-codex-text-copy-btn:hover {
   color: var(--text-normal);
 }
 
-.claudes-codex-text-copy-btn.copied {
+.pocket-codex-text-copy-btn.copied {
   color: var(--text-accent);
   font-size: 11px;
   font-family: var(--font-monospace);
 }
 
-.claudes-codex-text-block+.claudes-codex-tool-call {
+.pocket-codex-text-block+.pocket-codex-tool-call {
   margin-top: 8px;
 }
 
-.claudes-codex-tool-call+.claudes-codex-text-block {
+.pocket-codex-tool-call+.pocket-codex-text-block {
   margin-top: 8px;
 }
 
-.claudes-codex-message-content p {
+.pocket-codex-message-content p {
   margin: 0 0 8px 0;
 }
 
-.claudes-codex-message-content p:last-child {
+.pocket-codex-message-content p:last-child {
   margin-bottom: 0;
 }
 
-.claudes-codex-message-content ul,
-.claudes-codex-message-content ol {
+.pocket-codex-message-content ul,
+.pocket-codex-message-content ol {
   margin: 8px 0;
   padding-inline-start: 20px;
 }
 
 /* Full-width tables */
-.claudes-codex-message-content table {
+.pocket-codex-message-content table {
   width: 100%;
   border-collapse: collapse;
   margin: 8px 0;
 }
 
-.claudes-codex-message-content th,
-.claudes-codex-message-content td {
+.pocket-codex-message-content th,
+.pocket-codex-message-content td {
   border: 1px solid var(--background-modifier-border);
   padding: 6px 10px;
   text-align: start;
 }
 
-.claudes-codex-message-content th {
+.pocket-codex-message-content th {
   background: var(--background-secondary);
   font-weight: 600;
 }
 
-.claudes-codex-message-content tr:hover {
+.pocket-codex-message-content tr:hover {
   background: var(--background-secondary-alt);
 }
 
-.claudes-codex-messages::-webkit-scrollbar {
+.pocket-codex-messages::-webkit-scrollbar {
   width: 6px;
 }
 
-.claudes-codex-messages::-webkit-scrollbar-track {
+.pocket-codex-messages::-webkit-scrollbar-track {
   background: transparent;
 }
 
-.claudes-codex-messages::-webkit-scrollbar-thumb {
+.pocket-codex-messages::-webkit-scrollbar-thumb {
   background: var(--background-modifier-border);
   border-radius: 3px;
 }
 
-.claudes-codex-messages::-webkit-scrollbar-thumb:hover {
+.pocket-codex-messages::-webkit-scrollbar-thumb:hover {
   background: var(--background-modifier-border-hover);
 }
 
 /* Response duration footer - styled as another line of content */
-.claudes-codex-response-footer {
+.pocket-codex-response-footer {
   margin-top: 8px;
 }
 
-.claudes-codex-baked-duration {
+.pocket-codex-baked-duration {
   color: var(--text-muted);
   font-size: 12px;
   font-weight: 500;
@@ -203,7 +203,7 @@
 }
 
 /* Action buttons toolbar below user messages */
-.claudes-codex-user-msg-actions {
+.pocket-codex-user-msg-actions {
   position: absolute;
   bottom: -20px;
   right: 0;
@@ -214,11 +214,11 @@
   z-index: 1;
 }
 
-.claudes-codex-message-user:hover .claudes-codex-user-msg-actions {
+.pocket-codex-message-user:hover .pocket-codex-user-msg-actions {
   opacity: 1;
 }
 
-.claudes-codex-user-msg-actions span {
+.pocket-codex-user-msg-actions span {
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -227,44 +227,44 @@
   transition: color 0.15s;
 }
 
-.claudes-codex-user-msg-actions span svg {
+.pocket-codex-user-msg-actions span svg {
   width: 16px;
   height: 16px;
 }
 
-.claudes-codex-user-msg-actions span:hover {
+.pocket-codex-user-msg-actions span:hover {
   color: var(--text-normal);
 }
 
-.claudes-codex-user-msg-actions span.copied {
+.pocket-codex-user-msg-actions span.copied {
   color: var(--text-accent);
   font-size: 11px;
   font-family: var(--font-monospace);
 }
 
 /* Compact boundary indicator */
-.claudes-codex-compact-boundary {
+.pocket-codex-compact-boundary {
   display: flex;
   align-items: center;
   gap: 10px;
   margin: 12px 0;
 }
 
-.claudes-codex-compact-boundary::before,
-.claudes-codex-compact-boundary::after {
+.pocket-codex-compact-boundary::before,
+.pocket-codex-compact-boundary::after {
   content: '';
   flex: 1;
   height: 1px;
   background: var(--background-modifier-border);
 }
 
-.claudes-codex-compact-boundary-label {
+.pocket-codex-compact-boundary-label {
   color: var(--text-muted);
   font-size: 11px;
   white-space: nowrap;
 }
 
-.claudes-codex-tab-hydration {
+.pocket-codex-tab-hydration {
   min-height: 160px;
   display: flex;
   flex-direction: column;
@@ -275,7 +275,7 @@
   text-align: center;
 }
 
-.claudes-codex-tab-hydration-loading::before {
+.pocket-codex-tab-hydration-loading::before {
   content: '';
   display: inline-block;
   width: 12px;
@@ -284,11 +284,11 @@
   border: 2px solid var(--background-modifier-border);
   border-top-color: var(--interactive-accent);
   border-radius: 50%;
-  animation: claudes-codex-spin 0.8s linear infinite;
+  animation: pocket-codex-spin 0.8s linear infinite;
   vertical-align: -2px;
 }
 
-.claudes-codex-tab-hydration-error {
+.pocket-codex-tab-hydration-error {
   max-width: 420px;
-  color: var(--text-error, var(--claudes-codex-error));
+  color: var(--text-error, var(--pocket-codex-error));
 }

@@ -48,43 +48,43 @@ export class InlineExitPlanMode {
   }
 
   render(): void {
-    this.rootEl = this.containerEl.createDiv({ cls: 'claudes-codex-plan-approval-inline' });
+    this.rootEl = this.containerEl.createDiv({ cls: 'pocket-codex-plan-approval-inline' });
 
-    const titleEl = this.rootEl.createDiv({ cls: 'claudes-codex-plan-inline-title' });
+    const titleEl = this.rootEl.createDiv({ cls: 'pocket-codex-plan-inline-title' });
     titleEl.setText('Plan complete');
 
     this.planContent = this.readPlanContent();
     if (this.planContent) {
-      const contentEl = this.rootEl.createDiv({ cls: 'claudes-codex-plan-content-preview' });
+      const contentEl = this.rootEl.createDiv({ cls: 'pocket-codex-plan-content-preview' });
       if (this.renderContent) {
         void this.renderContent(contentEl, this.planContent);
       } else {
-        contentEl.createDiv({ cls: 'claudes-codex-plan-content-text', text: this.planContent });
+        contentEl.createDiv({ cls: 'pocket-codex-plan-content-text', text: this.planContent });
       }
     } else if (this.planReadError) {
       this.rootEl.createDiv({
-        cls: 'claudes-codex-plan-content-preview claudes-codex-plan-read-error',
+        cls: 'pocket-codex-plan-content-preview pocket-codex-plan-read-error',
         text: `Could not read plan file: ${this.planReadError}. "Approve (new session)" will not include plan details.`,
       });
     }
 
     const allowedPrompts = this.input.allowedPrompts as Array<{ tool: string; prompt: string }> | undefined;
     if (allowedPrompts && Array.isArray(allowedPrompts) && allowedPrompts.length > 0) {
-      const permEl = this.rootEl.createDiv({ cls: 'claudes-codex-plan-permissions' });
-      permEl.createDiv({ text: 'Requested permissions:', cls: 'claudes-codex-plan-permissions-label' });
-      const listEl = permEl.createEl('ul', { cls: 'claudes-codex-plan-permissions-list' });
+      const permEl = this.rootEl.createDiv({ cls: 'pocket-codex-plan-permissions' });
+      permEl.createDiv({ text: 'Requested permissions:', cls: 'pocket-codex-plan-permissions-label' });
+      const listEl = permEl.createEl('ul', { cls: 'pocket-codex-plan-permissions-list' });
       for (const perm of allowedPrompts) {
         listEl.createEl('li', { text: perm.prompt });
       }
     }
 
-    const actionsEl = this.rootEl.createDiv({ cls: 'claudes-codex-ask-list' });
+    const actionsEl = this.rootEl.createDiv({ cls: 'pocket-codex-ask-list' });
 
-    const newSessionRow = actionsEl.createDiv({ cls: 'claudes-codex-ask-item' });
+    const newSessionRow = actionsEl.createDiv({ cls: 'pocket-codex-ask-item' });
     newSessionRow.addClass('is-focused');
-    newSessionRow.createSpan({ text: '\u203A', cls: 'claudes-codex-ask-cursor' });
-    newSessionRow.createSpan({ text: '1. ', cls: 'claudes-codex-ask-item-num' });
-    newSessionRow.createSpan({ text: 'Approve (new session)', cls: 'claudes-codex-ask-item-label' });
+    newSessionRow.createSpan({ text: '\u203A', cls: 'pocket-codex-ask-cursor' });
+    newSessionRow.createSpan({ text: '1. ', cls: 'pocket-codex-ask-item-num' });
+    newSessionRow.createSpan({ text: 'Approve (new session)', cls: 'pocket-codex-ask-item-label' });
     newSessionRow.addEventListener('click', () => {
       this.focusedIndex = 0;
       this.updateFocus();
@@ -95,10 +95,10 @@ export class InlineExitPlanMode {
     });
     this.items.push(newSessionRow);
 
-    const approveRow = actionsEl.createDiv({ cls: 'claudes-codex-ask-item' });
-    approveRow.createSpan({ text: '\u00A0', cls: 'claudes-codex-ask-cursor' });
-    approveRow.createSpan({ text: '2. ', cls: 'claudes-codex-ask-item-num' });
-    approveRow.createSpan({ text: 'Approve (current session)', cls: 'claudes-codex-ask-item-label' });
+    const approveRow = actionsEl.createDiv({ cls: 'pocket-codex-ask-item' });
+    approveRow.createSpan({ text: '\u00A0', cls: 'pocket-codex-ask-cursor' });
+    approveRow.createSpan({ text: '2. ', cls: 'pocket-codex-ask-item-num' });
+    approveRow.createSpan({ text: 'Approve (current session)', cls: 'pocket-codex-ask-item-label' });
     approveRow.addEventListener('click', () => {
       this.focusedIndex = 1;
       this.updateFocus();
@@ -106,12 +106,12 @@ export class InlineExitPlanMode {
     });
     this.items.push(approveRow);
 
-    const feedbackRow = actionsEl.createDiv({ cls: 'claudes-codex-ask-item claudes-codex-ask-custom-item' });
-    feedbackRow.createSpan({ text: '\u00A0', cls: 'claudes-codex-ask-cursor' });
-    feedbackRow.createSpan({ text: '3. ', cls: 'claudes-codex-ask-item-num' });
+    const feedbackRow = actionsEl.createDiv({ cls: 'pocket-codex-ask-item pocket-codex-ask-custom-item' });
+    feedbackRow.createSpan({ text: '\u00A0', cls: 'pocket-codex-ask-cursor' });
+    feedbackRow.createSpan({ text: '3. ', cls: 'pocket-codex-ask-item-num' });
     this.feedbackInput = feedbackRow.createEl('input', {
       type: 'text',
-      cls: 'claudes-codex-ask-custom-text',
+      cls: 'pocket-codex-ask-custom-text',
       placeholder: 'Enter feedback to continue planning...',
     });
     this.feedbackInput.addEventListener('focus', () => { this.isInputFocused = true; });
@@ -122,7 +122,7 @@ export class InlineExitPlanMode {
     });
     this.items.push(feedbackRow);
 
-    this.rootEl.createDiv({ text: HINTS_TEXT, cls: 'claudes-codex-ask-hints' });
+    this.rootEl.createDiv({ text: HINTS_TEXT, cls: 'pocket-codex-ask-hints' });
 
     this.rootEl.setAttribute('tabindex', '0');
     this.rootEl.addEventListener('keydown', this.boundKeyDown);
@@ -227,14 +227,14 @@ export class InlineExitPlanMode {
   private updateFocus(): void {
     for (let i = 0; i < this.items.length; i++) {
       const item = this.items[i];
-      const cursor = item.querySelector('.claudes-codex-ask-cursor');
+      const cursor = item.querySelector('.pocket-codex-ask-cursor');
       if (i === this.focusedIndex) {
         item.addClass('is-focused');
         if (cursor) cursor.textContent = '\u203A';
         item.scrollIntoView({ block: 'nearest' });
 
-        if (item.hasClass('claudes-codex-ask-custom-item')) {
-          const input = item.querySelector('.claudes-codex-ask-custom-text') as HTMLInputElement;
+        if (item.hasClass('pocket-codex-ask-custom-item')) {
+          const input = item.querySelector('.pocket-codex-ask-custom-text') as HTMLInputElement;
           if (input) {
             input.focus();
             this.isInputFocused = true;
@@ -244,8 +244,8 @@ export class InlineExitPlanMode {
         item.removeClass('is-focused');
         if (cursor) cursor.textContent = '\u00A0';
 
-        if (item.hasClass('claudes-codex-ask-custom-item')) {
-          const input = item.querySelector('.claudes-codex-ask-custom-text') as HTMLInputElement;
+        if (item.hasClass('pocket-codex-ask-custom-item')) {
+          const input = item.querySelector('.pocket-codex-ask-custom-text') as HTMLInputElement;
           if (input && this.rootEl.ownerDocument.activeElement === input) {
             input.blur();
             this.isInputFocused = false;

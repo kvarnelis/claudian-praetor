@@ -1,5 +1,5 @@
 /**
- * WebSocket client for the Claude's Codex daemon. Platform-pure: relies on the
+ * WebSocket client for the Pocket Codex daemon. Platform-pure: relies on the
  * global WebSocket available in Obsidian's webview (and Node >= 22 for tests).
  *
  * One client is shared by all remote runtimes; it owns reconnection, RPC
@@ -8,9 +8,9 @@
 
 import {
   type CallbackKind,
-  CLAUDES_CODEX_PROTOCOL_VERSION,
   type ClientMessage,
   generateId,
+  POCKET_CODEX_PROTOCOL_VERSION,
   type QueryEvent,
   type ServerMessage,
 } from './protocol';
@@ -132,7 +132,7 @@ export class RemoteClient {
   async ensureConnected(): Promise<void> {
     if (this.state === 'connected' && this.helloDone) return;
     if (!this.config?.url) {
-      throw new Error("Remote daemon is not configured. Pair this device from Claude's Codex settings on your Mac.");
+      throw new Error("Remote daemon is not configured. Pair this device from Pocket Codex settings on your Mac.");
     }
 
     this.closedByUser = false;
@@ -145,7 +145,7 @@ export class RemoteClient {
       const timeout = window.setTimeout(() => {
         this.connectWaiters = this.connectWaiters.filter((w) => w !== waiter);
         reject(new Error(
-          `Can't reach the daemon at ${this.config?.url}. Check that Tailscale is connected on this device and that the Claude's Codex daemon is running on your Mac.`,
+          `Can't reach the daemon at ${this.config?.url}. Check that Tailscale is connected on this device and that the Pocket Codex daemon is running on your Mac.`,
         ));
       }, CONNECT_TIMEOUT_MS);
       waiter.resolve = () => { window.clearTimeout(timeout); resolve(); };
@@ -213,7 +213,7 @@ export class RemoteClient {
       if (!this.config) return;
       const hello: ClientMessage = {
         t: 'hello',
-        proto: CLAUDES_CODEX_PROTOCOL_VERSION,
+        proto: POCKET_CODEX_PROTOCOL_VERSION,
         clientId: this.clientId,
         clientInfo: this.getClientInfo(),
       };
@@ -308,7 +308,7 @@ export class RemoteClient {
 
   private handleDisconnect(): void {
     this.teardownSocket();
-    const error = new Error("Connection to the Claude's Codex daemon was lost");
+    const error = new Error("Connection to the Pocket Codex daemon was lost");
     for (const pending of this.pendingRpcs.values()) pending.reject(error);
     this.pendingRpcs.clear();
     this.setState('disconnected');

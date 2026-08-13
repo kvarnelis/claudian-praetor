@@ -6,8 +6,8 @@ import type { Editor, WorkspaceLeaf } from 'obsidian';
 import { MarkdownView, Notice, Platform, Plugin } from 'obsidian';
 
 import { ConversationRepository } from './app/conversations/ConversationRepository';
-import { ClaudesCodexProviderHost } from './app/providers/ClaudesCodexProviderHost';
-import { DEFAULT_CLAUDES_CODEX_SETTINGS } from './app/settings/defaultSettings';
+import { PocketCodexProviderHost } from './app/providers/PocketCodexProviderHost';
+import { DEFAULT_POCKET_CODEX_SETTINGS } from './app/settings/defaultSettings';
 import type { ConditionalSettingsMutation } from './app/settings/SettingsCoordinator';
 import { SettingsCoordinator, type SettingsMutation } from './app/settings/SettingsCoordinator';
 import { SharedStorageService } from './app/storage/SharedStorageService';
@@ -30,22 +30,22 @@ import type {
 import type { AppTabManagerState } from './core/providers/types';
 import { DEFAULT_CHAT_PROVIDER_ID } from './core/providers/types';
 import type {
-  ClaudesCodexSettings,
   Conversation,
   ConversationMeta,
+  PocketCodexSettings,
   SessionMetadata,
 } from './core/types';
 import {
-  VIEW_TYPE_CLAUDES_CODEX,
+  VIEW_TYPE_POCKET_CODEX,
 } from './core/types';
 import type { ChatViewPlacement, EnvironmentScope } from './core/types/settings';
 import type { DaemonPairingResult, DaemonStartResult, DaemonSupervisor } from './desktop/daemonSupervisor';
 import { isLocalDaemonHostEnabled, setLocalDaemonHostEnabled } from './desktop/localDaemonSettings';
-import { ClaudesCodexView } from './features/chat/ClaudesCodexView';
 import { registerFileMenu } from './features/chat/fileMenu';
+import { PocketCodexView } from './features/chat/PocketCodexView';
 import { MobileDock } from './features/chat/ui/mobileDock';
 import { type InlineEditContext, InlineEditModal } from './features/inline-edit/ui/InlineEditModal';
-import { ClaudesCodexSettingTab } from './features/settings/ClaudesCodexSettings';
+import { PocketCodexSettingTab } from './features/settings/PocketCodexSettings';
 import { setLocale } from './i18n/i18n';
 import type { Locale } from './i18n/types';
 import { buildCursorContext } from './utils/editor';
@@ -59,7 +59,7 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return !!value && typeof value === 'object' && !Array.isArray(value);
 }
 
-function isClaudesCodexView(value: unknown): value is ClaudesCodexView {
+function isPocketCodexView(value: unknown): value is PocketCodexView {
   return !!value
     && typeof value === 'object'
     && typeof (value as { getTabManager?: unknown }).getTabManager === 'function';
@@ -108,11 +108,11 @@ function hasSamePendingProviderSessionInvalidations(
     && entries.every(([providerId, generation]) => pending.get(providerId) === generation);
 }
 
-export default class ClaudesCodexPlugin extends Plugin {
-  settings!: ClaudesCodexSettings;
+export default class PocketCodexPlugin extends Plugin {
+  settings!: PocketCodexSettings;
   storage!: SharedAppStorage;
-  readonly providerHost = new ClaudesCodexProviderHost(this);
-  private settingsCoordinator!: SettingsCoordinator<ClaudesCodexSettings>;
+  readonly providerHost = new PocketCodexProviderHost(this);
+  private settingsCoordinator!: SettingsCoordinator<PocketCodexSettings>;
   private conversationRepository!: ConversationRepository;
   private lastKnownTabManagerState: AppTabManagerState | null = null;
   private mobileDock!: MobileDock;
@@ -160,7 +160,7 @@ export default class ClaudesCodexPlugin extends Plugin {
         const { registerRemoteProviders } = await import('./remote/registration');
         registerRemoteProviders(this);
         this.remoteMode = true;
-        if (typeof document !== 'undefined') document.body?.classList?.add('claudes-codex-mobile');
+        if (typeof document !== 'undefined') document.body?.classList?.add('pocket-codex-mobile');
       }
 
       await StartupProfiler.runAsync(
@@ -181,12 +181,12 @@ export default class ClaudesCodexPlugin extends Plugin {
       this.registerEvent(this.app.workspace.on('layout-change', () => this.mobileDock.sync()));
 
       this.registerView(
-        VIEW_TYPE_CLAUDES_CODEX,
-        (leaf) => new ClaudesCodexView(leaf, this)
+        VIEW_TYPE_POCKET_CODEX,
+        (leaf) => new PocketCodexView(leaf, this)
       );
       registerFileMenu(this);
 
-      this.addRibbonIcon('bot', "Open Claude's Codex", () => {
+      this.addRibbonIcon('bot', "Open Pocket Codex", () => {
         void this.activateView();
       });
 
@@ -319,7 +319,7 @@ export default class ClaudesCodexPlugin extends Plugin {
         },
       });
 
-      this.addSettingTab(new ClaudesCodexSettingTab(this.app, this));
+      this.addSettingTab(new PocketCodexSettingTab(this.app, this));
       this.scheduleRemainingSessionMetadataLoad();
     } finally {
       StartupProfiler.finishOnload();
@@ -329,7 +329,7 @@ export default class ClaudesCodexPlugin extends Plugin {
   onunload(): void {
     this.isUnloading = true;
     this.mobileDock?.clear();
-    if (typeof document !== 'undefined') document.body?.classList?.remove('claudes-codex-mobile');
+    if (typeof document !== 'undefined') document.body?.classList?.remove('pocket-codex-mobile');
     if (this.sessionMetadataLoadTimer !== null) {
       window.clearTimeout(this.sessionMetadataLoadTimer);
       this.sessionMetadataLoadTimer = null;
@@ -350,13 +350,13 @@ export default class ClaudesCodexPlugin extends Plugin {
 
   async activateView() {
     const { workspace } = this.app;
-    let leaf = workspace.getLeavesOfType(VIEW_TYPE_CLAUDES_CODEX)[0];
+    let leaf = workspace.getLeavesOfType(VIEW_TYPE_POCKET_CODEX)[0];
 
     if (!leaf) {
       const newLeaf = this.getLeafForPlacement(this.settings.chatViewPlacement);
       if (newLeaf) {
         await newLeaf.setViewState({
-          type: VIEW_TYPE_CLAUDES_CODEX,
+          type: VIEW_TYPE_POCKET_CODEX,
           active: true,
         });
         leaf = newLeaf;
@@ -390,7 +390,7 @@ export default class ClaudesCodexPlugin extends Plugin {
   }
 
   private canCreateNewTab(): boolean {
-    const hasClaudesCodexLeaf = this.app.workspace.getLeavesOfType(VIEW_TYPE_CLAUDES_CODEX).length > 0;
+    const hasPocketCodexLeaf = this.app.workspace.getLeavesOfType(VIEW_TYPE_POCKET_CODEX).length > 0;
     const view = this.getView();
     const tabManager = view?.getTabManager();
 
@@ -398,14 +398,14 @@ export default class ClaudesCodexPlugin extends Plugin {
       return tabManager.canCreateTab();
     }
 
-    if (hasClaudesCodexLeaf) {
+    if (hasPocketCodexLeaf) {
       return false;
     }
 
     return this.getLastKnownOpenTabCount() < this.getMaxTabsLimit();
   }
 
-  private async ensureViewOpen(): Promise<ClaudesCodexView | null> {
+  private async ensureViewOpen(): Promise<PocketCodexView | null> {
     const existingView = this.getView();
     if (existingView) {
       return existingView;
@@ -441,19 +441,19 @@ export default class ClaudesCodexPlugin extends Plugin {
     this.hasLoadedAllSessionMetadata = false;
     await this.importLegacyPluginDataOnFirstRun();
     this.storage = new SharedStorageService(this);
-    const { claudesCodex } = await this.storage.initialize();
+    const { pocketCodex } = await this.storage.initialize();
     this.lastKnownTabManagerState = await this.storage.getTabManagerState();
 
     this.settings = {
-      ...DEFAULT_CLAUDES_CODEX_SETTINGS,
-      ...claudesCodex,
+      ...DEFAULT_POCKET_CODEX_SETTINGS,
+      ...pocketCodex,
     };
     this.settingsCoordinator = new SettingsCoordinator(
       this.settings,
       async (settings) => {
         ProviderSettingsCoordinator.normalizeProviderSelection(settings);
         ProviderSettingsCoordinator.persistProjectedProviderState(settings);
-        await this.storage.saveClaudesCodexSettings(settings);
+        await this.storage.savePocketCodexSettings(settings);
       },
     );
     const didNormalizePendingSessionInvalidations = this.syncPendingSessionInvalidations();
@@ -569,7 +569,7 @@ export default class ClaudesCodexPlugin extends Plugin {
   }
 
   /**
-   * The `claudes-codex` plugin id gives Obsidian a new data.json. Copy the previous
+   * The `pocket-codex` plugin id gives Obsidian a new data.json. Copy the previous
    * fork's plugin data on first run while leaving its rollback copy untouched.
    */
   private async importLegacyPluginDataOnFirstRun(): Promise<void> {
@@ -592,7 +592,7 @@ export default class ClaudesCodexPlugin extends Plugin {
 
       await this.saveData(legacyData);
     } catch {
-      new Notice("Claude's Codex could not import settings from Claudian Praetor. The old data was left untouched.");
+      new Notice("Pocket Codex could not import settings from Claudian Praetor. The old data was left untouched.");
     }
   }
 
@@ -729,7 +729,7 @@ export default class ClaudesCodexPlugin extends Plugin {
   }
 
   private markPendingSessionInvalidations(
-    settings: ClaudesCodexSettings,
+    settings: PocketCodexSettings,
     providerIds: ProviderId[],
   ): Map<ProviderId, number> {
     const pending = readPendingProviderSessionInvalidations(settings);
@@ -884,11 +884,11 @@ export default class ClaudesCodexPlugin extends Plugin {
     const result = await this.daemonSupervisor.start({ retry: options.retry });
     if (options.notify) {
       if (result.status === 'started') {
-        new Notice(`Claude's Codex: mobile daemon started at ${result.url}.`, 8000);
+        new Notice(`Pocket Codex: mobile daemon started at ${result.url}.`, 8000);
       } else if (result.status === 'already-running') {
-        new Notice(`Claude's Codex: mobile daemon already running at ${result.url}.`, 8000);
+        new Notice(`Pocket Codex: mobile daemon already running at ${result.url}.`, 8000);
       } else if ('message' in result) {
-        new Notice(`Claude's Codex: ${result.message}`, 8000);
+        new Notice(`Pocket Codex: ${result.message}`, 8000);
       }
     }
     return result;
@@ -923,7 +923,7 @@ export default class ClaudesCodexPlugin extends Plugin {
     }
 
     new Notice(
-      "Claude's Codex mobile uses your Mac over Tailscale. Connect Tailscale on both devices, then on the Mac enable Mobile daemon and choose Pair iPhone or iPad.",
+      "Pocket Codex mobile uses your Mac over Tailscale. Connect Tailscale on both devices, then on the Mac enable Mobile daemon and choose Pair iPhone or iPad.",
       15_000,
     );
   }
@@ -932,12 +932,12 @@ export default class ClaudesCodexPlugin extends Plugin {
     await this.settingsCoordinator.persistCurrent();
   }
 
-  async mutateSettings(mutation: SettingsMutation<ClaudesCodexSettings>): Promise<void> {
+  async mutateSettings(mutation: SettingsMutation<PocketCodexSettings>): Promise<void> {
     await this.settingsCoordinator.mutate(mutation);
   }
 
   async mutateSettingsConditionally(
-    mutation: ConditionalSettingsMutation<ClaudesCodexSettings>,
+    mutation: ConditionalSettingsMutation<PocketCodexSettings>,
   ): Promise<void> {
     await this.settingsCoordinator.mutateConditionally(mutation);
   }
@@ -1050,7 +1050,7 @@ export default class ClaudesCodexPlugin extends Plugin {
   }
 
   private async restartEnvironmentAffectedRuntimes(
-    view: ClaudesCodexView,
+    view: PocketCodexView,
     affectedProviderIds: ProviderId[],
     resetSessions: boolean,
   ): Promise<number> {
@@ -1235,17 +1235,17 @@ export default class ClaudesCodexPlugin extends Plugin {
     await this.storage.setTabManagerState(state);
   }
 
-  getView(): ClaudesCodexView | null {
-    const leaves = this.app.workspace.getLeavesOfType(VIEW_TYPE_CLAUDES_CODEX);
-    return leaves.map(leaf => leaf.view).find(isClaudesCodexView) ?? null;
+  getView(): PocketCodexView | null {
+    const leaves = this.app.workspace.getLeavesOfType(VIEW_TYPE_POCKET_CODEX);
+    return leaves.map(leaf => leaf.view).find(isPocketCodexView) ?? null;
   }
 
-  getAllViews(): ClaudesCodexView[] {
-    const leaves = this.app.workspace.getLeavesOfType(VIEW_TYPE_CLAUDES_CODEX);
-    return leaves.map(leaf => leaf.view).filter(isClaudesCodexView);
+  getAllViews(): PocketCodexView[] {
+    const leaves = this.app.workspace.getLeavesOfType(VIEW_TYPE_POCKET_CODEX);
+    return leaves.map(leaf => leaf.view).filter(isPocketCodexView);
   }
 
-  findConversationAcrossViews(conversationId: string): { view: ClaudesCodexView; tabId: string } | null {
+  findConversationAcrossViews(conversationId: string): { view: PocketCodexView; tabId: string } | null {
     for (const view of this.getAllViews()) {
       const tabManager = view.getTabManager();
       if (!tabManager) continue;

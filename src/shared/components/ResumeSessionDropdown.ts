@@ -1,5 +1,5 @@
 /**
- * Claude's Codex - Resume session dropdown
+ * Pocket Codex - Resume session dropdown
  *
  * Dropup UI for selecting a previous conversation to resume.
  * Shown when the /resume built-in command is executed.
@@ -37,7 +37,7 @@ export class ResumeSessionDropdown {
     this.currentConversationId = currentConversationId;
     this.callbacks = callbacks;
 
-    this.dropdownEl = this.containerEl.createDiv({ cls: 'claudes-codex-resume-dropdown' });
+    this.dropdownEl = this.containerEl.createDiv({ cls: 'pocket-codex-resume-dropdown' });
     this.render();
     this.dropdownEl.addClass('visible');
 
@@ -109,7 +109,7 @@ export class ResumeSessionDropdown {
   }
 
   private updateSelection(): void {
-    const items = this.dropdownEl.querySelectorAll('.claudes-codex-resume-item');
+    const items = this.dropdownEl.querySelectorAll('.pocket-codex-resume-item');
     items?.forEach((item, index) => {
       if (index === this.selectedIndex) {
         item.addClass('selected');
@@ -129,32 +129,32 @@ export class ResumeSessionDropdown {
   private render(): void {
     this.dropdownEl.empty();
 
-    const header = this.dropdownEl.createDiv({ cls: 'claudes-codex-resume-header' });
+    const header = this.dropdownEl.createDiv({ cls: 'pocket-codex-resume-header' });
     header.createSpan({ text: 'Resume conversation' });
 
     if (this.conversations.length === 0) {
-      this.dropdownEl.createDiv({ cls: 'claudes-codex-resume-empty', text: 'No conversations' });
+      this.dropdownEl.createDiv({ cls: 'pocket-codex-resume-empty', text: 'No conversations' });
       return;
     }
 
-    const list = this.dropdownEl.createDiv({ cls: 'claudes-codex-resume-list' });
+    const list = this.dropdownEl.createDiv({ cls: 'pocket-codex-resume-list' });
 
     for (let i = 0; i < this.conversations.length; i++) {
       const conv = this.conversations[i];
       const isCurrent = conv.id === this.currentConversationId;
 
-      const item = list.createDiv({ cls: 'claudes-codex-resume-item' });
+      const item = list.createDiv({ cls: 'pocket-codex-resume-item' });
       if (isCurrent) item.addClass('current');
       if (i === this.selectedIndex) item.addClass('selected');
 
-      const iconEl = item.createDiv({ cls: 'claudes-codex-resume-item-icon' });
+      const iconEl = item.createDiv({ cls: 'pocket-codex-resume-item-icon' });
       setIcon(iconEl, isCurrent ? 'message-square-dot' : 'message-square');
 
-      const content = item.createDiv({ cls: 'claudes-codex-resume-item-content' });
-      const titleEl = content.createDiv({ cls: 'claudes-codex-resume-item-title', text: conv.title });
+      const content = item.createDiv({ cls: 'pocket-codex-resume-item-content' });
+      const titleEl = content.createDiv({ cls: 'pocket-codex-resume-item-title', text: conv.title });
       titleEl.setAttribute('title', conv.title);
       content.createDiv({
-        cls: 'claudes-codex-resume-item-date',
+        cls: 'pocket-codex-resume-item-date',
         text: isCurrent ? 'Current session' : this.formatDate(conv.lastResponseAt ?? conv.createdAt),
       });
 

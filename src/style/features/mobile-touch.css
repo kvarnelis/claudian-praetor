@@ -1,6 +1,6 @@
 /*
  * Touch ergonomics for the inline ask/plan/exit-plan cards on mobile. Rows are
- * already tappable on every card (they share .claudes-codex-ask-item); this hides
+ * already tappable on every card (they share .pocket-codex-ask-item); this hides
  * the keyboard-only hint line, makes rows finger-sized (44px Apple HIG
  * minimum), and gives them visible borders so they read as buttons rather
  * than a keyboard-navigated list.
@@ -9,15 +9,15 @@
  * all three mobile body classes — keying on `is-mobile` alone silently skips
  * the iPad, which is the primary target here.
  */
-body.is-mobile .claudes-codex-ask-hints,
-body.is-tablet .claudes-codex-ask-hints,
-body.is-phone .claudes-codex-ask-hints {
+body.is-mobile .pocket-codex-ask-hints,
+body.is-tablet .pocket-codex-ask-hints,
+body.is-phone .pocket-codex-ask-hints {
   display: none;
 }
 
-body.is-mobile .claudes-codex-ask-item,
-body.is-tablet .claudes-codex-ask-item,
-body.is-phone .claudes-codex-ask-item {
+body.is-mobile .pocket-codex-ask-item,
+body.is-tablet .pocket-codex-ask-item,
+body.is-phone .pocket-codex-ask-item {
   min-height: 44px;
   align-items: center;
   padding: 8px 12px;
@@ -27,22 +27,22 @@ body.is-phone .claudes-codex-ask-item {
   -webkit-tap-highlight-color: transparent;
 }
 
-body.is-mobile .claudes-codex-ask-item:active,
-body.is-tablet .claudes-codex-ask-item:active,
-body.is-phone .claudes-codex-ask-item:active {
+body.is-mobile .pocket-codex-ask-item:active,
+body.is-tablet .pocket-codex-ask-item:active,
+body.is-phone .pocket-codex-ask-item:active {
   background: var(--background-modifier-hover);
 }
 
 /* The '›' keyboard cursor is meaningless on touch; reclaim its gutter. */
-body.is-mobile .claudes-codex-ask-cursor,
-body.is-tablet .claudes-codex-ask-cursor,
-body.is-phone .claudes-codex-ask-cursor {
+body.is-mobile .pocket-codex-ask-cursor,
+body.is-tablet .pocket-codex-ask-cursor,
+body.is-phone .pocket-codex-ask-cursor {
   display: none;
 }
 
-body.is-mobile .claudes-codex-ask-custom-text,
-body.is-tablet .claudes-codex-ask-custom-text,
-body.is-phone .claudes-codex-ask-custom-text {
+body.is-mobile .pocket-codex-ask-custom-text,
+body.is-tablet .pocket-codex-ask-custom-text,
+body.is-phone .pocket-codex-ask-custom-text {
   min-height: 36px;
   font-size: var(--font-ui-medium);
 }

@@ -39,7 +39,7 @@ export class TabBar {
 
   /** Builds the tab bar UI. */
   private build(): void {
-    this.containerEl.addClass('claudes-codex-tab-badges');
+    this.containerEl.addClass('pocket-codex-tab-badges');
     this.containerEl.addEventListener('scroll', this.handleScroll);
   }
 
@@ -73,21 +73,21 @@ export class TabBar {
   /** Renders a single tab badge. */
   private renderBadge(item: TabBarItem): void {
     // Determine state class (priority: active > attention > streaming > idle)
-    let stateClass = 'claudes-codex-tab-badge-idle';
+    let stateClass = 'pocket-codex-tab-badge-idle';
     if (item.isActive) {
-      stateClass = 'claudes-codex-tab-badge-active';
+      stateClass = 'pocket-codex-tab-badge-active';
     } else if (item.needsAttention) {
-      stateClass = 'claudes-codex-tab-badge-attention';
+      stateClass = 'pocket-codex-tab-badge-attention';
     } else if (item.isStreaming) {
-      stateClass = 'claudes-codex-tab-badge-streaming';
+      stateClass = 'pocket-codex-tab-badge-streaming';
     }
 
     const isTitleExpanded = this.expandedTitleTabIds.has(item.id);
     const badgeEl = this.containerEl.createDiv({
       cls: [
-        'claudes-codex-tab-badge',
+        'pocket-codex-tab-badge',
         stateClass,
-        isTitleExpanded ? 'claudes-codex-tab-badge-expanded' : '',
+        isTitleExpanded ? 'pocket-codex-tab-badge-expanded' : '',
       ].filter(Boolean).join(' '),
       text: this.getBadgeLabel(item),
     });
@@ -113,7 +113,7 @@ export class TabBar {
     if (item.canClose) {
       // Visible close control — shown on mobile via CSS (desktop keeps
       // right-click + the long-press below). Tap × to close, tap number to switch.
-      const closeEl = badgeEl.createSpan({ cls: 'claudes-codex-tab-badge-close', text: '×' });
+      const closeEl = badgeEl.createSpan({ cls: 'pocket-codex-tab-badge-close', text: '×' });
       closeEl.setAttribute('aria-label', 'Close tab');
       closeEl.addEventListener('click', (e) => {
         e.preventDefault();
@@ -160,7 +160,7 @@ export class TabBar {
   /** Destroys the tab bar. */
   destroy(): void {
     this.containerEl.empty();
-    this.containerEl.removeClass('claudes-codex-tab-badges');
+    this.containerEl.removeClass('pocket-codex-tab-badges');
     this.containerEl.removeEventListener('scroll', this.handleScroll);
     this.expandedTitleTabIds.clear();
     this.lastKnownScrollLeft = 0;
@@ -206,7 +206,7 @@ export class TabBar {
 
     const isTitleExpanded = this.expandedTitleTabIds.has(item.id);
     badgeEl.textContent = this.getBadgeLabel(item);
-    badgeEl.toggleClass('claudes-codex-tab-badge-expanded', isTitleExpanded);
+    badgeEl.toggleClass('pocket-codex-tab-badge-expanded', isTitleExpanded);
     badgeEl.setAttribute('data-title-expanded', isTitleExpanded ? 'true' : 'false');
     this.callbacks.onTitleExpansionChanged?.(this.getExpandedTitleTabIds());
   }

@@ -1,11 +1,11 @@
 /* Codex fast-mode / service-tier toggle */
-.claudes-codex-service-tier-toggle {
+.pocket-codex-service-tier-toggle {
   display: flex;
   align-items: center;
   padding-left: 2px;
 }
 
-.claudes-codex-service-tier-button {
+.pocket-codex-service-tier-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -19,21 +19,21 @@
   flex-shrink: 0;
 }
 
-.claudes-codex-service-tier-icon {
+.pocket-codex-service-tier-icon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
 }
 
-.claudes-codex-service-tier-icon svg {
+.pocket-codex-service-tier-icon svg {
   width: 14px;
   height: 14px;
 }
 
-.claudes-codex-service-tier-button:hover {
+.pocket-codex-service-tier-button:hover {
   background: var(--background-modifier-hover);
 }
 
-.claudes-codex-service-tier-button.active {
-  color: var(--claudes-codex-brand);
+.pocket-codex-service-tier-button.active {
+  color: var(--pocket-codex-brand);
 }

@@ -1,5 +1,5 @@
 /**
- * Claude's Codex - Instruction modal
+ * Pocket Codex - Instruction modal
  *
  * Unified modal that handles all instruction mode states:
  * - Loading (initial processing)
@@ -58,35 +58,35 @@ export class InstructionModal extends Modal {
 
   onOpen() {
     const { contentEl } = this;
-    contentEl.addClass('claudes-codex-instruction-modal');
+    contentEl.addClass('pocket-codex-instruction-modal');
     this.setTitle('Add custom instruction');
 
     // User input section (always visible)
-    const inputSection = contentEl.createDiv({ cls: 'claudes-codex-instruction-section' });
-    const inputLabel = inputSection.createDiv({ cls: 'claudes-codex-instruction-label' });
+    const inputSection = contentEl.createDiv({ cls: 'pocket-codex-instruction-section' });
+    const inputLabel = inputSection.createDiv({ cls: 'pocket-codex-instruction-label' });
     inputLabel.setText('Your input:');
-    const inputText = inputSection.createDiv({ cls: 'claudes-codex-instruction-original' });
+    const inputText = inputSection.createDiv({ cls: 'pocket-codex-instruction-original' });
     inputText.setText(this.rawInstruction);
 
     // Main content section (changes based on state)
-    this.contentSectionEl = contentEl.createDiv({ cls: 'claudes-codex-instruction-content-section' });
+    this.contentSectionEl = contentEl.createDiv({ cls: 'pocket-codex-instruction-content-section' });
 
     // Loading state
-    this.loadingEl = this.contentSectionEl.createDiv({ cls: 'claudes-codex-instruction-loading' });
-    this.loadingEl.createDiv({ cls: 'claudes-codex-instruction-spinner' });
+    this.loadingEl = this.contentSectionEl.createDiv({ cls: 'pocket-codex-instruction-loading' });
+    this.loadingEl.createDiv({ cls: 'pocket-codex-instruction-spinner' });
     this.loadingEl.createSpan({ text: 'Processing your instruction...' });
 
     // Clarification state (hidden initially)
-    this.clarificationEl = this.contentSectionEl.createDiv({ cls: 'claudes-codex-instruction-clarification-section' });
-    this.clarificationEl.addClass('claudes-codex-hidden');
-    this.clarificationTextEl = this.clarificationEl.createDiv({ cls: 'claudes-codex-instruction-clarification' });
+    this.clarificationEl = this.contentSectionEl.createDiv({ cls: 'pocket-codex-instruction-clarification-section' });
+    this.clarificationEl.addClass('pocket-codex-hidden');
+    this.clarificationTextEl = this.clarificationEl.createDiv({ cls: 'pocket-codex-instruction-clarification' });
 
-    const responseSection = this.clarificationEl.createDiv({ cls: 'claudes-codex-instruction-section' });
-    const responseLabel = responseSection.createDiv({ cls: 'claudes-codex-instruction-label' });
+    const responseSection = this.clarificationEl.createDiv({ cls: 'pocket-codex-instruction-section' });
+    const responseLabel = responseSection.createDiv({ cls: 'pocket-codex-instruction-label' });
     responseLabel.setText('Your response:');
 
     this.responseTextarea = new TextAreaComponent(responseSection);
-    this.responseTextarea.inputEl.addClass('claudes-codex-instruction-response-textarea');
+    this.responseTextarea.inputEl.addClass('pocket-codex-instruction-response-textarea');
     this.responseTextarea.inputEl.rows = 3;
     this.responseTextarea.inputEl.placeholder = 'Provide more details...';
 
@@ -99,24 +99,24 @@ export class InstructionModal extends Modal {
     });
 
     // Confirmation state (hidden initially)
-    this.confirmationEl = this.contentSectionEl.createDiv({ cls: 'claudes-codex-instruction-confirmation-section' });
-    this.confirmationEl.addClass('claudes-codex-hidden');
+    this.confirmationEl = this.contentSectionEl.createDiv({ cls: 'pocket-codex-instruction-confirmation-section' });
+    this.confirmationEl.addClass('pocket-codex-hidden');
 
     // Refined instruction display/edit
-    const refinedSection = this.confirmationEl.createDiv({ cls: 'claudes-codex-instruction-section' });
-    const refinedLabel = refinedSection.createDiv({ cls: 'claudes-codex-instruction-label' });
+    const refinedSection = this.confirmationEl.createDiv({ cls: 'pocket-codex-instruction-section' });
+    const refinedLabel = refinedSection.createDiv({ cls: 'pocket-codex-instruction-label' });
     refinedLabel.setText('Refined snippet:');
 
-    this.refinedDisplayEl = refinedSection.createDiv({ cls: 'claudes-codex-instruction-refined' });
-    this.editContainerEl = refinedSection.createDiv({ cls: 'claudes-codex-instruction-edit-container' });
-    this.editContainerEl.addClass('claudes-codex-hidden');
+    this.refinedDisplayEl = refinedSection.createDiv({ cls: 'pocket-codex-instruction-refined' });
+    this.editContainerEl = refinedSection.createDiv({ cls: 'pocket-codex-instruction-edit-container' });
+    this.editContainerEl.addClass('pocket-codex-hidden');
 
     this.editTextarea = new TextAreaComponent(this.editContainerEl);
-    this.editTextarea.inputEl.addClass('claudes-codex-instruction-edit-textarea');
+    this.editTextarea.inputEl.addClass('pocket-codex-instruction-edit-textarea');
     this.editTextarea.inputEl.rows = 4;
 
     // Buttons (changes based on state)
-    this.buttonsEl = contentEl.createDiv({ cls: 'claudes-codex-instruction-buttons' });
+    this.buttonsEl = contentEl.createDiv({ cls: 'pocket-codex-instruction-buttons' });
     this.updateButtons();
 
     this.showState('loading');
@@ -156,7 +156,7 @@ export class InstructionModal extends Modal {
   showClarificationLoading() {
     this.isSubmitting = true;
     if (this.loadingEl) {
-      this.loadingEl.querySelector('.claudes-codex-instruction-spinner');
+      this.loadingEl.querySelector('.pocket-codex-instruction-spinner');
       const text = this.loadingEl.querySelector('span');
       if (text) text.textContent = 'Processing...';
     }
@@ -167,13 +167,13 @@ export class InstructionModal extends Modal {
     this.state = state;
 
     if (this.loadingEl) {
-      this.loadingEl.toggleClass('claudes-codex-hidden', state !== 'loading');
+      this.loadingEl.toggleClass('pocket-codex-hidden', state !== 'loading');
     }
     if (this.clarificationEl) {
-      this.clarificationEl.toggleClass('claudes-codex-hidden', state !== 'clarification');
+      this.clarificationEl.toggleClass('pocket-codex-hidden', state !== 'clarification');
     }
     if (this.confirmationEl) {
-      this.confirmationEl.toggleClass('claudes-codex-hidden', state !== 'confirmation');
+      this.confirmationEl.toggleClass('pocket-codex-hidden', state !== 'confirmation');
     }
 
     this.updateButtons();
@@ -185,7 +185,7 @@ export class InstructionModal extends Modal {
 
     const cancelBtn = this.buttonsEl.createEl('button', {
       text: 'Cancel',
-      cls: 'claudes-codex-instruction-btn claudes-codex-instruction-reject-btn',
+      cls: 'pocket-codex-instruction-btn pocket-codex-instruction-reject-btn',
       attr: { 'aria-label': 'Cancel' }
     });
     cancelBtn.addEventListener('click', () => this.handleReject());
@@ -193,7 +193,7 @@ export class InstructionModal extends Modal {
     if (this.state === 'clarification') {
       const submitBtn = this.buttonsEl.createEl('button', {
         text: 'Submit',
-        cls: 'claudes-codex-instruction-btn claudes-codex-instruction-accept-btn',
+        cls: 'pocket-codex-instruction-btn pocket-codex-instruction-accept-btn',
         attr: { 'aria-label': 'Submit response' }
       });
       submitBtn.addEventListener('click', () => {
@@ -202,14 +202,14 @@ export class InstructionModal extends Modal {
     } else if (this.state === 'confirmation') {
       this.editBtnEl = this.buttonsEl.createEl('button', {
         text: 'Edit',
-        cls: 'claudes-codex-instruction-btn claudes-codex-instruction-edit-btn',
+        cls: 'pocket-codex-instruction-btn pocket-codex-instruction-edit-btn',
         attr: { 'aria-label': 'Edit instruction' }
       });
       this.editBtnEl.addEventListener('click', () => this.toggleEdit());
 
       const acceptBtn = this.buttonsEl.createEl('button', {
         text: 'Accept',
-        cls: 'claudes-codex-instruction-btn claudes-codex-instruction-accept-btn',
+        cls: 'pocket-codex-instruction-btn pocket-codex-instruction-accept-btn',
         attr: { 'aria-label': 'Accept instruction' }
       });
       acceptBtn.addEventListener('click', () => this.handleAccept());
@@ -236,8 +236,8 @@ export class InstructionModal extends Modal {
     this.isEditing = !this.isEditing;
 
     if (this.isEditing) {
-      this.refinedDisplayEl?.addClass('claudes-codex-hidden');
-      this.editContainerEl?.removeClass('claudes-codex-hidden');
+      this.refinedDisplayEl?.addClass('pocket-codex-hidden');
+      this.editContainerEl?.removeClass('pocket-codex-hidden');
       if (this.editBtnEl) this.editBtnEl.setText('Preview');
       this.editTextarea?.inputEl.focus();
     } else {
@@ -245,9 +245,9 @@ export class InstructionModal extends Modal {
       this.refinedInstruction = edited;
       if (this.refinedDisplayEl) {
         this.refinedDisplayEl.setText(edited);
-        this.refinedDisplayEl.removeClass('claudes-codex-hidden');
+        this.refinedDisplayEl.removeClass('pocket-codex-hidden');
       }
-      this.editContainerEl?.addClass('claudes-codex-hidden');
+      this.editContainerEl?.addClass('pocket-codex-hidden');
       if (this.editBtnEl) this.editBtnEl.setText('Edit');
     }
   }
