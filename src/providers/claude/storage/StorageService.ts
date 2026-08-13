@@ -68,6 +68,7 @@ export class StorageService {
     await this.ensureDirectories();
 
     const cc = await this.ccSettings.load();
+    await this.pocketCodexSettings.seedOwnSettingsOnFirstRun();
     const pocketCodex = await this.pocketCodexSettings.load();
 
     return { cc, pocketCodex };

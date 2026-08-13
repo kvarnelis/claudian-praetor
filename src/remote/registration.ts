@@ -7,7 +7,6 @@
  */
 
 
-import type { ProviderHost } from '../core/providers/ProviderHost';
 import { ProviderRegistry } from '../core/providers/ProviderRegistry';
 import { ProviderWorkspaceRegistry } from '../core/providers/ProviderWorkspaceRegistry';
 import type {
@@ -60,21 +59,7 @@ export function getRemoteClient(): RemoteClient {
   return sharedClient;
 }
 
-function readRemoteConfig(plugin: ProviderHost): { url: string } | null {
-  // Registration runs before loadSettings(); settings may not exist yet.
-  const settings = plugin.settings as unknown as Record<string, unknown> | undefined;
-  const raw = settings?.remoteDaemon;
-  if (!raw || typeof raw !== 'object') return null;
-  const { url } = raw as { url?: unknown };
-  if (typeof url !== 'string' || !url.trim()) return null;
-  return { url: url.trim() };
-}
-
-function createRemoteRuntime(plugin: ProviderHost, providerId: ProviderId, capabilities: ProviderCapabilities): RemoteChatRuntime {
-  const config = readRemoteConfig(plugin);
-  if (config) {
-    sharedClient.configure(config);
-  }
+function createRemoteRuntime(providerId: ProviderId, capabilities: ProviderCapabilities): RemoteChatRuntime {
   const runtime = new RemoteChatRuntime({
     client: sharedClient,
     providerId,
@@ -152,10 +137,7 @@ class RemoteConversationHistoryService implements ProviderConversationHistorySer
 class RemoteTitleGenerationService implements TitleGenerationService {
   private cancelled = false;
 
-  constructor(
-    private readonly plugin: ProviderHost,
-    private readonly providerId: ProviderId,
-  ) {}
+  constructor(private readonly providerId: ProviderId) {}
 
   async generateTitle(
     conversationId: string,
@@ -164,8 +146,6 @@ class RemoteTitleGenerationService implements TitleGenerationService {
   ): Promise<void> {
     this.cancelled = false;
     try {
-      const config = readRemoteConfig(this.plugin);
-      if (config) sharedClient.configure(config);
       const result = await sharedClient.rpc<TitleGenerateResult>('aux.generateTitle', {
         providerId: this.providerId,
         conversationId,
@@ -303,11 +283,8 @@ let remoteProvidersRegistered = false;
 export function registerRemoteProviders(plugin: PocketCodexPlugin): void {
   if (remoteProvidersRegistered) return;
 
-  // Registration runs before loadSettings(), so the daemon config isn't readable
-  // yet. The client is configured lazily when the first runtime is created
-  // (createRemoteRuntime) and whenever the settings field changes
-  // (saveRemoteDaemonConfig) — both after settings load. A genuinely missing
-  // config surfaces at connect time via RemoteClient.ensureConnected().
+  // Registration runs before loadSettings(). The client is configured from
+  // plugin-private data.json during load and whenever saveRemoteDaemonConfig runs.
 
   for (const spec of REMOTE_PROVIDER_SPECS) {
     const registration: ProviderRegistration = {
@@ -318,10 +295,8 @@ export function registerRemoteProviders(plugin: PocketCodexPlugin): void {
       environmentKeyPatterns: spec.environmentKeyPatterns,
       chatUIConfig: spec.chatUIConfig,
       settingsReconciler: spec.settingsReconciler,
-      createRuntime: ({ plugin: runtimePlugin }) =>
-        createRemoteRuntime(runtimePlugin, spec.providerId, spec.capabilities),
-      createTitleGenerationService: (titlePlugin) =>
-        new RemoteTitleGenerationService(titlePlugin, spec.providerId),
+      createRuntime: () => createRemoteRuntime(spec.providerId, spec.capabilities),
+      createTitleGenerationService: () => new RemoteTitleGenerationService(spec.providerId),
       createInstructionRefineService: () => new RemoteInstructionRefineService(),
       createInlineEditService: () => new RemoteInlineEditService(),
       historyService: new RemoteConversationHistoryService(spec.providerId),

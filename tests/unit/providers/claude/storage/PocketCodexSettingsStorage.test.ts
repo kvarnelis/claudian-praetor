@@ -8,6 +8,7 @@ import type { VaultFileAdapter } from '@/core/storage/VaultFileAdapter';
 import { getClaudeProviderSettings } from '@/providers/claude/settings';
 import {
   LEGACY_POCKET_CODEX_SETTINGS_PATH,
+  POCKET_CODEX_OWN_SETTINGS_PATH,
   POCKET_CODEX_SETTINGS_PATH,
   PocketCodexSettingsStorage,
 } from '@/providers/claude/storage/PocketCodexSettingsStorage';
@@ -124,7 +125,39 @@ describe('PocketCodexSettingsStorage', () => {
       expect(mockAdapter.read).not.toHaveBeenCalled();
     });
 
-    it('loads legacy .claude settings and migrates them to .claudian', async () => {
+    it('loads the own settings file before either seed source', async () => {
+      mockAdapter.exists.mockImplementation(async (path: string) => (
+        path === POCKET_CODEX_OWN_SETTINGS_PATH
+        || path === POCKET_CODEX_SETTINGS_PATH
+        || path === LEGACY_POCKET_CODEX_SETTINGS_PATH
+      ));
+      mockAdapter.read.mockImplementation(async (path: string) => JSON.stringify({
+        userName: path,
+      }));
+
+      const result = await storage.load();
+
+      expect(result.userName).toBe(POCKET_CODEX_OWN_SETTINGS_PATH);
+      expect(mockAdapter.read).toHaveBeenCalledWith(POCKET_CODEX_OWN_SETTINGS_PATH);
+    });
+
+    it('loads the shared settings seed before the .claude fallback without writing', async () => {
+      mockAdapter.exists.mockImplementation(async (path: string) => (
+        path === POCKET_CODEX_SETTINGS_PATH
+        || path === LEGACY_POCKET_CODEX_SETTINGS_PATH
+      ));
+      mockAdapter.read.mockImplementation(async (path: string) => JSON.stringify({
+        userName: path,
+      }));
+
+      const result = await storage.load();
+
+      expect(result.userName).toBe(POCKET_CODEX_SETTINGS_PATH);
+      expect(mockAdapter.read).toHaveBeenCalledWith(POCKET_CODEX_SETTINGS_PATH);
+      expect(mockAdapter.write).not.toHaveBeenCalled();
+    });
+
+    it('loads legacy .claude settings without migrating or deleting them', async () => {
       mockAdapter.exists.mockImplementation(async (path: string) => (
         path === LEGACY_POCKET_CODEX_SETTINGS_PATH
       ));
@@ -142,11 +175,8 @@ describe('PocketCodexSettingsStorage', () => {
 
       expect(result.model).toBe('claude-opus-4-5');
       expect(result.userName).toBe('MigratedUser');
-      expect(mockAdapter.write).toHaveBeenCalledWith(
-        POCKET_CODEX_SETTINGS_PATH,
-        expect.any(String),
-      );
-      expect(mockAdapter.delete).toHaveBeenCalledWith(LEGACY_POCKET_CODEX_SETTINGS_PATH);
+      expect(mockAdapter.write).not.toHaveBeenCalled();
+      expect(mockAdapter.delete).not.toHaveBeenCalled();
     });
 
     it('should parse valid JSON and merge with defaults', async () => {
@@ -709,7 +739,7 @@ describe('PocketCodexSettingsStorage', () => {
       await storage.save(settings);
 
       expect(mockAdapter.write).toHaveBeenCalledWith(
-        POCKET_CODEX_SETTINGS_PATH,
+        POCKET_CODEX_OWN_SETTINGS_PATH,
         expect.any(String)
       );
       const writtenContent = JSON.parse(mockAdapter.write.mock.calls[0][1]);
@@ -794,24 +824,96 @@ describe('PocketCodexSettingsStorage', () => {
       });
     });
 
-    it('deletes the legacy settings file after writing the new path', async () => {
+    it('writes only the own settings file and leaves both seed sources untouched', async () => {
       mockAdapter.exists.mockImplementation(async (path: string) => (
-        path === LEGACY_POCKET_CODEX_SETTINGS_PATH
+        path === POCKET_CODEX_SETTINGS_PATH || path === LEGACY_POCKET_CODEX_SETTINGS_PATH
       ));
 
       await storage.save(DEFAULT_SETTINGS);
 
       expect(mockAdapter.write).toHaveBeenCalledWith(
+        POCKET_CODEX_OWN_SETTINGS_PATH,
+        expect.any(String),
+      );
+      expect(mockAdapter.write).not.toHaveBeenCalledWith(
         POCKET_CODEX_SETTINGS_PATH,
         expect.any(String),
       );
-      expect(mockAdapter.delete).toHaveBeenCalledWith(LEGACY_POCKET_CODEX_SETTINGS_PATH);
+      expect(mockAdapter.delete).not.toHaveBeenCalled();
+    });
+
+    it('never serializes remoteDaemon into the own settings file', async () => {
+      await storage.save({
+        ...DEFAULT_SETTINGS,
+        remoteDaemon: { url: 'ws://100.64.0.10:8423' },
+      } as typeof DEFAULT_SETTINGS & { remoteDaemon: { url: string } });
+
+      const writtenContent = JSON.parse(mockAdapter.write.mock.calls[0][1]);
+      expect(writtenContent).not.toHaveProperty('remoteDaemon');
     });
 
     it('should throw on write error', async () => {
       mockAdapter.write.mockRejectedValue(new Error('Write failed'));
 
       await expect(storage.save(DEFAULT_SETTINGS)).rejects.toThrow('Write failed');
+    });
+  });
+
+  describe('seedOwnSettingsOnFirstRun', () => {
+    it('copies the shared file verbatim once and leaves it byte-identical', async () => {
+      const sharedContent = '{\n  "providerConfigs": { "grok": { "enabled": true } },\n  "trailing": "spacing"\n}\n';
+      mockAdapter.exists.mockImplementation(async (path: string) => (
+        path === POCKET_CODEX_SETTINGS_PATH
+      ));
+      mockAdapter.read.mockResolvedValue(sharedContent);
+
+      await storage.seedOwnSettingsOnFirstRun();
+
+      expect(mockAdapter.read).toHaveBeenCalledWith(POCKET_CODEX_SETTINGS_PATH);
+      expect(mockAdapter.write).toHaveBeenCalledWith(
+        POCKET_CODEX_OWN_SETTINGS_PATH,
+        sharedContent,
+      );
+      expect(mockAdapter.write).not.toHaveBeenCalledWith(
+        POCKET_CODEX_SETTINGS_PATH,
+        expect.any(String),
+      );
+      expect(mockAdapter.delete).not.toHaveBeenCalled();
+    });
+
+    it('does nothing when the own file already exists', async () => {
+      mockAdapter.exists.mockImplementation(async (path: string) => (
+        path === POCKET_CODEX_OWN_SETTINGS_PATH || path === POCKET_CODEX_SETTINGS_PATH
+      ));
+
+      await storage.seedOwnSettingsOnFirstRun();
+
+      expect(mockAdapter.read).not.toHaveBeenCalled();
+      expect(mockAdapter.write).not.toHaveBeenCalled();
+    });
+
+    it('removes a seeded remoteDaemon value during own-file normalization', async () => {
+      const sharedContent = JSON.stringify({
+        userName: 'Seeded user',
+        remoteDaemon: { url: 'ws://100.64.0.10:8423' },
+      });
+      let ownContent: string | null = null;
+      mockAdapter.exists.mockImplementation(async (path: string) => (
+        path === POCKET_CODEX_SETTINGS_PATH
+        || (path === POCKET_CODEX_OWN_SETTINGS_PATH && ownContent !== null)
+      ));
+      mockAdapter.read.mockImplementation(async (path: string) => (
+        path === POCKET_CODEX_OWN_SETTINGS_PATH ? ownContent! : sharedContent
+      ));
+      mockAdapter.write.mockImplementation(async (path: string, content: string) => {
+        if (path === POCKET_CODEX_OWN_SETTINGS_PATH) ownContent = content;
+      });
+
+      await storage.seedOwnSettingsOnFirstRun();
+      await storage.load();
+
+      expect(JSON.parse(ownContent!)).not.toHaveProperty('remoteDaemon');
+      expect(sharedContent).toContain('remoteDaemon');
     });
   });
 

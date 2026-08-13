@@ -183,8 +183,9 @@ describe('StorageService convenience methods', () => {
 
       await storage.updatePocketCodexSettings({ userName: 'NewUser' });
 
-      const saved = JSON.parse(files.get('.claudian/claudian-settings.json')!) as Record<string, unknown>;
+      const saved = JSON.parse(files.get('.claudian/pocket-codex-settings.json')!) as Record<string, unknown>;
       expect(saved.userName).toBe('NewUser');
+      expect(files.get('.claudian/claudian-settings.json')).toBe(pocketCodexSettingsJson);
     });
   });
 
@@ -202,8 +203,9 @@ describe('StorageService convenience methods', () => {
       existing.userName = 'FullSave';
       await storage.savePocketCodexSettings(existing);
 
-      const saved = JSON.parse(files.get('.claudian/claudian-settings.json')!) as Record<string, unknown>;
+      const saved = JSON.parse(files.get('.claudian/pocket-codex-settings.json')!) as Record<string, unknown>;
       expect(saved.userName).toBe('FullSave');
+      expect(files.get('.claudian/claudian-settings.json')).toBe(pocketCodexSettingsJson);
     });
   });
 
@@ -222,7 +224,7 @@ describe('StorageService convenience methods', () => {
       expect(settings.model).toBe('haiku');
     });
 
-    it('migrates legacy settings into .claudian during initialization', async () => {
+    it('loads the .claude fallback without migrating or deleting it', async () => {
       const { plugin, files } = createMockPlugin({
         initialFiles: {
           '.claude/claudian-settings.json': pocketCodexSettingsJson,
@@ -232,8 +234,8 @@ describe('StorageService convenience methods', () => {
 
       await storage.initialize();
 
-      expect(files.get('.claudian/claudian-settings.json')).toBeDefined();
-      expect(files.has('.claude/claudian-settings.json')).toBe(false);
+      expect(files.has('.claudian/pocket-codex-settings.json')).toBe(false);
+      expect(files.get('.claude/claudian-settings.json')).toBe(pocketCodexSettingsJson);
     });
   });
 

@@ -65,7 +65,8 @@ The feature layer depends on `core/` contracts, not provider internals. Provider
 
 | Path | Contents |
 | --- | --- |
-| `.claudian/claudian-settings.json` | Shared Pocket Codex settings and provider-specific configuration |
+| `.claudian/pocket-codex-settings.json` | Pocket Codex-owned settings and provider-specific configuration |
+| `.claudian/claudian-settings.json` | Read-only first-run seed shared with upstream Claudian |
 | `.claudian/sessions/*.meta.json` | Provider-neutral session metadata |
 | `.claude/settings.json` | Claude Code-compatible project settings, permissions, and plugin overrides |
 | `.claude/mcp.json` | Pocket Codex-managed MCP servers for Claude |

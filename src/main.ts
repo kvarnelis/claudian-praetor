@@ -467,8 +467,9 @@ export default class PocketCodexPlugin extends Plugin {
     // Remote daemon config lives in plugin data.json (Sync-carried), not the
     // hidden .claudian/ compatibility folder; it takes precedence over any vault copy.
     const remoteDaemon = await this.storage.getRemoteDaemonConfig();
-    if (remoteDaemon) {
-      this.settings.remoteDaemon = remoteDaemon;
+    if (remoteDaemon && !Platform.isDesktopApp) {
+      const { getRemoteClient } = await import('./remote/registration');
+      getRemoteClient().configure(remoteDaemon);
     }
 
     const didMigrateLegacyDaemonAutoStart = this.settings.legacyDaemonAutoStart === true;
@@ -849,7 +850,6 @@ export default class PocketCodexPlugin extends Plugin {
   /** Persist the remote daemon URL to Sync-carried plugin data. Pairing stays local to the Mac. */
   async saveRemoteDaemonConfig(config: { url: string } | null): Promise<void> {
     await this.storage.setRemoteDaemonConfig(config);
-    this.settings.remoteDaemon = config ?? undefined;
     if (Platform.isMobile && config) {
       const { getRemoteClient } = await import('./remote/registration');
       getRemoteClient().configure(config);

@@ -16,7 +16,7 @@ import {
 } from '../../src/app/settings/SettingsCoordinator';
 import { SharedStorageService } from '../../src/app/storage/SharedStorageService';
 import {
-  POCKET_CODEX_SETTINGS_PATH,
+  POCKET_CODEX_OWN_SETTINGS_PATH,
   POCKET_CODEX_STORAGE_PATH,
 } from '../../src/core/bootstrap/StoragePaths';
 import {
@@ -246,12 +246,21 @@ export async function createHeadlessPlugin(options: {
  * replace the file, which kills file-level watchers) and debounces change
  * bursts before invoking the reload callback.
  */
+export function getSettingsWatchTarget(vaultPath: string): {
+  directory: string;
+  fileName: string;
+} {
+  return {
+    directory: path.join(vaultPath, POCKET_CODEX_STORAGE_PATH),
+    fileName: path.basename(POCKET_CODEX_OWN_SETTINGS_PATH),
+  };
+}
+
 function watchSettingsFile(
   vaultPath: string,
   onChange: () => Promise<void>,
 ): SettingsWatcher | null {
-  const settingsDir = path.join(vaultPath, POCKET_CODEX_STORAGE_PATH);
-  const settingsFileName = path.basename(POCKET_CODEX_SETTINGS_PATH);
+  const { directory: settingsDir, fileName: settingsFileName } = getSettingsWatchTarget(vaultPath);
   let timer: ReturnType<typeof setTimeout> | null = null;
   let reloading = false;
   let pendingReload = false;

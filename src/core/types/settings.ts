@@ -84,15 +84,13 @@ export type HostnameCliPaths = Record<string, string>;
 export type ProviderConfigMap = Partial<Record<string, Record<string, unknown>>>;
 
 /**
- * Application settings stored in .claudian/claudian-settings.json.
+ * Application settings stored in .claudian/pocket-codex-settings.json.
  *
  * Provider-specific fields (model, thinkingBudget, effortLevel, serviceTier, etc.) use
  * `string` here.  The active provider casts internally when it needs
  * narrower types.
  */
 export interface PocketCodexSettings {
-  /** Pocket Codex remote daemon connection used by mobile remote runtimes. */
-  remoteDaemon?: { url: string };
   /** Internal one-load migration flag for the pre-2.0.42 synced daemon host toggle. */
   legacyDaemonAutoStart?: boolean;
   // User preferences

@@ -13,7 +13,10 @@ jest.mock('@/providers/codex/runtime/CodexModelDiscoveryService', () => ({
 import { ProviderWorkspaceRegistry } from '@/core/providers/ProviderWorkspaceRegistry';
 import { registerBuiltInProviders } from '@/providers';
 
-import { createHeadlessPlugin } from '../../../daemon/src/headlessPlugin';
+import {
+  createHeadlessPlugin,
+  getSettingsWatchTarget,
+} from '../../../daemon/src/headlessPlugin';
 import { createNodeVaultApp } from '../../../daemon/src/nodeVaultApp';
 
 describe('daemon headless plugin', () => {
@@ -63,6 +66,13 @@ describe('daemon headless plugin', () => {
     }
   });
 
+  it('watches the Pocket Codex-owned settings file', () => {
+    expect(getSettingsWatchTarget(vaultPath)).toEqual({
+      directory: path.join(vaultPath, '.claudian'),
+      fileName: 'pocket-codex-settings.json',
+    });
+  });
+
   it('supports the complete provider host surface used by bundled providers', async () => {
     const handle = await createHeadlessPlugin({
       app: createNodeVaultApp(vaultPath),
@@ -97,14 +107,16 @@ describe('daemon headless plugin', () => {
 
   it('persists conditional mutations without dropping sibling provider settings', async () => {
     const settingsDir = path.join(vaultPath, '.claudian');
-    const settingsPath = path.join(settingsDir, 'claudian-settings.json');
+    const sharedSettingsPath = path.join(settingsDir, 'claudian-settings.json');
+    const ownSettingsPath = path.join(settingsDir, 'pocket-codex-settings.json');
     mkdirSync(settingsDir, { recursive: true });
-    writeFileSync(settingsPath, JSON.stringify({
+    const sharedContent = JSON.stringify({
       providerConfigs: {
         codex: { enabled: false, visibleModels: ['gpt-existing'] },
         opencode: { enabled: true, selectedMode: 'praetor-yolo' },
       },
-    }));
+    });
+    writeFileSync(sharedSettingsPath, sharedContent);
     const handle = await createHeadlessPlugin({
       app: createNodeVaultApp(vaultPath),
       vaultPath,
@@ -119,7 +131,7 @@ describe('daemon headless plugin', () => {
         return true;
       });
 
-      const persisted = JSON.parse(readFileSync(settingsPath, 'utf-8')) as {
+      const persisted = JSON.parse(readFileSync(ownSettingsPath, 'utf-8')) as {
         providerConfigs: Record<string, Record<string, unknown>>;
       };
       expect(persisted.providerConfigs.codex.visibleModels).toEqual(['gpt-current']);
@@ -127,6 +139,7 @@ describe('daemon headless plugin', () => {
         enabled: true,
         selectedMode: 'praetor-yolo',
       }));
+      expect(readFileSync(sharedSettingsPath, 'utf-8')).toBe(sharedContent);
     } finally {
       handle.dispose();
     }

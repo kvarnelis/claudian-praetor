@@ -345,10 +345,12 @@ export class PocketCodexSettingTab extends PluginSettingTab {
       daemonDesc.appendText("Pocket Codex on mobile connects to Pocket Codex running on your Mac over Tailscale. Sign in to Tailscale on both devices, then on the Mac open Pocket Codex settings and choose Pair iPhone or iPad. The URL can sync through Obsidian Sync; no token is needed. ");
       daemonDesc.createEl('a', { text: 'Install Tailscale', href: 'https://tailscale.com/download' });
 
+      let remoteDaemonConfig: { url: string } | null = null;
       const saveRemoteDaemonField = async (patch: { url?: string }): Promise<void> => {
-        const current = this.plugin.settings.remoteDaemon ?? { url: '' };
+        const current = remoteDaemonConfig ?? { url: '' };
         const next = { url: current.url, ...patch };
-        await this.plugin.saveRemoteDaemonConfig(next.url ? next : null);
+        remoteDaemonConfig = next.url ? next : null;
+        await this.plugin.saveRemoteDaemonConfig(remoteDaemonConfig);
       };
 
       new Setting(container)
@@ -357,10 +359,14 @@ export class PocketCodexSettingTab extends PluginSettingTab {
         .addText((text) => {
           text
             .setPlaceholder('ws://100.0.0.0:8423')
-            .setValue(this.plugin.settings.remoteDaemon?.url ?? '')
+            .setValue('')
             .onChange(async (value) => {
               await saveRemoteDaemonField({ url: value.trim() });
             });
+          void this.plugin.storage.getRemoteDaemonConfig().then((config) => {
+            remoteDaemonConfig = config;
+            text.setValue(config?.url ?? '');
+          });
         });
     }
 

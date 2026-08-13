@@ -1,5 +1,6 @@
 import {
   LEGACY_POCKET_CODEX_SETTINGS_PATH,
+  POCKET_CODEX_OWN_SETTINGS_PATH,
   POCKET_CODEX_SETTINGS_PATH,
 } from '../../core/bootstrap/StoragePaths';
 import {
@@ -26,6 +27,7 @@ import { DEFAULT_POCKET_CODEX_SETTINGS } from './defaultSettings';
 
 export {
   LEGACY_POCKET_CODEX_SETTINGS_PATH,
+  POCKET_CODEX_OWN_SETTINGS_PATH,
   POCKET_CODEX_SETTINGS_PATH,
 };
 
@@ -43,6 +45,7 @@ const LEGACY_STRIPPED_SHARED_SETTING_FIELDS = [
   'daemonAutoStart',
   'legacyDaemonAutoStart',
   'openInMainTab',
+  'remoteDaemon',
 ] as const;
 
 function getProviderSettingsAdapters() {
@@ -334,8 +337,8 @@ export class PocketCodexSettingsStorage {
     );
 
     if (
-      settingsPath !== POCKET_CODEX_SETTINGS_PATH
-      || (
+      settingsPath === POCKET_CODEX_OWN_SETTINGS_PATH
+      && (
       hasLegacyTopLevelProviderFields(stored)
       || 'show1MModel' in stored
       || 'slashCommands' in stored
@@ -346,6 +349,7 @@ export class PocketCodexSettingsStorage {
       || 'enableBlocklist' in stored
       || 'blockedCommands' in stored
       || 'daemonAutoStart' in stored
+      || 'remoteDaemon' in stored
       || shouldPersistChatViewPlacementMigration(stored, chatViewPlacement)
       || JSON.stringify(envSnippets) !== JSON.stringify(stored.envSnippets ?? [])
       || (
@@ -373,11 +377,26 @@ export class PocketCodexSettingsStorage {
       null,
       2,
     );
-    await this.adapter.write(POCKET_CODEX_SETTINGS_PATH, content);
-    await this.deleteLegacyFileIfPresent();
+    await this.adapter.write(POCKET_CODEX_OWN_SETTINGS_PATH, content);
+  }
+
+  async seedOwnSettingsOnFirstRun(): Promise<void> {
+    if (
+      await this.adapter.exists(POCKET_CODEX_OWN_SETTINGS_PATH)
+      || !await this.adapter.exists(POCKET_CODEX_SETTINGS_PATH)
+    ) {
+      return;
+    }
+
+    const sharedContent = await this.adapter.read(POCKET_CODEX_SETTINGS_PATH);
+    await this.adapter.write(POCKET_CODEX_OWN_SETTINGS_PATH, sharedContent);
   }
 
   async exists(): Promise<boolean> {
+    if (await this.adapter.exists(POCKET_CODEX_OWN_SETTINGS_PATH)) {
+      return true;
+    }
+
     if (await this.adapter.exists(POCKET_CODEX_SETTINGS_PATH)) {
       return true;
     }
@@ -395,6 +414,10 @@ export class PocketCodexSettingsStorage {
   }
 
   private async getLoadPath(): Promise<string | null> {
+    if (await this.adapter.exists(POCKET_CODEX_OWN_SETTINGS_PATH)) {
+      return POCKET_CODEX_OWN_SETTINGS_PATH;
+    }
+
     if (await this.adapter.exists(POCKET_CODEX_SETTINGS_PATH)) {
       return POCKET_CODEX_SETTINGS_PATH;
     }
@@ -404,11 +427,5 @@ export class PocketCodexSettingsStorage {
     }
 
     return null;
-  }
-
-  private async deleteLegacyFileIfPresent(): Promise<void> {
-    if (await this.adapter.exists(LEGACY_POCKET_CODEX_SETTINGS_PATH)) {
-      await this.adapter.delete(LEGACY_POCKET_CODEX_SETTINGS_PATH);
-    }
   }
 }

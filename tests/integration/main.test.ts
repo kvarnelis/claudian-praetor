@@ -468,7 +468,8 @@ describe('PocketCodexPlugin', () => {
     });
 
     it('keeps a pending provider invalidation after an incomplete metadata scan', async () => {
-      const settingsPath = '.claudian/claudian-settings.json';
+      const sharedSettingsPath = '.claudian/claudian-settings.json';
+      const settingsPath = '.claudian/pocket-codex-settings.json';
       const pendingGeneration = 11;
       const deferredMetadata = {
         id: 'incomplete-scan-session',
@@ -480,7 +481,7 @@ describe('PocketCodexPlugin', () => {
         providerState: { providerSessionId: 'incomplete-scan-provider-session-id' },
       };
       const files = installVaultFiles({
-        [settingsPath]: JSON.stringify({
+        [sharedSettingsPath]: JSON.stringify({
           pendingProviderSessionInvalidations: { claude: pendingGeneration },
           providerConfigs: {
             claude: {
@@ -565,7 +566,8 @@ describe('PocketCodexPlugin', () => {
     });
 
     it('retries a pending provider invalidation after unload and restart', async () => {
-      const settingsPath = '.claudian/claudian-settings.json';
+      const sharedSettingsPath = '.claudian/claudian-settings.json';
+      const settingsPath = '.claudian/pocket-codex-settings.json';
       const deferredMetadata = {
         id: 'restart-deferred-session',
         providerId: 'claude' as const,
@@ -576,7 +578,7 @@ describe('PocketCodexPlugin', () => {
         providerState: { providerSessionId: 'restart-provider-session-id' },
       };
       const files = installVaultFiles({
-        [settingsPath]: JSON.stringify({
+        [sharedSettingsPath]: JSON.stringify({
           providerConfigs: {
             claude: {
               environmentHash: 'ANTHROPIC_BASE_URL=https://old.example.com',
@@ -623,7 +625,8 @@ describe('PocketCodexPlugin', () => {
     });
 
     it('keeps a pending provider invalidation when a metadata write fails', async () => {
-      const settingsPath = '.claudian/claudian-settings.json';
+      const sharedSettingsPath = '.claudian/claudian-settings.json';
+      const settingsPath = '.claudian/pocket-codex-settings.json';
       const pendingGeneration = 7;
       const deferredMetadata = {
         id: 'failed-write-session',
@@ -635,7 +638,7 @@ describe('PocketCodexPlugin', () => {
         providerState: { providerSessionId: 'failed-write-provider-session-id' },
       };
       const files = installVaultFiles({
-        [settingsPath]: JSON.stringify({
+        [sharedSettingsPath]: JSON.stringify({
           pendingProviderSessionInvalidations: { claude: pendingGeneration },
           providerConfigs: {
             claude: {
@@ -826,7 +829,8 @@ describe('PocketCodexPlugin', () => {
       await plugin.onload();
 
       expect(plugin.saveData).toHaveBeenCalledWith(legacyData);
-      expect(plugin.settings.remoteDaemon).toEqual(legacyData.remoteDaemon);
+      expect(plugin.settings).not.toHaveProperty('remoteDaemon');
+      await expect(plugin.storage.getRemoteDaemonConfig()).resolves.toEqual(legacyData.remoteDaemon);
       expect(mockApp.vault.adapter.write).not.toHaveBeenCalledWith(legacyPath, expect.anything());
       expect(mockApp.vault.adapter.rename).not.toHaveBeenCalled();
       expect(mockApp.vault.adapter.remove).not.toHaveBeenCalledWith(legacyPath);
@@ -843,7 +847,8 @@ describe('PocketCodexPlugin', () => {
 
       await plugin.onload();
 
-      expect(plugin.settings.remoteDaemon).toEqual(currentData.remoteDaemon);
+      expect(plugin.settings).not.toHaveProperty('remoteDaemon');
+      await expect(plugin.storage.getRemoteDaemonConfig()).resolves.toEqual(currentData.remoteDaemon);
       expect(mockApp.vault.adapter.read).not.toHaveBeenCalledWith(legacyPath);
       expect(plugin.saveData).not.toHaveBeenCalled();
     });
@@ -869,17 +874,11 @@ describe('PocketCodexPlugin', () => {
     });
 
     it('should strip legacy blocklist fields when loading old settings', async () => {
-      mockApp.vault.adapter.exists.mockImplementation(async (path: string) => {
-        return path === '.claudian/claudian-settings.json';
-      });
-      mockApp.vault.adapter.read.mockImplementation(async (path: string) => {
-        if (path === '.claudian/claudian-settings.json') {
-          return JSON.stringify({
-            enableBlocklist: false,
-            blockedCommands: { unix: ['rm -rf', '  '] },
-          });
-        }
-        return '';
+      const files = installVaultFiles({
+        '.claudian/claudian-settings.json': JSON.stringify({
+          enableBlocklist: false,
+          blockedCommands: { unix: ['rm -rf', '  '] },
+        }),
       });
 
       await plugin.loadSettings();
@@ -887,14 +886,10 @@ describe('PocketCodexPlugin', () => {
       expect('enableBlocklist' in plugin.settings).toBe(false);
       expect('blockedCommands' in plugin.settings).toBe(false);
       expect(mockApp.vault.adapter.write).toHaveBeenCalledWith(
-        '.claudian/claudian-settings.json',
+        '.claudian/pocket-codex-settings.json',
         expect.any(String),
       );
-      const writeCall = (mockApp.vault.adapter.write as jest.Mock).mock.calls.find(
-        ([path]) => path === '.claudian/claudian-settings.json',
-      );
-      expect(writeCall).toBeDefined();
-      const content = JSON.parse(writeCall[1]);
+      const content = JSON.parse(files.get('.claudian/pocket-codex-settings.json') ?? '{}');
       expect(content).not.toHaveProperty('enableBlocklist');
       expect(content).not.toHaveProperty('blockedCommands');
     });
@@ -920,24 +915,14 @@ describe('PocketCodexPlugin', () => {
     });
 
     it('should migrate legacy openInMainTab true to main-tab placement', async () => {
-      mockApp.vault.adapter.exists.mockImplementation(async (path: string) => {
-        return path === '.claudian/claudian-settings.json';
-      });
-      mockApp.vault.adapter.read.mockImplementation(async (path: string) => {
-        if (path === '.claudian/claudian-settings.json') {
-          return JSON.stringify({ openInMainTab: true });
-        }
-        return '';
+      const files = installVaultFiles({
+        '.claudian/claudian-settings.json': JSON.stringify({ openInMainTab: true }),
       });
 
       await plugin.loadSettings();
 
       expect(plugin.settings.chatViewPlacement).toBe('main-tab');
-      const writeCall = (mockApp.vault.adapter.write as jest.Mock).mock.calls.find(
-        ([path]) => path === '.claudian/claudian-settings.json',
-      );
-      expect(writeCall).toBeDefined();
-      const content = JSON.parse(writeCall[1]);
+      const content = JSON.parse(files.get('.claudian/pocket-codex-settings.json') ?? '{}');
       expect(content.chatViewPlacement).toBe('main-tab');
       expect(content).not.toHaveProperty('openInMainTab');
     });
@@ -971,15 +956,15 @@ describe('PocketCodexPlugin', () => {
 
       await plugin.saveSettings();
 
-      // Pocket Codex-specific settings should be written to .claudian/claudian-settings.json
+      // Pocket Codex-specific settings should be written to its owned settings file.
       expect(mockApp.vault.adapter.write).toHaveBeenCalledWith(
-        '.claudian/claudian-settings.json',
+        '.claudian/pocket-codex-settings.json',
         expect.any(String)
       );
 
       // The written content should include state fields
       const writeCall = (mockApp.vault.adapter.write as jest.Mock).mock.calls.find(
-        ([path]) => path === '.claudian/claudian-settings.json'
+        ([path]) => path === '.claudian/pocket-codex-settings.json'
       );
       expect(writeCall).toBeDefined();
       const content = JSON.parse(writeCall[1]);

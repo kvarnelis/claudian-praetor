@@ -28,6 +28,7 @@ export class SharedStorageService implements SharedAppStorage {
   }
 
   async initialize(): Promise<{ pocketCodex: Record<string, unknown> }> {
+    await this.pocketCodexSettings.seedOwnSettingsOnFirstRun();
     const pocketCodex = await this.pocketCodexSettings.load();
     return { pocketCodex };
   }

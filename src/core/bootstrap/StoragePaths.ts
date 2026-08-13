@@ -4,6 +4,7 @@ export const POCKET_CODEX_STORAGE_PATH = '.claudian';
 
 export const LEGACY_POCKET_CODEX_SETTINGS_PATH = '.claude/claudian-settings.json';
 export const POCKET_CODEX_SETTINGS_PATH = `${POCKET_CODEX_STORAGE_PATH}/claudian-settings.json`;
+export const POCKET_CODEX_OWN_SETTINGS_PATH = `${POCKET_CODEX_STORAGE_PATH}/pocket-codex-settings.json`;
 
 export const LEGACY_SESSIONS_PATH = '.claude/sessions';
 export const SESSIONS_PATH = `${POCKET_CODEX_STORAGE_PATH}/sessions`;
