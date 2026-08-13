@@ -4,7 +4,6 @@ const PROVIDER_MODEL_SELECTION_PREFIXES: Partial<Record<ProviderId, string>> = {
   claude: 'claude-code/',
   codex: 'openai-codex/',
   opencode: 'opencode/',
-  pi: 'pi/',
 };
 
 export interface ProviderModelSelection {

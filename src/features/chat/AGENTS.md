@@ -44,7 +44,6 @@ Tabs stay cold until the first send. Keep runtime warmup explicit and provider-o
 - `/compact` is provider-specific:
   - Claude skips context injection so the provider handles the built-in command.
   - Codex routes compact turns to `thread/compact/start` and persists `context_compacted`.
-  - Pi sends a `compact` RPC request.
 - Plan mode is provider-specific:
   - Claude uses provider/runtime events for enter and exit.
   - Codex uses `collaborationMode` plus post-stream metadata.

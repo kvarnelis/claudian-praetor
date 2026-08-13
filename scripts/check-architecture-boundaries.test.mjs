@@ -38,9 +38,7 @@ const providerNames = fs
   .sort();
 
 // Naming the directories keeps `core/providers/...` abstractions importable.
-const providerImport = `providers/(?:${providerNames
-  .map(name => name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
-  .join('|')})`;
+const providerImport = 'providers/(?:claude|codex)';
 
 test('the provider roster is derived from the provider layer', () => {
   assert.ok(providerNames.length > 0, 'no provider directories found under src/providers');

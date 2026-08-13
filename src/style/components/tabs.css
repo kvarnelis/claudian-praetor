@@ -113,9 +113,6 @@ body.claudes-codex-mobile .claudes-codex-tab-badge-close:active {
   border-color: var(--claudes-codex-brand-opencode, #C8C8C8);
 }
 
-.claudes-codex-tab-badge-streaming[data-provider="pi"] {
-  border-color: var(--claudes-codex-brand-pi, #ffffff);
-}
 
 .claudes-codex-tab-badge-attention {
   border-color: var(--text-error);

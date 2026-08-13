@@ -2,7 +2,7 @@
 
 ## Project
 
-Claude's Codex is an independently maintained Obsidian plugin that embeds provider-backed coding agents in a sidebar and inline-edit flow. Claude is the default provider. Codex, Grok, OpenCode, and Pi are optional providers that plug into the same conversation model through `Conversation.providerId` and opaque provider-owned `providerState`.
+Claude's Codex is an independently maintained Obsidian plugin that embeds provider-backed coding agents in a sidebar and inline-edit flow. Claude is the default provider. Codex, Grok, and OpenCode are optional providers that plug into the same conversation model through `Conversation.providerId` and opaque provider-owned `providerState`.
 
 Do not assume provider parity. Check each provider's `capabilities.ts`, `registration.ts`, and UI config before wiring shared behavior.
 
@@ -16,7 +16,6 @@ Do not assume provider parity. Check each provider's `capabilities.ts`, `registr
   - `src/providers/claude/AGENTS.md`
   - `src/providers/codex/AGENTS.md`
   - `src/providers/opencode/AGENTS.md`
-  - `src/providers/pi/AGENTS.md`
   - `src/style/AGENTS.md`
 
 ## Commands
@@ -78,10 +77,8 @@ The feature layer depends on `core/` contracts, not provider internals. Provider
 | `.agents/skills/*/SKILL.md` | Alternate Codex vault skill root |
 | `.codex/agents/*.toml` | Codex vault subagent definitions |
 | `.opencode/agent`, `.opencode/agents` | OpenCode agent definitions |
-| `.pi/agent/sessions/` | Pi vault-local sessions |
 | `~/.claude/projects/{vault}/*.jsonl` | Claude-native transcripts |
 | `~/.codex/sessions/**/*.jsonl` | Codex-native transcripts |
-| `~/.pi/agent/sessions/` | Pi user-level sessions |
 
 The `.claudian/` names are deliberate compatibility paths inherited from
 Claudian. Do not rename or migrate them: Claude's Codex must continue reading existing

@@ -91,20 +91,10 @@ describe('ProviderRegistry', () => {
     expect(caps.supportsFork).toBe(false);
   });
 
-  it('returns Pi capabilities', () => {
-    const caps = ProviderRegistry.getCapabilities('pi');
-    expect(caps.providerId).toBe('pi');
-    expect(caps.supportsProviderCommands).toBe(true);
-    expect(caps.supportsImageAttachments).toBe(true);
-    expect(caps.supportsTurnSteer).toBe(true);
-    expect(caps.supportsFork).toBe(true);
-  });
-
   it('lists registered provider ids', () => {
     const ids = ProviderRegistry.getRegisteredProviderIds();
     expect(ids).toContain('claude');
     expect(ids).toContain('codex');
-    expect(ids).toContain('pi');
   });
 
   it('filters enabled provider ids using registration metadata', () => {
@@ -124,13 +114,6 @@ describe('ProviderRegistry', () => {
         opencode: { enabled: true },
       },
     })).toEqual(['opencode', 'codex', 'claude']);
-    expect(ProviderRegistry.getEnabledProviderIds({
-      providerConfigs: {
-        codex: { enabled: true },
-        opencode: { enabled: true },
-        pi: { enabled: true },
-      },
-    })).toEqual(['opencode', 'pi', 'codex', 'claude']);
   });
 
   it('exposes title generation models only from enabled providers', () => {

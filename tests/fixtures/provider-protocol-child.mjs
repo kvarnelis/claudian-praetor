@@ -11,26 +11,16 @@ for await (const line of rl) {
     continue;
   }
 
-  const command = mode === 'pi' ? message.type : message.method;
-  if (command === 'fixture/exit' || command === 'fixture_exit') {
+  const command = message.method;
+  if (command === 'fixture/exit') {
     process.stderr.write('fixture requested process exit\n');
     process.exit(17);
   }
-  if (command === 'fixture/hang' || command === 'fixture_hang') {
+  if (command === 'fixture/hang') {
     continue;
   }
   if (command === 'fixture/primitive') {
     process.stdout.write('null\n42\n"ignored"\n');
-  }
-
-  if (mode === 'pi') {
-    process.stdout.write(`${JSON.stringify({
-      id: message.id,
-      result: { command: message.type, payload: message.payload ?? null },
-      success: true,
-      type: 'response',
-    })}\n`);
-    continue;
   }
 
   process.stdout.write(`${JSON.stringify({

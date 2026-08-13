@@ -4,7 +4,7 @@
 ![License](https://img.shields.io/github/license/kvarnelis/claudian-praetor)
 
 Claude's Codex embeds coding agents directly in Obsidian. Claude Code, Codex, Grok,
-OpenCode, and Pi can work with the active vault through a shared sidebar chat,
+and OpenCode can work with the active vault through a shared sidebar chat,
 while provider-native sessions, models, permissions, and tools remain under
 each provider's control.
 

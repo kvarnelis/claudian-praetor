@@ -3,6 +3,7 @@ import '@/providers';
 import { TEST_CODEX_CATALOG } from '@test/helpers/codexModels';
 
 import type { VaultFileAdapter } from '@/core/storage/VaultFileAdapter';
+import { ProviderRegistry } from '@/core/providers/ProviderRegistry';
 import { getClaudeProviderSettings } from '@/providers/claude/settings';
 import {
   LEGACY_CLAUDES_CODEX_SETTINGS_PATH,
@@ -15,7 +16,6 @@ import {
   updateCodexProviderSettings,
 } from '@/providers/codex/settings';
 import { getOpencodeProviderSettings } from '@/providers/opencode/settings';
-import { getPiProviderSettings } from '@/providers/pi/settings';
 
 const mockGetHostnameKey = jest.fn(() => 'host-a');
 const mockGetLegacyHostnameKey = jest.fn(() => 'legacy-host');
@@ -55,6 +55,30 @@ describe('ClaudesCodexSettingsStorage', () => {
   });
 
   describe('load', () => {
+    it('ignores a removed Pi provider config without deleting it', async () => {
+      const piConfig = {
+        enabled: true,
+        lastModel: 'pi/legacy-model',
+        customSetting: 'keep-me',
+      };
+      mockAdapter.exists.mockResolvedValue(true);
+      mockAdapter.read.mockResolvedValue(JSON.stringify({
+        userName: 'Existing user',
+        providerConfigs: { pi: piConfig },
+      }));
+
+      const result = await storage.load();
+
+      expect(ProviderRegistry.getEnabledProviderIds(result)).not.toContain('pi');
+      expect(result.userName).toBe('Existing user');
+      expect(result.providerConfigs.pi).toEqual(piConfig);
+
+      await storage.save(result);
+      const writtenContent = JSON.parse(mockAdapter.write.mock.calls.at(-1)![1]);
+      expect(writtenContent.userName).toBe('Existing user');
+      expect(writtenContent.providerConfigs.pi).toEqual(piConfig);
+    });
+
     it('should return defaults when file does not exist', async () => {
       mockAdapter.exists.mockResolvedValue(false);
 
@@ -267,7 +291,6 @@ describe('ClaudesCodexSettingsStorage', () => {
       const claudeSettings = getClaudeProviderSettings(result);
       const codexSettings = getCodexProviderSettings(result);
       const opencodeSettings = getOpencodeProviderSettings(result);
-      const piSettings = getPiProviderSettings(result);
       const persistedOpencodeConfig = result.providerConfigs.opencode as Record<string, unknown>;
       const persistedPiConfig = result.providerConfigs.pi as Record<string, unknown>;
       const writtenContent = JSON.parse(mockAdapter.write.mock.calls[0][1]);
@@ -294,16 +317,12 @@ describe('ClaudesCodexSettingsStorage', () => {
         'device:current': '/custom/opencode-a',
         'host-b': '/custom/opencode-b',
       });
-      expect(piSettings.cliPathsByHost).toEqual({
-        'device:current': '/custom/pi-a',
-        'host-b': '/custom/pi-b',
-      });
       expect(persistedOpencodeConfig.cliPathsByHost).toEqual({
         'device:current': '/custom/opencode-a',
         'host-b': '/custom/opencode-b',
       });
       expect(persistedPiConfig.cliPathsByHost).toEqual({
-        'device:current': '/custom/pi-a',
+        'host-a': '/custom/pi-a',
         'host-b': '/custom/pi-b',
       });
       expect(writtenContent.providerConfigs.claude.cliPathsByHost).toEqual({
@@ -319,7 +338,7 @@ describe('ClaudesCodexSettingsStorage', () => {
         'host-b': '/custom/opencode-b',
       });
       expect(writtenContent.providerConfigs.pi.cliPathsByHost).toEqual({
-        'device:current': '/custom/pi-a',
+        'host-a': '/custom/pi-a',
         'host-b': '/custom/pi-b',
       });
     });
