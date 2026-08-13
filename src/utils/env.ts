@@ -10,6 +10,14 @@ const fs = requireNodeModule<typeof fsType>('fs');
 const os = requireNodeModule<typeof osType>('os');
 const path = requireNodeModule<typeof pathType>('path');
 
+export function getProcessEnvironment(): NodeJS.ProcessEnv {
+  return typeof process === 'undefined' ? {} : process.env;
+}
+
+export function getProcessPlatform(): NodeJS.Platform | undefined {
+  return typeof process === 'undefined' ? undefined : process.platform;
+}
+
 // Evaluated lazily: `process` is not defined in the mobile webview, so these
 // must not run at module scope (this module is on the mobile import graph).
 function isWindows(): boolean {

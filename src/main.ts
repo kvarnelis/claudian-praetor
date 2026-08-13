@@ -163,10 +163,25 @@ export default class PocketCodexPlugin extends Plugin {
         if (typeof document !== 'undefined') document.body?.classList?.add('pocket-codex-mobile');
       }
 
-      await StartupProfiler.runAsync(
-        'settings-load',
-        () => this.loadSettings({ deferNonRestoredSessionMetadata: true }),
-      );
+      try {
+        await StartupProfiler.runAsync(
+          'settings-load',
+          () => this.loadSettings({ deferNonRestoredSessionMetadata: true }),
+        );
+      } catch {
+        new Notice('Pocket Codex could not load settings. Open its settings to recover.');
+        // Recovery surface: the tab needs settings and a coordinator to render
+        // and to write a fresh valid settings file over the broken one.
+        this.settings = { ...DEFAULT_POCKET_CODEX_SETTINGS };
+        this.settingsCoordinator = new SettingsCoordinator(
+          this.settings,
+          async (settings) => {
+            await this.storage.savePocketCodexSettings(settings);
+          },
+        );
+        this.addSettingTab(new PocketCodexSettingTab(this.app, this));
+        return;
+      }
       this.showMobileRemoteOnboardingNotice();
       // Provider workspace services are initialized lazily on first use.
 
@@ -574,14 +589,14 @@ export default class PocketCodexPlugin extends Plugin {
    * fork's plugin data on first run while leaving its rollback copy untouched.
    */
   private async importLegacyPluginDataOnFirstRun(): Promise<void> {
-    const currentData: unknown = await this.loadData();
-    if (isRecord(currentData) && Object.keys(currentData).length > 0) {
-      return;
-    }
-
-    const adapter = this.app.vault.adapter;
-    const legacyPluginDataPath = `${this.app.vault.configDir}/${LEGACY_PLUGIN_DATA_RELATIVE_PATH}`;
     try {
+      const currentData: unknown = await this.loadData();
+      if (isRecord(currentData) && Object.keys(currentData).length > 0) {
+        return;
+      }
+
+      const adapter = this.app.vault.adapter;
+      const legacyPluginDataPath = `${this.app.vault.configDir}/${LEGACY_PLUGIN_DATA_RELATIVE_PATH}`;
       if (!await adapter.exists(legacyPluginDataPath)) {
         return;
       }

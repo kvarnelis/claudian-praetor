@@ -6,6 +6,7 @@ import type { AppSessionStorage, ProviderHistoryPathContext } from '../../core/p
 import { DEFAULT_CHAT_PROVIDER_ID, type ProviderId } from '../../core/providers/types';
 import type { Conversation, ConversationMeta } from '../../core/types';
 import { extractUserDisplayContent } from '../../utils/context';
+import { getProcessEnvironment, getProcessPlatform } from '../../utils/env';
 
 export interface ConversationRepositoryDeps {
   getSettings: () => Record<string, unknown>;
@@ -396,10 +397,10 @@ export class ConversationRepository {
     const settings = this.deps.getSettings();
     return {
       environment: {
-        ...process.env,
+        ...getProcessEnvironment(),
         ...getRuntimeEnvironmentVariables(settings, providerId),
       },
-      hostPlatform: process.platform,
+      hostPlatform: getProcessPlatform(),
       settings,
       vaultPath,
     };

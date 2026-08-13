@@ -1,4 +1,6 @@
 
+import { Notice } from 'obsidian';
+
 import { ProviderSettingsCoordinator } from '@/core/providers/ProviderSettingsCoordinator';
 import { TOOL_SUBAGENT } from '@/core/tools/toolNames';
 import { VIEW_TYPE_POCKET_CODEX } from '@/core/types';
@@ -113,6 +115,28 @@ describe('PocketCodexPlugin', () => {
   });
 
   describe('onload', () => {
+    it('registers the settings tab when settings loading fails', async () => {
+      jest.spyOn(plugin, 'loadSettings').mockRejectedValue(new Error('settings unavailable'));
+
+      await expect(plugin.onload()).resolves.toBeUndefined();
+
+      expect(plugin.addSettingTab).toHaveBeenCalledTimes(1);
+      expect(Notice).toHaveBeenCalledWith(
+        'Pocket Codex could not load settings. Open its settings to recover.',
+      );
+    });
+
+    it('completes loading when plugin data is corrupt', async () => {
+      (plugin.loadData as jest.Mock).mockRejectedValue(new SyntaxError('Unexpected token'));
+
+      await expect(plugin.onload()).resolves.toBeUndefined();
+
+      expect(plugin.addSettingTab).toHaveBeenCalledTimes(1);
+      expect(Notice).toHaveBeenCalledWith(
+        'Pocket Codex could not import settings from Claudian Praetor. The old data was left untouched.',
+      );
+    });
+
     it('should initialize settings with defaults', async () => {
       await plugin.onload();
 

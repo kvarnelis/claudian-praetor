@@ -19,6 +19,7 @@ import type {
   ProviderId,
   ProviderRegistration,
   ProviderSettingsReconciler,
+  ProviderSettingsStorageAdapter,
   ProviderTaskResultInterpreter,
   ProviderTaskTerminalStatus,
   TitleGenerationCallback,
@@ -245,6 +246,13 @@ interface RemoteProviderSpec {
   environmentKeyPatterns?: RegExp[];
 }
 
+const REMOTE_SETTINGS_STORAGE: ProviderSettingsStorageAdapter = {
+  legacyTopLevelFields: [],
+  runtimeOnlyFields: [],
+  hostScopedFields: [],
+  normalizeStored: () => false,
+};
+
 const REMOTE_PROVIDER_SPECS: RemoteProviderSpec[] = [
   {
     providerId: 'claude',
@@ -287,7 +295,9 @@ export function registerRemoteProviders(plugin: PocketCodexPlugin): void {
   // plugin-private data.json during load and whenever saveRemoteDaemonConfig runs.
 
   for (const spec of REMOTE_PROVIDER_SPECS) {
-    const registration: ProviderRegistration = {
+    const registration: ProviderRegistration & {
+      settingsStorage: ProviderSettingsStorageAdapter;
+    } = {
       displayName: spec.displayName,
       blankTabOrder: spec.blankTabOrder,
       isEnabled: spec.isEnabled,
@@ -295,6 +305,7 @@ export function registerRemoteProviders(plugin: PocketCodexPlugin): void {
       environmentKeyPatterns: spec.environmentKeyPatterns,
       chatUIConfig: spec.chatUIConfig,
       settingsReconciler: spec.settingsReconciler,
+      settingsStorage: REMOTE_SETTINGS_STORAGE,
       createRuntime: () => createRemoteRuntime(spec.providerId, spec.capabilities),
       createTitleGenerationService: () => new RemoteTitleGenerationService(spec.providerId),
       createInstructionRefineService: () => new RemoteInstructionRefineService(),

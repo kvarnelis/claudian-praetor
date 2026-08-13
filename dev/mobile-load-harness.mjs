@@ -10,7 +10,8 @@
  *  - The bundle is compiled with `new Function('require','module',...)` so we
  *    control the module scope. Node-ish globals (`process`, `Buffer`,
  *    `global`, `setImmediate`, `__dirname`, `__filename`) are shadowed to
- *    `undefined` on the mobile pass, exactly as on iOS.
+ *    `undefined` on the mobile pass, except `process`, which is pre-seeded
+ *    with the same compatibility shim that the plugin installs on iOS.
  *  - `require('obsidian')` returns an inline mock; `electron`/`@codemirror/*`
  *    return stubs; every Node builtin throws `MOBILE-VIOLATION: ...`.
  *    A *caught* violation (the lazy requireNodeModule pattern) is recorded as
@@ -589,12 +590,23 @@ async function runPass(platformKind) {
   const requireFn = makeRequire({ platformKind, obsidianMock, attempts });
   const browserGlobals = createBrowserGlobals();
   const moduleShim = { exports: {} };
+  const mobileProcessShim = {
+    platform: 'ios',
+    env: {},
+    cwd: () => '/',
+    argv: [],
+    version: '',
+    versions: {},
+    nextTick: (fn, ...nextTickArgs) => {
+      browserGlobals.window.setTimeout(() => fn(...nextTickArgs), 0);
+    },
+  };
 
   const args = {
     require: requireFn,
     module: moduleShim,
     exports: moduleShim.exports,
-    process: platformKind === 'desktop' ? process : undefined,
+    process: platformKind === 'desktop' ? nodeProcess : mobileProcessShim,
     Buffer: platformKind === 'desktop' ? Buffer : undefined,
     global: platformKind === 'desktop' ? globalThis : undefined,
     setImmediate: platformKind === 'desktop' ? setImmediate : undefined,
