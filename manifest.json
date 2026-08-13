@@ -1,7 +1,7 @@
 {
   "id": "pocket-codex",
   "name": "Pocket Codex",
-  "version": "2026.7.18",
+  "version": "2026.8.13",
   "minAppVersion": "1.7.2",
   "description": "Embeds Claude Code, Codex, Grok, and other coding agents in your vault, with mobile remote mode over Tailscale.",
   "author": "Kazys Varnelis",
