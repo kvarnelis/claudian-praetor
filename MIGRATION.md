@@ -7,8 +7,9 @@ upgrade the old `<vault>/.obsidian/plugins/claudian-praetor/` folder in place.
 ## Install
 
 1. In BRAT, remove the existing Claudian Praetor beta-plugin entry.
-2. Add `kvarnelis/claudian-praetor` again. The repository name is unchanged,
-   but its manifest now installs **Pocket Codex** under the `pocket-codex` plugin id.
+2. Add `kvarnelis/pocket-codex`. The repository was renamed from
+   `kvarnelis/claudian-praetor`; GitHub redirects the old name, but prefer the
+   new one in BRAT.
 3. Confirm `<vault>/.obsidian/plugins/pocket-codex/` exists.
 4. Disable the old **Claudian Praetor** plugin.
 5. Enable **Pocket Codex**. Do not run both plugins at the same time.

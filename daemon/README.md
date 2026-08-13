@@ -25,7 +25,7 @@ First run creates `~/.config/claudian-praetor/daemon.json` with the daemon host,
 
 ## Mobile Client Setup
 
-1. Install Pocket Codex on Obsidian mobile via BRAT from `kvarnelis/claudian-praetor`.
+1. Install Pocket Codex on Obsidian mobile via BRAT from `kvarnelis/pocket-codex`.
 2. Install and connect Tailscale on the mobile device, signed into the same tailnet as the Mac.
 3. Let Obsidian Sync carry the URL from the Mac, or paste it in **Remote Mac daemon** settings.
 4. Open pairing from the Mac settings, then open Pocket Codex on mobile to pair the device.

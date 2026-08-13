@@ -1,7 +1,7 @@
 # Pocket Codex
 
-![GitHub release](https://img.shields.io/github/v/release/kvarnelis/claudian-praetor)
-![License](https://img.shields.io/github/license/kvarnelis/claudian-praetor)
+![GitHub release](https://img.shields.io/github/v/release/kvarnelis/pocket-codex)
+![License](https://img.shields.io/github/license/kvarnelis/pocket-codex)
 
 ![Preview](assets/Preview.png)
 
@@ -28,11 +28,11 @@ plugin directory.
 ### BRAT
 
 1. Install [BRAT](https://github.com/TfTHacker/obsidian42-brat).
-2. Add `kvarnelis/claudian-praetor` as a beta plugin repository.
+2. Add `kvarnelis/pocket-codex` as a beta plugin repository.
 3. Enable **Pocket Codex** under Community plugins.
 
-The GitHub repository keeps the historical name `kvarnelis/claudian-praetor`
-for now, but the Obsidian plugin id and install folder are both `pocket-codex`.
+The repository was renamed from `kvarnelis/claudian-praetor`. GitHub redirects
+the old name, so existing clones and BRAT entries keep working.
 
 If you previously installed Claudian Praetor, follow [MIGRATION.md](MIGRATION.md)
 instead of enabling both plugins together.
@@ -40,7 +40,7 @@ instead of enabling both plugins together.
 ### Manual
 
 Download `main.js`, `manifest.json`, `styles.css`, and `pocket-codexd.cjs` from the
-[latest release](https://github.com/kvarnelis/claudian-praetor/releases/latest)
+[latest release](https://github.com/kvarnelis/pocket-codex/releases/latest)
 into `<vault>/.obsidian/plugins/pocket-codex/`, then enable **Pocket Codex**.
 
 ## Core workflow
