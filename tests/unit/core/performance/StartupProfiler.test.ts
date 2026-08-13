@@ -31,6 +31,18 @@ describe('StartupProfiler', () => {
     expect(report.spans[0].durationMs).toBeGreaterThanOrEqual(0);
   });
 
+  it('stamps in-flight spans at freeze so durations stop growing', async () => {
+    const span = StartupProfiler.start('in-flight-span');
+    StartupProfiler.freeze();
+
+    const before = StartupProfiler.getReport().spans[0].durationMs;
+    await new Promise((resolve) => setTimeout(resolve, 15));
+    const after = StartupProfiler.getReport().spans[0].durationMs;
+
+    expect(span.end).toBeDefined();
+    expect(after).toBe(before);
+  });
+
   it('records counts', () => {
     StartupProfiler.recordCount('session-metadata-count', 42);
     StartupProfiler.increment('provider-init-failures');

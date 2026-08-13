@@ -118,6 +118,8 @@ export class StartupProfiler {
   }
 
   static freeze(): void {
+    // Stamp in-flight spans so frozen reports don't show ever-growing durations.
+    state.spans.forEach(finishSpan);
     state.frozen = true;
   }
 

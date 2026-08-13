@@ -302,41 +302,47 @@ export class TabManager implements TabManagerInterface {
         // Load conversation if not already loaded
         if (needsHydration && tab.conversationId) {
           const conversationId = tab.conversationId;
-          const span = this.profiledFirstHydration ? null : StartupProfiler.start('active-hydration');
+          const shouldProfileHydration = !this.profiledFirstHydration;
+          const span = shouldProfileHydration ? StartupProfiler.start('active-hydration') : null;
           this.profiledFirstHydration = true;
           try {
-            await StartupProfiler.runAsync(
-              'hydration-conversation-switch',
-              async () => tab.controllers.conversationController?.switchTo(conversationId),
-            );
-            // Include the first rendered frame in the startup span. Conversation
-            // restoration schedules Markdown/DOM work synchronously, but the
-            // user does not see the result until the browser paints it.
-            await StartupProfiler.runAsync(
-              'hydration-content-paint',
-              () => this.waitForTabPaint(tab),
-            );
-            StartupProfiler.recordCount(
-              'restored-message-dom-count',
-              tab.dom.messagesEl.querySelectorAll('.pocket-codex-message').length,
-            );
-            const thinkingPanelCount = tab.dom.messagesEl
-              .querySelectorAll('.pocket-codex-thinking-block').length;
-            StartupProfiler.recordCount('restored-thinking-panel-count', thinkingPanelCount);
-            StartupProfiler.recordCount('deferred-thinking-markdown-count', thinkingPanelCount);
-            StartupProfiler.recordCount(
-              'restored-text-block-count',
-              tab.dom.messagesEl.querySelectorAll('.pocket-codex-text-block').length,
-            );
-            StartupProfiler.recordCount(
-              'restored-visible-tool-row-count',
-              tab.dom.messagesEl.querySelectorAll('.pocket-codex-tool-call').length
-                + tab.dom.messagesEl.querySelectorAll('.pocket-codex-write-edit-block').length
-                + tab.dom.messagesEl.querySelectorAll('.pocket-codex-subagent-list').length,
-            );
+            if (shouldProfileHydration) {
+              await StartupProfiler.runAsync(
+                'hydration-conversation-switch',
+                async () => tab.controllers.conversationController?.switchTo(conversationId),
+              );
+              // Include the first rendered frame in the startup span. Conversation
+              // restoration schedules Markdown/DOM work synchronously, but the
+              // user does not see the result until the browser paints it.
+              await StartupProfiler.runAsync(
+                'hydration-content-paint',
+                () => this.waitForTabPaint(tab),
+              );
+              StartupProfiler.recordCount(
+                'restored-message-dom-count',
+                tab.dom.messagesEl.querySelectorAll('.pocket-codex-message').length,
+              );
+              const thinkingPanelCount = tab.dom.messagesEl
+                .querySelectorAll('.pocket-codex-thinking-block').length;
+              StartupProfiler.recordCount('restored-thinking-panel-count', thinkingPanelCount);
+              StartupProfiler.recordCount('deferred-thinking-markdown-count', thinkingPanelCount);
+              StartupProfiler.recordCount(
+                'restored-text-block-count',
+                tab.dom.messagesEl.querySelectorAll('.pocket-codex-text-block').length,
+              );
+              StartupProfiler.recordCount(
+                'restored-visible-tool-row-count',
+                tab.dom.messagesEl.querySelectorAll('.pocket-codex-tool-call').length
+                  + tab.dom.messagesEl.querySelectorAll('.pocket-codex-write-edit-block').length
+                  + tab.dom.messagesEl.querySelectorAll('.pocket-codex-subagent-list').length,
+              );
+            } else {
+              await tab.controllers.conversationController?.switchTo(conversationId);
+            }
           } finally {
             if (span) {
               StartupProfiler.finish(span);
+              StartupProfiler.freeze();
             }
           }
           if (!this.isTabAlive(tab)) return;
@@ -374,6 +380,8 @@ export class TabManager implements TabManagerInterface {
 
       if (!this.isTabAlive(tab)) return;
       this.callbacks.onTabSwitched?.(previousTabId, tabId);
+      this.profiledFirstHydration = true;
+      StartupProfiler.freeze();
     } finally {
       this.isSwitchingTab = false;
       const pendingTabId = this.pendingSwitchTabId;

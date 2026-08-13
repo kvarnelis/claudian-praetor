@@ -866,6 +866,73 @@ describe('getHostnameKey', () => {
     expect(first).toBe(second);
   });
 
+  describe('fallback storage behavior', () => {
+    const storageKey = 'claudian.deviceSettingsKey';
+
+    async function loadFreshGetHostnameKey(storage: Storage | null) {
+      jest.resetModules();
+      jest.spyOn(window, 'localStorage', 'get').mockImplementation(() => {
+        if (!storage) throw new Error('Storage unavailable');
+        return storage;
+      });
+      return (await import('../../../src/utils/env')).getHostnameKey;
+    }
+
+    afterEach(() => {
+      jest.restoreAllMocks();
+    });
+
+    it('uses a fallback key when storage is absent', async () => {
+      const getFreshHostnameKey = await loadFreshGetHostnameKey(null);
+
+      const key = getFreshHostnameKey();
+
+      expect(key).toMatch(/^device:fallback:[0-9a-f]{8}$/);
+    });
+
+    it('keeps the fallback key stable across module reloads', async () => {
+      const firstGetHostnameKey = await loadFreshGetHostnameKey(null);
+      const first = firstGetHostnameKey();
+      jest.restoreAllMocks();
+      const secondGetHostnameKey = await loadFreshGetHostnameKey(null);
+
+      expect(secondGetHostnameKey()).toBe(first);
+    });
+
+    it('uses the stable fallback when a write does not survive read-back', async () => {
+      const storage = {
+        getItem: jest.fn().mockReturnValue(null),
+        setItem: jest.fn(),
+      } as unknown as Storage;
+      const getFreshHostnameKey = await loadFreshGetHostnameKey(storage);
+
+      const key = getFreshHostnameKey();
+
+      expect(storage.setItem).toHaveBeenCalledWith(storageKey, expect.stringMatching(/^device:/));
+      expect(storage.getItem).toHaveBeenCalledTimes(2);
+      expect(key).toMatch(/^device:fallback:[0-9a-f]{8}$/);
+    });
+
+    it('returns the cached key without consulting storage again', async () => {
+      const initialGetItem = jest.fn().mockReturnValue('device:persisted');
+      const storage = {
+        getItem: initialGetItem,
+        setItem: jest.fn(),
+      } as unknown as Storage;
+      const getFreshHostnameKey = await loadFreshGetHostnameKey(storage);
+
+      const first = getFreshHostnameKey();
+      const replacementGetItem = jest.fn().mockReturnValue('device:changed');
+      storage.getItem = replacementGetItem;
+      const second = getFreshHostnameKey();
+
+      expect(first).toBe('device:persisted');
+      expect(second).toBe(first);
+      expect(initialGetItem).toHaveBeenCalledTimes(1);
+      expect(replacementGetItem).not.toHaveBeenCalled();
+    });
+  });
+
   it('migrates the current legacy hostname entry to the opaque device key', () => {
     const migrated = migrateLegacyHostnameKeyedMap(
       {

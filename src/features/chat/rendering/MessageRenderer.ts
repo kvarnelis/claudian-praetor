@@ -405,6 +405,7 @@ export class MessageRenderer {
           }
 
           if (didRenderCodexThinking) continue;
+          flushPendingCodexText();
           renderStoredThinkingBlock(
             contentEl,
             codexThinkingContent,

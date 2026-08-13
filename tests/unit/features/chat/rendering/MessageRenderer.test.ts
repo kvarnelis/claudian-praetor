@@ -697,10 +697,13 @@ describe('MessageRenderer', () => {
     expect(renderStoredWriteEdit).toHaveBeenCalledTimes(1);
   });
 
-  it('coalesces stored Codex text separated by hidden tools and thinking', () => {
+  it('preserves stored Codex text order around hidden tools and thinking', () => {
     const messagesEl = createMockEl();
     const { renderer } = createRenderer(messagesEl, 'codex');
     const renderContentSpy = jest.spyOn(renderer, 'renderContent').mockResolvedValue(undefined);
+    (renderStoredThinkingBlock as jest.Mock).mockImplementationOnce((parentEl: HTMLElement) => {
+      parentEl.createDiv({ cls: 'pocket-codex-thinking-block' });
+    });
 
     const msg: ChatMessage = {
       id: 'm-codex-text',
@@ -725,11 +728,15 @@ describe('MessageRenderer', () => {
 
     renderer.renderStoredMessage(msg);
 
-    expect(renderContentSpy).toHaveBeenCalledTimes(1);
-    expect(renderContentSpy).toHaveBeenCalledWith(
-      expect.anything(),
-      'First update.\n\nSecond update.',
-    );
+    expect(renderContentSpy).toHaveBeenCalledTimes(2);
+    expect(renderContentSpy).toHaveBeenNthCalledWith(1, expect.anything(), 'First update.');
+    expect(renderContentSpy).toHaveBeenNthCalledWith(2, expect.anything(), 'Second update.');
+    const contentEl = messagesEl.querySelector('.pocket-codex-message-content')!;
+    expect(Array.from(contentEl.children as ArrayLike<HTMLElement>, child => child.className)).toEqual([
+      'pocket-codex-text-block',
+      'pocket-codex-thinking-block',
+      'pocket-codex-text-block',
+    ]);
   });
 
   it('keeps large restored Codex tool loops to one thinking and one text render', () => {

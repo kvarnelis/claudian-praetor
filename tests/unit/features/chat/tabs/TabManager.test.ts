@@ -278,6 +278,16 @@ describe('TabManager - Tab Lifecycle', () => {
       expect(mockWireTabInputEvents).toHaveBeenCalled();
     });
 
+    it('freezes startup spans after the initial blank tab is ready', async () => {
+      const manager = createManager({ callbacks });
+
+      await manager.createTab();
+      const initialSpanCount = StartupProfiler.getReport().spans.length;
+      await manager.createTab();
+
+      expect(StartupProfiler.getReport().spans).toHaveLength(initialSpanCount);
+    });
+
     it('should call onTabCreated callback', async () => {
       const manager = createManager({ callbacks });
 
@@ -433,23 +443,26 @@ describe('TabManager - Tab Lifecycle', () => {
     });
 
     it('profiles first hydration through paint and records restored DOM counts', async () => {
-      const manager = createManager();
-      const tab1 = await manager.createTab();
-      await manager.createTab();
-      tab1!.conversationId = 'conv-profiled';
-      tab1!.hydrationState = 'idle';
-      tab1!.state.messages = [];
-      tab1!.controllers.conversationController!.switchTo = jest.fn().mockImplementation(async () => {
-        tab1!.dom.messagesEl.empty();
-        tab1!.dom.messagesEl.createDiv({ cls: 'pocket-codex-message' });
-        tab1!.dom.messagesEl.createDiv({ cls: 'pocket-codex-thinking-block' });
-        tab1!.dom.messagesEl.createDiv({ cls: 'pocket-codex-text-block' });
-        tab1!.dom.messagesEl.createDiv({ cls: 'pocket-codex-tool-call' });
-        tab1!.dom.messagesEl.createDiv({ cls: 'pocket-codex-write-edit-block' });
-        tab1!.dom.messagesEl.createDiv({ cls: 'pocket-codex-subagent-list' });
+      const manager = createManager({
+        tabFactory: () => {
+          const tab = createMockTabData({
+            conversationId: 'conv-profiled',
+            hydrationState: 'idle',
+          });
+          tab.controllers.conversationController.switchTo = jest.fn().mockImplementation(async () => {
+            tab.dom.messagesEl.empty();
+            tab.dom.messagesEl.createDiv({ cls: 'pocket-codex-message' });
+            tab.dom.messagesEl.createDiv({ cls: 'pocket-codex-thinking-block' });
+            tab.dom.messagesEl.createDiv({ cls: 'pocket-codex-text-block' });
+            tab.dom.messagesEl.createDiv({ cls: 'pocket-codex-tool-call' });
+            tab.dom.messagesEl.createDiv({ cls: 'pocket-codex-write-edit-block' });
+            tab.dom.messagesEl.createDiv({ cls: 'pocket-codex-subagent-list' });
+          });
+          return tab;
+        },
       });
 
-      await manager.switchToTab(tab1!.id);
+      await manager.createTab('conv-profiled');
 
       const report = StartupProfiler.getReport();
       expect(report.spans.some(span => span.name === 'active-hydration')).toBe(true);
@@ -458,6 +471,51 @@ describe('TabManager - Tab Lifecycle', () => {
       expect(report.counts['deferred-thinking-markdown-count']).toBe(1);
       expect(report.counts['restored-text-block-count']).toBe(1);
       expect(report.counts['restored-visible-tool-row-count']).toBe(3);
+    });
+
+    it('does not profile paint or replace restored DOM counts after the first hydration', async () => {
+      const manager = createManager({
+        tabFactory: (counter) => {
+          const tab = createMockTabData(counter === 1 ? {
+            conversationId: 'conv-first',
+            hydrationState: 'idle',
+          } : {});
+          if (counter === 1) {
+            tab.controllers.conversationController.switchTo = jest.fn().mockImplementation(async () => {
+              tab.dom.messagesEl.empty();
+              tab.dom.messagesEl.createDiv({ cls: 'pocket-codex-message' });
+              tab.dom.messagesEl.createDiv({ cls: 'pocket-codex-text-block' });
+            });
+          }
+          return tab;
+        },
+      });
+      const waitForPaintSpy = jest.spyOn(manager as any, 'waitForTabPaint');
+      await manager.createTab('conv-first');
+      const secondTab = await manager.createTab();
+
+      secondTab!.conversationId = 'conv-second';
+      secondTab!.hydrationState = 'idle';
+      secondTab!.controllers.conversationController!.switchTo = jest.fn().mockImplementation(async () => {
+        secondTab!.dom.messagesEl.empty();
+        secondTab!.dom.messagesEl.createDiv({ cls: 'pocket-codex-message' });
+        secondTab!.dom.messagesEl.createDiv({ cls: 'pocket-codex-message' });
+        secondTab!.dom.messagesEl.createDiv({ cls: 'pocket-codex-thinking-block' });
+      });
+
+      await manager.switchToTab(secondTab!.id);
+
+      const tabCreateSpanCount = StartupProfiler.getReport().spans
+        .filter(span => span.name === 'tab-dom-create').length;
+      await manager.createTab(undefined, undefined, { activate: false });
+      const report = StartupProfiler.getReport();
+      expect(waitForPaintSpy).toHaveBeenCalledTimes(3);
+      expect(report.spans.filter(span => span.name === 'hydration-content-paint')).toHaveLength(1);
+      expect(report.spans.filter(span => span.name === 'hydration-conversation-switch')).toHaveLength(1);
+      expect(report.spans.filter(span => span.name === 'tab-dom-create')).toHaveLength(tabCreateSpanCount);
+      expect(report.counts['restored-message-dom-count']).toBe(1);
+      expect(report.counts['restored-thinking-panel-count']).toBe(0);
+      expect(report.counts['restored-text-block-count']).toBe(1);
     });
 
     it('does not rehydrate an already-ready conversation with an empty transcript', async () => {
