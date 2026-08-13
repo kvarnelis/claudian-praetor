@@ -1,5 +1,5 @@
 /* Permission Mode Toggle */
-.praetor-permission-toggle {
+.claudes-codex-permission-toggle {
   display: flex;
   align-items: center;
   gap: 6px;
@@ -8,18 +8,18 @@
   padding-right: 8px;
 }
 
-.praetor-permission-label {
+.claudes-codex-permission-label {
   font-size: 11px;
   color: var(--text-muted);
   min-width: 28px;
 }
 
-.praetor-permission-label.plan-active {
+.claudes-codex-permission-label.plan-active {
   color: rgb(92, 148, 140);
   font-weight: 600;
 }
 
-.praetor-toggle-switch {
+.claudes-codex-toggle-switch {
   width: 32px;
   height: 18px;
   border-radius: 9px;
@@ -30,7 +30,7 @@
   flex-shrink: 0;
 }
 
-.praetor-toggle-switch::after {
+.claudes-codex-toggle-switch::after {
   content: '';
   position: absolute;
   width: 14px;
@@ -42,15 +42,15 @@
   transition: transform 0.2s ease, background 0.2s ease;
 }
 
-.praetor-toggle-switch:hover {
+.claudes-codex-toggle-switch:hover {
   background: var(--background-modifier-hover);
 }
 
-.praetor-toggle-switch.active {
-  background: rgba(var(--praetor-brand-rgb), 0.3);
+.claudes-codex-toggle-switch.active {
+  background: rgba(var(--claudes-codex-brand-rgb), 0.3);
 }
 
-.praetor-toggle-switch.active::after {
+.claudes-codex-toggle-switch.active::after {
   transform: translateX(14px);
-  background: var(--praetor-brand);
+  background: var(--claudes-codex-brand);
 }

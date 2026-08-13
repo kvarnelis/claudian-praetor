@@ -2,16 +2,16 @@ import { Platform } from 'obsidian';
 
 import type { FeatureHost } from '../../FeatureHost';
 
-const BODY_CLASS = 'praetor-ipad-docked';
-const DRAWER_CLASS = 'praetor-dock-drawer';
-const ROOT_CLASS = 'praetor-dock-root';
+const BODY_CLASS = 'claudes-codex-ipad-docked';
+const DRAWER_CLASS = 'claudes-codex-dock-drawer';
+const ROOT_CLASS = 'claudes-codex-dock-root';
 
 /**
  * iPad side-by-side dock.
  *
  * Obsidian's mobile sidebars slide over the editor and never pin — even in
  * landscape — and main-area splits don't work on mobile. So for the "Beside
- * editor (split)" placement on a tablet we keep Praetor in the right drawer
+ * editor (split)" placement on a tablet we keep Claude's Codex in the right drawer
  * but re-style it: dock the drawer to a fixed-width right column and shrink the
  * editor area to sit beside it (all sizing lives in mobile-dock.css). We toggle
  * marker classes on the *actual* drawer/root elements (found via the view's DOM
@@ -19,7 +19,7 @@ const ROOT_CLASS = 'praetor-dock-root';
  * names) and re-apply on layout changes, because Obsidian rewrites drawer styles
  * whenever it opens or closes a leaf.
  */
-const DOCK_WIDTH_KEY = 'praetor-dock-width';
+const DOCK_WIDTH_KEY = 'claudes-codex-dock-width';
 const MIN_DOCK_PX = 280;
 
 export class MobileDock {
@@ -78,7 +78,7 @@ export class MobileDock {
   private restorePersistedWidth(): void {
     try {
       const saved = window.localStorage?.getItem(DOCK_WIDTH_KEY);
-      if (saved) document.body.style.setProperty('--praetor-dock-width', saved);
+      if (saved) document.body.style.setProperty('--claudes-codex-dock-width', saved);
     } catch {
       // localStorage may be unavailable; fall back to the CSS default.
     }
@@ -86,7 +86,7 @@ export class MobileDock {
 
   private ensureHandle(): void {
     if (this.handleEl?.isConnected) return;
-    const handle = document.body.createDiv({ cls: 'praetor-dock-handle' });
+    const handle = document.body.createDiv({ cls: 'claudes-codex-dock-handle' });
     this.handleEl = handle;
 
     let dragging = false;
@@ -99,14 +99,14 @@ export class MobileDock {
       if (!dragging) return;
       const fromRight = window.innerWidth - e.clientX;
       const width = Math.max(MIN_DOCK_PX, Math.min(window.innerWidth * 0.75, fromRight));
-      document.body.style.setProperty('--praetor-dock-width', `${Math.round(width)}px`);
+      document.body.style.setProperty('--claudes-codex-dock-width', `${Math.round(width)}px`);
     });
     const end = (e: PointerEvent): void => {
       if (!dragging) return;
       dragging = false;
       try {
         handle.releasePointerCapture(e.pointerId);
-        const value = document.body.style.getPropertyValue('--praetor-dock-width');
+        const value = document.body.style.getPropertyValue('--claudes-codex-dock-width');
         if (value) window.localStorage?.setItem(DOCK_WIDTH_KEY, value);
       } catch {
         // ignore capture/storage errors

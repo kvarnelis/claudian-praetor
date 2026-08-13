@@ -702,7 +702,7 @@ describe('ProviderSettingsCoordinator', () => {
         providerConfigs: {
           opencode: {
             enabled: true,
-            selectedMode: 'praetor-safe',
+            selectedMode: 'claudes-codex-safe',
           },
         },
         model: 'haiku',

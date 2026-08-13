@@ -28,12 +28,12 @@ export function calculateTextareaMinHeight({
  * - Max height is capped at 55% of view height (minimum 150px)
  */
 export function autoResizeTextarea(textarea: HTMLTextAreaElement): void {
-  const viewHeight = textarea.closest('.praetor-container')?.clientHeight ?? window.innerHeight;
+  const viewHeight = textarea.closest('.claudes-codex-container')?.clientHeight ?? window.innerHeight;
   const maxHeight = calculateTextareaMaxHeight(viewHeight);
 
   textarea.setCssProps({
-    '--praetor-textarea-min-height': `${TEXTAREA_BASE_MIN_HEIGHT}px`,
-    '--praetor-textarea-max-height': `${maxHeight}px`,
+    '--claudes-codex-textarea-min-height': `${TEXTAREA_BASE_MIN_HEIGHT}px`,
+    '--claudes-codex-textarea-max-height': `${maxHeight}px`,
   });
 
   const flexAllocatedHeight = textarea.offsetHeight;
@@ -41,7 +41,7 @@ export function autoResizeTextarea(textarea: HTMLTextAreaElement): void {
   const minHeight = calculateTextareaMinHeight({ contentHeight, flexAllocatedHeight });
 
   textarea.setCssProps({
-    '--praetor-textarea-min-height': `${minHeight}px`,
-    '--praetor-textarea-max-height': `${maxHeight}px`,
+    '--claudes-codex-textarea-min-height': `${minHeight}px`,
+    '--claudes-codex-textarea-max-height': `${maxHeight}px`,
   });
 }

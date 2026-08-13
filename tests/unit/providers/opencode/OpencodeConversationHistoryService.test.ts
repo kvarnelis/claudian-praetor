@@ -10,7 +10,7 @@ describe('OpencodeConversationHistoryService', () => {
   let tmpRoot: string;
 
   beforeEach(() => {
-    tmpRoot = mkdtempSync(path.join(os.tmpdir(), 'praetor-opencode-conversation-history-'));
+    tmpRoot = mkdtempSync(path.join(os.tmpdir(), 'claudes-codex-opencode-conversation-history-'));
   });
 
   afterEach(() => {

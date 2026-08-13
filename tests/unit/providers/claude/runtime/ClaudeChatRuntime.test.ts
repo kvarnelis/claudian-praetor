@@ -4,7 +4,7 @@ import * as sdkModule from '@anthropic-ai/claude-agent-sdk';
 import { Notice } from 'obsidian';
 
 import type { McpServerManager } from '@/core/mcp/McpServerManager';
-import type PraetorPlugin from '@/main';
+import type ClaudesCodexPlugin from '@/main';
 import * as historyStore from '@/providers/claude/history/ClaudeHistoryStore';
 import * as sdkLoader from '@/providers/claude/loadClaudeAgentSdk';
 import { ClaudeChatRuntime } from '@/providers/claude/runtime/ClaudeChatRuntime';
@@ -24,7 +24,7 @@ const sdkMock = sdkModule as unknown as {
 type MockMcpServerManager = jest.Mocked<McpServerManager>;
 
 describe('ClaudeChatRuntime', () => {
-  let mockPlugin: Partial<PraetorPlugin>;
+  let mockPlugin: Partial<ClaudesCodexPlugin>;
   let mockMcpManager: MockMcpServerManager;
   let service: ClaudeChatRuntime;
 
@@ -54,7 +54,7 @@ describe('ClaudeChatRuntime', () => {
         model: 'claude-3-5-sonnet',
         permissionMode: 'ask' as const,
         thinkingBudget: 0,
-        mediaFolder: 'praetor-media',
+        mediaFolder: 'claudes-codex-media',
         systemPrompt: '',
         loadUserClaudeSettings: false,
         claudeCliPath: '/usr/local/bin/claude',
@@ -67,7 +67,7 @@ describe('ClaudeChatRuntime', () => {
       pluginManager: {
         getPluginsKey: jest.fn().mockReturnValue(''),
       },
-    } as unknown as PraetorPlugin;
+    } as unknown as ClaudesCodexPlugin;
 
     mockMcpManager = {
       loadServers: jest.fn().mockResolvedValue(undefined),
@@ -79,7 +79,7 @@ describe('ClaudeChatRuntime', () => {
       transformMentions: jest.fn().mockImplementation((text: string) => text),
     } as unknown as MockMcpServerManager;
 
-    service = new ClaudeChatRuntime(mockPlugin as PraetorPlugin, mockMcpManager);
+    service = new ClaudeChatRuntime(mockPlugin as ClaudesCodexPlugin, mockMcpManager);
   });
 
   describe('prepareTurn', () => {

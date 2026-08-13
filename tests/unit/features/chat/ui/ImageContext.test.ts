@@ -30,7 +30,7 @@ function createMockCallbacks() {
 
 function createContainerWithInputWrapper(): { container: any; inputWrapper: any } {
   const container = createMockEl();
-  const inputWrapper = container.createDiv({ cls: 'praetor-input-wrapper' });
+  const inputWrapper = container.createDiv({ cls: 'claudes-codex-input-wrapper' });
   return { container, inputWrapper };
 }
 
@@ -183,7 +183,7 @@ describe('ImageContextManager', () => {
 
       const mgr = new ImageContextManager(c, input, cb, previewContainer);
       expect(mgr).toBeDefined();
-      const trayEl = previewContainer.querySelector('.praetor-context-row');
+      const trayEl = previewContainer.querySelector('.claudes-codex-context-row');
       expect(trayEl).not.toBeNull();
     });
 
@@ -197,7 +197,7 @@ describe('ImageContextManager', () => {
 
       new ImageContextManager(c, input, cb, previewContainer);
       expect(previewContainer.children).toContain(existingContent);
-      expect(previewContainer.querySelector('.praetor-context-row')).not.toBeNull();
+      expect(previewContainer.querySelector('.claudes-codex-context-row')).not.toBeNull();
     });
   });
 });
@@ -628,8 +628,8 @@ describe('ImageContextManager - Private Helpers', () => {
       manager['updateImagePreview']();
       const trayEl = manager['contextTray']['containerEl'];
       expect(trayEl.hasClass('has-content')).toBe(true);
-      expect(trayEl.querySelector('.praetor-image-attach-btn')).not.toBeNull();
-      expect(trayEl.querySelector('.praetor-context-chip--image')).toBeNull();
+      expect(trayEl.querySelector('.claudes-codex-image-attach-btn')).not.toBeNull();
+      expect(trayEl.querySelector('.claudes-codex-context-chip--image')).toBeNull();
     });
 
     it('updateImagePreview should show preview when images exist', () => {
@@ -642,24 +642,24 @@ describe('ImageContextManager - Private Helpers', () => {
       manager.clearImages();
 
       const trayEl = manager['contextTray']['containerEl'];
-      expect(trayEl.querySelector('.praetor-image-attach-btn')).not.toBeNull();
-      expect(trayEl.querySelector('.praetor-context-chip--image')).toBeNull();
+      expect(trayEl.querySelector('.claudes-codex-image-attach-btn')).not.toBeNull();
+      expect(trayEl.querySelector('.claudes-codex-context-chip--image')).toBeNull();
     });
 
     it('renders a compact image pill without a thumbnail preview', () => {
       manager.setImages([createImageAttachment({ id: 'img-1', name: 'photo.png', size: 2048 })]);
 
       const trayEl = manager['contextTray']['containerEl'];
-      const chipEl = trayEl.querySelector('.praetor-context-chip--image');
+      const chipEl = trayEl.querySelector('.claudes-codex-context-chip--image');
       expect(chipEl).not.toBeNull();
 
-      const thumbEl = chipEl.querySelector('.praetor-context-chip-thumbnail');
+      const thumbEl = chipEl.querySelector('.claudes-codex-context-chip-thumbnail');
       expect(thumbEl).toBeNull();
 
-      const labelEl = chipEl.querySelector('.praetor-context-chip-label');
+      const labelEl = chipEl.querySelector('.claudes-codex-context-chip-label');
       expect(labelEl?.textContent).toBe('Image');
 
-      const removeEl = chipEl.querySelector('.praetor-context-chip-remove');
+      const removeEl = chipEl.querySelector('.claudes-codex-context-chip-remove');
       expect(removeEl).not.toBeNull();
     });
 
@@ -670,7 +670,7 @@ describe('ImageContextManager - Private Helpers', () => {
       ]);
 
       const trayEl = manager['contextTray']['containerEl'];
-      const labels = trayEl.querySelectorAll('.praetor-context-chip-label');
+      const labels = trayEl.querySelectorAll('.claudes-codex-context-chip-label');
 
       expect(labels.map((label: any) => label.textContent)).toEqual(['Image 1', 'Image 2']);
     });
@@ -690,8 +690,8 @@ describe('ImageContextManager - Private Helpers', () => {
       cb.onImagesChanged.mockClear();
 
       const trayEl = mgr['contextTray']['containerEl'];
-      const firstChip = trayEl.querySelector('.praetor-context-chip--image');
-      const removeEl = firstChip.querySelector('.praetor-context-chip-remove');
+      const firstChip = trayEl.querySelector('.claudes-codex-context-chip--image');
+      const removeEl = firstChip.querySelector('.claudes-codex-context-chip-remove');
       removeEl.dispatchEvent({ type: 'click', stopPropagation: jest.fn() });
 
       expect(mgr.getAttachedImages()).toHaveLength(1);
@@ -729,7 +729,7 @@ describe('ImageContextManager - Private Helpers', () => {
       const image = createImageAttachment({ name: 'test.png', mediaType: 'image/png', data: 'abc123' });
       manager['showFullImage'](image);
 
-      expect(mockBody.createDiv).toHaveBeenCalledWith({ cls: 'praetor-image-modal-overlay' });
+      expect(mockBody.createDiv).toHaveBeenCalledWith({ cls: 'claudes-codex-image-modal-overlay' });
     });
 
     it('should register Escape key handler and close button', () => {

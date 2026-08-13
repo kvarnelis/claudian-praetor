@@ -295,7 +295,7 @@ export class InputController {
     // Hide welcome message when sending first message
     const welcomeEl = this.deps.getWelcomeEl();
     if (welcomeEl) {
-      welcomeEl.addClass('praetor-hidden');
+      welcomeEl.addClass('claudes-codex-hidden');
     }
 
     fileContextManager?.startSession();
@@ -369,7 +369,7 @@ export class InputController {
 
     streamController.showThinkingIndicator(
       isCompact ? 'Compacting...' : undefined,
-      isCompact ? 'praetor-thinking--compact' : undefined,
+      isCompact ? 'claudes-codex-thinking--compact' : undefined,
     );
     state.responseStartTime = performance.now();
 
@@ -470,11 +470,11 @@ export class InputController {
             this.rollbackFailedTurn(messagesBeforeTurn, hadPendingConversationSave);
           }
           const notice = resolution === 'deleted'
-            ? 'The provider session no longer exists. Its Praetor record was removed; send again to start a new session.'
+            ? "The provider session no longer exists. Its Claude's Codex record was removed; send again to start a new session."
             : resolution === 'reset'
-              ? 'The provider session no longer exists. Praetor preserved the recoverable history; send again to rebuild the session.'
+              ? "The provider session no longer exists. Claude's Codex preserved the recoverable history; send again to rebuild the session."
               : resolution === 'preserved'
-                ? 'The provider session no longer exists. Praetor preserved its record because the remaining history could not be verified.'
+                ? "The provider session no longer exists. Claude's Codex preserved its record because the remaining history could not be verified."
                 : 'The provider session no longer exists. Send again to start a new session.';
           new Notice(notice);
           wasInvalidated = true;
@@ -531,10 +531,10 @@ export class InputController {
             finalAssistantMsg.durationFlavorWord = flavorWord;
             // Add footer to live message in DOM
             if (state.currentContentEl) {
-              const footerEl = state.currentContentEl.createDiv({ cls: 'praetor-response-footer' });
+              const footerEl = state.currentContentEl.createDiv({ cls: 'claudes-codex-response-footer' });
               footerEl.createSpan({
                 text: `* ${flavorWord} for ${formatDurationMmSs(durationSeconds)}`,
-                cls: 'praetor-baked-duration',
+                cls: 'claudes-codex-baked-duration',
               });
             }
           }
@@ -646,16 +646,16 @@ export class InputController {
     if (visibleQueuedMessage) {
       const isPendingSteerOnly = !state.queuedMessage && !!this.pendingSteerMessage;
       indicatorEl.createSpan({
-        cls: 'praetor-queue-indicator-text',
+        cls: 'claudes-codex-queue-indicator-text',
         text: `${isPendingSteerOnly ? '⌙ Steering: ' : '⌙ Queued: '}${this.getQueuedMessageDisplay(visibleQueuedMessage)}`,
       });
 
       if (state.queuedMessage) {
-        const actionsEl = indicatorEl.createDiv({ cls: 'praetor-queue-indicator-actions' });
+        const actionsEl = indicatorEl.createDiv({ cls: 'claudes-codex-queue-indicator-actions' });
 
         if (this.canSteerQueuedMessage()) {
           const steerButton = actionsEl.createEl('button', {
-            cls: 'praetor-queue-indicator-action',
+            cls: 'claudes-codex-queue-indicator-action',
             text: this.steerInFlight ? 'Steering...' : 'Steer Now',
           });
           steerButton.setAttribute('type', 'button');
@@ -690,13 +690,13 @@ export class InputController {
         });
       }
 
-      indicatorEl.addClass('praetor-visible-flex');
-      indicatorEl.removeClass('praetor-hidden');
+      indicatorEl.addClass('claudes-codex-visible-flex');
+      indicatorEl.removeClass('claudes-codex-hidden');
       return;
     }
 
-    indicatorEl.removeClass('praetor-visible-flex');
-    indicatorEl.addClass('praetor-hidden');
+    indicatorEl.removeClass('claudes-codex-visible-flex');
+    indicatorEl.addClass('claudes-codex-hidden');
   }
 
   clearQueuedMessage(): void {
@@ -869,7 +869,7 @@ export class InputController {
     label: string,
   ): HTMLElement {
     const button = parentEl.createEl('button', {
-      cls: 'praetor-queue-indicator-icon-action',
+      cls: 'claudes-codex-queue-indicator-icon-action',
       attr: {
         'aria-label': label,
         title: label,
@@ -1054,7 +1054,7 @@ export class InputController {
   private activateStreamingAssistantMessage(message: ChatMessage): void {
     const { state, renderer } = this.deps;
     const msgEl = renderer.addMessage(message);
-    const contentEl = msgEl.querySelector<HTMLElement>('.praetor-message-content');
+    const contentEl = msgEl.querySelector<HTMLElement>('.claudes-codex-message-content');
 
     if (!contentEl) {
       return;
@@ -1215,7 +1215,7 @@ export class InputController {
     this.deps.getSubagentManager().resetStreamingState();
 
     if (messagesBeforeTurn.length === 0) {
-      this.deps.getWelcomeEl()?.removeClass('praetor-hidden');
+      this.deps.getWelcomeEl()?.removeClass('claudes-codex-hidden');
     }
   }
 
@@ -1456,26 +1456,26 @@ export class InputController {
     }
 
     // Build header element, then detach — InlineAskUserQuestion will re-attach it
-    const headerEl = parentEl.createDiv({ cls: 'praetor-ask-approval-info' });
+    const headerEl = parentEl.createDiv({ cls: 'claudes-codex-ask-approval-info' });
     headerEl.remove();
 
-    const toolEl = headerEl.createDiv({ cls: 'praetor-ask-approval-tool' });
-    const iconEl = toolEl.createSpan({ cls: 'praetor-ask-approval-icon' });
+    const toolEl = headerEl.createDiv({ cls: 'claudes-codex-ask-approval-tool' });
+    const iconEl = toolEl.createSpan({ cls: 'claudes-codex-ask-approval-icon' });
     iconEl.setAttribute('aria-hidden', 'true');
     setToolIcon(iconEl, toolName);
-    toolEl.createSpan({ text: toolName, cls: 'praetor-ask-approval-tool-name' });
+    toolEl.createSpan({ text: toolName, cls: 'claudes-codex-ask-approval-tool-name' });
 
     if (approvalOptions?.decisionReason) {
-      headerEl.createDiv({ text: approvalOptions.decisionReason, cls: 'praetor-ask-approval-reason' });
+      headerEl.createDiv({ text: approvalOptions.decisionReason, cls: 'claudes-codex-ask-approval-reason' });
     }
     if (approvalOptions?.blockedPath) {
-      headerEl.createDiv({ text: approvalOptions.blockedPath, cls: 'praetor-ask-approval-blocked-path' });
+      headerEl.createDiv({ text: approvalOptions.blockedPath, cls: 'claudes-codex-ask-approval-blocked-path' });
     }
     if (approvalOptions?.agentID) {
-      headerEl.createDiv({ text: `Agent: ${approvalOptions.agentID}`, cls: 'praetor-ask-approval-agent' });
+      headerEl.createDiv({ text: `Agent: ${approvalOptions.agentID}`, cls: 'claudes-codex-ask-approval-agent' });
     }
 
-    headerEl.createDiv({ text: description, cls: 'praetor-ask-approval-desc' });
+    headerEl.createDiv({ text: description, cls: 'claudes-codex-ask-approval-desc' });
 
     const decisionOptions = approvalOptions?.decisionOptions ?? DEFAULT_APPROVAL_DECISION_OPTIONS;
     const optionDecisionMap = new Map<string, ApprovalDecision>();
@@ -1695,21 +1695,21 @@ export class InputController {
 
   private hideInputContainer(inputContainerEl: HTMLElement): void {
     this.inputContainerHideDepth++;
-    inputContainerEl.addClass('praetor-hidden');
+    inputContainerEl.addClass('claudes-codex-hidden');
   }
 
   private restoreInputContainer(inputContainerEl: HTMLElement): void {
     if (this.inputContainerHideDepth <= 0) return;
     this.inputContainerHideDepth--;
     if (this.inputContainerHideDepth === 0) {
-      inputContainerEl.removeClass('praetor-hidden');
+      inputContainerEl.removeClass('claudes-codex-hidden');
     }
   }
 
   private resetInputContainerVisibility(): void {
     if (this.inputContainerHideDepth > 0) {
       this.inputContainerHideDepth = 0;
-      this.deps.getInputContainerEl().removeClass('praetor-hidden');
+      this.deps.getInputContainerEl().removeClass('claudes-codex-hidden');
     }
   }
 

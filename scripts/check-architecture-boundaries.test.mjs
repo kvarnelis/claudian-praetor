@@ -79,7 +79,7 @@ test('features and shared UI are independent from concrete providers', () => {
 test('persisted settings changes use the coordinator boundary', () => {
   const matches = findMatches([sourceRoot], /\.saveSettings\(\)/).filter(file => ![
     'src/main.ts',
-    'src/app/providers/PraetorProviderHost.ts',
+    'src/app/providers/ClaudesCodexProviderHost.ts',
   ].includes(file));
   assert.deepEqual(matches, []);
 });

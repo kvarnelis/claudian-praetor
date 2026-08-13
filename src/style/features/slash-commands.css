@@ -1,5 +1,5 @@
 /* Slash Command Dropdown */
-.praetor-slash-dropdown {
+.claudes-codex-slash-dropdown {
   display: none;
   position: absolute;
   bottom: 100%;
@@ -17,50 +17,50 @@
   overflow-y: auto;
 }
 
-.praetor-slash-dropdown.visible {
+.claudes-codex-slash-dropdown.visible {
   display: block;
 }
 
 /* Fixed positioning for inline editor */
-.praetor-slash-dropdown-fixed {
+.claudes-codex-slash-dropdown-fixed {
   position: fixed;
-  bottom: var(--praetor-fixed-dropdown-bottom);
-  left: var(--praetor-fixed-dropdown-left);
+  bottom: var(--claudes-codex-fixed-dropdown-bottom);
+  left: var(--claudes-codex-fixed-dropdown-left);
   right: auto;
-  width: var(--praetor-fixed-dropdown-width);
+  width: var(--claudes-codex-fixed-dropdown-width);
   z-index: 10001;
 }
 
-.praetor-slash-item {
+.claudes-codex-slash-item {
   padding: 8px 12px;
   cursor: pointer;
   transition: background 0.1s ease;
   border-bottom: 1px solid var(--background-modifier-border);
 }
 
-.praetor-slash-item:last-child {
+.claudes-codex-slash-item:last-child {
   border-bottom: none;
 }
 
-.praetor-slash-item:hover,
-.praetor-slash-item.selected {
+.claudes-codex-slash-item:hover,
+.claudes-codex-slash-item.selected {
   background: var(--background-modifier-hover);
 }
 
-.praetor-slash-name {
+.claudes-codex-slash-name {
   font-size: 12px;
   font-weight: 500;
   color: var(--text-normal);
   font-family: var(--font-monospace);
 }
 
-.praetor-slash-hint {
+.claudes-codex-slash-hint {
   font-size: 12px;
   color: var(--text-muted);
   margin-left: 8px;
 }
 
-.praetor-slash-desc {
+.claudes-codex-slash-desc {
   font-size: 11px;
   color: var(--text-muted);
   margin-top: 2px;
@@ -69,7 +69,7 @@
   white-space: nowrap;
 }
 
-.praetor-slash-empty {
+.claudes-codex-slash-empty {
   padding: 16px;
   text-align: center;
   color: var(--text-muted);
@@ -77,15 +77,15 @@
 }
 
 /* Scrollbar */
-.praetor-slash-dropdown::-webkit-scrollbar {
+.claudes-codex-slash-dropdown::-webkit-scrollbar {
   width: 6px;
 }
 
-.praetor-slash-dropdown::-webkit-scrollbar-track {
+.claudes-codex-slash-dropdown::-webkit-scrollbar-track {
   background: transparent;
 }
 
-.praetor-slash-dropdown::-webkit-scrollbar-thumb {
+.claudes-codex-slash-dropdown::-webkit-scrollbar-thumb {
   background: var(--background-modifier-border);
   border-radius: 3px;
 }

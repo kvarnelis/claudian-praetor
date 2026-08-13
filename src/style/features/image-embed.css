@@ -1,13 +1,13 @@
 /* Image embed styles - displays ![[image.png]] wikilinks as actual images */
 
-.praetor-embedded-image {
+.claudes-codex-embedded-image {
   display: inline-block;
   max-width: 100%;
   margin: 0.5em 0;
   vertical-align: middle;
 }
 
-.praetor-embedded-image img {
+.claudes-codex-embedded-image img {
   max-width: 100%;
   height: auto;
   border-radius: var(--radius-s);
@@ -15,23 +15,23 @@
   transition: opacity 0.2s ease;
 }
 
-.praetor-embedded-image img:hover {
+.claudes-codex-embedded-image img:hover {
   opacity: 0.9;
 }
 
 /* When image is inline with text */
-.praetor-text-block p .praetor-embedded-image {
+.claudes-codex-text-block p .claudes-codex-embedded-image {
   margin: 0.25em 0;
 }
 
 /* Block-level image (standalone on its own line) */
-.praetor-text-block p > .praetor-embedded-image:only-child {
+.claudes-codex-text-block p > .claudes-codex-embedded-image:only-child {
   display: block;
   margin: 0.75em 0;
 }
 
 /* Fallback when image file not found */
-.praetor-embedded-image-fallback {
+.claudes-codex-embedded-image-fallback {
   color: var(--text-muted);
   font-style: italic;
   background: var(--background-modifier-hover);

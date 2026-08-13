@@ -1,5 +1,5 @@
 /**
- * praetord entry point: boot the headless plugin against a vault, register
+ * claudes-codexd entry point: boot the headless plugin against a vault, register
  * the real providers, and serve the wire protocol.
  */
 
@@ -10,7 +10,7 @@ import { registerBuiltInProviders } from '../../src/providers';
 import { loadConfig, parseCliArgs, printUsage } from './config';
 import { createHeadlessPlugin } from './headlessPlugin';
 import { createNodeVaultApp } from './nodeVaultApp';
-import { PraetorServer } from './server';
+import { ClaudesCodexServer } from './server';
 
 const log = (message: string): void => {
   console.error(`${new Date().toISOString()} ${message}`);
@@ -25,22 +25,22 @@ async function main(): Promise<void> {
 
   const { config, configPath, created } = loadConfig(options);
   if (created) {
-    log(`[praetord] created config at ${configPath}`);
+    log(`[claudes-codexd] created config at ${configPath}`);
   }
   if (options.printConfig) {
     console.log(JSON.stringify({ ...config, configPath }, null, 2));
     return;
   }
 
-  log(`[praetord] vault: ${config.vaultPath}`);
+  log(`[claudes-codexd] vault: ${config.vaultPath}`);
   const app = createNodeVaultApp(config.vaultPath);
   const handle = await createHeadlessPlugin({ app, vaultPath: config.vaultPath, log });
 
   registerBuiltInProviders();
   await ProviderWorkspaceRegistry.initializeAll(handle.plugin);
-  log('[praetord] providers initialized');
+  log('[claudes-codexd] providers initialized');
 
-  const server = new PraetorServer({
+  const server = new ClaudesCodexServer({
     plugin: handle.plugin,
     settings: handle.settings,
     vaultPath: config.vaultPath,
@@ -50,10 +50,10 @@ async function main(): Promise<void> {
     log,
   });
   await server.start();
-  log(`[praetord] connect clients to ws://${config.host}:${config.port} (pair devices from Praetor settings)`);
+  log(`[claudes-codexd] connect clients to ws://${config.host}:${config.port} (pair devices from Claude's Codex settings)`);
 
   const shutdown = (): void => {
-    log('[praetord] shutting down');
+    log('[claudes-codexd] shutting down');
     handle.dispose();
     void server.stop().then(() => process.exit(0));
     setTimeout(() => process.exit(0), 3000).unref();
@@ -63,6 +63,6 @@ async function main(): Promise<void> {
 }
 
 main().catch((err: unknown) => {
-  console.error('[praetord] fatal:', err instanceof Error ? err.stack ?? err.message : err);
+  console.error('[claudes-codexd] fatal:', err instanceof Error ? err.stack ?? err.message : err);
   process.exit(1);
 });

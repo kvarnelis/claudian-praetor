@@ -1,12 +1,12 @@
 /* External Context Selector */
-.praetor-external-context-selector {
+.claudes-codex-external-context-selector {
   position: relative;
   display: flex;
   align-items: center;
   margin-left: 8px;
 }
 
-.praetor-external-context-icon-wrapper {
+.claudes-codex-external-context-icon-wrapper {
   position: relative;
   display: flex;
   align-items: center;
@@ -14,7 +14,7 @@
   cursor: pointer;
 }
 
-.praetor-external-context-icon {
+.claudes-codex-external-context-icon {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -24,37 +24,37 @@
   transition: color 0.15s ease;
 }
 
-.praetor-external-context-icon-wrapper:hover .praetor-external-context-icon {
+.claudes-codex-external-context-icon-wrapper:hover .claudes-codex-external-context-icon {
   color: var(--text-normal);
 }
 
-.praetor-external-context-icon.active {
-  color: var(--praetor-brand);
+.claudes-codex-external-context-icon.active {
+  color: var(--claudes-codex-brand);
   animation: external-context-glow 2s ease-in-out infinite;
 }
 
-.praetor-external-context-icon svg {
+.claudes-codex-external-context-icon svg {
   width: 16px;
   height: 16px;
 }
 
-.praetor-external-context-badge {
+.claudes-codex-external-context-badge {
   position: absolute;
   top: 0;
   right: 0;
   font-size: 9px;
   font-weight: 600;
-  color: var(--praetor-brand);
+  color: var(--claudes-codex-brand);
   opacity: 0;
   transition: opacity 0.15s ease;
   pointer-events: none;
 }
 
-.praetor-external-context-badge.visible {
+.claudes-codex-external-context-badge.visible {
   opacity: 1;
 }
 
-.praetor-external-context-dropdown {
+.claudes-codex-external-context-dropdown {
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
@@ -72,12 +72,12 @@
   z-index: 100;
 }
 
-.praetor-external-context-selector:hover .praetor-external-context-dropdown {
+.claudes-codex-external-context-selector:hover .claudes-codex-external-context-dropdown {
   opacity: 1;
   visibility: visible;
 }
 
-.praetor-external-context-header {
+.claudes-codex-external-context-header {
   padding: 10px 12px;
   font-size: 12px;
   font-weight: 600;
@@ -85,12 +85,12 @@
   border-bottom: 1px solid var(--background-modifier-border);
 }
 
-.praetor-external-context-list {
+.claudes-codex-external-context-list {
   max-height: 200px;
   overflow-y: auto;
 }
 
-.praetor-external-context-empty {
+.claudes-codex-external-context-empty {
   padding: 16px 12px;
   text-align: center;
   color: var(--text-muted);
@@ -98,7 +98,7 @@
   font-style: italic;
 }
 
-.praetor-external-context-item {
+.claudes-codex-external-context-item {
   display: flex;
   align-items: center;
   padding: 8px 12px;
@@ -106,11 +106,11 @@
   border-bottom: 1px solid var(--background-modifier-border-focus);
 }
 
-.praetor-external-context-item:last-child {
+.claudes-codex-external-context-item:last-child {
   border-bottom: none;
 }
 
-.praetor-external-context-text {
+.claudes-codex-external-context-text {
   flex: 1;
   font-size: 12px;
   font-family: var(--font-monospace);
@@ -120,7 +120,7 @@
   white-space: nowrap;
 }
 
-.praetor-external-context-lock {
+.claudes-codex-external-context-lock {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -133,26 +133,26 @@
   transition: all 0.15s ease;
 }
 
-.praetor-external-context-lock:hover {
+.claudes-codex-external-context-lock:hover {
   background: var(--background-modifier-hover);
   opacity: 0.8;
 }
 
-.praetor-external-context-lock.locked {
-  color: var(--praetor-brand);
+.claudes-codex-external-context-lock.locked {
+  color: var(--claudes-codex-brand);
   opacity: 0.9;
 }
 
-.praetor-external-context-lock.locked:hover {
+.claudes-codex-external-context-lock.locked:hover {
   opacity: 1;
 }
 
-.praetor-external-context-lock svg {
+.claudes-codex-external-context-lock svg {
   width: 12px;
   height: 12px;
 }
 
-.praetor-external-context-remove {
+.claudes-codex-external-context-remove {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -165,13 +165,13 @@
   transition: all 0.15s ease;
 }
 
-.praetor-external-context-remove:hover {
-  background: rgba(var(--praetor-error-rgb), 0.15);
-  color: var(--praetor-error);
+.claudes-codex-external-context-remove:hover {
+  background: rgba(var(--claudes-codex-error-rgb), 0.15);
+  color: var(--claudes-codex-error);
   opacity: 1;
 }
 
-.praetor-external-context-remove svg {
+.claudes-codex-external-context-remove svg {
   width: 14px;
   height: 14px;
 }

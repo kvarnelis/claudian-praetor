@@ -10,7 +10,7 @@ import {
 } from '../../../../src/providers/opencode/history/OpencodeHistoryStore';
 
 describe('mapOpencodeMessages', () => {
-  it('maps stored OpenCode messages into Praetor chat messages', () => {
+  it("maps stored OpenCode messages into Claude's Codex chat messages", () => {
     const messages = mapOpencodeMessages([
       {
         info: {
@@ -361,7 +361,7 @@ describe('loadOpencodeSessionMessages', () => {
   let tmpRoot: string;
 
   beforeEach(() => {
-    tmpRoot = mkdtempSync(path.join(os.tmpdir(), 'praetor-opencode-history-'));
+    tmpRoot = mkdtempSync(path.join(os.tmpdir(), 'claudes-codex-opencode-history-'));
   });
 
   afterEach(() => {

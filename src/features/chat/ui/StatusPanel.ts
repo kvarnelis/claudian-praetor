@@ -116,13 +116,13 @@ export class StatusPanel {
     }
 
     // Create panel element (no border/background - seamless)
-    this.panelEl = this.containerEl.createDiv({ cls: 'praetor-status-panel' });
+    this.panelEl = this.containerEl.createDiv({ cls: 'claudes-codex-status-panel' });
 
     // Bash output container - hidden by default
-    this.bashOutputContainerEl = this.panelEl.createDiv({ cls: 'praetor-status-panel-bash praetor-hidden' });
+    this.bashOutputContainerEl = this.panelEl.createDiv({ cls: 'claudes-codex-status-panel-bash claudes-codex-hidden' });
 
     this.bashHeaderEl = this.bashOutputContainerEl.createDiv({
-      cls: 'praetor-tool-header praetor-status-panel-bash-header',
+      cls: 'claudes-codex-tool-header claudes-codex-status-panel-bash-header',
       attr: { tabindex: '0', role: 'button' },
     });
 
@@ -136,14 +136,14 @@ export class StatusPanel {
     this.bashHeaderEl.addEventListener('click', this.bashClickHandler);
     this.bashHeaderEl.addEventListener('keydown', this.bashKeydownHandler);
 
-    this.bashContentEl = this.bashOutputContainerEl.createDiv({ cls: 'praetor-status-panel-bash-content' });
+    this.bashContentEl = this.bashOutputContainerEl.createDiv({ cls: 'claudes-codex-status-panel-bash-content' });
 
     // Todo container
-    this.todoContainerEl = this.panelEl.createDiv({ cls: 'praetor-status-panel-todos praetor-hidden' });
+    this.todoContainerEl = this.panelEl.createDiv({ cls: 'claudes-codex-status-panel-todos claudes-codex-hidden' });
 
     // Todo header (collapsed view)
     this.todoHeaderEl = this.todoContainerEl.createDiv({
-      cls: 'praetor-status-panel-header',
+      cls: 'claudes-codex-status-panel-header',
       attr: { tabindex: '0', role: 'button' },
     });
 
@@ -160,7 +160,7 @@ export class StatusPanel {
 
     // Todo content (expanded list)
     this.todoContentEl = this.todoContainerEl.createDiv({
-      cls: 'praetor-status-panel-content praetor-todo-list-container praetor-hidden',
+      cls: 'claudes-codex-status-panel-content claudes-codex-todo-list-container claudes-codex-hidden',
     });
   }
 
@@ -169,7 +169,7 @@ export class StatusPanel {
 
     const hasTodos = (this.currentTodos?.length ?? 0) > 0;
     const hasBashOutputs = this.currentBashOutputs.size > 0;
-    this.panelEl.toggleClass('praetor-status-panel--visible', hasTodos || hasBashOutputs);
+    this.panelEl.toggleClass('claudes-codex-status-panel--visible', hasTodos || hasBashOutputs);
   }
 
   /**
@@ -187,14 +187,14 @@ export class StatusPanel {
     this.currentTodos = todos;
 
     if (!todos || todos.length === 0) {
-      this.todoContainerEl.addClass('praetor-hidden');
+      this.todoContainerEl.addClass('claudes-codex-hidden');
       this.todoHeaderEl.empty();
       this.todoContentEl.empty();
       this.syncPanelVisibility();
       return;
     }
 
-    this.todoContainerEl.removeClass('praetor-hidden');
+    this.todoContainerEl.removeClass('claudes-codex-hidden');
     this.syncPanelVisibility();
 
     // Count completed and find current task
@@ -223,12 +223,12 @@ export class StatusPanel {
     this.todoHeaderEl.empty();
 
     // List icon
-    const icon = this.todoHeaderEl.createSpan({ cls: 'praetor-status-panel-icon' });
+    const icon = this.todoHeaderEl.createSpan({ cls: 'claudes-codex-status-panel-icon' });
     setIcon(icon, getToolIcon(TOOL_TODO_WRITE));
 
     // Label
     this.todoHeaderEl.createSpan({
-      cls: 'praetor-status-panel-label',
+      cls: 'claudes-codex-status-panel-label',
       text: `Tasks (${completedCount}/${totalCount})`,
     });
 
@@ -236,14 +236,14 @@ export class StatusPanel {
     if (!this.isTodoExpanded) {
       // Status indicator (tick only when all todos complete)
       if (completedCount === totalCount && totalCount > 0) {
-        const status = this.todoHeaderEl.createSpan({ cls: 'praetor-status-panel-status status-completed' });
+        const status = this.todoHeaderEl.createSpan({ cls: 'claudes-codex-status-panel-status status-completed' });
         setIcon(status, 'check');
       }
 
       // Current task preview
       if (currentTask) {
         this.todoHeaderEl.createSpan({
-          cls: 'praetor-status-panel-current',
+          cls: 'claudes-codex-status-panel-current',
           text: currentTask.activeForm,
         });
       }
@@ -273,7 +273,7 @@ export class StatusPanel {
     if (!this.todoContentEl || !this.todoHeaderEl) return;
 
     // Show/hide content
-    this.todoContentEl.toggleClass('praetor-hidden', !this.isTodoExpanded);
+    this.todoContentEl.toggleClass('claudes-codex-hidden', !this.isTodoExpanded);
 
     // Re-render header to update current task visibility
     if (this.currentTodos && this.currentTodos.length > 0) {
@@ -348,47 +348,47 @@ export class StatusPanel {
     const scroll = options.scroll ?? true;
 
     if (this.currentBashOutputs.size === 0) {
-      this.bashOutputContainerEl.addClass('praetor-hidden');
+      this.bashOutputContainerEl.addClass('claudes-codex-hidden');
       this.syncPanelVisibility();
       return;
     }
 
-    this.bashOutputContainerEl.removeClass('praetor-hidden');
+    this.bashOutputContainerEl.removeClass('claudes-codex-hidden');
     this.syncPanelVisibility();
     this.bashHeaderEl.empty();
     this.bashContentEl.empty();
 
     const headerIconEl = this.bashHeaderEl.createSpan({
-      cls: 'praetor-tool-icon',
+      cls: 'claudes-codex-tool-icon',
       attr: { 'aria-hidden': 'true' },
     });
     setIcon(headerIconEl, 'terminal');
 
     const latest = Array.from(this.currentBashOutputs.values()).at(-1);
 
-    const headerLabelEl = this.bashHeaderEl.createSpan({ cls: 'praetor-tool-label' });
+    const headerLabelEl = this.bashHeaderEl.createSpan({ cls: 'claudes-codex-tool-label' });
     if (this.isBashExpanded) {
       headerLabelEl.textContent = t('chat.bangBash.commandPanel');
     } else {
       headerLabelEl.textContent = latest ? this.truncateDescription(latest.command, 60) : t('chat.bangBash.commandPanel');
     }
 
-    const previewEl = this.bashHeaderEl.createSpan({ cls: 'praetor-tool-current' });
-    previewEl.classList.toggle('praetor-hidden', !this.isBashExpanded);
+    const previewEl = this.bashHeaderEl.createSpan({ cls: 'claudes-codex-tool-current' });
+    previewEl.classList.toggle('claudes-codex-hidden', !this.isBashExpanded);
 
-    const summaryStatusEl = this.bashHeaderEl.createSpan({ cls: 'praetor-tool-status' });
+    const summaryStatusEl = this.bashHeaderEl.createSpan({ cls: 'claudes-codex-tool-status' });
     if (!this.isBashExpanded && latest) {
       summaryStatusEl.classList.add(`status-${latest.status}`);
       summaryStatusEl.setAttribute('aria-label', t('chat.bangBash.statusLabel', { status: latest.status }));
       if (latest.status === 'completed') setIcon(summaryStatusEl, 'check');
       if (latest.status === 'error') setIcon(summaryStatusEl, 'x');
     } else {
-      summaryStatusEl.classList.add('praetor-hidden');
+      summaryStatusEl.classList.add('claudes-codex-hidden');
     }
 
     this.bashHeaderEl.setAttribute('aria-expanded', String(this.isBashExpanded));
 
-    const actionsEl = this.bashHeaderEl.createSpan({ cls: 'praetor-status-panel-bash-actions' });
+    const actionsEl = this.bashHeaderEl.createSpan({ cls: 'claudes-codex-status-panel-bash-actions' });
     this.appendActionButton(actionsEl, 'copy', t('chat.bangBash.copyAriaLabel'), 'copy', () => {
       void this.copyLatestBashOutput();
     });
@@ -396,7 +396,7 @@ export class StatusPanel {
       this.clearBashOutputs();
     });
 
-    this.bashContentEl.toggleClass('praetor-hidden', !this.isBashExpanded);
+    this.bashContentEl.toggleClass('claudes-codex-hidden', !this.isBashExpanded);
 
     if (!this.isBashExpanded) {
       return;
@@ -413,33 +413,33 @@ export class StatusPanel {
   }
 
   private renderBashEntry(info: PanelBashOutput): HTMLElement {
-    const entryEl = createDiv({ cls: 'praetor-tool-call praetor-status-panel-bash-entry' });
+    const entryEl = createDiv({ cls: 'claudes-codex-tool-call claudes-codex-status-panel-bash-entry' });
 
     const entryHeaderEl = entryEl.createDiv({
-      cls: 'praetor-tool-header',
+      cls: 'claudes-codex-tool-header',
       attr: { tabindex: '0', role: 'button' },
     });
 
     const entryIconEl = entryHeaderEl.createSpan({
-      cls: 'praetor-tool-icon',
+      cls: 'claudes-codex-tool-icon',
       attr: { 'aria-hidden': 'true' },
     });
     setIcon(entryIconEl, 'dollar-sign');
 
     entryHeaderEl.createSpan({
-      cls: 'praetor-tool-label',
+      cls: 'claudes-codex-tool-label',
       text: t('chat.bangBash.commandLabel', { command: this.truncateDescription(info.command, 60) }),
     });
 
-    const entryStatusEl = entryHeaderEl.createSpan({ cls: 'praetor-tool-status' });
+    const entryStatusEl = entryHeaderEl.createSpan({ cls: 'claudes-codex-tool-status' });
     entryStatusEl.classList.add(`status-${info.status}`);
     entryStatusEl.setAttribute('aria-label', t('chat.bangBash.statusLabel', { status: info.status }));
     if (info.status === 'completed') setIcon(entryStatusEl, 'check');
     if (info.status === 'error') setIcon(entryStatusEl, 'x');
 
-    const contentEl = entryEl.createDiv({ cls: 'praetor-tool-content' });
+    const contentEl = entryEl.createDiv({ cls: 'claudes-codex-tool-content' });
     const isEntryExpanded = this.bashEntryExpanded.get(info.id) ?? true;
-    contentEl.classList.toggle('praetor-hidden', !isEntryExpanded);
+    contentEl.classList.toggle('claudes-codex-hidden', !isEntryExpanded);
     entryHeaderEl.setAttribute('aria-expanded', String(isEntryExpanded));
     entryHeaderEl.setAttribute('aria-label', isEntryExpanded ? t('chat.bangBash.collapseOutput') : t('chat.bangBash.expandOutput'));
     entryHeaderEl.addEventListener('click', () => {
@@ -454,9 +454,9 @@ export class StatusPanel {
       }
     });
 
-    const rowEl = contentEl.createDiv({ cls: 'praetor-tool-result-row' });
+    const rowEl = contentEl.createDiv({ cls: 'claudes-codex-tool-result-row' });
 
-    const textEl = rowEl.createSpan({ cls: 'praetor-tool-result-text' });
+    const textEl = rowEl.createSpan({ cls: 'claudes-codex-tool-result-text' });
     if (info.status === 'running' && !info.output) {
       textEl.textContent = t('chat.bangBash.running');
     } else if (info.output) {
@@ -487,7 +487,7 @@ export class StatusPanel {
     action: () => void
   ): void {
     const el = parent.createSpan({
-      cls: `praetor-status-panel-bash-action praetor-status-panel-bash-action-${name}`,
+      cls: `claudes-codex-status-panel-bash-action claudes-codex-status-panel-bash-action-${name}`,
       attr: {
         role: 'button',
         tabindex: '0',

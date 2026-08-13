@@ -9,7 +9,7 @@ export interface ForkSource {
 }
 
 /** View type identifier for Obsidian. */
-export const VIEW_TYPE_PRAETOR = 'praetor-view';
+export const VIEW_TYPE_CLAUDES_CODEX = 'claudes-codex-view';
 
 /** Supported image media types for attachments. */
 export type ImageMediaType = 'image/jpeg' | 'image/png' | 'image/gif' | 'image/webp';

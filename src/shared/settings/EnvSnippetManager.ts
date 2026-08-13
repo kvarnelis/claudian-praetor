@@ -36,7 +36,7 @@ export class EnvSnippetModal extends Modal {
     const { contentEl } = this;
     this.setTitle(this.snippet ? t('settings.envSnippets.modal.titleEdit') : t('settings.envSnippets.modal.titleSave'));
 
-    this.modalEl.addClass('praetor-env-snippet-modal');
+    this.modalEl.addClass('claudes-codex-env-snippet-modal');
 
     let nameEl: HTMLInputElement;
     let descEl: HTMLInputElement;
@@ -109,11 +109,11 @@ export class EnvSnippetModal extends Modal {
       const uniqueModelIds = ProviderRegistry.getCustomModelIds(envVars);
 
       if (uniqueModelIds.size === 0) {
-        contextLimitsContainer.addClass('praetor-hidden');
+        contextLimitsContainer.addClass('claudes-codex-hidden');
         return;
       }
 
-      contextLimitsContainer.removeClass('praetor-hidden');
+      contextLimitsContainer.removeClass('claudes-codex-hidden');
 
       const existingLimits = this.snippet?.contextLimits ?? this.plugin.settings.customContextLimits ?? {};
       const existingAliases = this.snippet?.modelAliases ?? this.plugin.settings.customModelAliases ?? {};
@@ -128,14 +128,14 @@ export class EnvSnippetModal extends Modal {
       });
 
       for (const modelId of uniqueModelIds) {
-        const row = contextLimitsContainer.createDiv({ cls: 'praetor-snippet-limit-row' });
-        row.createSpan({ text: modelId, cls: 'praetor-snippet-limit-model' });
-        row.createSpan({ cls: 'praetor-snippet-limit-spacer' });
+        const row = contextLimitsContainer.createDiv({ cls: 'claudes-codex-snippet-limit-row' });
+        row.createSpan({ text: modelId, cls: 'claudes-codex-snippet-limit-model' });
+        row.createSpan({ cls: 'claudes-codex-snippet-limit-spacer' });
 
         const aliasInput = row.createEl('input', {
           type: 'text',
           placeholder: t('settings.customModelAliases.placeholder'),
-          cls: 'praetor-snippet-alias-input',
+          cls: 'claudes-codex-snippet-alias-input',
         });
         aliasInput.value = existingAliases[modelId] ?? '';
         aliasInput.setAttribute('aria-label', `Alias for ${modelId}`);
@@ -145,7 +145,7 @@ export class EnvSnippetModal extends Modal {
         const input = row.createEl('input', {
           type: 'text',
           placeholder: '200k',
-          cls: 'praetor-snippet-limit-input',
+          cls: 'claudes-codex-snippet-limit-input',
         });
         input.value = existingLimits[modelId] ? formatContextLimit(existingLimits[modelId]) : '';
         input.setAttribute('aria-label', `Context window for ${modelId}`);
@@ -181,23 +181,23 @@ export class EnvSnippetModal extends Modal {
         text.inputEl.rows = 8;
         text.inputEl.addEventListener('blur', () => renderContextLimitFields());
       });
-    envVarsSetting.settingEl.addClass('praetor-env-snippet-setting');
-    envVarsSetting.controlEl.addClass('praetor-env-snippet-control');
+    envVarsSetting.settingEl.addClass('claudes-codex-env-snippet-setting');
+    envVarsSetting.controlEl.addClass('claudes-codex-env-snippet-control');
 
-    contextLimitsContainer = contentEl.createDiv({ cls: 'praetor-snippet-context-limits' });
+    contextLimitsContainer = contentEl.createDiv({ cls: 'claudes-codex-snippet-context-limits' });
     renderContextLimitFields();
 
-    const buttonContainer = contentEl.createDiv({ cls: 'praetor-snippet-buttons' });
+    const buttonContainer = contentEl.createDiv({ cls: 'claudes-codex-snippet-buttons' });
 
     const cancelBtn = buttonContainer.createEl('button', {
       text: t('settings.envSnippets.modal.cancel'),
-      cls: 'praetor-cancel-btn'
+      cls: 'claudes-codex-cancel-btn'
     });
     cancelBtn.addEventListener('click', () => this.close());
 
     const saveBtn = buttonContainer.createEl('button', {
       text: this.snippet ? t('settings.envSnippets.modal.update') : t('settings.envSnippets.modal.save'),
-      cls: 'praetor-save-btn'
+      cls: 'claudes-codex-save-btn'
     });
     saveBtn.addEventListener('click', () => saveSnippet());
 
@@ -233,11 +233,11 @@ export class EnvSnippetManager {
   private render() {
     this.containerEl.empty();
 
-    const headerEl = this.containerEl.createDiv({ cls: 'praetor-snippet-header' });
-    headerEl.createSpan({ text: t('settings.envSnippets.name'), cls: 'praetor-snippet-label' });
+    const headerEl = this.containerEl.createDiv({ cls: 'claudes-codex-snippet-header' });
+    headerEl.createSpan({ text: t('settings.envSnippets.name'), cls: 'claudes-codex-snippet-label' });
 
     const saveBtn = headerEl.createEl('button', {
-      cls: 'praetor-settings-action-btn',
+      cls: 'claudes-codex-settings-action-btn',
       attr: { 'aria-label': t('settings.envSnippets.addBtn') },
     });
     setIcon(saveBtn, 'plus');
@@ -248,30 +248,30 @@ export class EnvSnippetManager {
     const snippets = this.plugin.settings.envSnippets.filter((snippet) => this.shouldDisplaySnippet(snippet));
 
     if (snippets.length === 0) {
-      const emptyEl = this.containerEl.createDiv({ cls: 'praetor-snippet-empty' });
+      const emptyEl = this.containerEl.createDiv({ cls: 'claudes-codex-snippet-empty' });
       emptyEl.setText(t('settings.envSnippets.noSnippets'));
       return;
     }
 
-    const listEl = this.containerEl.createDiv({ cls: 'praetor-snippet-list' });
+    const listEl = this.containerEl.createDiv({ cls: 'claudes-codex-snippet-list' });
 
     for (const snippet of snippets) {
-      const itemEl = listEl.createDiv({ cls: 'praetor-snippet-item' });
+      const itemEl = listEl.createDiv({ cls: 'claudes-codex-snippet-item' });
 
-      const infoEl = itemEl.createDiv({ cls: 'praetor-snippet-info' });
+      const infoEl = itemEl.createDiv({ cls: 'claudes-codex-snippet-info' });
 
-      const nameEl = infoEl.createDiv({ cls: 'praetor-snippet-name' });
+      const nameEl = infoEl.createDiv({ cls: 'claudes-codex-snippet-name' });
       nameEl.setText(snippet.name);
 
       if (snippet.description) {
-        const descEl = infoEl.createDiv({ cls: 'praetor-snippet-description' });
+        const descEl = infoEl.createDiv({ cls: 'claudes-codex-snippet-description' });
         descEl.setText(snippet.description);
       }
 
-      const actionsEl = itemEl.createDiv({ cls: 'praetor-snippet-actions' });
+      const actionsEl = itemEl.createDiv({ cls: 'claudes-codex-snippet-actions' });
 
       const restoreBtn = actionsEl.createEl('button', {
-        cls: 'praetor-settings-action-btn',
+        cls: 'claudes-codex-settings-action-btn',
         attr: { 'aria-label': 'Insert' },
       });
       setIcon(restoreBtn, 'clipboard-paste');
@@ -286,7 +286,7 @@ export class EnvSnippetManager {
       });
 
       const editBtn = actionsEl.createEl('button', {
-        cls: 'praetor-settings-action-btn',
+        cls: 'claudes-codex-settings-action-btn',
         attr: { 'aria-label': 'Edit' },
       });
       setIcon(editBtn, 'pencil');
@@ -295,7 +295,7 @@ export class EnvSnippetManager {
       });
 
       const deleteBtn = actionsEl.createEl('button', {
-        cls: 'praetor-settings-action-btn praetor-settings-delete-btn',
+        cls: 'claudes-codex-settings-action-btn claudes-codex-settings-delete-btn',
         attr: { 'aria-label': 'Delete' },
       });
       setIcon(deleteBtn, 'trash-2');
@@ -377,7 +377,7 @@ export class EnvSnippetManager {
     });
 
     this.onContextLimitsChange?.();
-    const view = this.plugin.app.workspace.getLeavesOfType('praetor-view')[0]?.view as {
+    const view = this.plugin.app.workspace.getLeavesOfType('claudes-codex-view')[0]?.view as {
       refreshModelSelector?(): void;
     } | undefined;
     view?.refreshModelSelector?.();
@@ -429,7 +429,7 @@ export class EnvSnippetManager {
   }
 
   private syncTextareaValue(scope: EnvironmentScope, value: string): void {
-    const selector = `.praetor-settings-env-textarea[data-env-scope="${scope}"]`;
+    const selector = `.claudes-codex-settings-env-textarea[data-env-scope="${scope}"]`;
     const envTextarea = (this.containerEl.ownerDocument ?? window.document).querySelector<HTMLTextAreaElement>(selector);
     if (envTextarea) {
       envTextarea.value = value;

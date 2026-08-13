@@ -2,7 +2,7 @@ import type { App } from 'obsidian';
 
 import type { SharedAppStorage } from '../bootstrap/storage';
 import type { ChatRuntime } from '../runtime/ChatRuntime';
-import type { PraetorSettings } from '../types';
+import type { ClaudesCodexSettings } from '../types';
 import type { EnvironmentScope } from '../types/settings';
 import type { ProviderCliResolutionContext, ProviderId } from './types';
 
@@ -15,16 +15,16 @@ import type { ProviderCliResolutionContext, ProviderId } from './types';
  */
 export interface ProviderHost {
   readonly app: App;
-  readonly settings: PraetorSettings;
+  readonly settings: ClaudesCodexSettings;
   readonly storage: SharedAppStorage;
   readonly manifest?: { version?: string };
 
   saveSettings(): Promise<void>;
   mutateSettings(
-    mutation: (settings: PraetorSettings) => void | Promise<void>,
+    mutation: (settings: ClaudesCodexSettings) => void | Promise<void>,
   ): Promise<void>;
   mutateSettingsConditionally(
-    mutation: (settings: PraetorSettings) => boolean | Promise<boolean>,
+    mutation: (settings: ClaudesCodexSettings) => boolean | Promise<boolean>,
   ): Promise<void>;
   loadData(): Promise<unknown>;
   saveData(data: unknown): Promise<void>;

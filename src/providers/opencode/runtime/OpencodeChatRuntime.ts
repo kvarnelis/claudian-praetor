@@ -732,7 +732,7 @@ export class OpencodeChatRuntime implements ChatRuntime {
     const connectionGeneration = ++this.connectionGeneration;
     this.connection = new AcpClientConnection({
       clientInfo: {
-        name: 'praetor',
+        name: 'claudes-codex',
         version: this.plugin.manifest?.version ?? '0.0.0',
       },
       delegate: {

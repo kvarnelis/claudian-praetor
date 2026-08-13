@@ -41,11 +41,11 @@ describe('textareaResize', () => {
       grownScrollHeight: 116,
     });
 
-    textarea.style.setProperty('--praetor-textarea-min-height', '116px');
+    textarea.style.setProperty('--claudes-codex-textarea-min-height', '116px');
 
     autoResizeTextarea(textarea);
 
-    expect(textarea.style.getPropertyValue('--praetor-textarea-min-height')).toBe('60px');
+    expect(textarea.style.getPropertyValue('--claudes-codex-textarea-min-height')).toBe('60px');
   });
 
   it('measures from base height so long content does not bounce', () => {
@@ -56,11 +56,11 @@ describe('textareaResize', () => {
       grownScrollHeight: 116,
     });
 
-    textarea.style.setProperty('--praetor-textarea-min-height', '116px');
+    textarea.style.setProperty('--claudes-codex-textarea-min-height', '116px');
 
     autoResizeTextarea(textarea);
 
-    expect(textarea.style.getPropertyValue('--praetor-textarea-min-height')).toBe('116px');
+    expect(textarea.style.getPropertyValue('--claudes-codex-textarea-min-height')).toBe('116px');
   });
 
   it('caps max height by viewport percentage with a minimum usable cap', () => {
@@ -89,7 +89,7 @@ function createResizeTextarea({
   };
 
   const isBaseHeight = () =>
-    textarea.style.getPropertyValue('--praetor-textarea-min-height') === `${TEXTAREA_BASE_MIN_HEIGHT}px`;
+    textarea.style.getPropertyValue('--claudes-codex-textarea-min-height') === `${TEXTAREA_BASE_MIN_HEIGHT}px`;
 
   Object.defineProperty(textarea, 'offsetHeight', {
     get: () => (isBaseHeight() ? baseOffsetHeight : grownOffsetHeight),

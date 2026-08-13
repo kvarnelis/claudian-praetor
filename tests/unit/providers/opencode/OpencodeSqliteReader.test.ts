@@ -17,7 +17,7 @@ describe('loadOpencodeSessionRows', () => {
   let tmpRoot: string;
 
   beforeEach(() => {
-    tmpRoot = mkdtempSync(path.join(os.tmpdir(), 'praetor-opencode-sqlite-reader-'));
+    tmpRoot = mkdtempSync(path.join(os.tmpdir(), 'claudes-codex-opencode-sqlite-reader-'));
   });
 
   afterEach(() => {

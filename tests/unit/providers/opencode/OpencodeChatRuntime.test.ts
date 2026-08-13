@@ -19,7 +19,7 @@ function createMockPlugin(overrides: Record<string, unknown> = {}): any {
     app: {
       vault: {
         adapter: {
-          basePath: '/tmp/praetor-test-vault',
+          basePath: '/tmp/claudes-codex-test-vault',
         },
       },
     },
@@ -108,11 +108,11 @@ describe('OpencodeChatRuntime', () => {
     jest.spyOn(launchArtifacts, 'prepareOpencodeLaunchArtifacts').mockImplementation(async (params) => {
       expect(params.runtimeEnv.OPENCODE_DB).toBe('/persisted/opencode.db');
       return {
-        configPath: '/tmp/praetor-opencode-config.json',
+        configPath: '/tmp/claudes-codex-opencode-config.json',
         configContent: '{}\n',
         databasePath: '/persisted/opencode.db',
         launchKey: 'launch-key',
-        systemPromptPath: '/tmp/praetor-opencode-system.md',
+        systemPromptPath: '/tmp/claudes-codex-opencode-system.md',
       };
     });
     (runtime as any).startProcess = jest.fn().mockImplementation(async () => {
@@ -152,11 +152,11 @@ describe('OpencodeChatRuntime', () => {
     jest.spyOn(launchArtifacts, 'prepareOpencodeLaunchArtifacts').mockImplementation(async (params) => {
       expect(params.runtimeEnv.OPENCODE_DB).toBeUndefined();
       return {
-        configPath: '/tmp/praetor-opencode-config.json',
+        configPath: '/tmp/claudes-codex-opencode-config.json',
         configContent: '{}\n',
         databasePath: '/default/opencode.db',
         launchKey: 'launch-key',
-        systemPromptPath: '/tmp/praetor-opencode-system.md',
+        systemPromptPath: '/tmp/claudes-codex-opencode-system.md',
       };
     });
     (runtime as any).startProcess = jest.fn().mockImplementation(async () => {
@@ -186,11 +186,11 @@ describe('OpencodeChatRuntime', () => {
     jest.spyOn(launchArtifacts, 'prepareOpencodeLaunchArtifacts').mockImplementation(async (params) => {
       expect(params.runtimeEnv.OPENCODE_DB).toBe(':memory:');
       return {
-        configPath: '/tmp/praetor-opencode-config.json',
+        configPath: '/tmp/claudes-codex-opencode-config.json',
         configContent: '{}\n',
         databasePath: ':memory:',
         launchKey: 'launch-key',
-        systemPromptPath: '/tmp/praetor-opencode-system.md',
+        systemPromptPath: '/tmp/claudes-codex-opencode-system.md',
       };
     });
     (runtime as any).startProcess = jest.fn().mockImplementation(async () => {
@@ -216,11 +216,11 @@ describe('OpencodeChatRuntime', () => {
     const mockConnection = { dispose: jest.fn() };
 
     jest.spyOn(launchArtifacts, 'prepareOpencodeLaunchArtifacts').mockResolvedValue({
-      configPath: '/tmp/praetor-opencode-config.json',
+      configPath: '/tmp/claudes-codex-opencode-config.json',
       configContent: '{}\n',
       databasePath: '/default/opencode.db',
       launchKey: 'launch-key',
-      systemPromptPath: '/tmp/praetor-opencode-system.md',
+      systemPromptPath: '/tmp/claudes-codex-opencode-system.md',
     });
     const shutdownProcess = jest.spyOn(runtime as any, 'shutdownProcess').mockResolvedValue(undefined);
     const startProcess = jest.spyOn(runtime as any, 'startProcess').mockImplementation(async () => {
@@ -243,11 +243,11 @@ describe('OpencodeChatRuntime', () => {
     });
     const runtime = new OpencodeChatRuntime(plugin);
     jest.spyOn(launchArtifacts, 'prepareOpencodeLaunchArtifacts').mockResolvedValue({
-      configPath: '/tmp/praetor-opencode-config.json',
+      configPath: '/tmp/claudes-codex-opencode-config.json',
       configContent: '{}\n',
       databasePath: '/default/opencode.db',
       launchKey: 'launch-key',
-      systemPromptPath: '/tmp/praetor-opencode-system.md',
+      systemPromptPath: '/tmp/claudes-codex-opencode-system.md',
     });
     let releaseStart!: () => void;
     const startGate = new Promise<void>(resolve => { releaseStart = resolve; });
@@ -271,11 +271,11 @@ describe('OpencodeChatRuntime', () => {
     });
     const runtime = new OpencodeChatRuntime(plugin);
     jest.spyOn(launchArtifacts, 'prepareOpencodeLaunchArtifacts').mockResolvedValue({
-      configPath: '/tmp/praetor-opencode-config.json',
+      configPath: '/tmp/claudes-codex-opencode-config.json',
       configContent: '{}\n',
       databasePath: '/default/opencode.db',
       launchKey: 'launch-key',
-      systemPromptPath: '/tmp/praetor-opencode-system.md',
+      systemPromptPath: '/tmp/claudes-codex-opencode-system.md',
     });
     jest.spyOn(runtime as any, 'startProcess').mockImplementation(async () => {
       (runtime as any).process = {
@@ -301,7 +301,7 @@ describe('OpencodeChatRuntime', () => {
     await new Promise(resolve => setImmediate(resolve));
     expect(loadSession).toHaveBeenCalledWith(
       'session-a',
-      '/tmp/praetor-test-vault',
+      '/tmp/claudes-codex-test-vault',
       expect.any(Number),
     );
 
@@ -313,7 +313,7 @@ describe('OpencodeChatRuntime', () => {
     await expect(second).resolves.toBe(true);
     expect(loadSession).toHaveBeenLastCalledWith(
       'session-b',
-      '/tmp/praetor-test-vault',
+      '/tmp/claudes-codex-test-vault',
       expect.any(Number),
     );
     expect(runtime.getSessionId()).toBe('session-b');
@@ -331,11 +331,11 @@ describe('OpencodeChatRuntime', () => {
     jest.spyOn(launchArtifacts, 'prepareOpencodeLaunchArtifacts').mockImplementation(async () => {
       await artifactsGate;
       return {
-        configPath: '/tmp/praetor-opencode-config.json',
+        configPath: '/tmp/claudes-codex-opencode-config.json',
         configContent: '{}\n',
         databasePath: '/default/opencode.db',
         launchKey: 'launch-key',
-        systemPromptPath: '/tmp/praetor-opencode-system.md',
+        systemPromptPath: '/tmp/claudes-codex-opencode-system.md',
       };
     });
     const startProcess = jest.spyOn(runtime as any, 'startProcess').mockResolvedValue(undefined);
@@ -379,11 +379,11 @@ describe('OpencodeChatRuntime', () => {
     }));
     runtime.syncConversationState({ providerState: {}, sessionId: 'session-1' });
     jest.spyOn(launchArtifacts, 'prepareOpencodeLaunchArtifacts').mockResolvedValue({
-      configPath: '/tmp/praetor-opencode-config.json',
+      configPath: '/tmp/claudes-codex-opencode-config.json',
       configContent: '{}\n',
       databasePath: '/default/opencode.db',
       launchKey: 'launch-key',
-      systemPromptPath: '/tmp/praetor-opencode-system.md',
+      systemPromptPath: '/tmp/claudes-codex-opencode-system.md',
     });
     const cancel = jest.fn();
     const startProcess = jest.spyOn(runtime as any, 'startProcess').mockImplementation(async () => {
@@ -608,7 +608,7 @@ describe('OpencodeChatRuntime', () => {
     expect((runtime as any).resolveSelectedModeId()).toBe(OPENCODE_YOLO_MODE_ID);
   });
 
-  it('falls back to the managed YOLO mode when a saved custom mode is not managed by Praetor', () => {
+  it("falls back to the managed YOLO mode when a saved custom mode is not managed by Claude's Codex", () => {
     const plugin = createMockPlugin({
       settings: {
         permissionMode: 'yolo',
@@ -635,7 +635,7 @@ describe('OpencodeChatRuntime', () => {
             availableModes: [
               { id: OPENCODE_BUILD_MODE_ID, name: 'build' },
               { id: 'compaction', name: 'compaction' },
-              { id: OPENCODE_SAFE_MODE_ID, name: 'praetor-safe' },
+              { id: OPENCODE_SAFE_MODE_ID, name: 'claudes-codex-safe' },
               { id: 'plan', name: 'plan' },
             ],
             selectedMode: '',

@@ -1,6 +1,6 @@
 import {
-  LEGACY_PRAETOR_SETTINGS_PATH,
-  PRAETOR_SETTINGS_PATH,
+  LEGACY_CLAUDES_CODEX_SETTINGS_PATH,
+  CLAUDES_CODEX_SETTINGS_PATH,
 } from '../../core/bootstrap/StoragePaths';
 import {
   normalizeHiddenCommandList,
@@ -19,17 +19,17 @@ import {
   type EnvironmentScope,
   type EnvSnippet,
   type HiddenProviderCommands,
-  type PraetorSettings,
+  type ClaudesCodexSettings,
   type ProviderConfigMap,
 } from '../../core/types/settings';
-import { DEFAULT_PRAETOR_SETTINGS } from './defaultSettings';
+import { DEFAULT_CLAUDES_CODEX_SETTINGS } from './defaultSettings';
 
 export {
-  LEGACY_PRAETOR_SETTINGS_PATH,
-  PRAETOR_SETTINGS_PATH,
+  LEGACY_CLAUDES_CODEX_SETTINGS_PATH,
+  CLAUDES_CODEX_SETTINGS_PATH,
 };
 
-export type StoredPraetorSettings = PraetorSettings;
+export type StoredClaudesCodexSettings = ClaudesCodexSettings;
 
 const LEGACY_STRIPPED_SHARED_SETTING_FIELDS = [
   'activeConversationId',
@@ -84,7 +84,7 @@ function normalizeChatViewPlacement(
     return legacyOpenInMainTab ? 'main-tab' : 'right-sidebar';
   }
 
-  return DEFAULT_PRAETOR_SETTINGS.chatViewPlacement;
+  return DEFAULT_CLAUDES_CODEX_SETTINGS.chatViewPlacement;
 }
 
 function shouldPersistChatViewPlacementMigration(
@@ -270,10 +270,10 @@ function mergeLegacyClaudeHiddenCommands(
   };
 }
 
-export class PraetorSettingsStorage {
+export class ClaudesCodexSettingsStorage {
   constructor(private adapter: VaultFileAdapter) {}
 
-  async load(): Promise<StoredPraetorSettings> {
+  async load(): Promise<StoredClaudesCodexSettings> {
     const settingsPath = await this.getLoadPath();
     if (!settingsPath) {
       return this.getDefaults();
@@ -334,7 +334,7 @@ export class PraetorSettingsStorage {
     );
 
     if (
-      settingsPath !== PRAETOR_SETTINGS_PATH
+      settingsPath !== CLAUDES_CODEX_SETTINGS_PATH
       || (
       hasLegacyTopLevelProviderFields(stored)
       || 'show1MModel' in stored
@@ -363,7 +363,7 @@ export class PraetorSettingsStorage {
     return merged;
   }
 
-  async save(settings: StoredPraetorSettings): Promise<void> {
+  async save(settings: StoredClaudesCodexSettings): Promise<void> {
     const { providerConfigs } = projectPersistableProviderConfigs(settings.providerConfigs);
     const content = JSON.stringify(
       stripLegacyFields({
@@ -373,42 +373,42 @@ export class PraetorSettingsStorage {
       null,
       2,
     );
-    await this.adapter.write(PRAETOR_SETTINGS_PATH, content);
+    await this.adapter.write(CLAUDES_CODEX_SETTINGS_PATH, content);
     await this.deleteLegacyFileIfPresent();
   }
 
   async exists(): Promise<boolean> {
-    if (await this.adapter.exists(PRAETOR_SETTINGS_PATH)) {
+    if (await this.adapter.exists(CLAUDES_CODEX_SETTINGS_PATH)) {
       return true;
     }
 
-    return this.adapter.exists(LEGACY_PRAETOR_SETTINGS_PATH);
+    return this.adapter.exists(LEGACY_CLAUDES_CODEX_SETTINGS_PATH);
   }
 
-  async update(updates: Partial<StoredPraetorSettings>): Promise<void> {
+  async update(updates: Partial<StoredClaudesCodexSettings>): Promise<void> {
     const current = await this.load();
     await this.save({ ...current, ...updates });
   }
 
-  private getDefaults(): StoredPraetorSettings {
-    return DEFAULT_PRAETOR_SETTINGS;
+  private getDefaults(): StoredClaudesCodexSettings {
+    return DEFAULT_CLAUDES_CODEX_SETTINGS;
   }
 
   private async getLoadPath(): Promise<string | null> {
-    if (await this.adapter.exists(PRAETOR_SETTINGS_PATH)) {
-      return PRAETOR_SETTINGS_PATH;
+    if (await this.adapter.exists(CLAUDES_CODEX_SETTINGS_PATH)) {
+      return CLAUDES_CODEX_SETTINGS_PATH;
     }
 
-    if (await this.adapter.exists(LEGACY_PRAETOR_SETTINGS_PATH)) {
-      return LEGACY_PRAETOR_SETTINGS_PATH;
+    if (await this.adapter.exists(LEGACY_CLAUDES_CODEX_SETTINGS_PATH)) {
+      return LEGACY_CLAUDES_CODEX_SETTINGS_PATH;
     }
 
     return null;
   }
 
   private async deleteLegacyFileIfPresent(): Promise<void> {
-    if (await this.adapter.exists(LEGACY_PRAETOR_SETTINGS_PATH)) {
-      await this.adapter.delete(LEGACY_PRAETOR_SETTINGS_PATH);
+    if (await this.adapter.exists(LEGACY_CLAUDES_CODEX_SETTINGS_PATH)) {
+      await this.adapter.delete(LEGACY_CLAUDES_CODEX_SETTINGS_PATH);
     }
   }
 }

@@ -87,7 +87,7 @@ describe('CodexWorkspaceDependencyResolver', () => {
   let tempDir: string;
 
   beforeEach(() => {
-    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'praetor-codex-runtime-'));
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'claudes-codex-codex-runtime-'));
   });
 
   afterEach(() => {

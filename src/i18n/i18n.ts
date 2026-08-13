@@ -1,5 +1,5 @@
 /**
- * i18n - Internationalization service for Praetor
+ * i18n - Internationalization service for Claude's Codex
  *
  * Provides translation functionality for all UI strings.
  * Supports 10 locales with English as the default fallback.

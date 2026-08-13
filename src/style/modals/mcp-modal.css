@@ -1,39 +1,39 @@
 /* MCP Server Modal */
-.praetor-mcp-modal .modal-content {
+.claudes-codex-mcp-modal .modal-content {
   width: 480px;
   max-width: 90vw;
 }
 
-.praetor-mcp-type-fields {
+.claudes-codex-mcp-type-fields {
   margin: 12px 0;
   padding: 12px;
   background: var(--background-secondary);
   border-radius: 6px;
 }
 
-.praetor-mcp-type-fields .setting-item {
+.claudes-codex-mcp-type-fields .setting-item {
   padding: 8px 0;
   border-top: none;
 }
 
-.praetor-mcp-type-fields .setting-item:first-child {
+.claudes-codex-mcp-type-fields .setting-item:first-child {
   padding-top: 0;
 }
 
-.praetor-mcp-cmd-setting,
-.praetor-mcp-env-setting {
+.claudes-codex-mcp-cmd-setting,
+.claudes-codex-mcp-env-setting {
   flex-direction: column;
   align-items: flex-start;
 }
 
-.praetor-mcp-cmd-setting .setting-item-control,
-.praetor-mcp-env-setting .setting-item-control {
+.claudes-codex-mcp-cmd-setting .setting-item-control,
+.claudes-codex-mcp-env-setting .setting-item-control {
   width: 100%;
   margin-top: 8px;
 }
 
-.praetor-mcp-cmd-textarea,
-.praetor-mcp-env-textarea {
+.claudes-codex-mcp-cmd-textarea,
+.claudes-codex-mcp-env-textarea {
   width: 100%;
   min-height: 50px;
   resize: vertical;
@@ -45,13 +45,13 @@
   background: var(--background-primary);
 }
 
-.praetor-mcp-cmd-textarea:focus,
-.praetor-mcp-env-textarea:focus {
+.claudes-codex-mcp-cmd-textarea:focus,
+.claudes-codex-mcp-env-textarea:focus {
   border-color: var(--interactive-accent);
   outline: none;
 }
 
-.praetor-mcp-buttons {
+.claudes-codex-mcp-buttons {
   display: flex;
   justify-content: flex-end;
   gap: 8px;
@@ -59,21 +59,21 @@
 }
 
 /* MCP Test Modal */
-.praetor-mcp-test-modal {
+.claudes-codex-mcp-test-modal {
   width: 500px;
   max-width: 90vw;
 }
 
-.praetor-mcp-test-modal .modal-content {
+.claudes-codex-mcp-test-modal .modal-content {
   padding: 0 20px 20px 20px;
 }
 
-.praetor-mcp-test-modal .modal-title {
+.claudes-codex-mcp-test-modal .modal-title {
   padding: 20px 20px 12px 20px;
   margin: 0 -20px;
 }
 
-.praetor-mcp-test-loading {
+.claudes-codex-mcp-test-loading {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -82,18 +82,18 @@
   color: var(--text-muted);
 }
 
-.praetor-mcp-test-spinner {
+.claudes-codex-mcp-test-spinner {
   width: 20px;
   height: 20px;
-  animation: praetor-spin 1s linear infinite;
+  animation: claudes-codex-spin 1s linear infinite;
 }
 
-.praetor-mcp-test-spinner svg {
+.claudes-codex-mcp-test-spinner svg {
   width: 100%;
   height: 100%;
 }
 
-.praetor-mcp-test-status {
+.claudes-codex-mcp-test-status {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -103,29 +103,29 @@
   margin-bottom: 12px;
 }
 
-.praetor-mcp-test-icon {
+.claudes-codex-mcp-test-icon {
   display: flex;
   align-items: center;
 }
 
-.praetor-mcp-test-icon svg {
+.claudes-codex-mcp-test-icon svg {
   width: 20px;
   height: 20px;
 }
 
-.praetor-mcp-test-icon.success {
+.claudes-codex-mcp-test-icon.success {
   color: var(--color-green);
 }
 
-.praetor-mcp-test-icon.error {
+.claudes-codex-mcp-test-icon.error {
   color: var(--text-error);
 }
 
-.praetor-mcp-test-text {
+.claudes-codex-mcp-test-text {
   font-weight: 500;
 }
 
-.praetor-mcp-test-error {
+.claudes-codex-mcp-test-error {
   padding: 10px 12px;
   background: rgba(var(--color-red-rgb), 0.1);
   border: 1px solid var(--text-error);
@@ -135,18 +135,18 @@
   margin-bottom: 12px;
 }
 
-.praetor-mcp-test-tools {
+.claudes-codex-mcp-test-tools {
   margin-bottom: 16px;
 }
 
-.praetor-mcp-test-tools-header {
+.claudes-codex-mcp-test-tools-header {
   font-weight: 600;
   font-size: 13px;
   margin-bottom: 8px;
   color: var(--text-muted);
 }
 
-.praetor-mcp-test-tools-list {
+.claudes-codex-mcp-test-tools-list {
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -154,67 +154,67 @@
   overflow-y: auto;
 }
 
-.praetor-mcp-test-tool {
+.claudes-codex-mcp-test-tool {
   padding: 10px 12px;
   background: var(--background-secondary);
   border-radius: 6px;
 }
 
-.praetor-mcp-test-tool-header {
+.claudes-codex-mcp-test-tool-header {
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
-.praetor-mcp-test-tool-icon {
+.claudes-codex-mcp-test-tool-icon {
   display: flex;
   align-items: center;
   color: var(--text-muted);
 }
 
-.praetor-mcp-test-tool-icon svg {
+.claudes-codex-mcp-test-tool-icon svg {
   width: 14px;
   height: 14px;
 }
 
-.praetor-mcp-test-tool-name {
+.claudes-codex-mcp-test-tool-name {
   font-weight: 500;
   font-size: 13px;
 }
 
-.praetor-mcp-test-tool-toggle {
+.claudes-codex-mcp-test-tool-toggle {
   margin-left: auto;
 }
 
-.praetor-mcp-test-tool-toggle .checkbox-container {
+.claudes-codex-mcp-test-tool-toggle .checkbox-container {
   display: flex;
   align-items: center;
 }
 
-.praetor-mcp-test-tool-disabled {
+.claudes-codex-mcp-test-tool-disabled {
   opacity: 0.75;
 }
 
-.praetor-mcp-test-tool-disabled .praetor-mcp-test-tool-name {
+.claudes-codex-mcp-test-tool-disabled .claudes-codex-mcp-test-tool-name {
   text-decoration: line-through;
   color: var(--text-muted);
 }
 
-.praetor-mcp-toggle-all-btn {
+.claudes-codex-mcp-toggle-all-btn {
   margin-right: 8px;
 }
 
-.praetor-mcp-toggle-all-btn.is-destructive {
+.claudes-codex-mcp-toggle-all-btn.is-destructive {
   background: rgba(var(--color-red-rgb), 0.1);
   border-color: rgba(var(--color-red-rgb), 0.3);
   color: var(--text-error);
 }
 
-.praetor-mcp-toggle-all-btn.is-destructive:hover {
+.claudes-codex-mcp-toggle-all-btn.is-destructive:hover {
   background: rgba(var(--color-red-rgb), 0.2);
 }
 
-.praetor-mcp-test-tool-desc {
+.claudes-codex-mcp-test-tool-desc {
   font-size: 12px;
   color: var(--text-muted);
   margin-top: 4px;
@@ -224,7 +224,7 @@
   overflow: hidden;
 }
 
-.praetor-mcp-test-no-tools {
+.claudes-codex-mcp-test-no-tools {
   padding: 16px;
   text-align: center;
   color: var(--text-muted);
@@ -234,7 +234,7 @@
   margin-bottom: 16px;
 }
 
-.praetor-mcp-test-buttons {
+.claudes-codex-mcp-test-buttons {
   display: flex;
   justify-content: center;
   margin-top: 16px;

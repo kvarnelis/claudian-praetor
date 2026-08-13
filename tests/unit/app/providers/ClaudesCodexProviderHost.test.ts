@@ -1,7 +1,7 @@
-import { PraetorProviderHost } from '@/app/providers/PraetorProviderHost';
-import type PraetorPlugin from '@/main';
+import { ClaudesCodexProviderHost } from '@/app/providers/ClaudesCodexProviderHost';
+import type ClaudesCodexPlugin from '@/main';
 
-function createPlugin(overrides: Record<string, unknown> = {}): PraetorPlugin {
+function createPlugin(overrides: Record<string, unknown> = {}): ClaudesCodexPlugin {
   return {
     app: {},
     settings: {},
@@ -19,10 +19,10 @@ function createPlugin(overrides: Record<string, unknown> = {}): PraetorPlugin {
     getAllViews: jest.fn(() => []),
     getView: jest.fn(() => null),
     ...overrides,
-  } as unknown as PraetorPlugin;
+  } as unknown as ClaudesCodexPlugin;
 }
 
-describe('PraetorProviderHost', () => {
+describe('ClaudesCodexProviderHost', () => {
   it('delegates provider capabilities without exposing plugin lifecycle APIs', async () => {
     const trace: string[] = [];
     const plugin = createPlugin({
@@ -33,7 +33,7 @@ describe('PraetorProviderHost', () => {
         return '/usr/bin/codex';
       }),
     });
-    const host = new PraetorProviderHost(plugin);
+    const host = new ClaudesCodexProviderHost(plugin);
 
     await host.saveSettings();
     await host.applyEnvironmentVariables('provider:codex', 'OPENAI_API_KEY=test');
@@ -60,7 +60,7 @@ describe('PraetorProviderHost', () => {
     const plugin = createPlugin({
       getAllViews: jest.fn(() => [createView('first'), createView('second')]),
     });
-    const host = new PraetorProviderHost(plugin);
+    const host = new ClaudesCodexProviderHost(plugin);
 
     await host.recycleProviderRuntimes('opencode');
 

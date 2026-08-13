@@ -29,21 +29,21 @@ export class NavigationSidebar {
     private parentEl: HTMLElement,
     private messagesEl: HTMLElement
   ) {
-    this.container = this.parentEl.createDiv({ cls: 'praetor-nav-sidebar' });
+    this.container = this.parentEl.createDiv({ cls: 'claudes-codex-nav-sidebar' });
 
     // Create buttons
-    this.topBtn = this.createButton('praetor-nav-btn-top', 'chevrons-up', 'Scroll to top');
-    this.prevBtn = this.createButton('praetor-nav-btn-prev', 'chevron-up', 'Previous message');
-    this.tocBtn = this.createButton('praetor-nav-btn-toc', 'list-tree', 'Conversation directory');
-    this.nextBtn = this.createButton('praetor-nav-btn-next', 'chevron-down', 'Next message');
-    this.bottomBtn = this.createButton('praetor-nav-btn-bottom', 'chevrons-down', 'Scroll to bottom');
+    this.topBtn = this.createButton('claudes-codex-nav-btn-top', 'chevrons-up', 'Scroll to top');
+    this.prevBtn = this.createButton('claudes-codex-nav-btn-prev', 'chevron-up', 'Previous message');
+    this.tocBtn = this.createButton('claudes-codex-nav-btn-toc', 'list-tree', 'Conversation directory');
+    this.nextBtn = this.createButton('claudes-codex-nav-btn-next', 'chevron-down', 'Next message');
+    this.bottomBtn = this.createButton('claudes-codex-nav-btn-bottom', 'chevrons-down', 'Scroll to bottom');
 
     this.setupEventListeners();
     this.applyVisibility();
   }
 
   private createButton(cls: string, icon: string, label: string): HTMLElement {
-    const btn = this.container.createDiv({ cls: `praetor-nav-btn ${cls}` });
+    const btn = this.container.createDiv({ cls: `claudes-codex-nav-btn ${cls}` });
     setIcon(btn, icon);
     btn.setAttribute('aria-label', label);
     return btn;
@@ -114,14 +114,14 @@ export class NavigationSidebar {
   private applyVisibility(): void {
     const { scrollHeight, clientHeight } = this.messagesEl;
     const isScrollable = scrollHeight > clientHeight + 50; // Small buffer
-    this.tocBtn.classList.remove('praetor-hidden');
+    this.tocBtn.classList.remove('claudes-codex-hidden');
     if (this.isVisible === isScrollable) return;
     this.isVisible = isScrollable;
     this.container.classList.toggle('visible', isScrollable);
   }
 
   private getDirectoryEntries(): Array<{ el: HTMLElement; title: string }> {
-    return Array.from(this.messagesEl.querySelectorAll<HTMLElement>('.praetor-message-user, [data-role="user"]'))
+    return Array.from(this.messagesEl.querySelectorAll<HTMLElement>('.claudes-codex-message-user, [data-role="user"]'))
       .map(el => ({
         el,
         title: this.getDirectoryTitle(el),
@@ -133,7 +133,7 @@ export class NavigationSidebar {
     const explicitTitle = (el.getAttribute('data-toc-title') ?? '').trim();
     if (explicitTitle) return explicitTitle;
 
-    const contentEl = el.querySelector<HTMLElement>('.praetor-message-content');
+    const contentEl = el.querySelector<HTMLElement>('.claudes-codex-message-content');
     return formatConversationDirectoryTitle(contentEl?.textContent ?? el.textContent ?? '');
   }
 
@@ -154,7 +154,7 @@ export class NavigationSidebar {
     if (this.isDirectoryMessageElement(node)) return true;
     const candidate = node as { querySelector?: (selector: string) => Element | null };
     return typeof candidate.querySelector === 'function'
-      && candidate.querySelector('.praetor-message-user, [data-role="user"]') !== null;
+      && candidate.querySelector('.claudes-codex-message-user, [data-role="user"]') !== null;
   }
 
   private isDirectoryMessageElement(node: Node): boolean {
@@ -164,9 +164,9 @@ export class NavigationSidebar {
       getAttribute?: (name: string) => string | null;
     };
     if (typeof candidate.matches === 'function') {
-      return candidate.matches('.praetor-message-user, [data-role="user"]');
+      return candidate.matches('.claudes-codex-message-user, [data-role="user"]');
     }
-    return candidate.classList?.contains?.('praetor-message-user') === true
+    return candidate.classList?.contains?.('claudes-codex-message-user') === true
       || candidate.getAttribute?.('data-role') === 'user';
   }
 
@@ -181,13 +181,13 @@ export class NavigationSidebar {
   private openDirectory(): void {
     const entries = this.getDirectoryEntries();
     this.closeDirectory();
-    this.tocPopover = this.parentEl.createDiv({ cls: 'praetor-nav-toc-popover' });
-    this.tocPopover.createDiv({ cls: 'praetor-nav-toc-title', text: 'Conversation directory' });
-    const listEl = this.tocPopover.createDiv({ cls: 'praetor-nav-toc-list' });
+    this.tocPopover = this.parentEl.createDiv({ cls: 'claudes-codex-nav-toc-popover' });
+    this.tocPopover.createDiv({ cls: 'claudes-codex-nav-toc-title', text: 'Conversation directory' });
+    const listEl = this.tocPopover.createDiv({ cls: 'claudes-codex-nav-toc-list' });
 
     if (entries.length === 0) {
       listEl.createDiv({
-        cls: 'praetor-nav-toc-empty',
+        cls: 'claudes-codex-nav-toc-empty',
         text: 'No user prompts in this conversation',
       });
       return;
@@ -195,7 +195,7 @@ export class NavigationSidebar {
 
     entries.forEach((entry, index) => {
       const itemEl = listEl.createDiv({
-        cls: 'praetor-nav-toc-item',
+        cls: 'claudes-codex-nav-toc-item',
         text: `${index + 1}. ${entry.title}`,
       });
       itemEl.setAttribute('role', 'button');
@@ -236,7 +236,7 @@ export class NavigationSidebar {
    * Scrolls to previous or next user message, skipping assistant messages.
    */
   private scrollToMessage(direction: 'prev' | 'next'): void {
-    const messages = Array.from(this.messagesEl.querySelectorAll<HTMLElement>('.praetor-message-user'));
+    const messages = Array.from(this.messagesEl.querySelectorAll<HTMLElement>('.claudes-codex-message-user'));
 
     if (messages.length === 0) return;
 

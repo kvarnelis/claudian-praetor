@@ -1,12 +1,12 @@
 /* Code block wrapper - contains pre + button outside scroll area */
-.praetor-code-wrapper {
+.claudes-codex-code-wrapper {
   position: relative;
   margin: 8px 0;
 }
 
 /* Code blocks in chat messages */
-.praetor-code-wrapper pre,
-.praetor-message-content pre {
+.claudes-codex-code-wrapper pre,
+.claudes-codex-message-content pre {
   background: rgba(0, 0, 0, 0.2);
   padding: 8px 12px;
   border-radius: 6px;
@@ -15,30 +15,30 @@
 }
 
 /* Light mode: use a lighter background so hljs comment colors stay readable */
-body.theme-light .praetor-code-wrapper pre,
-body.theme-light .praetor-message-content pre {
+body.theme-light .claudes-codex-code-wrapper pre,
+body.theme-light .claudes-codex-message-content pre {
   background: rgba(0, 0, 0, 0.08);
 }
 
 /* Code blocks without language - wrap content */
-.praetor-code-wrapper:not(.has-language) pre {
+.claudes-codex-code-wrapper:not(.has-language) pre {
   white-space: pre-wrap;
   word-wrap: break-word;
   overflow-x: hidden;
 }
 
 /* Unwrapped pre still needs margin */
-.praetor-message-content>pre {
+.claudes-codex-message-content>pre {
   margin: 8px 0;
 }
 
-.praetor-message-content code {
+.claudes-codex-message-content code {
   font-family: var(--font-monospace);
   font-size: 13px;
 }
 
 /* Clickable language label - positioned outside scroll area */
-.praetor-code-wrapper .praetor-code-lang-label {
+.claudes-codex-code-wrapper .claudes-codex-code-lang-label {
   position: absolute;
   top: 6px;
   inset-inline-end: 6px;
@@ -53,18 +53,18 @@ body.theme-light .praetor-message-content pre {
   transition: color 0.15s ease, background 0.15s ease;
 }
 
-.praetor-code-wrapper .praetor-code-lang-label:hover {
+.claudes-codex-code-wrapper .claudes-codex-code-lang-label:hover {
   color: var(--text-normal);
   background: var(--background-modifier-hover);
 }
 
 /* Hide default copy button when language label exists */
-.praetor-code-wrapper.has-language .copy-code-button {
+.claudes-codex-code-wrapper.has-language .copy-code-button {
   display: none;
 }
 
 /* Copy button - positioned outside scroll area */
-.praetor-code-wrapper .copy-code-button {
+.claudes-codex-code-wrapper .copy-code-button {
   position: absolute;
   top: 6px;
   inset-inline-end: 6px;
@@ -81,17 +81,17 @@ body.theme-light .praetor-message-content pre {
 }
 
 /* If copy button uses an icon (svg) */
-.praetor-code-wrapper .copy-code-button svg {
+.claudes-codex-code-wrapper .copy-code-button svg {
   width: 14px;
   height: 14px;
 }
 
 /* Show copy button on hover */
-.praetor-code-wrapper:not(.has-language):hover .copy-code-button {
+.claudes-codex-code-wrapper:not(.has-language):hover .copy-code-button {
   opacity: 1;
 }
 
-.praetor-code-wrapper .copy-code-button:hover {
+.claudes-codex-code-wrapper .copy-code-button:hover {
   background: var(--background-modifier-hover);
   color: var(--text-normal);
 }

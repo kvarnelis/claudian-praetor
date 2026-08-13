@@ -72,11 +72,11 @@ export class MentionDropdownController {
     this.fixed = options.fixed ?? false;
 
     this.dropdown = new SelectableDropdown<MentionItem>(this.containerEl, {
-      listClassName: 'praetor-mention-dropdown',
-      itemClassName: 'praetor-mention-item',
-      emptyClassName: 'praetor-mention-empty',
+      listClassName: 'claudes-codex-mention-dropdown',
+      itemClassName: 'claudes-codex-mention-item',
+      emptyClassName: 'claudes-codex-mention-empty',
       fixed: this.fixed,
-      fixedClassName: 'praetor-mention-dropdown-fixed',
+      fixedClassName: 'claudes-codex-mention-dropdown-fixed',
     });
   }
 
@@ -534,7 +534,7 @@ export class MentionDropdownController {
         }
       },
       renderItem: (item, itemEl) => {
-        const iconEl = itemEl.createSpan({ cls: 'praetor-mention-icon' });
+        const iconEl = itemEl.createSpan({ cls: 'claudes-codex-mention-icon' });
         switch (item.type) {
           case 'mcp-server':
             appendMcpIcon(iconEl);
@@ -554,44 +554,44 @@ export class MentionDropdownController {
             setIcon(iconEl, 'file-text');
         }
 
-        const textEl = itemEl.createSpan({ cls: 'praetor-mention-text' });
+        const textEl = itemEl.createSpan({ cls: 'claudes-codex-mention-text' });
 
         switch (item.type) {
           case 'mcp-server':
-            textEl.createSpan({ cls: 'praetor-mention-name' }).setText(`@${item.name}`);
+            textEl.createSpan({ cls: 'claudes-codex-mention-name' }).setText(`@${item.name}`);
             break;
           case 'agent-folder':
             textEl.createSpan({
-              cls: 'praetor-mention-name praetor-mention-name-agent-folder',
+              cls: 'claudes-codex-mention-name claudes-codex-mention-name-agent-folder',
             }).setText(`@${item.name}/`);
             break;
           case 'agent': {
             // Show ID (which is namespaced for plugin agents) for consistency with inserted text
             textEl.createSpan({
-              cls: 'praetor-mention-name praetor-mention-name-agent',
+              cls: 'claudes-codex-mention-name claudes-codex-mention-name-agent',
             }).setText(`@${item.id}`);
             if (item.description) {
-              textEl.createSpan({ cls: 'praetor-mention-agent-desc' }).setText(item.description);
+              textEl.createSpan({ cls: 'claudes-codex-mention-agent-desc' }).setText(item.description);
             }
             break;
           }
           case 'context-folder':
             textEl.createSpan({
-              cls: 'praetor-mention-name praetor-mention-name-folder',
+              cls: 'claudes-codex-mention-name claudes-codex-mention-name-folder',
             }).setText(`@${item.name}/`);
             break;
           case 'context-file':
             textEl.createSpan({
-              cls: 'praetor-mention-name praetor-mention-name-context',
+              cls: 'claudes-codex-mention-name claudes-codex-mention-name-context',
             }).setText(item.name);
             break;
           case 'folder':
             textEl.createSpan({
-              cls: 'praetor-mention-name praetor-mention-name-folder',
+              cls: 'claudes-codex-mention-name claudes-codex-mention-name-folder',
             }).setText(`@${item.path}/`);
             break;
           default:
-            textEl.createSpan({ cls: 'praetor-mention-path' }).setText(item.path || item.name);
+            textEl.createSpan({ cls: 'claudes-codex-mention-path' }).setText(item.path || item.name);
         }
       },
       onItemClick: (item, index, e) => {
@@ -619,9 +619,9 @@ export class MentionDropdownController {
 
     const inputRect = this.inputEl.getBoundingClientRect();
     dropdownEl.setCssProps({
-      '--praetor-fixed-dropdown-bottom': `${window.innerHeight - inputRect.top + 4}px`,
-      '--praetor-fixed-dropdown-left': `${inputRect.left}px`,
-      '--praetor-fixed-dropdown-width': `${Math.max(inputRect.width, 280)}px`,
+      '--claudes-codex-fixed-dropdown-bottom': `${window.innerHeight - inputRect.top + 4}px`,
+      '--claudes-codex-fixed-dropdown-left': `${inputRect.left}px`,
+      '--claudes-codex-fixed-dropdown-width': `${Math.max(inputRect.width, 280)}px`,
     });
   }
 

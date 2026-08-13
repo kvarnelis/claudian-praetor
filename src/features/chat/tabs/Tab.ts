@@ -26,7 +26,7 @@ import {
 import type { ChatRuntime } from '../../../core/runtime/ChatRuntime';
 import type { AutoTurnResult } from '../../../core/runtime/types';
 import { TOOL_AGENT_OUTPUT } from '../../../core/tools/toolNames';
-import type { ChatMessage, Conversation, PraetorSettings, StreamChunk } from '../../../core/types';
+import type { ChatMessage, Conversation, ClaudesCodexSettings, StreamChunk } from '../../../core/types';
 import { t } from '../../../i18n/i18n';
 import { SlashCommandDropdown } from '../../../shared/components/SlashCommandDropdown';
 import { getEnhancedPath } from '../../../utils/env';
@@ -168,7 +168,7 @@ function getTabSettingsSnapshot(
 function getWritableTabSettingsSnapshot(
   tab: TabProviderContext,
   plugin: FeatureHost,
-  settings: PraetorSettings = plugin.settings,
+  settings: ClaudesCodexSettings = plugin.settings,
 ): TabProviderSettings {
   return getProviderSettingsSnapshotWithModel(
     settings,
@@ -247,7 +247,7 @@ function shouldSendMessageFromExplicitEnterShortcut(e: KeyboardEvent): boolean {
 
 function shouldSendMessageFromEnterKey(
   e: KeyboardEvent,
-  settings: Pick<PraetorSettings, 'requireCommandOrControlEnterToSend'>,
+  settings: Pick<ClaudesCodexSettings, 'requireCommandOrControlEnterToSend'>,
 ): boolean {
   if (!isEnterWithoutShiftOrComposition(e)) {
     return false;
@@ -297,7 +297,7 @@ export function sendTabInputMessageFromExplicitEnterShortcut(
 
 function sendTabInputMessageFromEnterKey(
   tab: TabData,
-  settings: Pick<PraetorSettings, 'requireCommandOrControlEnterToSend'>,
+  settings: Pick<ClaudesCodexSettings, 'requireCommandOrControlEnterToSend'>,
   e: KeyboardEvent,
 ): boolean {
   if (!shouldSendMessageFromEnterKey(e, settings)) {
@@ -381,7 +381,7 @@ function refreshTabProviderUI(tab: TabData, plugin: FeatureHost): void {
   tab.ui.permissionToggle?.updateDisplay();
   tab.ui.serviceTierToggle?.updateDisplay();
   tab.dom.inputWrapper.toggleClass(
-    'praetor-input-plan-mode',
+    'claudes-codex-input-plan-mode',
     permissionMode === 'plan' && capabilities.supportsPlanMode,
   );
 }
@@ -514,7 +514,7 @@ export function createTab(options: TabCreateOptions): TabData {
 
   const id = tabId ?? generateTabId();
 
-  const contentEl = containerEl.createDiv({ cls: 'praetor-tab-content praetor-hidden' });
+  const contentEl = containerEl.createDiv({ cls: 'claudes-codex-tab-content claudes-codex-hidden' });
 
   const state = new ChatState({
     onStreamingStateChanged: onStreamingChanged,
@@ -633,18 +633,18 @@ export function createTab(options: TabCreateOptions): TabData {
  * Builds the DOM structure for a tab.
  */
 function buildTabDOM(contentEl: HTMLElement): TabDOMElements {
-  const messagesWrapperEl = contentEl.createDiv({ cls: 'praetor-messages-wrapper' });
-  const messagesEl = messagesWrapperEl.createDiv({ cls: 'praetor-messages' });
+  const messagesWrapperEl = contentEl.createDiv({ cls: 'claudes-codex-messages-wrapper' });
+  const messagesEl = messagesWrapperEl.createDiv({ cls: 'claudes-codex-messages' });
   const welcomeEl = createWelcomeElement(messagesEl);
-  const statusPanelContainerEl = contentEl.createDiv({ cls: 'praetor-status-panel-container' });
-  const inputComposerEl = contentEl.createDiv({ cls: 'praetor-input-composer' });
-  const inputContainerEl = inputComposerEl.createDiv({ cls: 'praetor-input-container' });
-  const queueIndicatorEl = inputContainerEl.createDiv({ cls: 'praetor-input-queue-row' });
-  const navRowEl = inputContainerEl.createDiv({ cls: 'praetor-input-nav-row' });
-  const inputWrapper = inputContainerEl.createDiv({ cls: 'praetor-input-wrapper' });
-  const contextRowEl = inputWrapper.createDiv({ cls: 'praetor-context-row' });
+  const statusPanelContainerEl = contentEl.createDiv({ cls: 'claudes-codex-status-panel-container' });
+  const inputComposerEl = contentEl.createDiv({ cls: 'claudes-codex-input-composer' });
+  const inputContainerEl = inputComposerEl.createDiv({ cls: 'claudes-codex-input-container' });
+  const queueIndicatorEl = inputContainerEl.createDiv({ cls: 'claudes-codex-input-queue-row' });
+  const navRowEl = inputContainerEl.createDiv({ cls: 'claudes-codex-input-nav-row' });
+  const inputWrapper = inputContainerEl.createDiv({ cls: 'claudes-codex-input-wrapper' });
+  const contextRowEl = inputWrapper.createDiv({ cls: 'claudes-codex-context-row' });
   const inputEl = inputWrapper.createEl('textarea', {
-    cls: 'praetor-input',
+    cls: 'claudes-codex-input',
     attr: {
       placeholder: 'Ask to make changes, @mention files,  run /commands',
       rows: '3',
@@ -909,7 +909,7 @@ function initializeInputToolbar(
 ): void {
   const { dom } = tab;
 
-  const inputToolbar = dom.inputWrapper.createDiv({ cls: 'praetor-input-toolbar' });
+  const inputToolbar = dom.inputWrapper.createDiv({ cls: 'claudes-codex-input-toolbar' });
 
   // Blank-tab UI config wrapper that returns mixed model options
   const blankTabUIConfigProxy = (): ProviderChatUIConfig => {
@@ -1064,7 +1064,7 @@ function initializeInputToolbar(
       });
       tab.ui.permissionToggle?.updateDisplay();
       dom.inputWrapper.toggleClass(
-        'praetor-input-plan-mode',
+        'claudes-codex-input-plan-mode',
         mode === 'plan' && getTabCapabilities(tab, plugin).supportsPlanMode,
       );
     },
@@ -1763,7 +1763,7 @@ export function wireTabInputEvents(tab: TabData, plugin: FeatureHost): void {
  * Activates a tab (shows it and starts services).
  */
 export function activateTab(tab: TabData): void {
-  tab.dom.contentEl.removeClass('praetor-hidden');
+  tab.dom.contentEl.removeClass('claudes-codex-hidden');
   tab.controllers.selectionController?.start();
   tab.controllers.browserSelectionController?.start();
   tab.controllers.canvasSelectionController?.start();
@@ -1775,7 +1775,7 @@ export function activateTab(tab: TabData): void {
  * Deactivates a tab (hides it and stops services).
  */
 export function deactivateTab(tab: TabData): void {
-  tab.dom.contentEl.addClass('praetor-hidden');
+  tab.dom.contentEl.addClass('claudes-codex-hidden');
   tab.controllers.selectionController?.stop();
   tab.controllers.browserSelectionController?.stop();
   tab.controllers.canvasSelectionController?.stop();
@@ -2119,7 +2119,7 @@ async function renderAutoTriggeredTurn(tab: TabData, result: AutoTurnResult): Pr
   if (hasVisibleContent) {
     tab.state.addMessage(assistantMsg);
     const msgEl = tab.renderer?.addMessage?.(assistantMsg);
-    const contentEl = msgEl?.querySelector<HTMLElement>('.praetor-message-content');
+    const contentEl = msgEl?.querySelector<HTMLElement>('.claudes-codex-message-content');
     if (contentEl) {
       if (!previousContentEl) {
         tab.state.toolCallElements.clear();
@@ -2185,7 +2185,7 @@ export async function updatePlanModeUI(
     const activeMode = getTabPermissionMode(tab, plugin);
     tab.ui.permissionToggle?.updateDisplay();
     tab.dom.inputWrapper.toggleClass(
-      'praetor-input-plan-mode',
+      'claudes-codex-input-plan-mode',
       activeMode === 'plan' && getTabCapabilities(tab, plugin).supportsPlanMode,
     );
   }

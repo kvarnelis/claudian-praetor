@@ -1,13 +1,13 @@
 /* MCP Server Settings */
-.praetor-mcp-settings-desc {
+.claudes-codex-mcp-settings-desc {
   margin-bottom: 12px;
 }
 
-.praetor-mcp-container {
+.claudes-codex-mcp-container {
   margin-top: 8px;
 }
 
-.praetor-mcp-header {
+.claudes-codex-mcp-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -15,17 +15,17 @@
   padding: 0 12px;
 }
 
-.praetor-mcp-label {
+.claudes-codex-mcp-label {
   font-size: var(--font-ui-small);
   color: var(--text-muted);
   font-weight: var(--font-medium);
 }
 
-.praetor-mcp-add-container {
+.claudes-codex-mcp-add-container {
   position: relative;
 }
 
-.praetor-add-mcp-btn {
+.claudes-codex-add-mcp-btn {
   padding: 4px 12px;
   border-radius: 4px;
   background: var(--interactive-accent);
@@ -35,11 +35,11 @@
   border: none;
 }
 
-.praetor-add-mcp-btn:hover {
+.claudes-codex-add-mcp-btn:hover {
   background: var(--interactive-accent-hover);
 }
 
-.praetor-mcp-add-dropdown {
+.claudes-codex-mcp-add-dropdown {
   display: none;
   position: absolute;
   top: 100%;
@@ -54,11 +54,11 @@
   overflow: hidden;
 }
 
-.praetor-mcp-add-dropdown.is-visible {
+.claudes-codex-mcp-add-dropdown.is-visible {
   display: block;
 }
 
-.praetor-mcp-add-option {
+.claudes-codex-mcp-add-option {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -68,22 +68,22 @@
   color: var(--text-normal);
 }
 
-.praetor-mcp-add-option:hover {
+.claudes-codex-mcp-add-option:hover {
   background: var(--background-modifier-hover);
 }
 
-.praetor-mcp-add-option-icon {
+.claudes-codex-mcp-add-option-icon {
   display: flex;
   align-items: center;
   color: var(--text-muted);
 }
 
-.praetor-mcp-add-option-icon svg {
+.claudes-codex-mcp-add-option-icon svg {
   width: 16px;
   height: 16px;
 }
 
-.praetor-mcp-empty {
+.claudes-codex-mcp-empty {
   padding: 16px;
   text-align: center;
   color: var(--text-muted);
@@ -92,13 +92,13 @@
   border-radius: 6px;
 }
 
-.praetor-mcp-list {
+.claudes-codex-mcp-list {
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
-.praetor-mcp-item {
+.claudes-codex-mcp-item {
   display: flex;
   align-items: flex-start;
   gap: 10px;
@@ -108,15 +108,15 @@
   transition: background 0.15s ease;
 }
 
-.praetor-mcp-item:hover {
+.claudes-codex-mcp-item:hover {
   background: var(--background-modifier-hover);
 }
 
-.praetor-mcp-item-disabled {
+.claudes-codex-mcp-item-disabled {
   opacity: 0.6;
 }
 
-.praetor-mcp-status {
+.claudes-codex-mcp-status {
   width: 8px;
   height: 8px;
   border-radius: 50%;
@@ -124,31 +124,31 @@
   flex-shrink: 0;
 }
 
-.praetor-mcp-status-enabled {
+.claudes-codex-mcp-status-enabled {
   background: var(--color-green);
 }
 
-.praetor-mcp-status-disabled {
+.claudes-codex-mcp-status-disabled {
   background: var(--text-muted);
 }
 
-.praetor-mcp-info {
+.claudes-codex-mcp-info {
   flex: 1;
   min-width: 0;
 }
 
-.praetor-mcp-name-row {
+.claudes-codex-mcp-name-row {
   display: flex;
   align-items: center;
   gap: 8px;
   flex-wrap: wrap;
 }
 
-.praetor-mcp-name {
+.claudes-codex-mcp-name {
   font-weight: 600;
 }
 
-.praetor-mcp-type-badge {
+.claudes-codex-mcp-type-badge {
   font-size: 10px;
   padding: 2px 6px;
   background: var(--background-modifier-border);
@@ -157,7 +157,7 @@
   text-transform: uppercase;
 }
 
-.praetor-mcp-context-saving-badge {
+.claudes-codex-mcp-context-saving-badge {
   font-size: 11px;
   padding: 2px 6px;
   background: var(--interactive-accent);
@@ -166,7 +166,7 @@
   font-weight: 600;
 }
 
-.praetor-mcp-preview {
+.claudes-codex-mcp-preview {
   font-size: 12px;
   color: var(--text-muted);
   margin-top: 4px;
@@ -175,13 +175,13 @@
   white-space: nowrap;
 }
 
-.praetor-mcp-actions {
+.claudes-codex-mcp-actions {
   display: flex;
   gap: 4px;
   flex-shrink: 0;
 }
 
-.praetor-mcp-action-btn {
+.claudes-codex-mcp-action-btn {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -196,16 +196,16 @@
   transition: background 0.15s ease, color 0.15s ease;
 }
 
-.praetor-mcp-action-btn:hover {
+.claudes-codex-mcp-action-btn:hover {
   background: var(--background-modifier-hover);
   color: var(--text-normal);
 }
 
-.praetor-mcp-action-btn svg {
+.claudes-codex-mcp-action-btn svg {
   width: 14px;
   height: 14px;
 }
 
-.praetor-mcp-delete-btn:hover {
+.claudes-codex-mcp-delete-btn:hover {
   color: var(--text-error);
 }

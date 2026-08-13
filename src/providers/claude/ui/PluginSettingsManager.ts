@@ -30,11 +30,11 @@ export class PluginSettingsManager {
   private render() {
     this.containerEl.empty();
 
-    const headerEl = this.containerEl.createDiv({ cls: 'praetor-plugin-header' });
-    headerEl.createSpan({ text: 'Claude Code Plugins', cls: 'praetor-plugin-label' });
+    const headerEl = this.containerEl.createDiv({ cls: 'claudes-codex-plugin-header' });
+    headerEl.createSpan({ text: 'Claude Code Plugins', cls: 'claudes-codex-plugin-label' });
 
     const refreshBtn = headerEl.createEl('button', {
-      cls: 'praetor-settings-action-btn',
+      cls: 'claudes-codex-settings-action-btn',
       attr: { 'aria-label': 'Refresh' },
     });
     setIcon(refreshBtn, 'refresh-cw');
@@ -45,7 +45,7 @@ export class PluginSettingsManager {
     const plugins = this.pluginManager.getPlugins();
 
     if (plugins.length === 0) {
-      const emptyEl = this.containerEl.createDiv({ cls: 'praetor-plugin-empty' });
+      const emptyEl = this.containerEl.createDiv({ cls: 'claudes-codex-plugin-empty' });
       emptyEl.setText('No Claude code plugins found. Enable plugins via the Claude CLI.');
       return;
     }
@@ -53,10 +53,10 @@ export class PluginSettingsManager {
     const projectPlugins = plugins.filter(p => p.scope === 'project');
     const userPlugins = plugins.filter(p => p.scope === 'user');
 
-    const listEl = this.containerEl.createDiv({ cls: 'praetor-plugin-list' });
+    const listEl = this.containerEl.createDiv({ cls: 'claudes-codex-plugin-list' });
 
     if (projectPlugins.length > 0) {
-      const sectionHeader = listEl.createDiv({ cls: 'praetor-plugin-section-header' });
+      const sectionHeader = listEl.createDiv({ cls: 'claudes-codex-plugin-section-header' });
       sectionHeader.setText('Project plugins');
 
       for (const plugin of projectPlugins) {
@@ -65,7 +65,7 @@ export class PluginSettingsManager {
     }
 
     if (userPlugins.length > 0) {
-      const sectionHeader = listEl.createDiv({ cls: 'praetor-plugin-section-header' });
+      const sectionHeader = listEl.createDiv({ cls: 'claudes-codex-plugin-section-header' });
       sectionHeader.setText('User plugins');
 
       for (const plugin of userPlugins) {
@@ -75,29 +75,29 @@ export class PluginSettingsManager {
   }
 
   private renderPluginItem(listEl: HTMLElement, plugin: PluginInfo) {
-    const itemEl = listEl.createDiv({ cls: 'praetor-plugin-item' });
+    const itemEl = listEl.createDiv({ cls: 'claudes-codex-plugin-item' });
     if (!plugin.enabled) {
-      itemEl.addClass('praetor-plugin-item-disabled');
+      itemEl.addClass('claudes-codex-plugin-item-disabled');
     }
 
-    const statusEl = itemEl.createDiv({ cls: 'praetor-plugin-status' });
+    const statusEl = itemEl.createDiv({ cls: 'claudes-codex-plugin-status' });
     if (plugin.enabled) {
-      statusEl.addClass('praetor-plugin-status-enabled');
+      statusEl.addClass('claudes-codex-plugin-status-enabled');
     } else {
-      statusEl.addClass('praetor-plugin-status-disabled');
+      statusEl.addClass('claudes-codex-plugin-status-disabled');
     }
 
-    const infoEl = itemEl.createDiv({ cls: 'praetor-plugin-info' });
+    const infoEl = itemEl.createDiv({ cls: 'claudes-codex-plugin-info' });
 
-    const nameRow = infoEl.createDiv({ cls: 'praetor-plugin-name-row' });
+    const nameRow = infoEl.createDiv({ cls: 'claudes-codex-plugin-name-row' });
 
-    const nameEl = nameRow.createSpan({ cls: 'praetor-plugin-name' });
+    const nameEl = nameRow.createSpan({ cls: 'claudes-codex-plugin-name' });
     nameEl.setText(plugin.name);
 
-    const actionsEl = itemEl.createDiv({ cls: 'praetor-plugin-actions' });
+    const actionsEl = itemEl.createDiv({ cls: 'claudes-codex-plugin-actions' });
 
     const toggleBtn = actionsEl.createEl('button', {
-      cls: 'praetor-plugin-action-btn',
+      cls: 'claudes-codex-plugin-action-btn',
       attr: { 'aria-label': plugin.enabled ? 'Disable' : 'Enable' },
     });
     setIcon(toggleBtn, plugin.enabled ? 'toggle-right' : 'toggle-left');

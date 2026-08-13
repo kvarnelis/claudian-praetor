@@ -1,49 +1,49 @@
 /* Accessibility - Focus Visible Styles */
 
 /* outline + offset + border-radius */
-.praetor-tool-header:focus-visible,
-.praetor-thinking-header:focus-visible,
-.praetor-subagent-header:focus-visible,
-.praetor-input-nav-btn:focus-visible,
-.praetor-model-btn:focus-visible,
-.praetor-thinking-current:focus-visible {
+.claudes-codex-tool-header:focus-visible,
+.claudes-codex-thinking-header:focus-visible,
+.claudes-codex-subagent-header:focus-visible,
+.claudes-codex-input-nav-btn:focus-visible,
+.claudes-codex-model-btn:focus-visible,
+.claudes-codex-thinking-current:focus-visible {
   outline: 2px solid var(--interactive-accent);
   outline-offset: 2px;
   border-radius: 4px;
 }
 
 /* outline + offset only */
-.praetor-action-btn:focus-visible,
-.praetor-toggle-switch:focus-visible,
-.praetor-context-chip-main:focus-visible,
-.praetor-context-chip-remove:focus-visible,
-.praetor-context-more:focus-visible,
-.praetor-image-modal-close:focus-visible,
-.praetor-approved-remove-btn:focus-visible,
-.praetor-save-env-btn:focus-visible,
-.praetor-restore-snippet-btn:focus-visible,
-.praetor-edit-snippet-btn:focus-visible,
-.praetor-delete-snippet-btn:focus-visible,
-.praetor-cancel-btn:focus-visible,
-.praetor-save-btn:focus-visible,
-.praetor-code-lang-label:focus-visible {
+.claudes-codex-action-btn:focus-visible,
+.claudes-codex-toggle-switch:focus-visible,
+.claudes-codex-context-chip-main:focus-visible,
+.claudes-codex-context-chip-remove:focus-visible,
+.claudes-codex-context-more:focus-visible,
+.claudes-codex-image-modal-close:focus-visible,
+.claudes-codex-approved-remove-btn:focus-visible,
+.claudes-codex-save-env-btn:focus-visible,
+.claudes-codex-restore-snippet-btn:focus-visible,
+.claudes-codex-edit-snippet-btn:focus-visible,
+.claudes-codex-delete-snippet-btn:focus-visible,
+.claudes-codex-cancel-btn:focus-visible,
+.claudes-codex-save-btn:focus-visible,
+.claudes-codex-code-lang-label:focus-visible {
   outline: 2px solid var(--interactive-accent);
   outline-offset: 2px;
 }
 
-.praetor-inline-preview-action:focus-visible {
+.claudes-codex-inline-preview-action:focus-visible {
   outline: 2px solid var(--interactive-accent);
   outline-offset: 2px;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .praetor-inline-spinner {
+  .claudes-codex-inline-spinner {
     animation: none;
   }
 }
 
 /* outline + negative offset + border-radius */
-.praetor-history-item-content:focus-visible {
+.claudes-codex-history-item-content:focus-visible {
   outline: 2px solid var(--interactive-accent);
   outline-offset: -2px;
   border-radius: 4px;

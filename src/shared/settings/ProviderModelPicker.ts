@@ -53,36 +53,36 @@ export function renderProviderModelPicker(
     .setDesc(options.settingDescription);
 
   const pickerEl = options.container.createDiv({
-    cls: `praetor-provider-model-picker praetor-provider-model-picker--${options.modifier}`,
+    cls: `claudes-codex-provider-model-picker claudes-codex-provider-model-picker--${options.modifier}`,
   });
   let searchQuery = '';
   let providerFilter = ALL_PROVIDERS_KEY;
   let loadingCatalog = false;
   let catalogLoadFailed = false;
 
-  const summaryEl = pickerEl.createDiv({ cls: 'praetor-provider-model-picker-summary' });
-  const selectedEl = pickerEl.createDiv({ cls: 'praetor-provider-model-picker-selected' });
-  const catalogEl = pickerEl.createEl('details', { cls: 'praetor-provider-model-picker-catalog' });
+  const summaryEl = pickerEl.createDiv({ cls: 'claudes-codex-provider-model-picker-summary' });
+  const selectedEl = pickerEl.createDiv({ cls: 'claudes-codex-provider-model-picker-selected' });
+  const catalogEl = pickerEl.createEl('details', { cls: 'claudes-codex-provider-model-picker-catalog' });
   catalogEl.open = options.initiallyOpen ?? options.getState().selectedIds.length === 0;
 
   const catalogSummaryEl = catalogEl.createEl('summary', {
-    cls: 'praetor-provider-model-picker-catalog-summary',
+    cls: 'claudes-codex-provider-model-picker-catalog-summary',
   });
   catalogSummaryEl.createSpan({
-    cls: 'praetor-provider-model-picker-catalog-caret',
+    cls: 'claudes-codex-provider-model-picker-catalog-caret',
     text: '▸',
   });
   catalogSummaryEl.createSpan({
-    cls: 'praetor-provider-model-picker-catalog-title',
+    cls: 'claudes-codex-provider-model-picker-catalog-title',
     text: 'Browse models',
   });
   const catalogSummaryCountEl = catalogSummaryEl.createSpan({
-    cls: 'praetor-provider-model-picker-catalog-count',
+    cls: 'claudes-codex-provider-model-picker-catalog-count',
   });
 
-  const controlsEl = catalogEl.createDiv({ cls: 'praetor-provider-model-picker-controls' });
+  const controlsEl = catalogEl.createDiv({ cls: 'claudes-codex-provider-model-picker-controls' });
   const searchInput = controlsEl.createEl('input', {
-    cls: 'praetor-provider-model-picker-search',
+    cls: 'claudes-codex-provider-model-picker-search',
     type: 'search',
   });
   searchInput.placeholder = options.searchPlaceholder ?? 'Filter by model, provider, or ID...';
@@ -92,7 +92,7 @@ export function renderProviderModelPicker(
   });
 
   const providerSelectEl = controlsEl.createEl('select', {
-    cls: 'praetor-provider-model-picker-provider',
+    cls: 'claudes-codex-provider-model-picker-provider',
   });
   providerSelectEl.addEventListener('change', () => {
     providerFilter = providerSelectEl.value;
@@ -100,7 +100,7 @@ export function renderProviderModelPicker(
   });
 
   const catalogActionEl = controlsEl.createEl('button', {
-    cls: 'praetor-provider-model-picker-action',
+    cls: 'claudes-codex-provider-model-picker-action',
     text: 'Discover',
   });
   catalogActionEl.setAttribute('type', 'button');
@@ -108,7 +108,7 @@ export function renderProviderModelPicker(
     void loadCatalog(true);
   });
 
-  const listEl = catalogEl.createDiv({ cls: 'praetor-provider-model-picker-list' });
+  const listEl = catalogEl.createDiv({ cls: 'claudes-codex-provider-model-picker-list' });
 
   const renderSummary = (): void => {
     summaryEl.empty();
@@ -119,7 +119,7 @@ export function renderProviderModelPicker(
 
     summaryEl.createSpan({ text: 'Visible: ' });
     summaryEl.createSpan({
-      cls: 'praetor-provider-model-picker-summary-value',
+      cls: 'claudes-codex-provider-model-picker-summary-value',
       text: String(state.selectedIds.length),
     });
     summaryEl.createSpan({
@@ -167,19 +167,19 @@ export function renderProviderModelPicker(
     selectedEl.empty();
     const state = options.getState();
     if (state.selectedIds.length === 0) {
-      selectedEl.toggleClass('praetor-hidden', true);
+      selectedEl.toggleClass('claudes-codex-hidden', true);
       return;
     }
 
-    selectedEl.toggleClass('praetor-hidden', false);
+    selectedEl.toggleClass('claudes-codex-hidden', false);
     const modelsById = new Map(state.models.map(model => [model.id, model] as const));
-    const headerEl = selectedEl.createDiv({ cls: 'praetor-provider-model-picker-selected-header' });
+    const headerEl = selectedEl.createDiv({ cls: 'claudes-codex-provider-model-picker-selected-header' });
     headerEl.createSpan({
-      cls: 'praetor-provider-model-picker-selected-label',
+      cls: 'claudes-codex-provider-model-picker-selected-label',
       text: `Selected (${state.selectedIds.length})`,
     });
     const clearAllButton = headerEl.createEl('button', {
-      cls: 'praetor-provider-model-picker-selected-clear',
+      cls: 'claudes-codex-provider-model-picker-selected-clear',
       text: 'Clear all',
     });
     clearAllButton.setAttribute('type', 'button');
@@ -188,7 +188,7 @@ export function renderProviderModelPicker(
       void persistSelectedIds([]);
     });
 
-    const rowsEl = selectedEl.createDiv({ cls: 'praetor-provider-model-picker-selected-rows' });
+    const rowsEl = selectedEl.createDiv({ cls: 'claudes-codex-provider-model-picker-selected-rows' });
     for (const modelId of state.selectedIds) {
       const model = modelsById.get(modelId) ?? {
         id: modelId,
@@ -197,37 +197,37 @@ export function renderProviderModelPicker(
       };
       const defaultLabel = model.aliasPlaceholder
         ?? (model.providerLabel ? `${model.providerLabel}/${model.name}` : model.name);
-      const rowEl = rowsEl.createDiv({ cls: 'praetor-provider-model-picker-selected-row' });
+      const rowEl = rowsEl.createDiv({ cls: 'claudes-codex-provider-model-picker-selected-row' });
       if (model.isAvailable === false) {
-        rowEl.classList.add('praetor-provider-model-picker-selected-row--unavailable');
+        rowEl.classList.add('claudes-codex-provider-model-picker-selected-row--unavailable');
       }
 
-      const infoEl = rowEl.createDiv({ cls: 'praetor-provider-model-picker-selected-info' });
-      const titleEl = infoEl.createDiv({ cls: 'praetor-provider-model-picker-selected-title' });
+      const infoEl = rowEl.createDiv({ cls: 'claudes-codex-provider-model-picker-selected-info' });
+      const titleEl = infoEl.createDiv({ cls: 'claudes-codex-provider-model-picker-selected-title' });
       if (model.providerLabel) {
         titleEl.createSpan({
-          cls: 'praetor-provider-model-picker-selected-badge',
+          cls: 'claudes-codex-provider-model-picker-selected-badge',
           text: model.providerLabel,
         });
       }
       titleEl.createSpan({
-        cls: 'praetor-provider-model-picker-selected-name',
+        cls: 'claudes-codex-provider-model-picker-selected-name',
         text: model.name,
       });
       if (model.isAvailable === false && model.unavailableMessage) {
         infoEl.createDiv({
-          cls: 'praetor-provider-model-picker-selected-unavailable',
+          cls: 'claudes-codex-provider-model-picker-selected-unavailable',
           text: model.unavailableMessage,
         });
       }
       infoEl.createDiv({
-        cls: 'praetor-provider-model-picker-selected-id',
+        cls: 'claudes-codex-provider-model-picker-selected-id',
         text: model.id,
       });
 
-      const rowControlsEl = rowEl.createDiv({ cls: 'praetor-provider-model-picker-selected-controls' });
+      const rowControlsEl = rowEl.createDiv({ cls: 'claudes-codex-provider-model-picker-selected-controls' });
       const aliasInput = rowControlsEl.createEl('input', {
-        cls: 'praetor-provider-model-picker-selected-alias',
+        cls: 'claudes-codex-provider-model-picker-selected-alias',
         type: 'text',
       });
       aliasInput.placeholder = defaultLabel;
@@ -249,7 +249,7 @@ export function renderProviderModelPicker(
       });
 
       const removeButton = rowControlsEl.createEl('button', {
-        cls: 'praetor-provider-model-picker-selected-remove',
+        cls: 'claudes-codex-provider-model-picker-selected-remove',
         text: '×',
       });
       removeButton.setAttribute('type', 'button');
@@ -275,7 +275,7 @@ export function renderProviderModelPicker(
       }
     }
 
-    providerSelectEl.toggleClass('praetor-hidden', providers.size === 0);
+    providerSelectEl.toggleClass('claudes-codex-hidden', providers.size === 0);
     providerSelectEl.empty();
     providerSelectEl.createEl('option', {
       text: `All providers (${models.length})`,
@@ -320,7 +320,7 @@ export function renderProviderModelPicker(
 
     if (models.length === 0) {
       listEl.createDiv({
-        cls: 'praetor-provider-model-picker-empty',
+        cls: 'claudes-codex-provider-model-picker-empty',
         text: loadingCatalog
           ? options.loadingCatalogText
           : catalogLoadFailed
@@ -333,10 +333,10 @@ export function renderProviderModelPicker(
     }
 
     for (const model of models) {
-      const rowEl = listEl.createEl('label', { cls: 'praetor-provider-model-picker-row' });
+      const rowEl = listEl.createEl('label', { cls: 'claudes-codex-provider-model-picker-row' });
       const isSelected = selectedIds.has(model.id);
       if (isSelected) {
-        rowEl.classList.add('praetor-provider-model-picker-row--selected');
+        rowEl.classList.add('claudes-codex-provider-model-picker-row--selected');
       }
       rowEl.title = model.id;
 
@@ -357,10 +357,10 @@ export function renderProviderModelPicker(
         void persistSelection();
       });
 
-      const textEl = rowEl.createDiv({ cls: 'praetor-provider-model-picker-row-text' });
-      const headerEl = textEl.createDiv({ cls: 'praetor-provider-model-picker-row-header' });
+      const textEl = rowEl.createDiv({ cls: 'claudes-codex-provider-model-picker-row-text' });
+      const headerEl = textEl.createDiv({ cls: 'claudes-codex-provider-model-picker-row-header' });
       headerEl.createSpan({
-        cls: 'praetor-provider-model-picker-row-name',
+        cls: 'claudes-codex-provider-model-picker-row-name',
         text: model.name,
       });
       const badgeLabel = model.isAvailable === false
@@ -368,21 +368,21 @@ export function renderProviderModelPicker(
         : model.catalogBadge ?? model.providerLabel;
       if (badgeLabel) {
         const badgeEl = headerEl.createSpan({
-          cls: 'praetor-provider-model-picker-row-badge',
+          cls: 'claudes-codex-provider-model-picker-row-badge',
           text: badgeLabel,
         });
         if (model.isAvailable === false) {
-          badgeEl.classList.add('praetor-provider-model-picker-row-badge--unavailable');
+          badgeEl.classList.add('claudes-codex-provider-model-picker-row-badge--unavailable');
           badgeEl.title = model.unavailableTitle ?? `Configured model not currently reported by ${options.providerName}`;
         }
       }
       textEl.createDiv({
-        cls: 'praetor-provider-model-picker-row-meta',
+        cls: 'claudes-codex-provider-model-picker-row-meta',
         text: model.id,
       });
       if (model.description) {
         textEl.createDiv({
-          cls: 'praetor-provider-model-picker-row-desc',
+          cls: 'claudes-codex-provider-model-picker-row-desc',
           text: model.description,
         });
       }

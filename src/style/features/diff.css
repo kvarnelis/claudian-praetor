@@ -1,19 +1,19 @@
 /* Write/Edit Diff Block - Subagent style */
-.praetor-write-edit-block {
+.claudes-codex-write-edit-block {
   margin: 4px 0;
   background: transparent;
   overflow: hidden;
 }
 
-.praetor-text-block+.praetor-write-edit-block {
+.claudes-codex-text-block+.claudes-codex-write-edit-block {
   margin-top: 8px;
 }
 
-.praetor-write-edit-block+.praetor-text-block {
+.claudes-codex-write-edit-block+.claudes-codex-text-block {
   margin-top: 8px;
 }
 
-.praetor-write-edit-header {
+.claudes-codex-write-edit-header {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -24,20 +24,20 @@
   overflow: hidden;
 }
 
-.praetor-write-edit-icon {
+.claudes-codex-write-edit-icon {
   width: 16px;
   height: 16px;
   color: var(--text-accent);
   flex-shrink: 0;
 }
 
-.praetor-write-edit-icon svg {
+.claudes-codex-write-edit-icon svg {
   width: 16px;
   height: 16px;
 }
 
 /* Two-part header: name (fixed) + summary (flexible) */
-.praetor-write-edit-name {
+.claudes-codex-write-edit-name {
   font-family: var(--font-monospace);
   font-size: 13px;
   font-weight: 400;
@@ -46,7 +46,7 @@
   flex-shrink: 0;
 }
 
-.praetor-write-edit-summary {
+.claudes-codex-write-edit-summary {
   font-family: var(--font-monospace);
   font-size: 13px;
   color: var(--text-muted);
@@ -57,57 +57,57 @@
   min-width: 0;
 }
 
-.praetor-write-edit-stats {
+.claudes-codex-write-edit-stats {
   font-family: var(--font-monospace);
   font-size: 11px;
   flex-shrink: 0;
 }
 
-.praetor-write-edit-stats .added {
+.claudes-codex-write-edit-stats .added {
   color: var(--color-green);
 }
 
-.praetor-write-edit-stats .removed {
+.claudes-codex-write-edit-stats .removed {
   color: var(--color-red);
   margin-left: 4px;
 }
 
-.praetor-write-edit-status {
+.claudes-codex-write-edit-status {
   width: 16px;
   height: 16px;
   flex-shrink: 0;
 }
 
 /* Hide empty status on successful completion so stats align to right edge */
-.praetor-write-edit-block.done .praetor-write-edit-status:empty {
+.claudes-codex-write-edit-block.done .claudes-codex-write-edit-status:empty {
   display: none;
 }
 
-.praetor-write-edit-status svg {
+.claudes-codex-write-edit-status svg {
   width: 16px;
   height: 16px;
 }
 
-.praetor-write-edit-status.status-completed {
+.claudes-codex-write-edit-status.status-completed {
   color: var(--color-green);
 }
 
-.praetor-write-edit-status.status-error,
-.praetor-write-edit-status.status-blocked {
+.claudes-codex-write-edit-status.status-error,
+.claudes-codex-write-edit-status.status-blocked {
   color: var(--color-red);
 }
 
-.praetor-write-edit-content {
+.claudes-codex-write-edit-content {
   padding: 0;
   background: transparent;
   overflow: hidden;
 }
 
-.praetor-write-edit-diff-row {
+.claudes-codex-write-edit-diff-row {
   display: flex;
 }
 
-.praetor-write-edit-diff {
+.claudes-codex-write-edit-diff {
   flex: 1;
   font-family: var(--font-monospace);
   font-size: 12px;
@@ -118,31 +118,31 @@
   overflow-x: auto;
 }
 
-.praetor-write-edit-loading,
-.praetor-write-edit-binary,
-.praetor-write-edit-error,
-.praetor-write-edit-done-text {
+.claudes-codex-write-edit-loading,
+.claudes-codex-write-edit-binary,
+.claudes-codex-write-edit-error,
+.claudes-codex-write-edit-done-text {
   font-family: var(--font-monospace);
   font-size: 12px;
   color: var(--text-muted);
 }
 
-.praetor-write-edit-error {
+.claudes-codex-write-edit-error {
   color: var(--color-red);
 }
 
 /* Diff line styling */
-.praetor-diff-hunk {
+.claudes-codex-diff-hunk {
   margin-bottom: 4px;
 }
 
-.praetor-diff-line {
+.claudes-codex-diff-line {
   display: flex;
   white-space: pre-wrap;
   word-break: break-all;
 }
 
-.praetor-diff-prefix {
+.claudes-codex-diff-prefix {
   flex-shrink: 0;
   width: 16px;
   text-align: center;
@@ -150,36 +150,36 @@
   user-select: none;
 }
 
-.praetor-diff-text {
+.claudes-codex-diff-text {
   flex: 1;
   min-width: 0;
 }
 
 /* Diff colors - NO strikethrough for Write/Edit blocks */
-.praetor-diff-equal {
+.claudes-codex-diff-equal {
   color: var(--text-muted);
 }
 
-.praetor-diff-delete {
+.claudes-codex-diff-delete {
   background: rgba(255, 80, 80, 0.25);
   color: var(--text-normal);
 }
 
-.praetor-diff-delete .praetor-diff-prefix {
+.claudes-codex-diff-delete .claudes-codex-diff-prefix {
   color: var(--color-red);
 }
 
-.praetor-diff-insert {
+.claudes-codex-diff-insert {
   background: rgba(80, 200, 80, 0.25);
   color: var(--text-normal);
 }
 
-.praetor-diff-insert .praetor-diff-prefix {
+.claudes-codex-diff-insert .claudes-codex-diff-prefix {
   color: var(--color-green);
 }
 
 /* Hunk separator */
-.praetor-diff-separator {
+.claudes-codex-diff-separator {
   color: var(--text-muted);
   text-align: center;
   padding: 4px 0;
@@ -190,7 +190,7 @@
   font-size: 11px;
 }
 
-.praetor-diff-no-changes {
+.claudes-codex-diff-no-changes {
   color: var(--text-muted);
   font-style: italic;
   padding: 8px;

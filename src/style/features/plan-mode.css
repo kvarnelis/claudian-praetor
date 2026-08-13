@@ -1,12 +1,12 @@
 /* Plan Mode - inline cards for EnterPlanMode / ExitPlanMode */
 
-.praetor-plan-approval-inline {
+.claudes-codex-plan-approval-inline {
   font-family: var(--font-monospace);
   font-size: 12px;
   outline: none;
 }
 
-.praetor-plan-inline-title {
+.claudes-codex-plan-inline-title {
   font-weight: 700;
   color: var(--text-muted);
   padding: 6px 10px 0;
@@ -14,7 +14,7 @@
 
 /* ── Plan content preview ────────────────────────── */
 
-.praetor-plan-content-preview {
+.claudes-codex-plan-content-preview {
   max-height: 300px;
   overflow-y: auto;
   margin: 6px 10px 8px;
@@ -27,46 +27,46 @@
   color: var(--text-normal);
 }
 
-.praetor-plan-content-preview::-webkit-scrollbar {
+.claudes-codex-plan-content-preview::-webkit-scrollbar {
   width: 4px;
 }
 
-.praetor-plan-content-preview::-webkit-scrollbar-thumb {
+.claudes-codex-plan-content-preview::-webkit-scrollbar-thumb {
   background: var(--background-modifier-border);
   border-radius: 2px;
 }
 
-.praetor-plan-content-preview p {
+.claudes-codex-plan-content-preview p {
   margin: 0 0 6px;
 }
 
-.praetor-plan-content-preview p:last-child {
+.claudes-codex-plan-content-preview p:last-child {
   margin-bottom: 0;
 }
 
-.praetor-plan-content-preview h1,
-.praetor-plan-content-preview h2,
-.praetor-plan-content-preview h3,
-.praetor-plan-content-preview h4 {
+.claudes-codex-plan-content-preview h1,
+.claudes-codex-plan-content-preview h2,
+.claudes-codex-plan-content-preview h3,
+.claudes-codex-plan-content-preview h4 {
   margin: 8px 0 4px;
   font-size: 13px;
 }
 
-.praetor-plan-content-preview ul,
-.praetor-plan-content-preview ol {
+.claudes-codex-plan-content-preview ul,
+.claudes-codex-plan-content-preview ol {
   margin: 2px 0 6px;
   padding-left: 18px;
 }
 
-.praetor-plan-content-preview li {
+.claudes-codex-plan-content-preview li {
   margin: 0;
 }
 
-.praetor-plan-content-preview code {
+.claudes-codex-plan-content-preview code {
   font-size: 11px;
 }
 
-.praetor-plan-content-text {
+.claudes-codex-plan-content-text {
   white-space: pre-wrap;
   word-break: break-word;
   font-family: var(--font-monospace);
@@ -74,30 +74,30 @@
 
 /* ── Permissions list ──────────────────────────── */
 
-.praetor-plan-permissions {
+.claudes-codex-plan-permissions {
   padding: 4px 10px 8px;
 }
 
-.praetor-plan-permissions-label {
+.claudes-codex-plan-permissions-label {
   color: var(--text-muted);
   font-weight: 600;
   margin-bottom: 4px;
 }
 
-.praetor-plan-permissions-list {
+.claudes-codex-plan-permissions-list {
   margin: 0;
   padding-left: 18px;
   color: var(--text-normal);
   line-height: 1.5;
 }
 
-.praetor-plan-permissions-list li {
+.claudes-codex-plan-permissions-list li {
   margin: 0;
 }
 
 /* ── Plan mode input border ──────────────────────── */
 
-.praetor-input-wrapper.praetor-input-plan-mode {
-  --praetor-input-wrapper-border-color: rgb(92, 148, 140);
-  --praetor-input-wrapper-box-shadow: 0 0 0 1px rgb(92, 148, 140);
+.claudes-codex-input-wrapper.claudes-codex-input-plan-mode {
+  --claudes-codex-input-wrapper-border-color: rgb(92, 148, 140);
+  --claudes-codex-input-wrapper-box-shadow: 0 0 0 1px rgb(92, 148, 140);
 }

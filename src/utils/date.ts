@@ -1,5 +1,5 @@
 /**
- * Praetor - Date Utilities
+ * Claude's Codex - Date Utilities
  *
  * Date formatting helpers for system prompts.
  */

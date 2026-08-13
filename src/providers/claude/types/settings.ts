@@ -1,7 +1,7 @@
 /** Claude provider settings and Claude Code compatibility types. */
 
 // Re-export shared defaults for backward compatibility within the Claude package
-export { DEFAULT_PRAETOR_SETTINGS as DEFAULT_SETTINGS } from '../../../app/settings/defaultSettings';
+export { DEFAULT_CLAUDES_CODEX_SETTINGS as DEFAULT_SETTINGS } from '../../../app/settings/defaultSettings';
 
 /**
  * CC-compatible permission rule string.

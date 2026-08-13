@@ -63,7 +63,7 @@ export class ComposerContextTray {
   constructor(containerEl: HTMLElement, options: ComposerContextTrayOptions = {}) {
     this.containerEl = containerEl;
     this.options = options;
-    this.containerEl.addClass('praetor-context-row');
+    this.containerEl.addClass('claudes-codex-context-row');
     this.observeSize();
     this.render();
   }
@@ -96,47 +96,47 @@ export class ComposerContextTray {
 
   refreshLayout(): void {
     const chips = Array.from(
-      this.containerEl.querySelectorAll<HTMLElement>('.praetor-context-chip')
+      this.containerEl.querySelectorAll<HTMLElement>('.claudes-codex-context-chip')
     );
-    const moreButton = this.containerEl.querySelector<HTMLElement>('.praetor-context-more');
+    const moreButton = this.containerEl.querySelector<HTMLElement>('.claudes-codex-context-more');
     if (!moreButton || chips.length === 0) return;
 
     for (const chip of chips) {
-      chip.removeClass('praetor-context-chip--overflow-hidden');
+      chip.removeClass('claudes-codex-context-chip--overflow-hidden');
     }
-    moreButton.addClass('praetor-hidden');
+    moreButton.addClass('claudes-codex-hidden');
 
     const rows = this.getRows(chips);
     const hasOverflow = rows.length > MAX_COLLAPSED_ROWS;
     if (!hasOverflow) {
       this.expanded = false;
-      this.containerEl.removeClass('praetor-context-row--expanded');
+      this.containerEl.removeClass('claudes-codex-context-row--expanded');
       moreButton.setAttribute('aria-expanded', 'false');
       return;
     }
 
-    moreButton.removeClass('praetor-hidden');
+    moreButton.removeClass('claudes-codex-hidden');
     if (this.expanded) {
-      this.containerEl.addClass('praetor-context-row--expanded');
+      this.containerEl.addClass('claudes-codex-context-row--expanded');
       moreButton.textContent = 'Show less';
       moreButton.setAttribute('aria-expanded', 'true');
       return;
     }
 
-    this.containerEl.removeClass('praetor-context-row--expanded');
+    this.containerEl.removeClass('claudes-codex-context-row--expanded');
     moreButton.setAttribute('aria-expanded', 'false');
 
     const lastVisibleRow = rows[MAX_COLLAPSED_ROWS - 1];
     let visibleCount = lastVisibleRow.lastIndex + 1;
 
     for (let index = visibleCount; index < chips.length; index++) {
-      chips[index].addClass('praetor-context-chip--overflow-hidden');
+      chips[index].addClass('claudes-codex-context-chip--overflow-hidden');
     }
 
     const minimumVisibleCount = Math.max(1, lastVisibleRow.firstIndex);
     while (visibleCount > minimumVisibleCount && moreButton.offsetTop >= lastVisibleRow.bottom) {
       visibleCount -= 1;
-      chips[visibleCount].addClass('praetor-context-chip--overflow-hidden');
+      chips[visibleCount].addClass('claudes-codex-context-chip--overflow-hidden');
     }
 
     const hiddenCount = chips.length - visibleCount;
@@ -155,12 +155,12 @@ export class ComposerContextTray {
     this.leadingAccessories.clear();
     this.containerEl.empty();
     this.containerEl.removeClass('has-content');
-    this.containerEl.removeClass('praetor-context-row--expanded');
+    this.containerEl.removeClass('claudes-codex-context-row--expanded');
   }
 
   private render(): void {
     this.containerEl.empty();
-    this.containerEl.removeClass('praetor-context-row--expanded');
+    this.containerEl.removeClass('claudes-codex-context-row--expanded');
 
     for (const elements of this.leadingAccessories.values()) {
       for (const element of elements) {
@@ -182,7 +182,7 @@ export class ComposerContextTray {
 
     if (entries.length > 0) {
       const moreButton = this.containerEl.createEl('button', {
-        cls: 'praetor-context-more praetor-hidden',
+        cls: 'claudes-codex-context-more claudes-codex-hidden',
         attr: {
           type: 'button',
           'aria-expanded': 'false',
@@ -201,17 +201,17 @@ export class ComposerContextTray {
 
   private renderItem(slot: ComposerContextSlot, item: ComposerContextItem): void {
     const chipEl = this.containerEl.createDiv({
-      cls: `praetor-context-chip praetor-context-chip--${item.kind}`,
+      cls: `claudes-codex-context-chip claudes-codex-context-chip--${item.kind}`,
     });
     chipEl.dataset.contextSlot = slot;
     chipEl.dataset.contextId = item.id;
 
     const contentEl = item.onActivate
       ? chipEl.createEl('button', {
-        cls: 'praetor-context-chip-main',
+        cls: 'claudes-codex-context-chip-main',
         attr: { type: 'button' },
       })
-      : chipEl.createSpan({ cls: 'praetor-context-chip-main' });
+      : chipEl.createSpan({ cls: 'claudes-codex-context-chip-main' });
 
     if (item.title) {
       contentEl.setAttribute('title', item.title);
@@ -222,15 +222,15 @@ export class ComposerContextTray {
     }
 
     if (item.icon) {
-      const iconEl = contentEl.createSpan({ cls: 'praetor-context-chip-icon' });
+      const iconEl = contentEl.createSpan({ cls: 'claudes-codex-context-chip-icon' });
       setIcon(iconEl, item.icon);
     }
 
-    contentEl.createSpan({ cls: 'praetor-context-chip-label', text: item.label });
+    contentEl.createSpan({ cls: 'claudes-codex-context-chip-label', text: item.label });
 
     if (item.onRemove) {
       const removeButton = chipEl.createEl('button', {
-        cls: 'praetor-context-chip-remove',
+        cls: 'claudes-codex-context-chip-remove',
         text: '\u00D7',
         attr: {
           type: 'button',

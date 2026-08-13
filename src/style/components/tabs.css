@@ -1,4 +1,4 @@
-.praetor-tab-bar-container {
+.claudes-codex-tab-bar-container {
   display: flex;
   align-items: center;
   flex: 1 1 auto;
@@ -7,7 +7,7 @@
   max-width: 100%;
 }
 
-.praetor-tab-badges {
+.claudes-codex-tab-badges {
   display: flex;
   align-items: center;
   gap: 4px;
@@ -21,11 +21,11 @@
   -ms-overflow-style: none;
 }
 
-.praetor-tab-badges::-webkit-scrollbar {
+.claudes-codex-tab-badges::-webkit-scrollbar {
   display: none;
 }
 
-.praetor-tab-badge {
+.claudes-codex-tab-badge {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -48,7 +48,7 @@
   transition: border-color 0.15s ease, color 0.15s ease, background 0.15s ease;
 }
 
-.praetor-tab-badge-expanded {
+.claudes-codex-tab-badge-expanded {
   flex: 0 0 auto;
   justify-content: flex-start;
   width: auto;
@@ -56,25 +56,25 @@
   padding: 0 8px;
 }
 
-.praetor-tab-badge:hover {
+.claudes-codex-tab-badge:hover {
   background: var(--background-modifier-hover);
   color: var(--text-normal);
 }
 
 /* Per-tab close control. Hidden on desktop (right-click closes); shown on touch
    where there is no right-click. Badge grows to a pill to fit number + ×. */
-.praetor-tab-badge-close {
+.claudes-codex-tab-badge-close {
   display: none;
 }
 
-body.praetor-mobile .praetor-tab-badge {
+body.claudes-codex-mobile .claudes-codex-tab-badge {
   width: auto;
   min-width: 24px;
   padding: 0 4px;
   gap: 3px;
 }
 
-body.praetor-mobile .praetor-tab-badge-close {
+body.claudes-codex-mobile .claudes-codex-tab-badge-close {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -87,45 +87,45 @@ body.praetor-mobile .praetor-tab-badge-close {
   background: var(--background-modifier-border);
 }
 
-body.praetor-mobile .praetor-tab-badge-close:active {
+body.claudes-codex-mobile .claudes-codex-tab-badge-close:active {
   background: var(--background-modifier-error);
   color: var(--text-on-accent);
 }
 
-.praetor-tab-badge-active {
+.claudes-codex-tab-badge-active {
   border-color: var(--interactive-accent);
   color: var(--text-normal);
 }
 
-.praetor-tab-badge-streaming {
-  border-color: var(--praetor-brand, #da7756);
+.claudes-codex-tab-badge-streaming {
+  border-color: var(--claudes-codex-brand, #da7756);
 }
 
-.praetor-tab-badge-streaming[data-provider="claude"] {
-  border-color: var(--praetor-brand-claude, #D97757);
+.claudes-codex-tab-badge-streaming[data-provider="claude"] {
+  border-color: var(--claudes-codex-brand-claude, #D97757);
 }
 
-.praetor-tab-badge-streaming[data-provider="codex"] {
-  border-color: var(--praetor-brand-codex, #d0d0d0);
+.claudes-codex-tab-badge-streaming[data-provider="codex"] {
+  border-color: var(--claudes-codex-brand-codex, #d0d0d0);
 }
 
-.praetor-tab-badge-streaming[data-provider="opencode"] {
-  border-color: var(--praetor-brand-opencode, #C8C8C8);
+.claudes-codex-tab-badge-streaming[data-provider="opencode"] {
+  border-color: var(--claudes-codex-brand-opencode, #C8C8C8);
 }
 
-.praetor-tab-badge-streaming[data-provider="pi"] {
-  border-color: var(--praetor-brand-pi, #ffffff);
+.claudes-codex-tab-badge-streaming[data-provider="pi"] {
+  border-color: var(--claudes-codex-brand-pi, #ffffff);
 }
 
-.praetor-tab-badge-attention {
+.claudes-codex-tab-badge-attention {
   border-color: var(--text-error);
 }
 
-.praetor-tab-badge-idle {
+.claudes-codex-tab-badge-idle {
   border-color: var(--background-modifier-border);
 }
 
-.praetor-tab-content-container {
+.claudes-codex-tab-content-container {
   display: flex;
   flex-direction: column;
   flex: 1;
@@ -133,7 +133,7 @@ body.praetor-mobile .praetor-tab-badge-close:active {
   overflow: hidden;
 }
 
-.praetor-tab-content {
+.claudes-codex-tab-content {
   position: relative; /* For scroll-to-bottom button positioning */
   display: flex;
   flex-direction: column;

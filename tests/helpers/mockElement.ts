@@ -69,25 +69,25 @@ export interface MockElement {
 }
 
 const CLASS_DISPLAY: Record<string, string> = {
-  'praetor-context-meter': 'flex',
-  'praetor-mcp-selector': 'flex',
-  'praetor-mode-selector': 'flex',
-  'praetor-permission-toggle': 'flex',
-  'praetor-service-tier-toggle': 'flex',
-  'praetor-status-panel-bash': 'block',
-  'praetor-status-panel-bash-content': 'block',
-  'praetor-status-panel-bash-entry-content': 'block',
-  'praetor-status-panel-content': 'block',
-  'praetor-status-panel-todos': 'block',
-  'praetor-tab-content': 'flex',
-  'praetor-thinking-budget': 'flex',
-  'praetor-thinking-effort': 'flex',
+  'claudes-codex-context-meter': 'flex',
+  'claudes-codex-mcp-selector': 'flex',
+  'claudes-codex-mode-selector': 'flex',
+  'claudes-codex-permission-toggle': 'flex',
+  'claudes-codex-service-tier-toggle': 'flex',
+  'claudes-codex-status-panel-bash': 'block',
+  'claudes-codex-status-panel-bash-content': 'block',
+  'claudes-codex-status-panel-bash-entry-content': 'block',
+  'claudes-codex-status-panel-content': 'block',
+  'claudes-codex-status-panel-todos': 'block',
+  'claudes-codex-tab-content': 'flex',
+  'claudes-codex-thinking-budget': 'flex',
+  'claudes-codex-thinking-effort': 'flex',
 };
 
 const DISPLAY_CLASSES = new Set([
-  'praetor-hidden',
-  'praetor-visible-block',
-  'praetor-visible-flex',
+  'claudes-codex-hidden',
+  'claudes-codex-visible-block',
+  'claudes-codex-visible-flex',
   ...Object.keys(CLASS_DISPLAY),
 ]);
 
@@ -101,9 +101,9 @@ export function createMockEl(tag = 'div'): any {
   let textContent = '';
 
   const resolveDisplay = (): string | null => {
-    if (classes.has('praetor-hidden')) return 'none';
-    if (classes.has('praetor-visible-flex')) return 'flex';
-    if (classes.has('praetor-visible-block')) return 'block';
+    if (classes.has('claudes-codex-hidden')) return 'none';
+    if (classes.has('claudes-codex-visible-flex')) return 'flex';
+    if (classes.has('claudes-codex-visible-block')) return 'block';
 
     for (const [cls, display] of Object.entries(CLASS_DISPLAY)) {
       if (classes.has(cls)) return display;

@@ -27,18 +27,18 @@ export class InlinePlanApproval {
   }
 
   render(): void {
-    this.rootEl = this.containerEl.createDiv({ cls: 'praetor-plan-approval-inline' });
+    this.rootEl = this.containerEl.createDiv({ cls: 'claudes-codex-plan-approval-inline' });
 
-    this.rootEl.createDiv({ cls: 'praetor-plan-inline-title', text: 'Plan complete' });
+    this.rootEl.createDiv({ cls: 'claudes-codex-plan-inline-title', text: 'Plan complete' });
 
-    const actionsEl = this.rootEl.createDiv({ cls: 'praetor-ask-list' });
+    const actionsEl = this.rootEl.createDiv({ cls: 'claudes-codex-ask-list' });
 
     // 1. Implement
-    const implementRow = actionsEl.createDiv({ cls: 'praetor-ask-item' });
+    const implementRow = actionsEl.createDiv({ cls: 'claudes-codex-ask-item' });
     implementRow.addClass('is-focused');
-    implementRow.createSpan({ text: '\u203A', cls: 'praetor-ask-cursor' });
-    implementRow.createSpan({ text: '1. ', cls: 'praetor-ask-item-num' });
-    implementRow.createSpan({ text: 'Implement', cls: 'praetor-ask-item-label' });
+    implementRow.createSpan({ text: '\u203A', cls: 'claudes-codex-ask-cursor' });
+    implementRow.createSpan({ text: '1. ', cls: 'claudes-codex-ask-item-num' });
+    implementRow.createSpan({ text: 'Implement', cls: 'claudes-codex-ask-item-label' });
     implementRow.addEventListener('click', () => {
       this.focusedIndex = 0;
       this.updateFocus();
@@ -47,12 +47,12 @@ export class InlinePlanApproval {
     this.items.push(implementRow);
 
     // 2. Revise (with feedback input)
-    const reviseRow = actionsEl.createDiv({ cls: 'praetor-ask-item praetor-ask-custom-item' });
-    reviseRow.createSpan({ text: '\u00A0', cls: 'praetor-ask-cursor' });
-    reviseRow.createSpan({ text: '2. ', cls: 'praetor-ask-item-num' });
+    const reviseRow = actionsEl.createDiv({ cls: 'claudes-codex-ask-item claudes-codex-ask-custom-item' });
+    reviseRow.createSpan({ text: '\u00A0', cls: 'claudes-codex-ask-cursor' });
+    reviseRow.createSpan({ text: '2. ', cls: 'claudes-codex-ask-item-num' });
     this.feedbackInput = reviseRow.createEl('input', {
       type: 'text',
-      cls: 'praetor-ask-custom-text',
+      cls: 'claudes-codex-ask-custom-text',
       placeholder: 'Enter feedback to revise plan...',
     });
     this.feedbackInput.addEventListener('focus', () => { this.isInputFocused = true; });
@@ -64,10 +64,10 @@ export class InlinePlanApproval {
     this.items.push(reviseRow);
 
     // 3. Cancel
-    const cancelRow = actionsEl.createDiv({ cls: 'praetor-ask-item' });
-    cancelRow.createSpan({ text: '\u00A0', cls: 'praetor-ask-cursor' });
-    cancelRow.createSpan({ text: '3. ', cls: 'praetor-ask-item-num' });
-    cancelRow.createSpan({ text: 'Cancel', cls: 'praetor-ask-item-label' });
+    const cancelRow = actionsEl.createDiv({ cls: 'claudes-codex-ask-item' });
+    cancelRow.createSpan({ text: '\u00A0', cls: 'claudes-codex-ask-cursor' });
+    cancelRow.createSpan({ text: '3. ', cls: 'claudes-codex-ask-item-num' });
+    cancelRow.createSpan({ text: 'Cancel', cls: 'claudes-codex-ask-item-label' });
     cancelRow.addEventListener('click', () => {
       this.focusedIndex = 2;
       this.updateFocus();
@@ -75,7 +75,7 @@ export class InlinePlanApproval {
     });
     this.items.push(cancelRow);
 
-    this.rootEl.createDiv({ text: HINTS_TEXT, cls: 'praetor-ask-hints' });
+    this.rootEl.createDiv({ text: HINTS_TEXT, cls: 'claudes-codex-ask-hints' });
 
     this.rootEl.setAttribute('tabindex', '0');
     this.rootEl.addEventListener('keydown', this.boundKeyDown);
@@ -146,14 +146,14 @@ export class InlinePlanApproval {
   private updateFocus(): void {
     for (let i = 0; i < this.items.length; i++) {
       const item = this.items[i];
-      const cursor = item.querySelector('.praetor-ask-cursor');
+      const cursor = item.querySelector('.claudes-codex-ask-cursor');
       if (i === this.focusedIndex) {
         item.addClass('is-focused');
         if (cursor) cursor.textContent = '\u203A';
         item.scrollIntoView({ block: 'nearest' });
 
-        if (item.hasClass('praetor-ask-custom-item')) {
-          const input = item.querySelector('.praetor-ask-custom-text') as HTMLInputElement;
+        if (item.hasClass('claudes-codex-ask-custom-item')) {
+          const input = item.querySelector('.claudes-codex-ask-custom-text') as HTMLInputElement;
           if (input) {
             input.focus();
             this.isInputFocused = true;
@@ -163,8 +163,8 @@ export class InlinePlanApproval {
         item.removeClass('is-focused');
         if (cursor) cursor.textContent = '\u00A0';
 
-        if (item.hasClass('praetor-ask-custom-item') && this.isInputFocused) {
-          const input = item.querySelector('.praetor-ask-custom-text') as HTMLInputElement;
+        if (item.hasClass('claudes-codex-ask-custom-item') && this.isInputFocused) {
+          const input = item.querySelector('.claudes-codex-ask-custom-text') as HTMLInputElement;
           if (input) {
             input.blur();
             this.isInputFocused = false;

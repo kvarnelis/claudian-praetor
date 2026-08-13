@@ -1,7 +1,7 @@
 import { buildOpencodePromptBlocks, buildOpencodePromptText } from '../../../../src/providers/opencode/runtime/buildOpencodePrompt';
 
 describe('buildOpencodePromptText', () => {
-  it('appends Praetor XML context to the user query', () => {
+  it("appends Claude's Codex XML context to the user query", () => {
     const prompt = buildOpencodePromptText({
       browserSelection: {
         selectedText: 'Browser quote',

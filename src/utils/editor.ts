@@ -1,5 +1,5 @@
 /**
- * Praetor - Editor Context Utilities
+ * Claude's Codex - Editor Context Utilities
  *
  * Editor cursor and selection context for inline editing.
  */

@@ -92,7 +92,7 @@ describe('ThinkingBlockRenderer', () => {
       clickHandlers[0]();
       expect(state.isExpanded).toBe(true);
       expect((state.wrapperEl as any).hasClass('expanded')).toBe(true);
-      expect((state.contentEl as any).hasClass('praetor-hidden')).toBe(false);
+      expect((state.contentEl as any).hasClass('claudes-codex-hidden')).toBe(false);
     });
 
     it('should update aria-expanded on finalize', () => {

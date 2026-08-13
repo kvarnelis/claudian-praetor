@@ -44,7 +44,7 @@ function createMockPlugin(settings: Record<string, unknown> = {}) {
     app: {
       vault: {
         adapter: {
-          basePath: '/tmp/praetor-test-vault',
+          basePath: '/tmp/claudes-codex-test-vault',
         },
       },
     },
@@ -130,11 +130,11 @@ describe('OpencodeAuxQueryRunner', () => {
     MockAcpJsonRpcTransport.mockImplementation(() => mockTransport as any);
     MockAcpSubprocess.mockImplementation(() => mockProcess as any);
     mockPrepareOpencodeLaunchArtifacts.mockResolvedValue({
-      configPath: '/tmp/praetor-opencode-aux/config.json',
-      configContent: '{"default_agent":"praetor-aux-passive"}\n',
+      configPath: '/tmp/claudes-codex-opencode-aux/config.json',
+      configContent: '{"default_agent":"claudes-codex-aux-passive"}\n',
       databasePath: null,
       launchKey: 'launch-key',
-      systemPromptPath: '/tmp/praetor-opencode-aux/system.md',
+      systemPromptPath: '/tmp/claudes-codex-opencode-aux/system.md',
     });
   });
 
@@ -152,20 +152,20 @@ describe('OpencodeAuxQueryRunner', () => {
 
     expect(mockPrepareOpencodeLaunchArtifacts).toHaveBeenCalledWith(expect.objectContaining({
       artifactsSubdir: 'opencode/auxiliary/title-gen',
-      defaultAgentId: 'praetor-aux-passive',
-      managedAgents: [expect.objectContaining({ id: 'praetor-aux-passive' })],
+      defaultAgentId: 'claudes-codex-aux-passive',
+      managedAgents: [expect.objectContaining({ id: 'claudes-codex-aux-passive' })],
       systemPromptKey: 'Use this custom system prompt.',
       systemPromptText: 'Use this custom system prompt.',
     }));
     expect(mockConnection.newSession).toHaveBeenCalledWith({
-      cwd: '/tmp/praetor-test-vault',
+      cwd: '/tmp/claudes-codex-test-vault',
       mcpServers: [],
     });
     expect(mockConnection.setConfigOption).toHaveBeenCalledWith({
       configId: 'mode',
       sessionId: 'session-1',
       type: 'select',
-      value: 'praetor-aux-passive',
+      value: 'claudes-codex-aux-passive',
     });
     expect(mockConnection.setConfigOption).toHaveBeenCalledWith({
       configId: 'model',
@@ -260,7 +260,7 @@ describe('OpencodeAuxQueryRunner', () => {
       configId: 'mode',
       sessionId: 'session-1',
       type: 'select',
-      value: 'praetor-aux-passive',
+      value: 'claudes-codex-aux-passive',
     });
   });
 
@@ -343,13 +343,13 @@ describe('OpencodeAuxQueryRunner', () => {
       allowReadTextFile: true,
     });
 
-    (runner as any).sessionCwds.set('session-1', '/tmp/praetor-test-vault');
+    (runner as any).sessionCwds.set('session-1', '/tmp/claudes-codex-test-vault');
 
     expect(() => (runner as any).resolveSessionPath('session-1', '/tmp/outside.md')).toThrow(
       'OpenCode aux read access is limited to the current workspace.',
     );
-    expect((runner as any).resolveSessionPath('session-1', '/tmp/praetor-test-vault/notes/today.md')).toBe(
-      '/tmp/praetor-test-vault/notes/today.md',
+    expect((runner as any).resolveSessionPath('session-1', '/tmp/claudes-codex-test-vault/notes/today.md')).toBe(
+      '/tmp/claudes-codex-test-vault/notes/today.md',
     );
   });
 });

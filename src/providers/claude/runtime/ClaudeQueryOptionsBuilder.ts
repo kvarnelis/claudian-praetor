@@ -11,7 +11,7 @@ import {
   type SystemPromptSettings,
 } from '../../../core/prompt/mainAgent';
 import type { AppPluginManager } from '../../../core/providers/types';
-import type { PermissionMode,PraetorSettings } from '../../../core/types/settings';
+import type { PermissionMode,ClaudesCodexSettings } from '../../../core/types/settings';
 import { toClaudeRuntimeModelId } from '../modelSelection';
 import {
   type ClaudeSafeMode,
@@ -31,7 +31,7 @@ import {
 export interface QueryOptionsContext {
   vaultPath: string;
   cliPath: string;
-  settings: PraetorSettings;
+  settings: ClaudesCodexSettings;
   customEnv: Record<string, string>;
   enhancedPath: string;
   mcpManager: McpServerManager;
@@ -295,7 +295,7 @@ export class QueryOptionsBuilder {
 
   private static applyThinking(
     options: Options,
-    settings: PraetorSettings,
+    settings: ClaudesCodexSettings,
     model: string
   ): void {
     const effortLevel = resolveEffortLevel(model, settings.effortLevel);

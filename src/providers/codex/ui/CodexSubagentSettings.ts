@@ -102,7 +102,7 @@ class CodexSubagentModal extends Modal {
 
   onOpen() {
     this.setTitle(this.existing ? t('settings.codexSubagents.modal.titleEdit') : t('settings.codexSubagents.modal.titleAdd'));
-    this.modalEl.addClass('praetor-sp-modal');
+    this.modalEl.addClass('claudes-codex-sp-modal');
 
     const { contentEl } = this;
 
@@ -125,10 +125,10 @@ class CodexSubagentModal extends Modal {
       });
 
     // Advanced options
-    const details = contentEl.createEl('details', { cls: 'praetor-sp-advanced-section' });
+    const details = contentEl.createEl('details', { cls: 'claudes-codex-sp-advanced-section' });
     details.createEl('summary', {
       text: t('settings.subagents.modal.advancedOptions'),
-      cls: 'praetor-sp-advanced-summary',
+      cls: 'claudes-codex-sp-advanced-summary',
     });
     if (
       this.existing?.model ||
@@ -184,7 +184,7 @@ class CodexSubagentModal extends Modal {
       .setDesc(t('settings.codexSubagents.developerInstructions.desc'));
 
     const instructionsArea = contentEl.createEl('textarea', {
-      cls: 'praetor-sp-content-area',
+      cls: 'claudes-codex-sp-content-area',
       attr: {
         rows: '10',
         placeholder: t('settings.codexSubagents.developerInstructions.placeholder'),
@@ -256,17 +256,17 @@ class CodexSubagentModal extends Modal {
     };
     this._triggerSave = doSave;
 
-    const buttonContainer = contentEl.createDiv({ cls: 'praetor-sp-modal-buttons' });
+    const buttonContainer = contentEl.createDiv({ cls: 'claudes-codex-sp-modal-buttons' });
 
     const cancelBtn = buttonContainer.createEl('button', {
       text: t('common.cancel'),
-      cls: 'praetor-cancel-btn',
+      cls: 'claudes-codex-cancel-btn',
     });
     cancelBtn.addEventListener('click', () => this.close());
 
     const saveBtn = buttonContainer.createEl('button', {
       text: t('common.save'),
-      cls: 'praetor-save-btn',
+      cls: 'claudes-codex-save-btn',
     });
     saveBtn.addEventListener('click', () => {
       void doSave();
@@ -302,65 +302,65 @@ export class CodexSubagentSettings {
       this.agents = [];
     }
 
-    const headerEl = this.containerEl.createDiv({ cls: 'praetor-sp-header' });
-    headerEl.createSpan({ text: t('settings.codexSubagents.header'), cls: 'praetor-sp-label' });
+    const headerEl = this.containerEl.createDiv({ cls: 'claudes-codex-sp-header' });
+    headerEl.createSpan({ text: t('settings.codexSubagents.header'), cls: 'claudes-codex-sp-label' });
 
-    const actionsEl = headerEl.createDiv({ cls: 'praetor-sp-header-actions' });
+    const actionsEl = headerEl.createDiv({ cls: 'claudes-codex-sp-header-actions' });
 
     const refreshBtn = actionsEl.createEl('button', {
-      cls: 'praetor-settings-action-btn',
+      cls: 'claudes-codex-settings-action-btn',
       attr: { 'aria-label': t('common.refresh') },
     });
     setIcon(refreshBtn, 'refresh-cw');
     refreshBtn.addEventListener('click', () => { void this.render(); });
 
     const addBtn = actionsEl.createEl('button', {
-      cls: 'praetor-settings-action-btn',
+      cls: 'claudes-codex-settings-action-btn',
       attr: { 'aria-label': t('common.add') },
     });
     setIcon(addBtn, 'plus');
     addBtn.addEventListener('click', () => this.openModal(null));
 
     if (this.agents.length === 0) {
-      const emptyEl = this.containerEl.createDiv({ cls: 'praetor-sp-empty-state' });
+      const emptyEl = this.containerEl.createDiv({ cls: 'claudes-codex-sp-empty-state' });
       emptyEl.setText(t('settings.codexSubagents.noAgents'));
       return;
     }
 
-    const listEl = this.containerEl.createDiv({ cls: 'praetor-sp-list' });
+    const listEl = this.containerEl.createDiv({ cls: 'claudes-codex-sp-list' });
     for (const agent of this.agents) {
       this.renderItem(listEl, agent);
     }
   }
 
   private renderItem(listEl: HTMLElement, agent: CodexSubagentDefinition): void {
-    const itemEl = listEl.createDiv({ cls: 'praetor-sp-item' });
-    const infoEl = itemEl.createDiv({ cls: 'praetor-sp-info' });
+    const itemEl = listEl.createDiv({ cls: 'claudes-codex-sp-item' });
+    const infoEl = itemEl.createDiv({ cls: 'claudes-codex-sp-info' });
 
-    const headerRow = infoEl.createDiv({ cls: 'praetor-sp-item-header' });
-    const nameEl = headerRow.createSpan({ cls: 'praetor-sp-item-name' });
+    const headerRow = infoEl.createDiv({ cls: 'claudes-codex-sp-item-header' });
+    const nameEl = headerRow.createSpan({ cls: 'claudes-codex-sp-item-name' });
     nameEl.setText(agent.name);
 
     if (agent.model) {
-      headerRow.createSpan({ text: agent.model, cls: 'praetor-slash-item-badge' });
+      headerRow.createSpan({ text: agent.model, cls: 'claudes-codex-slash-item-badge' });
     }
 
     if (agent.description) {
-      const descEl = infoEl.createDiv({ cls: 'praetor-sp-item-desc' });
+      const descEl = infoEl.createDiv({ cls: 'claudes-codex-sp-item-desc' });
       descEl.setText(agent.description);
     }
 
-    const actionsEl = itemEl.createDiv({ cls: 'praetor-sp-item-actions' });
+    const actionsEl = itemEl.createDiv({ cls: 'claudes-codex-sp-item-actions' });
 
     const editBtn = actionsEl.createEl('button', {
-      cls: 'praetor-settings-action-btn',
+      cls: 'claudes-codex-settings-action-btn',
       attr: { 'aria-label': t('common.edit') },
     });
     setIcon(editBtn, 'pencil');
     editBtn.addEventListener('click', () => this.openModal(agent));
 
     const deleteBtn = actionsEl.createEl('button', {
-      cls: 'praetor-settings-action-btn praetor-settings-delete-btn',
+      cls: 'claudes-codex-settings-action-btn claudes-codex-settings-delete-btn',
       attr: { 'aria-label': t('common.delete') },
     });
     setIcon(deleteBtn, 'trash-2');

@@ -71,11 +71,11 @@ export class OpencodeCommandCatalog implements ProviderCommandCatalog {
   }
 
   async saveVaultEntry(_entry: ProviderCommandEntry): Promise<void> {
-    throw new Error('OpenCode runtime commands are not editable from Praetor.');
+    throw new Error("OpenCode runtime commands are not editable from Claude's Codex.");
   }
 
   async deleteVaultEntry(_entry: ProviderCommandEntry): Promise<void> {
-    throw new Error('OpenCode runtime commands are not deletable from Praetor.');
+    throw new Error("OpenCode runtime commands are not deletable from Claude's Codex.");
   }
 
   getDropdownConfig(): ProviderCommandDropdownConfig {

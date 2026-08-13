@@ -232,7 +232,7 @@ describe('NavigationController', () => {
 
     it('adds focusable CSS class to messagesEl', () => {
       controller.initialize();
-      expect(messagesEl.hasClass('praetor-messages-focusable')).toBe(true);
+      expect(messagesEl.hasClass('claudes-codex-messages-focusable')).toBe(true);
     });
 
     it('attaches keydown listener to messagesEl', () => {

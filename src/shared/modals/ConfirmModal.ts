@@ -29,7 +29,7 @@ class ConfirmModal extends Modal {
 
   onOpen() {
     this.setTitle(t('common.confirm'));
-    this.modalEl.addClass('praetor-confirm-modal');
+    this.modalEl.addClass('claudes-codex-confirm-modal');
 
     this.contentEl.createEl('p', { text: this.message });
 

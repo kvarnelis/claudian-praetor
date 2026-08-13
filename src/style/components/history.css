@@ -1,9 +1,9 @@
-.praetor-history-container {
+.claudes-codex-history-container {
   position: static;
 }
 
 /* History dropup menu (opens upward since it's at bottom of view) */
-.praetor-history-menu {
+.claudes-codex-history-menu {
   display: none;
   position: absolute;
   bottom: 100%;
@@ -21,11 +21,11 @@
   inset-inline-end: 0;
 }
 
-.praetor-history-menu.visible {
+.claudes-codex-history-menu.visible {
   display: block;
 }
 
-.praetor-history-header {
+.claudes-codex-history-header {
   padding: 8px 12px;
   font-size: 12px;
   font-weight: 600;
@@ -35,19 +35,19 @@
   border-bottom: 1px solid var(--background-modifier-border);
 }
 
-.praetor-history-list {
+.claudes-codex-history-list {
   max-height: 350px;
   overflow-y: auto;
 }
 
-.praetor-history-empty {
+.claudes-codex-history-empty {
   padding: 16px;
   text-align: center;
   color: var(--text-muted);
   font-size: 13px;
 }
 
-.praetor-history-item {
+.claudes-codex-history-item {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -56,86 +56,86 @@
   transition: background 0.15s ease;
 }
 
-.praetor-history-item-icon {
+.claudes-codex-history-item-icon {
   display: flex;
   align-items: center;
   color: var(--text-muted);
   flex-shrink: 0;
 }
 
-.praetor-history-item-icon svg {
+.claudes-codex-history-item-icon svg {
   width: 16px;
   height: 16px;
 }
 
-.praetor-history-item:last-child {
+.claudes-codex-history-item:last-child {
   border-bottom: none;
 }
 
-.praetor-history-item:hover {
+.claudes-codex-history-item:hover {
   background: var(--background-modifier-hover);
 }
 
-.praetor-history-item.active {
+.claudes-codex-history-item.active {
   background: var(--background-modifier-hover);
   border-inline-start: 2px solid var(--interactive-accent);
   padding-inline-start: 10px;
 }
 
-.praetor-history-item.active:hover {
+.claudes-codex-history-item.active:hover {
   background: var(--background-modifier-active-hover, var(--background-modifier-hover));
 }
 
-.praetor-history-item.active .praetor-history-item-icon {
+.claudes-codex-history-item.active .claudes-codex-history-item-icon {
   color: var(--interactive-accent);
 }
 
-.praetor-history-item.active .praetor-history-item-content {
+.claudes-codex-history-item.active .claudes-codex-history-item-content {
   cursor: default;
 }
 
-.praetor-history-item.active .praetor-history-item-date {
+.claudes-codex-history-item.active .claudes-codex-history-item-date {
   color: var(--text-faint);
 }
 
-.praetor-history-item.open {
+.claudes-codex-history-item.open {
   background: var(--background-modifier-hover);
   border-inline-start: 2px solid var(--interactive-accent);
   padding-inline-start: 10px;
 }
 
-.praetor-history-item.open:hover {
+.claudes-codex-history-item.open:hover {
   background: var(--background-modifier-active-hover, var(--background-modifier-hover));
 }
 
-.praetor-history-item.open .praetor-history-item-icon {
+.claudes-codex-history-item.open .claudes-codex-history-item-icon {
   color: var(--interactive-accent);
 }
 
-.praetor-history-item.open .praetor-history-item-date {
+.claudes-codex-history-item.open .claudes-codex-history-item-date {
   color: var(--text-muted);
 }
 
-.praetor-history-item.running .praetor-history-item-icon {
+.claudes-codex-history-item.running .claudes-codex-history-item-icon {
   color: var(--interactive-accent);
 }
 
-.praetor-history-item.running .praetor-history-item-icon svg {
+.claudes-codex-history-item.running .claudes-codex-history-item-icon svg {
   animation: spin 1s linear infinite;
 }
 
-.praetor-history-item.running .praetor-history-item-date {
+.claudes-codex-history-item.running .claudes-codex-history-item-date {
   color: var(--interactive-accent);
   font-weight: 500;
 }
 
-.praetor-history-item-content {
+.claudes-codex-history-item-content {
   flex: 1;
   min-width: 0;
   cursor: pointer;
 }
 
-.praetor-history-item-title {
+.claudes-codex-history-item-title {
   font-size: 13px;
   font-weight: 500;
   color: var(--text-normal);
@@ -144,13 +144,13 @@
   text-overflow: ellipsis;
 }
 
-.praetor-history-item-date {
+.claudes-codex-history-item-date {
   font-size: 11px;
   color: var(--text-faint);
   margin-top: 2px;
 }
 
-.praetor-history-item-actions {
+.claudes-codex-history-item-actions {
   display: flex;
   gap: 4px;
   margin-inline-start: 8px;
@@ -158,15 +158,15 @@
   transition: opacity 0.15s ease;
 }
 
-.praetor-history-item:hover .praetor-history-item-actions {
+.claudes-codex-history-item:hover .claudes-codex-history-item-actions {
   opacity: 1;
 }
 
-.praetor-history-item:focus-within .praetor-history-item-actions {
+.claudes-codex-history-item:focus-within .claudes-codex-history-item-actions {
   opacity: 1;
 }
 
-.praetor-action-btn {
+.claudes-codex-action-btn {
   background: transparent;
   border: none;
   cursor: pointer;
@@ -176,25 +176,25 @@
   transition: background 0.15s ease, color 0.15s ease;
 }
 
-.praetor-action-btn:hover {
+.claudes-codex-action-btn:hover {
   background: var(--background-modifier-hover);
   color: var(--text-normal);
 }
 
-.praetor-action-btn svg {
+.claudes-codex-action-btn svg {
   width: 14px;
   height: 14px;
 }
 
-.praetor-delete-btn:hover {
+.claudes-codex-delete-btn:hover {
   color: var(--color-red);
 }
 
-.praetor-open-new-tab-btn:hover {
+.claudes-codex-open-new-tab-btn:hover {
   color: var(--interactive-accent);
 }
 
-.praetor-rename-input {
+.claudes-codex-rename-input {
   width: 100%;
   padding: 2px 4px;
   font-size: 13px;
@@ -205,13 +205,13 @@
   color: var(--text-normal);
 }
 
-.praetor-rename-input:focus {
+.claudes-codex-rename-input:focus {
   outline: none;
   box-shadow: 0 0 0 2px var(--interactive-accent-hover);
 }
 
 /* Loading indicator for title generation */
-.praetor-action-loading {
+.claudes-codex-action-loading {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -220,7 +220,7 @@
   cursor: default;
 }
 
-.praetor-history-load-more {
+.claudes-codex-history-load-more {
   width: calc(100% - 16px);
   margin: 8px;
   padding: 8px 12px;
@@ -231,7 +231,7 @@
   cursor: pointer;
 }
 
-.praetor-history-load-more:hover {
+.claudes-codex-history-load-more:hover {
   background: var(--background-modifier-hover);
   color: var(--text-normal);
 }

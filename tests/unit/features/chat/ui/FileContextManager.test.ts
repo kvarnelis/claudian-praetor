@@ -203,11 +203,11 @@ describe('FileContextManager', () => {
 
     manager.setCurrentNote('notes/chip.md');
 
-    const chip = findByClass(containerEl, 'praetor-context-chip--note');
+    const chip = findByClass(containerEl, 'claudes-codex-context-chip--note');
     expect(chip).toBeDefined();
     expect(containerEl.hasClass('has-content')).toBe(true);
 
-    const removeEl = findByClass(containerEl, 'praetor-context-chip-remove');
+    const removeEl = findByClass(containerEl, 'claudes-codex-context-chip-remove');
     expect(removeEl).toBeDefined();
 
     removeEl!.click();
@@ -262,7 +262,7 @@ describe('FileContextManager', () => {
     manager.handleInputChange();
     jest.advanceTimersByTime(200);
 
-    const pathEl = findByClass(containerEl, 'praetor-mention-path');
+    const pathEl = findByClass(containerEl, 'claudes-codex-mention-path');
     expect(pathEl?.textContent).toBe('clipping/file.md');
 
     manager.handleMentionKeydown({ key: 'Enter', preventDefault: jest.fn() } as any);
@@ -295,7 +295,7 @@ describe('FileContextManager', () => {
     jest.advanceTimersByTime(200);
 
     expect(getFoldersSpy).toHaveBeenCalled();
-    const folderLabel = findByClass(containerEl, 'praetor-mention-name-folder');
+    const folderLabel = findByClass(containerEl, 'claudes-codex-mention-name-folder');
     expect(folderLabel?.textContent).toBe('@src/');
 
     manager.destroy();
@@ -328,7 +328,7 @@ describe('FileContextManager', () => {
     manager.handleInputChange();
     jest.advanceTimersByTime(200);
 
-    const nameEls = findAllByClass(containerEl, 'praetor-mention-name-context');
+    const nameEls = findAllByClass(containerEl, 'claudes-codex-mention-name-context');
     expect(nameEls[0]?.textContent).toBe('src/app.md');
 
     manager.handleMentionKeydown({ key: 'Enter', preventDefault: jest.fn() } as any);

@@ -515,11 +515,11 @@ describe('Tab - Creation', () => {
       expect(tab.id).toMatch(/^tab-/);
     });
 
-    it('should create the welcome container with Praetor branding', () => {
+    it("should create the welcome container with Claude's Codex branding", () => {
       const tab = createTab(createMockOptions());
 
-      expect(tab.dom.welcomeEl?.querySelector('.praetor-welcome-brand')?.textContent)
-        .toBe('Praetor');
+      expect(tab.dom.welcomeEl?.querySelector('.claudes-codex-welcome-brand')?.textContent)
+        .toBe("Claude's Codex");
     });
 
     it('should describe composer actions in the input placeholder', () => {
@@ -1118,12 +1118,12 @@ describe('Tab - Service Initialization', () => {
           providerConfigs: {
             opencode: {
               availableModes: [
-                { id: 'praetor-yolo', name: 'YOLO' },
-                { id: 'praetor-safe', name: 'Safe' },
+                { id: 'claudes-codex-yolo', name: 'YOLO' },
+                { id: 'claudes-codex-safe', name: 'Safe' },
                 { id: 'plan', name: 'Plan' },
               ],
               enabled: true,
-              selectedMode: 'praetor-yolo',
+              selectedMode: 'claudes-codex-yolo',
             },
           },
           savedProviderEffort: {
@@ -1163,7 +1163,7 @@ describe('Tab - Service Initialization', () => {
 
       await toolbarCallbacks.onPermissionModeChange('normal');
 
-      expect(plugin.settings.providerConfigs.opencode.selectedMode).toBe('praetor-safe');
+      expect(plugin.settings.providerConfigs.opencode.selectedMode).toBe('claudes-codex-safe');
       expect(plugin.settings.savedProviderPermissionMode).toEqual(expect.objectContaining({
         claude: 'yolo',
         opencode: 'normal',
@@ -1198,7 +1198,7 @@ describe('Tab - Service Initialization', () => {
 
       expect(plugin.settings.permissionMode).toBe('plan');
       expect(tab.ui.permissionToggle!.updateDisplay).toHaveBeenCalledTimes(1);
-      expect(tab.dom.inputWrapper.hasClass('praetor-input-plan-mode')).toBe(true);
+      expect(tab.dom.inputWrapper.hasClass('claudes-codex-input-plan-mode')).toBe(true);
     });
 
     it('renders the in-memory permission mode when persistence fails after mutation', async () => {
@@ -1214,7 +1214,7 @@ describe('Tab - Service Initialization', () => {
 
       expect(plugin.settings.permissionMode).toBe('plan');
       expect(tab.ui.permissionToggle!.updateDisplay).toHaveBeenCalledTimes(1);
-      expect(tab.dom.inputWrapper.hasClass('praetor-input-plan-mode')).toBe(true);
+      expect(tab.dom.inputWrapper.hasClass('claudes-codex-input-plan-mode')).toBe(true);
     });
 
     it('resets to blank state when the new-conversation callback fires', () => {
@@ -1657,7 +1657,7 @@ describe('Tab - Service Callbacks', () => {
       const addMessageSpy = jest.spyOn(tab.state, 'addMessage');
       const addMessage = jest.fn(() => {
         const msgEl = createMockEl();
-        msgEl.createDiv({ cls: 'praetor-message-content' });
+        msgEl.createDiv({ cls: 'claudes-codex-message-content' });
         return msgEl;
       });
       const scrollToBottom = jest.fn();
@@ -3128,11 +3128,11 @@ describe('Tab - Controller Configuration', () => {
       const config = constructorCall[0];
       const inputStyle = tab.dom.inputEl.style as unknown as Record<string, string>;
       tab.dom.inputEl.value = '';
-      inputStyle['--praetor-textarea-min-height'] = '240px';
+      inputStyle['--claudes-codex-textarea-min-height'] = '240px';
 
       config.resetInputHeight();
 
-      expect(inputStyle['--praetor-textarea-min-height'])
+      expect(inputStyle['--claudes-codex-textarea-min-height'])
         .toBe(`${TEXTAREA_BASE_MIN_HEIGHT}px`);
     });
 

@@ -17,8 +17,8 @@
 
 ## Storage Rules
 
-- `CCSettingsStorage.save()` must merge with existing `.claude/settings.json`; Praetor only owns permissions and plugin enablement.
-- `.claude/mcp.json` has a Claude-compatible `mcpServers` namespace and a Praetor `_claudian.servers` metadata namespace. Keep them separate.
+- `CCSettingsStorage.save()` must merge with existing `.claude/settings.json`; Claude's Codex only owns permissions and plugin enablement.
+- `.claude/mcp.json` has a Claude-compatible `mcpServers` namespace and a Claude's Codex `_claudian.servers` metadata namespace. Keep them separate.
 - Plugin enabled state is dual-written to `.claude/settings.json` and `PluginManager.plugins[].enabled`. Keep both in sync.
 - Slash command IDs use reversible encoding: dashes become `-_`, slashes become `--`.
 

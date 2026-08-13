@@ -14,16 +14,16 @@ export interface FileMenuHost {
   registerEvent(eventRef: EventRef): void;
 }
 
-export async function addFileToPraetor(host: FileMenuHost, file: TFile): Promise<boolean> {
+export async function addFileToClaudesCodex(host: FileMenuHost, file: TFile): Promise<boolean> {
   try {
     await host.activateView();
     const appended = host.getView()?.appendToActiveInput(formatVaultFileMention(file.path)) ?? false;
     if (!appended) {
-      new Notice('Praetor chat is not ready.');
+      new Notice("Claude's Codex chat is not ready.");
     }
     return appended;
   } catch {
-    new Notice('Failed to add file to Praetor.');
+    new Notice("Failed to add file to Claude's Codex.");
     return false;
   }
 }
@@ -34,9 +34,9 @@ export function registerFileMenu(host: FileMenuHost): void {
       if (!(file instanceof TFile)) return;
 
       menu.addItem((item) => item
-        .setTitle('Add to Praetor')
+        .setTitle("Add to Claude's Codex")
         .setIcon('message-square-plus')
-        .onClick(() => addFileToPraetor(host, file)));
+        .onClick(() => addFileToClaudesCodex(host, file)));
     }),
   );
 }

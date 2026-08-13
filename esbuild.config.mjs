@@ -133,7 +133,7 @@ function createPatchRendererUnsafeUnref(outputPaths) {
 const manifest = JSON.parse(readFileSync(path.join(process.cwd(), 'manifest.json'), 'utf-8'));
 const OBSIDIAN_PLUGIN_ID = process.env.OBSIDIAN_PLUGIN_ID
   || manifest.id
-  || 'praetor';
+  || 'claudes-codex';
 
 const OBSIDIAN_VAULT = process.env.OBSIDIAN_VAULT;
 const OBSIDIAN_PLUGIN_PATH = OBSIDIAN_VAULT && existsSync(OBSIDIAN_VAULT)
@@ -158,7 +158,7 @@ const copyToObsidian = {
         ['main.js', 'main.js'],
         ['manifest.json', 'manifest.json'],
         ['styles.css', 'styles.css'],
-        ['daemon/dist/praetord.cjs', 'praetord.cjs'],
+        ['daemon/dist/claudes-codexd.cjs', 'claudes-codexd.cjs'],
       ];
       for (const [source, file] of files) {
         if (existsSync(source)) {

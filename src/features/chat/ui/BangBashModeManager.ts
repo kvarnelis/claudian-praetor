@@ -48,7 +48,7 @@ export class BangBashModeManager {
     const wrapper = this.callbacks.getInputWrapper();
     if (!wrapper) return false;
 
-    wrapper.addClass('praetor-input-bang-bash-mode');
+    wrapper.addClass('claudes-codex-input-bang-bash-mode');
     this.state = { active: true, rawCommand: '' };
     this.inputEl.placeholder = t('chat.bangBash.placeholder');
     return true;
@@ -57,7 +57,7 @@ export class BangBashModeManager {
   private exitMode(): void {
     const wrapper = this.callbacks.getInputWrapper();
     if (wrapper) {
-      wrapper.removeClass('praetor-input-bang-bash-mode');
+      wrapper.removeClass('claudes-codex-input-bang-bash-mode');
     }
     this.state = { active: false, rawCommand: '' };
     this.inputEl.placeholder = this.originalPlaceholder;

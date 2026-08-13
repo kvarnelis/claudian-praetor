@@ -1,5 +1,5 @@
 /**
- * Headless PraetorPlugin shim: just enough plugin surface for provider
+ * Headless ClaudesCodexPlugin shim: just enough plugin surface for provider
  * registries, workspace services, and chat runtimes to operate outside
  * Obsidian. Every member NOT explicitly provided throws loudly via a Proxy
  * trap so missing surface is discovered instead of silently undefined.
@@ -8,7 +8,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 
-import { DEFAULT_PRAETOR_SETTINGS } from '../../src/app/settings/defaultSettings';
+import { DEFAULT_CLAUDES_CODEX_SETTINGS } from '../../src/app/settings/defaultSettings';
 import {
   SettingsCoordinator,
   type ConditionalSettingsMutation,
@@ -16,8 +16,8 @@ import {
 } from '../../src/app/settings/SettingsCoordinator';
 import { SharedStorageService } from '../../src/app/storage/SharedStorageService';
 import {
-  PRAETOR_SETTINGS_PATH,
-  PRAETOR_STORAGE_PATH,
+  CLAUDES_CODEX_SETTINGS_PATH,
+  CLAUDES_CODEX_STORAGE_PATH,
 } from '../../src/core/bootstrap/StoragePaths';
 import {
   type EnvironmentScope,
@@ -30,12 +30,12 @@ import type { ProviderHost } from '../../src/core/providers/ProviderHost';
 import { ProviderSettingsCoordinator } from '../../src/core/providers/ProviderSettingsCoordinator';
 import { ProviderWorkspaceRegistry } from '../../src/core/providers/ProviderWorkspaceRegistry';
 import type { ProviderCliResolutionContext, ProviderId } from '../../src/core/providers/types';
-import type { PraetorSettings } from '../../src/core/types';
-import type PraetorPlugin from '../../src/main';
+import type { ClaudesCodexSettings } from '../../src/core/types';
+import type ClaudesCodexPlugin from '../../src/main';
 import { OPENCODE_PLAN_MODE_ID, OPENCODE_SAFE_MODE_ID } from '../../src/providers/opencode/modes';
 import type { NodeVaultApp } from './nodeVaultApp';
 
-const DAEMON_DATA_FILE = 'praetor-daemon-data.json';
+const DAEMON_DATA_FILE = 'claudes-codex-daemon-data.json';
 const SETTINGS_WATCH_DEBOUNCE_MS = 500;
 
 interface SettingsWatcher {
@@ -43,14 +43,14 @@ interface SettingsWatcher {
 }
 
 export interface HeadlessPluginHandle {
-  plugin: PraetorPlugin;
-  settings: PraetorSettings;
+  plugin: ClaudesCodexPlugin;
+  settings: ClaudesCodexSettings;
   storage: SharedStorageService;
   dispose(): void;
 }
 
 /** Mirrors the load-time normalization in main.ts loadSettings() (essentials only). */
-function normalizeLoadedSettings(settings: PraetorSettings): void {
+function normalizeLoadedSettings(settings: ClaudesCodexSettings): void {
   // Plan mode is ephemeral; never boot stuck in it.
   if (settings.permissionMode === 'plan') {
     settings.permissionMode = 'normal';
@@ -88,7 +88,7 @@ export async function createHeadlessPlugin(options: {
 }): Promise<HeadlessPluginHandle> {
   const { app, vaultPath } = options;
   const log = options.log ?? ((message: string) => console.error(message));
-  const dataFilePath = path.join(vaultPath, PRAETOR_STORAGE_PATH, DAEMON_DATA_FILE);
+  const dataFilePath = path.join(vaultPath, CLAUDES_CODEX_STORAGE_PATH, DAEMON_DATA_FILE);
 
   const loadData = async (): Promise<unknown> => {
     try {
@@ -105,11 +105,11 @@ export async function createHeadlessPlugin(options: {
   // SharedStorageService only touches plugin.app + loadData/saveData.
   const storageHost = { app, loadData, saveData };
   const storage = new SharedStorageService(storageHost as never);
-  const { praetor } = await storage.initialize();
+  const { claudesCodex } = await storage.initialize();
 
-  const settings: PraetorSettings = {
-    ...DEFAULT_PRAETOR_SETTINGS,
-    ...praetor,
+  const settings: ClaudesCodexSettings = {
+    ...DEFAULT_CLAUDES_CODEX_SETTINGS,
+    ...claudesCodex,
   };
   normalizeLoadedSettings(settings);
 
@@ -120,7 +120,7 @@ export async function createHeadlessPlugin(options: {
     ProviderSettingsCoordinator.persistProjectedProviderState(
       settings as unknown as Record<string, unknown>,
     );
-    await storage.savePraetorSettings(settings);
+    await storage.saveClaudesCodexSettings(settings);
   };
   const settingsCoordinator = new SettingsCoordinator(settings, persistSettings);
 
@@ -132,10 +132,10 @@ export async function createHeadlessPlugin(options: {
     loadData,
     saveData,
     saveSettings: (): Promise<void> => settingsCoordinator.persistCurrent(),
-    mutateSettings: (mutation: SettingsMutation<PraetorSettings>): Promise<void> =>
+    mutateSettings: (mutation: SettingsMutation<ClaudesCodexSettings>): Promise<void> =>
       settingsCoordinator.mutate(mutation),
     mutateSettingsConditionally: (
-      mutation: ConditionalSettingsMutation<PraetorSettings>,
+      mutation: ConditionalSettingsMutation<ClaudesCodexSettings>,
     ): Promise<void> => settingsCoordinator.mutateConditionally(mutation),
     getResolvedProviderCliPath: async (
       providerId: ProviderId,
@@ -216,15 +216,15 @@ export async function createHeadlessPlugin(options: {
       if (prop === 'then') {
         return undefined;
       }
-      throw new Error(`praetord shim: PraetorPlugin.${String(prop)} is not implemented`);
+      throw new Error(`claudes-codexd shim: ClaudesCodexPlugin.${String(prop)} is not implemented`);
     },
-  }) as unknown as PraetorPlugin;
+  }) as unknown as ClaudesCodexPlugin;
 
   const watcher = watchSettingsFile(vaultPath, async () => {
     try {
-      const reloaded = await storage.praetorSettings.load();
-      const next: PraetorSettings = {
-        ...DEFAULT_PRAETOR_SETTINGS,
+      const reloaded = await storage.claudesCodexSettings.load();
+      const next: ClaudesCodexSettings = {
+        ...DEFAULT_CLAUDES_CODEX_SETTINGS,
         ...reloaded,
       };
       normalizeLoadedSettings(next);
@@ -236,9 +236,9 @@ export async function createHeadlessPlugin(options: {
         Object.assign(settings, next);
         return false;
       });
-      log('[praetord] settings reloaded from vault');
+      log('[claudes-codexd] settings reloaded from vault');
     } catch (err) {
-      log(`[praetord] settings reload failed: ${err instanceof Error ? err.message : String(err)}`);
+      log(`[claudes-codexd] settings reload failed: ${err instanceof Error ? err.message : String(err)}`);
     }
   });
 
@@ -261,8 +261,8 @@ function watchSettingsFile(
   vaultPath: string,
   onChange: () => Promise<void>,
 ): SettingsWatcher | null {
-  const settingsDir = path.join(vaultPath, PRAETOR_STORAGE_PATH);
-  const settingsFileName = path.basename(PRAETOR_SETTINGS_PATH);
+  const settingsDir = path.join(vaultPath, CLAUDES_CODEX_STORAGE_PATH);
+  const settingsFileName = path.basename(CLAUDES_CODEX_SETTINGS_PATH);
   let timer: ReturnType<typeof setTimeout> | null = null;
   let reloading = false;
   let pendingReload = false;

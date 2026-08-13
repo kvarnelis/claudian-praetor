@@ -50,7 +50,7 @@ export const piSettingsTabRenderer: ProviderSettingsTabRenderer = {
       );
 
     const validationEl = container.createDiv({
-      cls: 'praetor-cli-path-validation praetor-setting-validation praetor-setting-validation-error praetor-hidden',
+      cls: 'claudes-codex-cli-path-validation claudes-codex-setting-validation claudes-codex-setting-validation-error claudes-codex-hidden',
     });
     const cliPathsByHost = { ...piSettings.cliPathsByHost };
     let cliPathInputEl: HTMLInputElement | null = null;
@@ -59,13 +59,13 @@ export const piSettingsTabRenderer: ProviderSettingsTabRenderer = {
       const error = validateCliPath(value);
       if (error) {
         validationEl.setText(error);
-        validationEl.toggleClass('praetor-hidden', false);
-        inputEl?.toggleClass('praetor-input-error', true);
+        validationEl.toggleClass('claudes-codex-hidden', false);
+        inputEl?.toggleClass('claudes-codex-input-error', true);
         return false;
       }
 
-      validationEl.toggleClass('praetor-hidden', true);
-      inputEl?.toggleClass('praetor-input-error', false);
+      validationEl.toggleClass('claudes-codex-hidden', true);
+      inputEl?.toggleClass('claudes-codex-input-error', false);
       return true;
     };
 

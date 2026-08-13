@@ -1,14 +1,14 @@
 /* Fork Target Modal */
-.praetor-fork-target-modal {
+.claudes-codex-fork-target-modal {
   max-width: 340px;
 }
 
-.praetor-fork-target-list {
+.claudes-codex-fork-target-list {
   display: flex;
   flex-direction: column;
 }
 
-.praetor-fork-target-option {
+.claudes-codex-fork-target-option {
   padding: 10px 12px;
   border-radius: 6px;
   cursor: pointer;
@@ -16,6 +16,6 @@
   font-size: 14px;
 }
 
-.praetor-fork-target-option:hover {
+.claudes-codex-fork-target-option:hover {
   background: var(--background-modifier-hover);
 }

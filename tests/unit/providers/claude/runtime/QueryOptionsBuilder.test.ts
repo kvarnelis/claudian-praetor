@@ -1,4 +1,4 @@
-import type { PraetorSettings } from '@/core/types/settings';
+import type { ClaudesCodexSettings } from '@/core/types/settings';
 import type { QueryOptionsContext } from '@/providers/claude/runtime/ClaudeQueryOptionsBuilder';
 import { QueryOptionsBuilder } from '@/providers/claude/runtime/ClaudeQueryOptionsBuilder';
 import type { PersistentQueryConfig } from '@/providers/claude/runtime/types';
@@ -34,7 +34,7 @@ function createMockPluginManager() {
 }
 
 // Create a mock settings object
-function createMockSettings(overrides: Partial<PraetorSettings> = {}): PraetorSettings {
+function createMockSettings(overrides: Partial<ClaudesCodexSettings> = {}): ClaudesCodexSettings {
   return {
     permissions: [],
     permissionMode: 'yolo',
@@ -57,7 +57,7 @@ function createMockSettings(overrides: Partial<PraetorSettings> = {}): PraetorSe
     claudeCliPath: '',
     enableChrome: false,
     ...overrides,
-  } as PraetorSettings;
+  } as ClaudesCodexSettings;
 }
 
 function createMockPersistentQueryConfig(

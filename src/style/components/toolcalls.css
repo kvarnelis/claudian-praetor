@@ -1,8 +1,8 @@
-.praetor-tool-call {
+.claudes-codex-tool-call {
   margin: 8px 0;
 }
 
-.praetor-tool-header {
+.claudes-codex-tool-header {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -11,23 +11,23 @@
   overflow: hidden;
 }
 
-.praetor-tool-header:hover {
+.claudes-codex-tool-header:hover {
   opacity: 0.85;
 }
 
-.praetor-tool-icon {
+.claudes-codex-tool-icon {
   display: flex;
   align-items: center;
   color: var(--text-accent);
   flex-shrink: 0;
 }
 
-.praetor-tool-icon svg {
+.claudes-codex-tool-icon svg {
   width: 16px;
   height: 16px;
 }
 
-.praetor-tool-name {
+.claudes-codex-tool-name {
   font-family: var(--font-monospace);
   font-size: 13px;
   font-weight: 400;
@@ -36,7 +36,7 @@
   flex-shrink: 0;
 }
 
-.praetor-tool-summary {
+.claudes-codex-tool-summary {
   font-family: var(--font-monospace);
   font-size: 13px;
   color: var(--text-muted);
@@ -47,15 +47,15 @@
   min-width: 0;
 }
 
-.praetor-tool-summary:empty {
+.claudes-codex-tool-summary:empty {
   display: none;
 }
 
-.praetor-tool-call-bash.expanded .praetor-tool-summary {
+.claudes-codex-tool-call-bash.expanded .claudes-codex-tool-summary {
   display: none;
 }
 
-.praetor-tool-bash-command {
+.claudes-codex-tool-bash-command {
   font-family: var(--font-monospace);
   font-size: 12px;
   line-height: 1.4;
@@ -65,8 +65,8 @@
   padding: 2px 0 4px;
 }
 
-/* Legacy: StatusPanel bash entries still use praetor-tool-label */
-.praetor-tool-label {
+/* Legacy: StatusPanel bash entries still use claudes-codex-tool-label */
+.claudes-codex-tool-label {
   font-family: var(--font-monospace);
   font-size: 13px;
   font-weight: 400;
@@ -76,47 +76,47 @@
   text-overflow: ellipsis;
 }
 
-.praetor-tool-current {
+.claudes-codex-tool-current {
   font-family: var(--font-monospace);
   font-size: 13px;
   color: var(--text-muted);
   white-space: nowrap;
 }
 
-.praetor-tool-current:empty {
+.claudes-codex-tool-current:empty {
   display: none;
 }
 
-.praetor-tool-status {
+.claudes-codex-tool-status {
   display: flex;
   align-items: center;
   flex-shrink: 0;
   margin-left: auto;
 }
 
-.praetor-tool-status svg {
+.claudes-codex-tool-status svg {
   width: 14px;
   height: 14px;
 }
 
-.praetor-tool-status.status-running {
+.claudes-codex-tool-status.status-running {
   color: var(--text-accent);
 }
 
-.praetor-tool-status.status-completed {
+.claudes-codex-tool-status.status-completed {
   color: var(--color-green);
 }
 
-.praetor-tool-status.status-error {
+.claudes-codex-tool-status.status-error {
   color: var(--color-red);
 }
 
-.praetor-tool-status.status-blocked {
+.claudes-codex-tool-status.status-blocked {
   color: var(--color-orange);
 }
 
 /* Tool call content - border style (like thinking block) */
-.praetor-tool-content {
+.claudes-codex-tool-content {
   padding: 4px 0;
   padding-inline-start: 16px;
   margin-inline-start: 7px;
@@ -124,39 +124,39 @@
 }
 
 /* Tool content variants that render inline widgets instead of bordered results */
-.praetor-tool-content-todo,
-.praetor-tool-content-ask {
+.claudes-codex-tool-content-todo,
+.claudes-codex-tool-content-ask {
   border-inline-start: none;
   margin-inline-start: 0;
   padding-inline-start: 0;
 }
 
 /* Expanded content: per-line rendering */
-.praetor-tool-lines {
+.claudes-codex-tool-lines {
   font-family: var(--font-monospace);
   font-size: 12px;
   line-height: 1.4;
   overflow-x: auto;
 }
 
-.praetor-tool-line {
+.claudes-codex-tool-line {
   padding: 1px 0;
   color: var(--text-muted);
   white-space: pre;
 }
 
-.praetor-tool-line-wrap {
+.claudes-codex-tool-line-wrap {
   white-space: pre-wrap;
   word-break: break-word;
 }
 
 /* Hover highlight for file search results */
-.praetor-tool-line.hoverable:hover {
+.claudes-codex-tool-line.hoverable:hover {
   background: var(--background-modifier-hover);
 }
 
 /* Truncation indicator: "... N more lines" */
-.praetor-tool-truncated {
+.claudes-codex-tool-truncated {
   color: var(--text-faint);
   font-style: italic;
   padding: 4px 0;
@@ -165,7 +165,7 @@
 }
 
 /* ToolSearch expanded: icon + tool name rows */
-.praetor-tool-search-item {
+.claudes-codex-tool-search-item {
   display: flex;
   align-items: center;
   gap: 4px;
@@ -175,7 +175,7 @@
   color: var(--text-muted);
 }
 
-.praetor-tool-search-icon {
+.claudes-codex-tool-search-icon {
   display: flex;
   align-items: center;
   flex-shrink: 0;
@@ -184,13 +184,13 @@
   color: var(--text-faint);
 }
 
-.praetor-tool-search-icon svg {
+.claudes-codex-tool-search-icon svg {
   width: 14px;
   height: 14px;
 }
 
 /* Web search links */
-.praetor-tool-link {
+.claudes-codex-tool-link {
   display: flex;
   align-items: flex-start;
   gap: 6px;
@@ -203,11 +203,11 @@
   line-height: 1.4;
 }
 
-.praetor-tool-link:hover {
+.claudes-codex-tool-link:hover {
   color: var(--text-accent);
 }
 
-.praetor-tool-link-icon {
+.claudes-codex-tool-link-icon {
   flex-shrink: 0;
   width: 12px;
   height: 12px;
@@ -215,19 +215,19 @@
   color: var(--text-faint);
 }
 
-.praetor-tool-link-icon svg {
+.claudes-codex-tool-link-icon svg {
   width: 12px;
   height: 12px;
 }
 
-.praetor-tool-link-title {
+.claudes-codex-tool-link-title {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 /* Web search summary section */
-.praetor-tool-web-summary {
+.claudes-codex-tool-web-summary {
   font-family: var(--font-monospace);
   font-size: 12px;
   color: var(--text-muted);
@@ -241,7 +241,7 @@
 }
 
 /* Empty state for file search */
-.praetor-tool-empty {
+.claudes-codex-tool-empty {
   color: var(--text-faint);
   font-style: italic;
   font-family: var(--font-monospace);
@@ -249,12 +249,12 @@
   padding: 4px 0;
 }
 
-.praetor-tool-result-row {
+.claudes-codex-tool-result-row {
   display: flex;
   align-items: flex-start;
 }
 
-.praetor-tool-result-text {
+.claudes-codex-tool-result-text {
   font-family: var(--font-monospace);
   font-size: 12px;
   color: var(--text-muted);
@@ -264,15 +264,15 @@
   flex: 1;
 }
 
-.praetor-tool-result-item {
+.claudes-codex-tool-result-item {
   display: block;
   margin-bottom: 2px;
 }
 
-.praetor-tool-patch-section + .praetor-tool-patch-section {
+.claudes-codex-tool-patch-section + .claudes-codex-tool-patch-section {
   margin-top: 10px;
 }
 
-.praetor-tool-result-item:last-child {
+.claudes-codex-tool-result-item:last-child {
   margin-bottom: 0;
 }

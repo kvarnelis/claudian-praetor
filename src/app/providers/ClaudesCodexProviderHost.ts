@@ -2,11 +2,11 @@ import type { ProviderHost } from '../../core/providers/ProviderHost';
 import type { ProviderCliResolutionContext, ProviderId } from '../../core/providers/types';
 import type { ChatRuntime } from '../../core/runtime/ChatRuntime';
 import type { EnvironmentScope } from '../../core/types/settings';
-import type PraetorPlugin from '../../main';
+import type ClaudesCodexPlugin from '../../main';
 
 /** Delegates provider-facing capabilities to the application composition root. */
-export class PraetorProviderHost implements ProviderHost {
-  constructor(private readonly plugin: PraetorPlugin) {}
+export class ClaudesCodexProviderHost implements ProviderHost {
+  constructor(private readonly plugin: ClaudesCodexPlugin) {}
 
   get app() {
     return this.plugin.app;

@@ -1,42 +1,42 @@
-.praetor-thinking {
-  color: var(--praetor-brand);
+.claudes-codex-thinking {
+  color: var(--claudes-codex-brand);
   font-style: italic;
   padding: 4px 0;
   text-align: start;
   animation: thinking-pulse 1.5s ease-in-out infinite;
 }
 
-.praetor-thinking.praetor-thinking--compact {
-  color: var(--praetor-compact);
+.claudes-codex-thinking.claudes-codex-thinking--compact {
+  color: var(--claudes-codex-compact);
 }
 
-.praetor-thinking-hint {
+.claudes-codex-thinking-hint {
   color: var(--text-muted);
   font-style: normal;
   font-variant-numeric: tabular-nums;
 }
 
-.praetor-thinking-block {
+.claudes-codex-thinking-block {
   margin: 8px 0;
 }
 
-.praetor-text-block+.praetor-thinking-block {
+.claudes-codex-text-block+.claudes-codex-thinking-block {
   margin-top: 8px;
 }
 
-.praetor-thinking-block+.praetor-text-block {
+.claudes-codex-thinking-block+.claudes-codex-text-block {
   margin-top: 8px;
 }
 
-.praetor-thinking-block+.praetor-tool-call {
+.claudes-codex-thinking-block+.claudes-codex-tool-call {
   margin-top: 8px;
 }
 
-.praetor-tool-call+.praetor-thinking-block {
+.claudes-codex-tool-call+.claudes-codex-thinking-block {
   margin-top: 8px;
 }
 
-.praetor-thinking-header {
+.claudes-codex-thinking-header {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -45,15 +45,15 @@
   overflow: hidden;
 }
 
-.praetor-thinking-label {
+.claudes-codex-thinking-label {
   flex: 1;
   font-size: 13px;
   font-weight: 500;
-  color: var(--praetor-brand);
+  color: var(--claudes-codex-brand);
 }
 
 /* Thinking block content - tree-branch style */
-.praetor-thinking-content {
+.claudes-codex-thinking-content {
   padding: 4px 0;
   padding-inline-start: 24px;
   font-size: 13px;
@@ -65,24 +65,24 @@
   margin-inline-start: 7px;
 }
 
-.praetor-thinking-content p {
+.claudes-codex-thinking-content p {
   margin: 0 0 8px 0;
 }
 
-.praetor-thinking-content p:last-child {
+.claudes-codex-thinking-content p:last-child {
   margin-bottom: 0;
 }
 
-.praetor-thinking-content .praetor-code-wrapper {
+.claudes-codex-thinking-content .claudes-codex-code-wrapper {
   margin: 8px 0;
 }
 
-.praetor-thinking-content .praetor-code-wrapper pre {
+.claudes-codex-thinking-content .claudes-codex-code-wrapper pre {
   padding: 8px 10px;
   border-radius: 4px;
 }
 
-.praetor-thinking-content code {
+.claudes-codex-thinking-content code {
   font-family: var(--font-monospace);
   font-size: 12px;
 }

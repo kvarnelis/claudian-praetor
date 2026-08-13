@@ -1,5 +1,5 @@
 /**
- * Praetor - Markdown Utilities
+ * Claude's Codex - Markdown Utilities
  *
  * Markdown manipulation helpers.
  */

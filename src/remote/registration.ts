@@ -1,7 +1,7 @@
 /**
  * Remote provider registrations for mobile: same provider ids and chat UI
  * configuration as the local registrations, but runtimes/history/aux services
- * proxy to the Praetor daemon over WebSocket.
+ * proxy to the Claude's Codex daemon over WebSocket.
  *
  * Every import here must stay free of Node usage — this module loads on iOS.
  */
@@ -26,7 +26,7 @@ import type {
   TitleGenerationService,
 } from '../core/providers/types';
 import type { Conversation, InstructionRefineResult } from '../core/types';
-import type PraetorPlugin from '../main';
+import type ClaudesCodexPlugin from '../main';
 import { CLAUDE_PROVIDER_CAPABILITIES } from '../providers/claude/capabilities';
 import { claudeSettingsReconciler } from '../providers/claude/env/ClaudeSettingsReconciler';
 import { claudeChatUIConfig } from '../providers/claude/ui/ClaudeChatUIConfig';
@@ -300,7 +300,7 @@ const REMOTE_PROVIDER_SPECS: RemoteProviderSpec[] = [
 
 let remoteProvidersRegistered = false;
 
-export function registerRemoteProviders(plugin: PraetorPlugin): void {
+export function registerRemoteProviders(plugin: ClaudesCodexPlugin): void {
   if (remoteProvidersRegistered) return;
 
   // Registration runs before loadSettings(), so the daemon config isn't readable

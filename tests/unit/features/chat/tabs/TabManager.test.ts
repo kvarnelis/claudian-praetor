@@ -423,7 +423,7 @@ describe('TabManager - Tab Lifecycle', () => {
       const switchPromise = manager.switchToTab(tab1!.id);
 
       expect(tab1!.hydrationState).toBe('loading');
-      expect(tab1!.dom.messagesEl.querySelector('.praetor-tab-hydration')).not.toBeNull();
+      expect(tab1!.dom.messagesEl.querySelector('.claudes-codex-tab-hydration')).not.toBeNull();
       expect(tab1!.controllers.conversationController!.switchTo).not.toHaveBeenCalled();
 
       await switchPromise;
@@ -441,12 +441,12 @@ describe('TabManager - Tab Lifecycle', () => {
       tab1!.state.messages = [];
       tab1!.controllers.conversationController!.switchTo = jest.fn().mockImplementation(async () => {
         tab1!.dom.messagesEl.empty();
-        tab1!.dom.messagesEl.createDiv({ cls: 'praetor-message' });
-        tab1!.dom.messagesEl.createDiv({ cls: 'praetor-thinking-block' });
-        tab1!.dom.messagesEl.createDiv({ cls: 'praetor-text-block' });
-        tab1!.dom.messagesEl.createDiv({ cls: 'praetor-tool-call' });
-        tab1!.dom.messagesEl.createDiv({ cls: 'praetor-write-edit-block' });
-        tab1!.dom.messagesEl.createDiv({ cls: 'praetor-subagent-list' });
+        tab1!.dom.messagesEl.createDiv({ cls: 'claudes-codex-message' });
+        tab1!.dom.messagesEl.createDiv({ cls: 'claudes-codex-thinking-block' });
+        tab1!.dom.messagesEl.createDiv({ cls: 'claudes-codex-text-block' });
+        tab1!.dom.messagesEl.createDiv({ cls: 'claudes-codex-tool-call' });
+        tab1!.dom.messagesEl.createDiv({ cls: 'claudes-codex-write-edit-block' });
+        tab1!.dom.messagesEl.createDiv({ cls: 'claudes-codex-subagent-list' });
       });
 
       await manager.switchToTab(tab1!.id);
@@ -478,7 +478,7 @@ describe('TabManager - Tab Lifecycle', () => {
       await manager.switchToTab(tab1!.id);
 
       expect(tab1!.controllers.conversationController!.switchTo).not.toHaveBeenCalled();
-      expect(tab1!.dom.messagesEl.querySelector('.praetor-tab-hydration')).toBeNull();
+      expect(tab1!.dom.messagesEl.querySelector('.claudes-codex-tab-hydration')).toBeNull();
       expect(tab1!.dom.messagesEl.contains(readyMarker)).toBe(true);
     });
 
@@ -496,7 +496,7 @@ describe('TabManager - Tab Lifecycle', () => {
       await manager.switchToTab(tab1!.id);
 
       expect(tab1!.hydrationState).toBe('failed');
-      const retryButton = tab1!.dom.messagesEl.querySelector('.praetor-tab-hydration-retry');
+      const retryButton = tab1!.dom.messagesEl.querySelector('.claudes-codex-tab-hydration-retry');
       expect(retryButton).not.toBeNull();
 
       (retryButton as HTMLElement).click();
@@ -516,7 +516,7 @@ describe('TabManager - Tab Lifecycle', () => {
       expect(tab).not.toBeNull();
       expect(tab!.hydrationState).toBe('failed');
       expect(tab!.controllers.conversationController!.initializeWelcome).not.toHaveBeenCalled();
-      const retryButton = tab!.dom.messagesEl.querySelector('.praetor-tab-hydration-retry');
+      const retryButton = tab!.dom.messagesEl.querySelector('.claudes-codex-tab-hydration-retry');
       expect(retryButton).not.toBeNull();
 
       (retryButton as HTMLElement).click();

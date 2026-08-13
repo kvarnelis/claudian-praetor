@@ -1,5 +1,5 @@
 /**
- * Praetor - Image Embed Utilities
+ * Claude's Codex - Image Embed Utilities
  *
  * Replaces Obsidian image embeds ![[image.png]] with HTML <img> tags
  * before MarkdownRenderer processes the content.
@@ -81,11 +81,11 @@ function createImageHtml(
   const alt = escapeHtml(altText || file.basename);
   const style = buildStyleAttribute(altText);
 
-  return `<span class="praetor-embedded-image"><img src="${escapeHtml(src)}" alt="${alt}" loading="lazy"${style}></span>`;
+  return `<span class="claudes-codex-embedded-image"><img src="${escapeHtml(src)}" alt="${alt}" loading="lazy"${style}></span>`;
 }
 
 function createFallbackHtml(wikilink: string): string {
-  return `<span class="praetor-embedded-image-fallback">${escapeHtml(wikilink)}</span>`;
+  return `<span class="claudes-codex-embedded-image-fallback">${escapeHtml(wikilink)}</span>`;
 }
 
 function normalizeOptions(options?: string | ReplaceImageEmbedsOptions): Required<ReplaceImageEmbedsOptions> {

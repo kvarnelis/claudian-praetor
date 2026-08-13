@@ -1,5 +1,5 @@
 /* @ Mention dropdown */
-.praetor-mention-dropdown {
+.claudes-codex-mention-dropdown {
   display: none;
   position: absolute;
   bottom: 100%;
@@ -17,21 +17,21 @@
   overflow-y: auto;
 }
 
-.praetor-mention-dropdown.visible {
+.claudes-codex-mention-dropdown.visible {
   display: block;
 }
 
 /* Fixed positioning for inline editor */
-.praetor-mention-dropdown-fixed {
+.claudes-codex-mention-dropdown-fixed {
   position: fixed;
-  bottom: var(--praetor-fixed-dropdown-bottom);
-  left: var(--praetor-fixed-dropdown-left);
+  bottom: var(--claudes-codex-fixed-dropdown-bottom);
+  left: var(--claudes-codex-fixed-dropdown-left);
   right: auto;
-  width: var(--praetor-fixed-dropdown-width);
+  width: var(--claudes-codex-fixed-dropdown-width);
   z-index: 10001;
 }
 
-.praetor-mention-item {
+.claudes-codex-mention-item {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -40,24 +40,24 @@
   transition: background 0.1s ease;
 }
 
-.praetor-mention-item:hover,
-.praetor-mention-item.selected {
+.claudes-codex-mention-item:hover,
+.claudes-codex-mention-item.selected {
   background: var(--background-modifier-hover);
 }
 
-.praetor-mention-icon {
+.claudes-codex-mention-icon {
   display: flex;
   align-items: center;
   color: var(--text-muted);
   flex-shrink: 0;
 }
 
-.praetor-mention-icon svg {
+.claudes-codex-mention-icon svg {
   width: 14px;
   height: 14px;
 }
 
-.praetor-mention-path {
+.claudes-codex-mention-path {
   font-size: 13px;
   color: var(--text-normal);
   overflow: hidden;
@@ -65,7 +65,7 @@
   white-space: nowrap;
 }
 
-.praetor-mention-empty {
+.claudes-codex-mention-empty {
   padding: 12px;
   text-align: center;
   color: var(--text-muted);
@@ -73,29 +73,29 @@
 }
 
 /* Scrollbar for mention dropdown */
-.praetor-mention-dropdown::-webkit-scrollbar {
+.claudes-codex-mention-dropdown::-webkit-scrollbar {
   width: 6px;
 }
 
-.praetor-mention-dropdown::-webkit-scrollbar-track {
+.claudes-codex-mention-dropdown::-webkit-scrollbar-track {
   background: transparent;
 }
 
-.praetor-mention-dropdown::-webkit-scrollbar-thumb {
+.claudes-codex-mention-dropdown::-webkit-scrollbar-thumb {
   background: var(--background-modifier-border);
   border-radius: 3px;
 }
 
 /* MCP items in @-mention dropdown */
-.praetor-mention-item.mcp-server .praetor-mention-icon {
+.claudes-codex-mention-item.mcp-server .claudes-codex-mention-icon {
   color: var(--interactive-accent);
 }
 
-.praetor-mention-item.vault-folder .praetor-mention-icon {
+.claudes-codex-mention-item.vault-folder .claudes-codex-mention-icon {
   color: var(--text-muted);
 }
 
-.praetor-mention-text {
+.claudes-codex-mention-text {
   display: flex;
   flex-direction: column;
   gap: 2px;
@@ -103,13 +103,13 @@
   flex: 1;
 }
 
-.praetor-mention-name {
+.claudes-codex-mention-name {
   font-size: 13px;
   font-weight: 500;
   color: var(--interactive-accent);
 }
 
-.praetor-mention-desc {
+.claudes-codex-mention-desc {
   font-size: 11px;
   color: var(--text-muted);
   overflow: hidden;
@@ -118,17 +118,17 @@
 }
 
 /* Context file items in @-mention dropdown */
-.praetor-mention-item.context-file .praetor-mention-icon {
-  color: var(--praetor-brand);
+.claudes-codex-mention-item.context-file .claudes-codex-mention-icon {
+  color: var(--claudes-codex-brand);
 }
 
-.praetor-mention-item.context-file .praetor-mention-text {
+.claudes-codex-mention-item.context-file .claudes-codex-mention-text {
   flex-direction: row;
   overflow: hidden;
   white-space: nowrap;
 }
 
-.praetor-mention-item.context-file .praetor-mention-name-context {
+.claudes-codex-mention-item.context-file .claudes-codex-mention-name-context {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -136,35 +136,35 @@
 }
 
 /* Context folder filter items in @-mention dropdown */
-.praetor-mention-item.context-folder .praetor-mention-icon {
+.claudes-codex-mention-item.context-folder .claudes-codex-mention-icon {
   color: var(--text-muted);
 }
 
-.praetor-mention-name-folder {
+.claudes-codex-mention-name-folder {
   color: var(--text-normal);
   font-weight: 500;
 }
 
-.praetor-mention-name-context {
+.claudes-codex-mention-name-context {
   color: var(--text-normal);
 }
 
 /* Agent folder items in @-mention dropdown */
-.praetor-mention-item.agent-folder .praetor-mention-icon {
+.claudes-codex-mention-item.agent-folder .claudes-codex-mention-icon {
   color: var(--link-color);
 }
 
-.praetor-mention-name-agent-folder {
+.claudes-codex-mention-name-agent-folder {
   color: var(--link-color);
   font-weight: 600;
 }
 
 /* Agent items in @-mention dropdown (inside @Agents/) */
-.praetor-mention-item.agent .praetor-mention-icon {
+.claudes-codex-mention-item.agent .claudes-codex-mention-icon {
   color: var(--link-color);
 }
 
-.praetor-mention-item.agent .praetor-mention-text {
+.claudes-codex-mention-item.agent .claudes-codex-mention-text {
   flex-direction: row;
   align-items: baseline;
   gap: 6px;
@@ -172,13 +172,13 @@
   white-space: nowrap;
 }
 
-.praetor-mention-item.agent .praetor-mention-name-agent {
+.claudes-codex-mention-item.agent .claudes-codex-mention-name-agent {
   color: var(--text-normal);
   font-size: 13px;
   flex-shrink: 0;
 }
 
-.praetor-mention-item.agent .praetor-mention-agent-desc {
+.claudes-codex-mention-item.agent .claudes-codex-mention-agent-desc {
   font-size: 11px;
   color: var(--text-muted);
   overflow: hidden;

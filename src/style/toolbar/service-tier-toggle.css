@@ -1,11 +1,11 @@
 /* Codex fast-mode / service-tier toggle */
-.praetor-service-tier-toggle {
+.claudes-codex-service-tier-toggle {
   display: flex;
   align-items: center;
   padding-left: 2px;
 }
 
-.praetor-service-tier-button {
+.claudes-codex-service-tier-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -19,21 +19,21 @@
   flex-shrink: 0;
 }
 
-.praetor-service-tier-icon {
+.claudes-codex-service-tier-icon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
 }
 
-.praetor-service-tier-icon svg {
+.claudes-codex-service-tier-icon svg {
   width: 14px;
   height: 14px;
 }
 
-.praetor-service-tier-button:hover {
+.claudes-codex-service-tier-button:hover {
   background: var(--background-modifier-hover);
 }
 
-.praetor-service-tier-button.active {
-  color: var(--praetor-brand);
+.claudes-codex-service-tier-button.active {
+  color: var(--claudes-codex-brand);
 }

@@ -778,7 +778,7 @@ describe('MentionDropdownController', () => {
       const itemEl = createMockEl();
       renderOptions.renderItem(folderItem, itemEl);
 
-      const nameEl = itemEl.querySelector('.praetor-mention-name-folder');
+      const nameEl = itemEl.querySelector('.claudes-codex-mention-name-folder');
       expect(nameEl?.textContent).toBe('@src/');
 
       localController.destroy();

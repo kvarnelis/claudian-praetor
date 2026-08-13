@@ -6,8 +6,8 @@ import type { Editor, WorkspaceLeaf } from 'obsidian';
 import { MarkdownView, Notice, Platform, Plugin } from 'obsidian';
 
 import { ConversationRepository } from './app/conversations/ConversationRepository';
-import { PraetorProviderHost } from './app/providers/PraetorProviderHost';
-import { DEFAULT_PRAETOR_SETTINGS } from './app/settings/defaultSettings';
+import { ClaudesCodexProviderHost } from './app/providers/ClaudesCodexProviderHost';
+import { DEFAULT_CLAUDES_CODEX_SETTINGS } from './app/settings/defaultSettings';
 import type { ConditionalSettingsMutation } from './app/settings/SettingsCoordinator';
 import { SettingsCoordinator, type SettingsMutation } from './app/settings/SettingsCoordinator';
 import { SharedStorageService } from './app/storage/SharedStorageService';
@@ -32,20 +32,20 @@ import { DEFAULT_CHAT_PROVIDER_ID } from './core/providers/types';
 import type {
   Conversation,
   ConversationMeta,
-  PraetorSettings,
+  ClaudesCodexSettings,
   SessionMetadata,
 } from './core/types';
 import {
-  VIEW_TYPE_PRAETOR,
+  VIEW_TYPE_CLAUDES_CODEX,
 } from './core/types';
 import type { ChatViewPlacement, EnvironmentScope } from './core/types/settings';
 import type { DaemonPairingResult, DaemonStartResult, DaemonSupervisor } from './desktop/daemonSupervisor';
 import { isLocalDaemonHostEnabled, setLocalDaemonHostEnabled } from './desktop/localDaemonSettings';
 import { registerFileMenu } from './features/chat/fileMenu';
-import { PraetorView } from './features/chat/PraetorView';
+import { ClaudesCodexView } from './features/chat/ClaudesCodexView';
 import { MobileDock } from './features/chat/ui/mobileDock';
 import { type InlineEditContext, InlineEditModal } from './features/inline-edit/ui/InlineEditModal';
-import { PraetorSettingTab } from './features/settings/PraetorSettings';
+import { ClaudesCodexSettingTab } from './features/settings/ClaudesCodexSettings';
 import { setLocale } from './i18n/i18n';
 import type { Locale } from './i18n/types';
 import { OPENCODE_PLAN_MODE_ID, OPENCODE_SAFE_MODE_ID } from './providers/opencode/modes';
@@ -60,7 +60,7 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return !!value && typeof value === 'object' && !Array.isArray(value);
 }
 
-function isPraetorView(value: unknown): value is PraetorView {
+function isClaudesCodexView(value: unknown): value is ClaudesCodexView {
   return !!value
     && typeof value === 'object'
     && typeof (value as { getTabManager?: unknown }).getTabManager === 'function';
@@ -109,11 +109,11 @@ function hasSamePendingProviderSessionInvalidations(
     && entries.every(([providerId, generation]) => pending.get(providerId) === generation);
 }
 
-export default class PraetorPlugin extends Plugin {
-  settings!: PraetorSettings;
+export default class ClaudesCodexPlugin extends Plugin {
+  settings!: ClaudesCodexSettings;
   storage!: SharedAppStorage;
-  readonly providerHost = new PraetorProviderHost(this);
-  private settingsCoordinator!: SettingsCoordinator<PraetorSettings>;
+  readonly providerHost = new ClaudesCodexProviderHost(this);
+  private settingsCoordinator!: SettingsCoordinator<ClaudesCodexSettings>;
   private conversationRepository!: ConversationRepository;
   private lastKnownTabManagerState: AppTabManagerState | null = null;
   private mobileDock!: MobileDock;
@@ -161,7 +161,7 @@ export default class PraetorPlugin extends Plugin {
         const { registerRemoteProviders } = await import('./remote/registration');
         registerRemoteProviders(this);
         this.remoteMode = true;
-        if (typeof document !== 'undefined') document.body?.classList?.add('praetor-mobile');
+        if (typeof document !== 'undefined') document.body?.classList?.add('claudes-codex-mobile');
       }
 
       await StartupProfiler.runAsync(
@@ -182,12 +182,12 @@ export default class PraetorPlugin extends Plugin {
       this.registerEvent(this.app.workspace.on('layout-change', () => this.mobileDock.sync()));
 
       this.registerView(
-        VIEW_TYPE_PRAETOR,
-        (leaf) => new PraetorView(leaf, this)
+        VIEW_TYPE_CLAUDES_CODEX,
+        (leaf) => new ClaudesCodexView(leaf, this)
       );
       registerFileMenu(this);
 
-      this.addRibbonIcon('bot', 'Open Praetor', () => {
+      this.addRibbonIcon('bot', "Open Claude's Codex", () => {
         void this.activateView();
       });
 
@@ -320,7 +320,7 @@ export default class PraetorPlugin extends Plugin {
         },
       });
 
-      this.addSettingTab(new PraetorSettingTab(this.app, this));
+      this.addSettingTab(new ClaudesCodexSettingTab(this.app, this));
       this.scheduleRemainingSessionMetadataLoad();
     } finally {
       StartupProfiler.finishOnload();
@@ -330,7 +330,7 @@ export default class PraetorPlugin extends Plugin {
   onunload(): void {
     this.isUnloading = true;
     this.mobileDock?.clear();
-    if (typeof document !== 'undefined') document.body?.classList?.remove('praetor-mobile');
+    if (typeof document !== 'undefined') document.body?.classList?.remove('claudes-codex-mobile');
     if (this.sessionMetadataLoadTimer !== null) {
       window.clearTimeout(this.sessionMetadataLoadTimer);
       this.sessionMetadataLoadTimer = null;
@@ -351,13 +351,13 @@ export default class PraetorPlugin extends Plugin {
 
   async activateView() {
     const { workspace } = this.app;
-    let leaf = workspace.getLeavesOfType(VIEW_TYPE_PRAETOR)[0];
+    let leaf = workspace.getLeavesOfType(VIEW_TYPE_CLAUDES_CODEX)[0];
 
     if (!leaf) {
       const newLeaf = this.getLeafForPlacement(this.settings.chatViewPlacement);
       if (newLeaf) {
         await newLeaf.setViewState({
-          type: VIEW_TYPE_PRAETOR,
+          type: VIEW_TYPE_CLAUDES_CODEX,
           active: true,
         });
         leaf = newLeaf;
@@ -391,7 +391,7 @@ export default class PraetorPlugin extends Plugin {
   }
 
   private canCreateNewTab(): boolean {
-    const hasPraetorLeaf = this.app.workspace.getLeavesOfType(VIEW_TYPE_PRAETOR).length > 0;
+    const hasClaudesCodexLeaf = this.app.workspace.getLeavesOfType(VIEW_TYPE_CLAUDES_CODEX).length > 0;
     const view = this.getView();
     const tabManager = view?.getTabManager();
 
@@ -399,14 +399,14 @@ export default class PraetorPlugin extends Plugin {
       return tabManager.canCreateTab();
     }
 
-    if (hasPraetorLeaf) {
+    if (hasClaudesCodexLeaf) {
       return false;
     }
 
     return this.getLastKnownOpenTabCount() < this.getMaxTabsLimit();
   }
 
-  private async ensureViewOpen(): Promise<PraetorView | null> {
+  private async ensureViewOpen(): Promise<ClaudesCodexView | null> {
     const existingView = this.getView();
     if (existingView) {
       return existingView;
@@ -442,19 +442,19 @@ export default class PraetorPlugin extends Plugin {
     this.hasLoadedAllSessionMetadata = false;
     await this.importLegacyPluginDataOnFirstRun();
     this.storage = new SharedStorageService(this);
-    const { praetor } = await this.storage.initialize();
+    const { claudesCodex } = await this.storage.initialize();
     this.lastKnownTabManagerState = await this.storage.getTabManagerState();
 
     this.settings = {
-      ...DEFAULT_PRAETOR_SETTINGS,
-      ...praetor,
+      ...DEFAULT_CLAUDES_CODEX_SETTINGS,
+      ...claudesCodex,
     };
     this.settingsCoordinator = new SettingsCoordinator(
       this.settings,
       async (settings) => {
         ProviderSettingsCoordinator.normalizeProviderSelection(settings);
         ProviderSettingsCoordinator.persistProjectedProviderState(settings);
-        await this.storage.savePraetorSettings(settings);
+        await this.storage.saveClaudesCodexSettings(settings);
       },
     );
     const didNormalizePendingSessionInvalidations = this.syncPendingSessionInvalidations();
@@ -580,7 +580,7 @@ export default class PraetorPlugin extends Plugin {
   }
 
   /**
-   * The `praetor` plugin id gives Obsidian a new data.json. Copy the previous
+   * The `claudes-codex` plugin id gives Obsidian a new data.json. Copy the previous
    * fork's plugin data on first run while leaving its rollback copy untouched.
    */
   private async importLegacyPluginDataOnFirstRun(): Promise<void> {
@@ -603,7 +603,7 @@ export default class PraetorPlugin extends Plugin {
 
       await this.saveData(legacyData);
     } catch {
-      new Notice('Praetor could not import settings from Claudian Praetor. The old data was left untouched.');
+      new Notice("Claude's Codex could not import settings from Claudian Praetor. The old data was left untouched.");
     }
   }
 
@@ -740,7 +740,7 @@ export default class PraetorPlugin extends Plugin {
   }
 
   private markPendingSessionInvalidations(
-    settings: PraetorSettings,
+    settings: ClaudesCodexSettings,
     providerIds: ProviderId[],
   ): Map<ProviderId, number> {
     const pending = readPendingProviderSessionInvalidations(settings);
@@ -895,11 +895,11 @@ export default class PraetorPlugin extends Plugin {
     const result = await this.daemonSupervisor.start({ retry: options.retry });
     if (options.notify) {
       if (result.status === 'started') {
-        new Notice(`Praetor: mobile daemon started at ${result.url}.`, 8000);
+        new Notice(`Claude's Codex: mobile daemon started at ${result.url}.`, 8000);
       } else if (result.status === 'already-running') {
-        new Notice(`Praetor: mobile daemon already running at ${result.url}.`, 8000);
+        new Notice(`Claude's Codex: mobile daemon already running at ${result.url}.`, 8000);
       } else if ('message' in result) {
-        new Notice(`Praetor: ${result.message}`, 8000);
+        new Notice(`Claude's Codex: ${result.message}`, 8000);
       }
     }
     return result;
@@ -934,7 +934,7 @@ export default class PraetorPlugin extends Plugin {
     }
 
     new Notice(
-      'Praetor mobile uses your Mac over Tailscale. Connect Tailscale on both devices, then on the Mac enable Mobile daemon and choose Pair iPhone or iPad.',
+      "Claude's Codex mobile uses your Mac over Tailscale. Connect Tailscale on both devices, then on the Mac enable Mobile daemon and choose Pair iPhone or iPad.",
       15_000,
     );
   }
@@ -943,12 +943,12 @@ export default class PraetorPlugin extends Plugin {
     await this.settingsCoordinator.persistCurrent();
   }
 
-  async mutateSettings(mutation: SettingsMutation<PraetorSettings>): Promise<void> {
+  async mutateSettings(mutation: SettingsMutation<ClaudesCodexSettings>): Promise<void> {
     await this.settingsCoordinator.mutate(mutation);
   }
 
   async mutateSettingsConditionally(
-    mutation: ConditionalSettingsMutation<PraetorSettings>,
+    mutation: ConditionalSettingsMutation<ClaudesCodexSettings>,
   ): Promise<void> {
     await this.settingsCoordinator.mutateConditionally(mutation);
   }
@@ -1061,7 +1061,7 @@ export default class PraetorPlugin extends Plugin {
   }
 
   private async restartEnvironmentAffectedRuntimes(
-    view: PraetorView,
+    view: ClaudesCodexView,
     affectedProviderIds: ProviderId[],
     resetSessions: boolean,
   ): Promise<number> {
@@ -1246,17 +1246,17 @@ export default class PraetorPlugin extends Plugin {
     await this.storage.setTabManagerState(state);
   }
 
-  getView(): PraetorView | null {
-    const leaves = this.app.workspace.getLeavesOfType(VIEW_TYPE_PRAETOR);
-    return leaves.map(leaf => leaf.view).find(isPraetorView) ?? null;
+  getView(): ClaudesCodexView | null {
+    const leaves = this.app.workspace.getLeavesOfType(VIEW_TYPE_CLAUDES_CODEX);
+    return leaves.map(leaf => leaf.view).find(isClaudesCodexView) ?? null;
   }
 
-  getAllViews(): PraetorView[] {
-    const leaves = this.app.workspace.getLeavesOfType(VIEW_TYPE_PRAETOR);
-    return leaves.map(leaf => leaf.view).filter(isPraetorView);
+  getAllViews(): ClaudesCodexView[] {
+    const leaves = this.app.workspace.getLeavesOfType(VIEW_TYPE_CLAUDES_CODEX);
+    return leaves.map(leaf => leaf.view).filter(isClaudesCodexView);
   }
 
-  findConversationAcrossViews(conversationId: string): { view: PraetorView; tabId: string } | null {
+  findConversationAcrossViews(conversationId: string): { view: ClaudesCodexView; tabId: string } | null {
     for (const view of this.getAllViews()) {
       const tabManager = view.getTabManager();
       if (!tabManager) continue;

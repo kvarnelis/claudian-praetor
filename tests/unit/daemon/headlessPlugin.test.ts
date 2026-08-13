@@ -20,7 +20,7 @@ describe('daemon headless plugin', () => {
   let vaultPath: string;
 
   beforeEach(() => {
-    vaultPath = mkdtempSync(path.join(os.tmpdir(), 'praetor-headless-'));
+    vaultPath = mkdtempSync(path.join(os.tmpdir(), 'claudes-codex-headless-'));
     registerBuiltInProviders();
     mockDiscoverModels.mockResolvedValue({
       kind: 'completed',
@@ -102,7 +102,7 @@ describe('daemon headless plugin', () => {
     writeFileSync(settingsPath, JSON.stringify({
       providerConfigs: {
         codex: { enabled: false, visibleModels: ['gpt-existing'] },
-        opencode: { enabled: true, selectedMode: 'praetor-yolo' },
+        opencode: { enabled: true, selectedMode: 'claudes-codex-yolo' },
       },
     }));
     const handle = await createHeadlessPlugin({
@@ -125,7 +125,7 @@ describe('daemon headless plugin', () => {
       expect(persisted.providerConfigs.codex.visibleModels).toEqual(['gpt-current']);
       expect(persisted.providerConfigs.opencode).toEqual(expect.objectContaining({
         enabled: true,
-        selectedMode: 'praetor-yolo',
+        selectedMode: 'claudes-codex-yolo',
       }));
     } finally {
       handle.dispose();

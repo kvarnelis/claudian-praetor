@@ -1,6 +1,6 @@
 import * as sdkModule from '@anthropic-ai/claude-agent-sdk';
 
-import type PraetorPlugin from '@/main';
+import type ClaudesCodexPlugin from '@/main';
 import { probeRuntimeCommands } from '@/providers/claude/commands/probeRuntimeCommands';
 
 const sdkMock = sdkModule as unknown as {
@@ -20,13 +20,13 @@ jest.mock('@/utils/env', () => ({
   findNodeExecutable: jest.fn().mockReturnValue('/usr/bin/node'),
 }));
 
-function createMockPlugin(settings: Record<string, unknown> = {}): PraetorPlugin {
+function createMockPlugin(settings: Record<string, unknown> = {}): ClaudesCodexPlugin {
   return {
     app: {},
     settings,
     getResolvedProviderCliPath: jest.fn().mockReturnValue('/mock/claude'),
     getActiveEnvironmentVariables: jest.fn().mockReturnValue(''),
-  } as unknown as PraetorPlugin;
+  } as unknown as ClaudesCodexPlugin;
 }
 
 describe('probeRuntimeCommands', () => {

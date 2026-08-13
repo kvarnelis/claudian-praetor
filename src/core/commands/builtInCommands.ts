@@ -1,5 +1,5 @@
 /**
- * Praetor - Built-in slash commands
+ * Claude's Codex - Built-in slash commands
  *
  * System commands that perform actions (not prompt expansions).
  * These are handled separately from user-defined slash commands.

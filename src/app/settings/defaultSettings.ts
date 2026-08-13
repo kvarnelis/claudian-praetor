@@ -1,9 +1,9 @@
 import { getDefaultHiddenProviderCommands } from '../../core/providers/commands/hiddenCommands';
 import { DEFAULT_REASONING_VALUE } from '../../core/providers/reasoning';
-import { type PraetorSettings } from '../../core/types/settings';
+import { type ClaudesCodexSettings } from '../../core/types/settings';
 import { getBuiltInProviderDefaultConfigs } from '../../providers/defaultProviderConfigs';
 
-export const DEFAULT_PRAETOR_SETTINGS: PraetorSettings = {
+export const DEFAULT_CLAUDES_CODEX_SETTINGS: ClaudesCodexSettings = {
   userName: '',
 
   permissionMode: 'yolo',

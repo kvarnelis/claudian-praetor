@@ -6,14 +6,14 @@ import type { SharedAppStorage } from '../../core/bootstrap/storage';
 import { normalizeTabManagerState } from '../../core/bootstrap/tabManagerState';
 import type { AppTabManagerState } from '../../core/providers/types';
 import { VaultFileAdapter } from '../../core/storage/VaultFileAdapter';
-import { PraetorSettingsStorage, type StoredPraetorSettings } from '../settings/PraetorSettingsStorage';
+import { ClaudesCodexSettingsStorage, type StoredClaudesCodexSettings } from '../settings/ClaudesCodexSettingsStorage';
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return !!value && typeof value === 'object' && !Array.isArray(value);
 }
 
 export class SharedStorageService implements SharedAppStorage {
-  readonly praetorSettings: PraetorSettingsStorage;
+  readonly claudesCodexSettings: ClaudesCodexSettingsStorage;
   readonly sessions: SessionStorage;
 
   private adapter: VaultFileAdapter;
@@ -23,17 +23,17 @@ export class SharedStorageService implements SharedAppStorage {
   constructor(plugin: Plugin) {
     this.plugin = plugin;
     this.adapter = new VaultFileAdapter(plugin.app);
-    this.praetorSettings = new PraetorSettingsStorage(this.adapter);
+    this.claudesCodexSettings = new ClaudesCodexSettingsStorage(this.adapter);
     this.sessions = new SessionStorage(this.adapter);
   }
 
-  async initialize(): Promise<{ praetor: Record<string, unknown> }> {
-    const praetor = await this.praetorSettings.load();
-    return { praetor };
+  async initialize(): Promise<{ claudesCodex: Record<string, unknown> }> {
+    const claudesCodex = await this.claudesCodexSettings.load();
+    return { claudesCodex };
   }
 
-  async savePraetorSettings(settings: Record<string, unknown>): Promise<void> {
-    await this.praetorSettings.save(settings as StoredPraetorSettings);
+  async saveClaudesCodexSettings(settings: Record<string, unknown>): Promise<void> {
+    await this.claudesCodexSettings.save(settings as StoredClaudesCodexSettings);
   }
 
   async setTabManagerState(state: AppTabManagerState): Promise<void> {

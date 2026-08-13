@@ -4,7 +4,7 @@ import type { SharedAppStorage } from '../core/bootstrap/storage';
 import type { ProviderHost } from '../core/providers/ProviderHost';
 import type { AppTabManagerState, ProviderId } from '../core/providers/types';
 import type { ChatRuntime } from '../core/runtime/ChatRuntime';
-import type { Conversation, ConversationMeta,PraetorSettings } from '../core/types';
+import type { Conversation, ConversationMeta,ClaudesCodexSettings } from '../core/types';
 import type { TabData, TabId, TabManagerViewHost } from './chat/tabs/types';
 
 type MobileDaemonStartResult =
@@ -37,7 +37,7 @@ export interface FeatureViewHost extends TabManagerViewHost {
 export interface FeatureHost {
   readonly app: App;
   readonly providerHost: ProviderHost;
-  readonly settings: PraetorSettings;
+  readonly settings: ClaudesCodexSettings;
   readonly storage: SharedAppStorage;
 
   isLocalDaemonHostEnabled(): boolean;
@@ -46,7 +46,7 @@ export interface FeatureHost {
   saveRemoteDaemonConfig(config: { url: string } | null): Promise<void>;
 
   mutateSettings(
-    mutation: (settings: PraetorSettings) => void | Promise<void>,
+    mutation: (settings: ClaudesCodexSettings) => void | Promise<void>,
   ): Promise<void>;
   getActiveEnvironmentVariables(providerId?: ProviderId): string;
 

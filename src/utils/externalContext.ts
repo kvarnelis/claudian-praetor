@@ -1,5 +1,5 @@
 /**
- * Praetor - External Context Utilities
+ * Claude's Codex - External Context Utilities
  *
  * Utilities for external context validation, normalization, and conflict detection.
  */

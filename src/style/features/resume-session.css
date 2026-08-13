@@ -1,5 +1,5 @@
 /* Resume Session Dropdown */
-.praetor-resume-dropdown {
+.claudes-codex-resume-dropdown {
   display: none;
   position: absolute;
   bottom: 100%;
@@ -17,11 +17,11 @@
   overflow: hidden;
 }
 
-.praetor-resume-dropdown.visible {
+.claudes-codex-resume-dropdown.visible {
   display: block;
 }
 
-.praetor-resume-header {
+.claudes-codex-resume-header {
   padding: 8px 12px;
   font-size: 12px;
   font-weight: 600;
@@ -31,19 +31,19 @@
   border-bottom: 1px solid var(--background-modifier-border);
 }
 
-.praetor-resume-list {
+.claudes-codex-resume-list {
   max-height: 350px;
   overflow-y: auto;
 }
 
-.praetor-resume-empty {
+.claudes-codex-resume-empty {
   padding: 16px;
   text-align: center;
   color: var(--text-muted);
   font-size: 13px;
 }
 
-.praetor-resume-item {
+.claudes-codex-resume-item {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -53,43 +53,43 @@
   transition: background 0.1s ease;
 }
 
-.praetor-resume-item:last-child {
+.claudes-codex-resume-item:last-child {
   border-bottom: none;
 }
 
-.praetor-resume-item:hover,
-.praetor-resume-item.selected {
+.claudes-codex-resume-item:hover,
+.claudes-codex-resume-item.selected {
   background: var(--background-modifier-hover);
 }
 
-.praetor-resume-item.current {
+.claudes-codex-resume-item.current {
   background: var(--background-secondary);
   border-inline-start: 2px solid var(--interactive-accent);
   padding-inline-start: 10px;
 }
 
-.praetor-resume-item-icon {
+.claudes-codex-resume-item-icon {
   display: flex;
   align-items: center;
   color: var(--text-muted);
   flex-shrink: 0;
 }
 
-.praetor-resume-item-icon svg {
+.claudes-codex-resume-item-icon svg {
   width: 16px;
   height: 16px;
 }
 
-.praetor-resume-item.current .praetor-resume-item-icon {
+.claudes-codex-resume-item.current .claudes-codex-resume-item-icon {
   color: var(--interactive-accent);
 }
 
-.praetor-resume-item-content {
+.claudes-codex-resume-item-content {
   flex: 1;
   min-width: 0;
 }
 
-.praetor-resume-item-title {
+.claudes-codex-resume-item-title {
   font-size: 13px;
   font-weight: 500;
   color: var(--text-normal);
@@ -98,22 +98,22 @@
   text-overflow: ellipsis;
 }
 
-.praetor-resume-item-date {
+.claudes-codex-resume-item-date {
   font-size: 11px;
   color: var(--text-faint);
   margin-top: 2px;
 }
 
 /* Scrollbar */
-.praetor-resume-list::-webkit-scrollbar {
+.claudes-codex-resume-list::-webkit-scrollbar {
   width: 6px;
 }
 
-.praetor-resume-list::-webkit-scrollbar-track {
+.claudes-codex-resume-list::-webkit-scrollbar-track {
   background: transparent;
 }
 
-.praetor-resume-list::-webkit-scrollbar-thumb {
+.claudes-codex-resume-list::-webkit-scrollbar-thumb {
   background: var(--background-modifier-border);
   border-radius: 3px;
 }

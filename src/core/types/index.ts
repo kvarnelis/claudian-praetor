@@ -10,7 +10,7 @@ export {
   type SessionMetadata,
   type StreamChunk,
   type UsageInfo,
-  VIEW_TYPE_PRAETOR,
+  VIEW_TYPE_CLAUDES_CODEX,
 } from './chat';
 export { type ProviderId } from './provider';
 
@@ -23,7 +23,7 @@ export {
   type InstructionRefineResult,
   type KeyboardNavigationSettings,
   type PermissionMode,
-  type PraetorSettings,
+  type ClaudesCodexSettings,
   type SlashCommand,
 } from './settings';
 

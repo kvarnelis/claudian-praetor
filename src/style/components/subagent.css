@@ -1,24 +1,24 @@
-.praetor-subagent-list {
+.claudes-codex-subagent-list {
   margin: 8px 0;
 }
 
-.praetor-text-block+.praetor-subagent-list {
+.claudes-codex-text-block+.claudes-codex-subagent-list {
   margin-top: 8px;
 }
 
-.praetor-subagent-list+.praetor-text-block {
+.claudes-codex-subagent-list+.claudes-codex-text-block {
   margin-top: 8px;
 }
 
-.praetor-tool-call+.praetor-subagent-list {
+.claudes-codex-tool-call+.claudes-codex-subagent-list {
   margin-top: 8px;
 }
 
-.praetor-subagent-list+.praetor-tool-call {
+.claudes-codex-subagent-list+.claudes-codex-tool-call {
   margin-top: 8px;
 }
 
-.praetor-subagent-header {
+.claudes-codex-subagent-header {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -27,19 +27,19 @@
   overflow: hidden;
 }
 
-.praetor-subagent-icon {
+.claudes-codex-subagent-icon {
   display: flex;
   align-items: center;
   color: var(--interactive-accent);
   flex-shrink: 0;
 }
 
-.praetor-subagent-icon svg {
+.claudes-codex-subagent-icon svg {
   width: 16px;
   height: 16px;
 }
 
-.praetor-subagent-label {
+.claudes-codex-subagent-label {
   flex: 1;
   font-family: var(--font-monospace);
   font-size: 13px;
@@ -47,41 +47,41 @@
   color: var(--text-normal);
 }
 
-.praetor-subagent-status {
+.claudes-codex-subagent-status {
   display: flex;
   align-items: center;
   flex-shrink: 0;
 }
 
-.praetor-subagent-status svg {
+.claudes-codex-subagent-status svg {
   width: 14px;
   height: 14px;
 }
 
-.praetor-subagent-status.status-running {
+.claudes-codex-subagent-status.status-running {
   color: var(--text-accent);
 }
 
-.praetor-subagent-status.status-completed {
+.claudes-codex-subagent-status.status-completed {
   color: var(--color-green);
 }
 
-.praetor-subagent-status.status-error {
+.claudes-codex-subagent-status.status-error {
   color: var(--color-red);
 }
 
-.praetor-subagent-content {
+.claudes-codex-subagent-content {
   padding: 4px 0;
   padding-inline-start: 16px;
   margin-inline-start: 7px;
   border-inline-start: 2px solid var(--background-modifier-border);
 }
 
-.praetor-subagent-section {
+.claudes-codex-subagent-section {
   margin: 2px 0 6px;
 }
 
-.praetor-subagent-section-header {
+.claudes-codex-subagent-section-header {
   display: flex;
   align-items: center;
   gap: 6px;
@@ -93,21 +93,21 @@
   padding: 2px 0;
 }
 
-.praetor-subagent-section-header:hover {
+.claudes-codex-subagent-section-header:hover {
   color: var(--text-normal);
 }
 
-.praetor-subagent-section-title {
+.claudes-codex-subagent-section-title {
   flex: 1;
   min-width: 0;
 }
 
-.praetor-subagent-section-body {
+.claudes-codex-subagent-section-body {
   padding-inline-start: 6px;
 }
 
-.praetor-subagent-prompt-text,
-.praetor-subagent-result-output {
+.claudes-codex-subagent-prompt-text,
+.claudes-codex-subagent-result-output {
   font-family: var(--font-monospace);
   font-size: 12px;
   line-height: 1.4;
@@ -116,22 +116,22 @@
   word-break: break-word;
 }
 
-.praetor-subagent-result-output {
+.claudes-codex-subagent-result-output {
   max-height: 220px;
   overflow-y: auto;
 }
 
-.praetor-subagent-tools {
+.claudes-codex-subagent-tools {
   display: flex;
   flex-direction: column;
   gap: 4px;
 }
 
-.praetor-subagent-tool-item {
+.claudes-codex-subagent-tool-item {
   display: block;
 }
 
-.praetor-subagent-tool-header {
+.claudes-codex-subagent-tool-header {
   display: flex;
   align-items: center;
   gap: 6px;
@@ -140,23 +140,23 @@
   padding: 2px 0;
 }
 
-.praetor-subagent-tool-header:hover {
+.claudes-codex-subagent-tool-header:hover {
   opacity: 0.85;
 }
 
-.praetor-subagent-tool-icon {
+.claudes-codex-subagent-tool-icon {
   display: flex;
   align-items: center;
   color: var(--text-accent);
   flex-shrink: 0;
 }
 
-.praetor-subagent-tool-icon svg {
+.claudes-codex-subagent-tool-icon svg {
   width: 13px;
   height: 13px;
 }
 
-.praetor-subagent-tool-name {
+.claudes-codex-subagent-tool-name {
   font-family: var(--font-monospace);
   font-size: 12px;
   color: var(--text-normal);
@@ -164,7 +164,7 @@
   flex-shrink: 0;
 }
 
-.praetor-subagent-tool-summary {
+.claudes-codex-subagent-tool-summary {
   font-family: var(--font-monospace);
   font-size: 12px;
   color: var(--text-muted);
@@ -175,35 +175,35 @@
   min-width: 0;
 }
 
-.praetor-subagent-tool-status {
+.claudes-codex-subagent-tool-status {
   display: flex;
   align-items: center;
   flex-shrink: 0;
 }
 
-.praetor-subagent-tool-status svg {
+.claudes-codex-subagent-tool-status svg {
   width: 12px;
   height: 12px;
 }
 
-.praetor-subagent-tool-status.status-running {
+.claudes-codex-subagent-tool-status.status-running {
   color: var(--text-accent);
 }
 
-.praetor-subagent-tool-status.status-completed {
+.claudes-codex-subagent-tool-status.status-completed {
   color: var(--color-green);
 }
 
-.praetor-subagent-tool-status.status-error,
-.praetor-subagent-tool-status.status-blocked {
+.claudes-codex-subagent-tool-status.status-error,
+.claudes-codex-subagent-tool-status.status-blocked {
   color: var(--color-red);
 }
 
-.praetor-subagent-tool-content {
+.claudes-codex-subagent-tool-content {
   padding: 2px 0 2px 16px;
 }
 
-.praetor-subagent-tool-empty {
+.claudes-codex-subagent-tool-empty {
   color: var(--text-faint);
   font-style: italic;
   font-family: var(--font-monospace);
@@ -211,7 +211,7 @@
   padding: 2px 0;
 }
 
-.praetor-subagent-status-text {
+.claudes-codex-subagent-status-text {
   font-size: 11px;
   font-family: var(--font-monospace);
   color: var(--text-muted);
@@ -219,30 +219,30 @@
   padding-inline-start: 8px;
 }
 
-.praetor-subagent-list.async .praetor-subagent-icon {
+.claudes-codex-subagent-list.async .claudes-codex-subagent-icon {
   color: var(--interactive-accent);
 }
 
-.praetor-subagent-list.async.pending .praetor-subagent-status-text {
+.claudes-codex-subagent-list.async.pending .claudes-codex-subagent-status-text {
   color: var(--text-muted);
 }
 
-.praetor-subagent-list.async.running .praetor-subagent-status-text {
+.claudes-codex-subagent-list.async.running .claudes-codex-subagent-status-text {
   color: var(--text-accent);
 }
 
-.praetor-subagent-list.async.awaiting .praetor-subagent-status-text {
+.claudes-codex-subagent-list.async.awaiting .claudes-codex-subagent-status-text {
   color: var(--color-yellow);
 }
 
-.praetor-subagent-list.async.completed .praetor-subagent-status-text {
+.claudes-codex-subagent-list.async.completed .claudes-codex-subagent-status-text {
   color: var(--color-green);
 }
 
-.praetor-subagent-list.async.error .praetor-subagent-status-text {
+.claudes-codex-subagent-list.async.error .claudes-codex-subagent-status-text {
   color: var(--color-red);
 }
 
-.praetor-subagent-list.async.orphaned .praetor-subagent-status-text {
+.claudes-codex-subagent-list.async.orphaned .claudes-codex-subagent-status-text {
   color: var(--color-orange);
 }

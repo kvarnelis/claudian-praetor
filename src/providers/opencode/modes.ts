@@ -5,8 +5,8 @@ export interface OpencodeMode {
 }
 
 export const OPENCODE_BUILD_MODE_ID = 'build';
-export const OPENCODE_YOLO_MODE_ID = 'praetor-yolo';
-export const OPENCODE_SAFE_MODE_ID = 'praetor-safe';
+export const OPENCODE_YOLO_MODE_ID = 'claudes-codex-yolo';
+export const OPENCODE_SAFE_MODE_ID = 'claudes-codex-safe';
 export const OPENCODE_PLAN_MODE_ID = 'plan';
 
 export const OPENCODE_FALLBACK_MODES: ReadonlyArray<OpencodeMode> = Object.freeze([

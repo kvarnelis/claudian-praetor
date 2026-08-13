@@ -24,9 +24,9 @@ src/style/
 
 ## Conventions
 
-- Praetor-owned classes use the `.praetor-` prefix.
+- Claude's Codex-owned classes use the `.claudes-codex-` prefix.
 - Shared Obsidian host selectors and generic state classes may remain unprefixed.
-- Prefer BEM-lite names: `.praetor-{block}`, `.praetor-{block}-{element}`, `.praetor-{block}--{modifier}`.
+- Prefer BEM-lite names: `.claudes-codex-{block}`, `.claudes-codex-{block}-{element}`, `.claudes-codex-{block}--{modifier}`.
 - Avoid `!important` unless overriding Obsidian defaults.
 - Use Obsidian CSS variables such as `--background-*`, `--text-*`, and `--interactive-*`.
 - Use `var(--font-monospace)` for code blocks.

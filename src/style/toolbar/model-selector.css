@@ -1,34 +1,34 @@
 /* Model selector */
-.praetor-model-selector {
+.claudes-codex-model-selector {
   position: relative;
 }
 
-.praetor-model-btn {
+.claudes-codex-model-btn {
   display: flex;
   align-items: center;
   gap: 4px;
   padding: 4px 8px;
   border-radius: 4px;
   cursor: pointer;
-  color: var(--praetor-brand);
+  color: var(--claudes-codex-brand);
   font-size: 12px;
 }
 
-.praetor-model-label {
+.claudes-codex-model-label {
   font-weight: 500;
 }
 
-.praetor-model-chevron {
+.claudes-codex-model-chevron {
   display: flex;
   align-items: center;
 }
 
-.praetor-model-chevron svg {
+.claudes-codex-model-chevron svg {
   width: 12px;
   height: 12px;
 }
 
-.praetor-model-dropdown {
+.claudes-codex-model-dropdown {
   position: absolute;
   bottom: 100%;
   left: 0;
@@ -48,12 +48,12 @@
   transition: opacity 0.15s ease, visibility 0.15s ease;
 }
 
-.praetor-model-selector:hover .praetor-model-dropdown {
+.claudes-codex-model-selector:hover .claudes-codex-model-dropdown {
   opacity: 1;
   visibility: visible;
 }
 
-.praetor-model-group {
+.claudes-codex-model-group {
   padding: 3px 8px;
   font-size: 8px;
   font-weight: 600;
@@ -63,21 +63,21 @@
   pointer-events: none;
 }
 
-.praetor-model-group:not(:first-child) {
+.claudes-codex-model-group:not(:first-child) {
   margin-top: 4px;
   border-top: 1px solid var(--background-modifier-border);
   padding-top: 6px;
 }
 
-.praetor-model-provider-icon {
+.claudes-codex-model-provider-icon {
   flex-shrink: 0;
 }
 
-.praetor-model-option .praetor-model-provider-icon {
+.claudes-codex-model-option .claudes-codex-model-provider-icon {
   opacity: 0.7;
 }
 
-.praetor-model-option {
+.claudes-codex-model-option {
   display: flex;
   align-items: center;
   gap: 5px;
@@ -90,13 +90,13 @@
   white-space: nowrap;
 }
 
-.praetor-model-option:hover {
+.claudes-codex-model-option:hover {
   background: var(--background-modifier-hover);
   color: var(--text-normal);
 }
 
-.praetor-model-option.selected {
-  background: rgba(var(--praetor-brand-rgb), 0.15);
-  color: var(--praetor-brand);
+.claudes-codex-model-option.selected {
+  background: rgba(var(--claudes-codex-brand-rgb), 0.15);
+  color: var(--claudes-codex-brand);
   font-weight: 500;
 }

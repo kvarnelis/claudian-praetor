@@ -1,5 +1,5 @@
 /**
- * praetord WebSocket server: hosts real ChatRuntime instances and speaks the
+ * claudes-codexd WebSocket server: hosts real ChatRuntime instances and speaks the
  * wire protocol in src/remote/protocol.ts.
  *
  * Runtimes survive client disconnects: each runtime host buffers its
@@ -17,13 +17,13 @@ import { ProviderRegistry } from '../../src/core/providers/ProviderRegistry';
 import type { ProviderId } from '../../src/core/providers/types';
 import type { ChatRuntime } from '../../src/core/runtime/ChatRuntime';
 import type { ChatTurnMetadata } from '../../src/core/runtime/types';
-import type { PraetorSettings, Conversation } from '../../src/core/types';
-import type PraetorPlugin from '../../src/main';
+import type { ClaudesCodexSettings, Conversation } from '../../src/core/types';
+import type ClaudesCodexPlugin from '../../src/main';
 import {
   type ClientMessage,
   generateId,
   type HistoryHydrateParams,
-  PRAETOR_PROTOCOL_VERSION,
+  CLAUDES_CODEX_PROTOCOL_VERSION,
   preparedTurnToWire,
   PROXIED_RUNTIME_METHODS,
   type QueryEvent,
@@ -65,9 +65,9 @@ interface PendingCallback {
   timer: NodeJS.Timeout;
 }
 
-export interface PraetorServerOptions {
-  plugin: PraetorPlugin;
-  settings: PraetorSettings;
+export interface ClaudesCodexServerOptions {
+  plugin: ClaudesCodexPlugin;
+  settings: ClaudesCodexSettings;
   vaultPath: string;
   host: string;
   port: number;
@@ -75,7 +75,7 @@ export interface PraetorServerOptions {
   log: (message: string) => void;
 }
 
-export class PraetorServer {
+export class ClaudesCodexServer {
   private wss: WebSocketServer | null = null;
   private readonly hosts = new Map<string, RuntimeHost>();
   private readonly pendingCallbacks = new Map<number, PendingCallback>();
@@ -83,7 +83,7 @@ export class PraetorServer {
   private gcTimer: NodeJS.Timeout | null = null;
   private heartbeatTimer: NodeJS.Timeout | null = null;
 
-  constructor(private readonly options: PraetorServerOptions) {}
+  constructor(private readonly options: ClaudesCodexServerOptions) {}
 
   start(): Promise<void> {
     const { host, port, log } = this.options;
@@ -107,7 +107,7 @@ export class PraetorServer {
 
     return new Promise((resolve, reject) => {
       wss.once('listening', () => {
-        log(`[praetord] listening on ws://${host}:${port}`);
+        log(`[claudes-codexd] listening on ws://${host}:${port}`);
         resolve();
       });
       wss.once('error', reject);
@@ -161,7 +161,7 @@ export class PraetorServer {
           return;
         }
         clearTimeout(handshakeTimer);
-        if (msg.proto !== PRAETOR_PROTOCOL_VERSION) {
+        if (msg.proto !== CLAUDES_CODEX_PROTOCOL_VERSION) {
           this.send(socket, { t: 'hello.err', error: 'protocol version mismatch' });
           socket.close();
           return;
@@ -181,7 +181,7 @@ export class PraetorServer {
         meta.authed = true;
         this.send(socket, {
           t: 'hello.ok',
-          proto: PRAETOR_PROTOCOL_VERSION,
+          proto: CLAUDES_CODEX_PROTOCOL_VERSION,
           daemonVersion: DAEMON_VERSION,
           vaultPath: this.options.vaultPath,
           vaultName: path.basename(this.options.vaultPath),
@@ -189,7 +189,7 @@ export class PraetorServer {
             this.options.settings as unknown as Record<string, unknown>,
           ),
         });
-        log(authorization.paired ? '[praetord] paired and connected client' : '[praetord] client connected');
+        log(authorization.paired ? '[claudes-codexd] paired and connected client' : '[claudes-codexd] client connected');
         return;
       }
 
@@ -305,7 +305,7 @@ export class PraetorServer {
     };
     this.hosts.set(host.runtimeId, host);
     this.wireRuntimeCallbacks(host);
-    this.options.log(`[praetord] runtime created: ${host.runtimeId} (${providerId})`);
+    this.options.log(`[claudes-codexd] runtime created: ${host.runtimeId} (${providerId})`);
 
     return { runtimeId: host.runtimeId, state: this.snapshot(host, { consume: false }) };
   }
@@ -562,7 +562,7 @@ export class PraetorServer {
         } catch {
           // disposed anyway
         }
-        this.options.log(`[praetord] disposed orphaned runtime ${runtimeId}`);
+        this.options.log(`[claudes-codexd] disposed orphaned runtime ${runtimeId}`);
       }
     }
   }

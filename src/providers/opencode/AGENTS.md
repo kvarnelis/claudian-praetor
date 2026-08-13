@@ -10,21 +10,21 @@
 ## Protocol Rules
 
 - Live output comes from ACP session notifications and is normalized through `AcpSessionUpdateNormalizer` plus OpenCode tool normalization.
-- History hydration reads OpenCode's native SQLite database. Never mutate OpenCode native history from Praetor.
+- History hydration reads OpenCode's native SQLite database. Never mutate OpenCode native history from Claude's Codex.
 - `providerState.databasePath` preserves the database used for a conversation. Keep it when building session updates.
 - `sessionCwds` maps ACP session IDs to vault working directories for read/write request path resolution.
 
 ## Launch and Settings
 
 - `prepareOpencodeLaunchArtifacts()` writes managed config and system prompt files under `.claudian/opencode/`.
-- Preserve user OpenCode config by loading `OPENCODE_CONFIG` and layering Praetor-managed agent config over it.
+- Preserve user OpenCode config by loading `OPENCODE_CONFIG` and layering Claude's Codex-managed agent config over it.
 - Environment keys that affect config or data location invalidate OpenCode sessions: `OPENCODE_CONFIG`, `OPENCODE_DB`, `OPENCODE_DISABLE_PROJECT_CONFIG`, and `XDG_DATA_HOME`.
 - OpenCode mode IDs map to shared permission modes. Keep this mapping in `modes.ts`, not feature code.
 
 ## Commands and Agents
 
 - Runtime commands are read from the OpenCode session and exposed through `OpencodeCommandCatalog`.
-- OpenCode runtime commands are not editable or deletable from Praetor.
+- OpenCode runtime commands are not editable or deletable from Claude's Codex.
 - Command discovery warmup for blank tabs should use the isolated metadata database, not a persisted conversation session.
 - Do not let command discovery create a real session for history-backed conversations that have messages but no provider session yet.
 - OpenCode agent definitions are stored under `.opencode/agent` and `.opencode/agents`; keep parsing and serialization in `OpencodeAgentStorage`.

@@ -6,18 +6,18 @@ import {
 } from '@/features/chat/rendering/Welcome';
 
 describe('Welcome', () => {
-  it('renders Praetor branding before the dynamic greeting', () => {
+  it("renders Claude's Codex branding before the dynamic greeting", () => {
     const parentEl = createMockEl();
 
     const welcomeEl = createWelcomeElement(parentEl, 'Good morning');
 
-    expect(welcomeEl.hasClass('praetor-welcome')).toBe(true);
+    expect(welcomeEl.hasClass('claudes-codex-welcome')).toBe(true);
     expect(welcomeEl.children).toHaveLength(2);
-    expect(welcomeEl.children[0].hasClass('praetor-welcome-brand')).toBe(true);
-    expect(welcomeEl.children[0].hasClass('praetor-welcome-text')).toBe(true);
-    expect(welcomeEl.children[0].textContent).toBe('Praetor');
-    expect(welcomeEl.children[1].hasClass('praetor-welcome-greeting')).toBe(true);
-    expect(welcomeEl.children[1].hasClass('praetor-welcome-text')).toBe(true);
+    expect(welcomeEl.children[0].hasClass('claudes-codex-welcome-brand')).toBe(true);
+    expect(welcomeEl.children[0].hasClass('claudes-codex-welcome-text')).toBe(true);
+    expect(welcomeEl.children[0].textContent).toBe("Claude's Codex");
+    expect(welcomeEl.children[1].hasClass('claudes-codex-welcome-greeting')).toBe(true);
+    expect(welcomeEl.children[1].hasClass('claudes-codex-welcome-text')).toBe(true);
     expect(welcomeEl.children[1].textContent).toBe('Good morning');
   });
 
@@ -28,8 +28,8 @@ describe('Welcome', () => {
     renderWelcomeContent(welcomeEl, 'Welcome back');
 
     expect(welcomeEl.children).toHaveLength(2);
-    expect(welcomeEl.querySelectorAll('.praetor-welcome-brand')).toHaveLength(1);
-    expect(welcomeEl.querySelector('.praetor-welcome-greeting')?.textContent)
+    expect(welcomeEl.querySelectorAll('.claudes-codex-welcome-brand')).toHaveLength(1);
+    expect(welcomeEl.querySelector('.claudes-codex-welcome-greeting')?.textContent)
       .toBe('Welcome back');
   });
 
@@ -39,6 +39,6 @@ describe('Welcome', () => {
     const welcomeEl = createWelcomeElement(parentEl);
 
     expect(welcomeEl.children).toHaveLength(1);
-    expect(welcomeEl.children[0].textContent).toBe('Praetor');
+    expect(welcomeEl.children[0].textContent).toBe("Claude's Codex");
   });
 });

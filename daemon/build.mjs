@@ -1,7 +1,7 @@
 /**
- * Builds praetord into a single CJS file. Mirrors the SDK import.meta patch
+ * Builds claudes-codexd into a single CJS file. Mirrors the SDK import.meta patch
  * from the root esbuild.config.mjs (cjs output has no import.meta); the
- * renderer-unref patch is intentionally skipped — praetord runs in real Node.
+ * renderer-unref patch is intentionally skipped — claudes-codexd runs in real Node.
  */
 
 import esbuild from 'esbuild';
@@ -76,7 +76,7 @@ await esbuild.build({
   platform: 'node',
   target: 'node18',
   format: 'cjs',
-  outfile: path.join(daemonDir, 'dist', 'praetord.cjs'),
+  outfile: path.join(daemonDir, 'dist', 'claudes-codexd.cjs'),
   alias: {
     obsidian: path.join(daemonDir, 'src', 'obsidianStub.ts'),
   },
@@ -90,4 +90,4 @@ await esbuild.build({
   absWorkingDir: repoRoot,
 });
 
-console.log('praetord built: daemon/dist/praetord.cjs');
+console.log('claudes-codexd built: daemon/dist/claudes-codexd.cjs');

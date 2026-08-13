@@ -44,13 +44,13 @@ function createMockCallbacks(overrides: Partial<SlashCommandDropdownCallbacks> =
 
 function getRenderedItems(containerEl: any): { name: string; description: string }[] {
   const dropdownEl = containerEl.children.find(
-    (c: any) => c.hasClass('praetor-slash-dropdown')
+    (c: any) => c.hasClass('claudes-codex-slash-dropdown')
   );
   if (!dropdownEl) return [];
-  const items = dropdownEl.querySelectorAll('.praetor-slash-item');
+  const items = dropdownEl.querySelectorAll('.claudes-codex-slash-item');
   return items.map((item: any) => {
-    const nameSpan = item.children.find((c: any) => c.hasClass('praetor-slash-name'));
-    const descDiv = item.children.find((c: any) => c.hasClass('praetor-slash-desc'));
+    const nameSpan = item.children.find((c: any) => c.hasClass('claudes-codex-slash-name'));
+    const descDiv = item.children.find((c: any) => c.hasClass('claudes-codex-slash-desc'));
     return {
       name: nameSpan?.textContent ?? '',
       description: descDiv?.textContent ?? '',

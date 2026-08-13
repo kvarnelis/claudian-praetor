@@ -77,7 +77,7 @@ export class ModelSelector {
   private callbacks: ToolbarCallbacks;
   constructor(parentEl: HTMLElement, callbacks: ToolbarCallbacks) {
     this.callbacks = callbacks;
-    this.container = parentEl.createDiv({ cls: 'praetor-model-selector' });
+    this.container = parentEl.createDiv({ cls: 'claudes-codex-model-selector' });
     this.render();
     // The dropdown opens on hover (CSS) and its options are built once. Rebuild
     // them on hover so an async-populated model catalog (models read live from
@@ -101,10 +101,10 @@ export class ModelSelector {
   private render() {
     this.container.empty();
 
-    this.buttonEl = this.container.createDiv({ cls: 'praetor-model-btn' });
+    this.buttonEl = this.container.createDiv({ cls: 'claudes-codex-model-btn' });
     this.updateDisplay();
 
-    this.dropdownEl = this.container.createDiv({ cls: 'praetor-model-dropdown' });
+    this.dropdownEl = this.container.createDiv({ cls: 'claudes-codex-model-dropdown' });
     this.renderOptions();
   }
 
@@ -122,13 +122,13 @@ export class ModelSelector {
 
     if (icon) {
       createProviderIconSvg(icon, {
-        className: 'praetor-model-provider-icon',
+        className: 'claudes-codex-model-provider-icon',
         height: 12,
         parent: this.buttonEl,
         width: 12,
       });
     }
-    const labelEl = this.buttonEl.createSpan({ cls: 'praetor-model-label' });
+    const labelEl = this.buttonEl.createSpan({ cls: 'claudes-codex-model-label' });
     labelEl.setText(displayModel?.label || 'Unknown');
   }
 
@@ -143,12 +143,12 @@ export class ModelSelector {
     let lastGroup: string | undefined;
     for (const model of reversed) {
       if (model.group && model.group !== lastGroup) {
-        const separator = this.dropdownEl.createDiv({ cls: 'praetor-model-group' });
+        const separator = this.dropdownEl.createDiv({ cls: 'claudes-codex-model-group' });
         separator.setText(model.group);
         lastGroup = model.group;
       }
 
-      const option = this.dropdownEl.createDiv({ cls: 'praetor-model-option' });
+      const option = this.dropdownEl.createDiv({ cls: 'claudes-codex-model-option' });
       if (model.value === currentModel) {
         option.addClass('selected');
       }
@@ -156,7 +156,7 @@ export class ModelSelector {
       const icon = model.providerIcon ?? this.callbacks.getUIConfig().getProviderIcon?.();
       if (icon) {
         createProviderIconSvg(icon, {
-          className: 'praetor-model-provider-icon',
+          className: 'claudes-codex-model-provider-icon',
           height: 12,
           parent: option,
           width: 12,
@@ -187,7 +187,7 @@ export class ModeSelector {
 
   constructor(parentEl: HTMLElement, callbacks: ToolbarCallbacks) {
     this.callbacks = callbacks;
-    this.container = parentEl.createDiv({ cls: 'praetor-mode-selector' });
+    this.container = parentEl.createDiv({ cls: 'claudes-codex-mode-selector' });
     this.render();
   }
 
@@ -198,8 +198,8 @@ export class ModeSelector {
   private render() {
     this.container.empty();
 
-    this.labelEl = this.container.createSpan({ cls: 'praetor-mode-label' });
-    this.toggleEl = this.container.createDiv({ cls: 'praetor-toggle-switch' });
+    this.labelEl = this.container.createSpan({ cls: 'claudes-codex-mode-label' });
+    this.toggleEl = this.container.createDiv({ cls: 'claudes-codex-toggle-switch' });
 
     this.toggleEl.addEventListener('click', () => {
       runToolbarAction(() => this.toggle(), 'Failed to change mode');
@@ -227,11 +227,11 @@ export class ModeSelector {
 
     const selectorConfig = this.getSelectorConfig();
     if (!selectorConfig || selectorConfig.options.length !== 2) {
-      this.container.addClass('praetor-hidden');
+      this.container.addClass('claudes-codex-hidden');
       return;
     }
 
-    this.container.removeClass('praetor-hidden');
+    this.container.removeClass('claudes-codex-hidden');
     const { active, inactive } = this.resolveOptionPair(selectorConfig);
     const currentOption = selectorConfig.options.find((option) => option.value === selectorConfig.value)
       ?? selectorConfig.options[0];
@@ -279,7 +279,7 @@ export class ThinkingBudgetSelector {
 
   constructor(parentEl: HTMLElement, callbacks: ToolbarCallbacks) {
     this.callbacks = callbacks;
-    this.container = parentEl.createDiv({ cls: 'praetor-thinking-selector' });
+    this.container = parentEl.createDiv({ cls: 'claudes-codex-thinking-selector' });
     this.render();
   }
 
@@ -287,16 +287,16 @@ export class ThinkingBudgetSelector {
     this.container.empty();
 
     // Effort selector (for adaptive thinking models)
-    this.effortEl = this.container.createDiv({ cls: 'praetor-thinking-effort' });
-    const effortLabel = this.effortEl.createSpan({ cls: 'praetor-thinking-label-text' });
+    this.effortEl = this.container.createDiv({ cls: 'claudes-codex-thinking-effort' });
+    const effortLabel = this.effortEl.createSpan({ cls: 'claudes-codex-thinking-label-text' });
     effortLabel.setText('Effort:');
-    this.effortGearsEl = this.effortEl.createDiv({ cls: 'praetor-thinking-gears' });
+    this.effortGearsEl = this.effortEl.createDiv({ cls: 'claudes-codex-thinking-gears' });
 
     // Legacy budget selector (for custom models)
-    this.budgetEl = this.container.createDiv({ cls: 'praetor-thinking-budget' });
-    const budgetLabel = this.budgetEl.createSpan({ cls: 'praetor-thinking-label-text' });
+    this.budgetEl = this.container.createDiv({ cls: 'claudes-codex-thinking-budget' });
+    const budgetLabel = this.budgetEl.createSpan({ cls: 'claudes-codex-thinking-label-text' });
     budgetLabel.setText('Thinking:');
-    this.budgetGearsEl = this.budgetEl.createDiv({ cls: 'praetor-thinking-gears' });
+    this.budgetGearsEl = this.budgetEl.createDiv({ cls: 'claudes-codex-thinking-gears' });
 
     this.updateDisplay();
   }
@@ -312,13 +312,13 @@ export class ThinkingBudgetSelector {
     const options = uiConfig.getReasoningOptions(model, settings);
     const currentInfo = options.find(e => e.value === currentEffort);
 
-    const currentEl = this.effortGearsEl.createDiv({ cls: 'praetor-thinking-current' });
+    const currentEl = this.effortGearsEl.createDiv({ cls: 'claudes-codex-thinking-current' });
     currentEl.setText(currentInfo?.label || options[0]?.label || 'High');
 
-    const optionsEl = this.effortGearsEl.createDiv({ cls: 'praetor-thinking-options' });
+    const optionsEl = this.effortGearsEl.createDiv({ cls: 'claudes-codex-thinking-options' });
 
     for (const effort of [...options].reverse()) {
-      const gearEl = optionsEl.createDiv({ cls: 'praetor-thinking-gear' });
+      const gearEl = optionsEl.createDiv({ cls: 'claudes-codex-thinking-gear' });
       gearEl.setText(effort.label);
       if (effort.description) {
         gearEl.setAttribute('title', effort.description);
@@ -349,13 +349,13 @@ export class ThinkingBudgetSelector {
     const options: ProviderReasoningOption[] = uiConfig.getReasoningOptions(model, settings);
     const currentBudgetInfo = options.find(b => b.value === currentBudget);
 
-    const currentEl = this.budgetGearsEl.createDiv({ cls: 'praetor-thinking-current' });
+    const currentEl = this.budgetGearsEl.createDiv({ cls: 'claudes-codex-thinking-current' });
     currentEl.setText(currentBudgetInfo?.label || options[0]?.label || 'Off');
 
-    const optionsEl = this.budgetGearsEl.createDiv({ cls: 'praetor-thinking-options' });
+    const optionsEl = this.budgetGearsEl.createDiv({ cls: 'claudes-codex-thinking-options' });
 
     for (const budget of [...options].reverse()) {
-      const gearEl = optionsEl.createDiv({ cls: 'praetor-thinking-gear' });
+      const gearEl = optionsEl.createDiv({ cls: 'claudes-codex-thinking-gear' });
       gearEl.setText(budget.label);
       const tokens = budget.tokens ?? 0;
       gearEl.setAttribute('title', tokens > 0 ? `${tokens.toLocaleString()} tokens` : 'Disabled');
@@ -377,8 +377,8 @@ export class ThinkingBudgetSelector {
   updateDisplay() {
     const capabilities = this.callbacks.getCapabilities();
     if (capabilities.reasoningControl === 'none') {
-      this.effortEl?.addClass('praetor-hidden');
-      this.budgetEl?.addClass('praetor-hidden');
+      this.effortEl?.addClass('claudes-codex-hidden');
+      this.budgetEl?.addClass('claudes-codex-hidden');
       return;
     }
 
@@ -391,18 +391,18 @@ export class ThinkingBudgetSelector {
       || (options.length === 1 && options[0]?.value === defaultValue);
 
     if (shouldHide) {
-      this.effortEl?.addClass('praetor-hidden');
-      this.budgetEl?.addClass('praetor-hidden');
+      this.effortEl?.addClass('claudes-codex-hidden');
+      this.budgetEl?.addClass('claudes-codex-hidden');
       return;
     }
 
     const adaptive = uiConfig.isAdaptiveReasoningModel(model, settings);
 
     if (this.effortEl) {
-      this.effortEl.toggleClass('praetor-hidden', !adaptive);
+      this.effortEl.toggleClass('claudes-codex-hidden', !adaptive);
     }
     if (this.budgetEl) {
-      this.budgetEl.toggleClass('praetor-hidden', adaptive);
+      this.budgetEl.toggleClass('claudes-codex-hidden', adaptive);
     }
 
     if (adaptive) {
@@ -422,7 +422,7 @@ export class PermissionToggle {
 
   constructor(parentEl: HTMLElement, callbacks: ToolbarCallbacks) {
     this.callbacks = callbacks;
-    this.container = parentEl.createDiv({ cls: 'praetor-permission-toggle' });
+    this.container = parentEl.createDiv({ cls: 'claudes-codex-permission-toggle' });
     this.render();
   }
 
@@ -434,8 +434,8 @@ export class PermissionToggle {
   private render() {
     this.container.empty();
 
-    this.labelEl = this.container.createSpan({ cls: 'praetor-permission-label' });
-    this.toggleEl = this.container.createDiv({ cls: 'praetor-toggle-switch' });
+    this.labelEl = this.container.createSpan({ cls: 'claudes-codex-permission-label' });
+    this.toggleEl = this.container.createDiv({ cls: 'claudes-codex-toggle-switch' });
 
     this.updateDisplay();
 
@@ -455,22 +455,22 @@ export class PermissionToggle {
     const toggleConfig = this.getToggleConfig();
     const capabilities = this.callbacks.getCapabilities();
     if (!this.visible || !toggleConfig) {
-      this.container.addClass('praetor-hidden');
+      this.container.addClass('claudes-codex-hidden');
       return;
     }
 
-    this.container.removeClass('praetor-hidden');
+    this.container.removeClass('claudes-codex-hidden');
     const mode = this.callbacks.getSettings().permissionMode;
     const planValue = toggleConfig.planValue;
     const planLabel = toggleConfig.planLabel ?? 'PLAN';
     const canShowPlan = Boolean(planValue) && capabilities.supportsPlanMode;
 
     if (canShowPlan && planValue && mode === planValue) {
-      this.toggleEl.addClass('praetor-hidden');
+      this.toggleEl.addClass('claudes-codex-hidden');
       this.labelEl.setText(planLabel);
       this.labelEl.addClass('plan-active');
     } else {
-      this.toggleEl.removeClass('praetor-hidden');
+      this.toggleEl.removeClass('claudes-codex-hidden');
       this.labelEl.removeClass('plan-active');
       if (mode === toggleConfig.activeValue) {
         this.toggleEl.addClass('active');
@@ -503,15 +503,15 @@ export class ServiceTierToggle {
 
   constructor(parentEl: HTMLElement, callbacks: ToolbarCallbacks) {
     this.callbacks = callbacks;
-    this.container = parentEl.createDiv({ cls: 'praetor-service-tier-toggle' });
+    this.container = parentEl.createDiv({ cls: 'claudes-codex-service-tier-toggle' });
     this.render();
   }
 
   private render() {
     this.container.empty();
 
-    this.buttonEl = this.container.createDiv({ cls: 'praetor-service-tier-button' });
-    this.iconEl = this.buttonEl.createSpan({ cls: 'praetor-service-tier-icon' });
+    this.buttonEl = this.container.createDiv({ cls: 'claudes-codex-service-tier-button' });
+    this.iconEl = this.buttonEl.createSpan({ cls: 'claudes-codex-service-tier-icon' });
     setIcon(this.iconEl, 'zap');
 
     this.updateDisplay();
@@ -531,11 +531,11 @@ export class ServiceTierToggle {
 
     const toggleConfig = this.getToggleConfig();
     if (!toggleConfig) {
-      this.container.addClass('praetor-hidden');
+      this.container.addClass('claudes-codex-hidden');
       return;
     }
 
-    this.container.removeClass('praetor-hidden');
+    this.container.removeClass('claudes-codex-hidden');
     const current = this.callbacks.getSettings().serviceTier;
     const isActive = current === toggleConfig.activeValue;
     if (isActive) {
@@ -584,7 +584,7 @@ export class ExternalContextSelector {
 
   constructor(parentEl: HTMLElement, callbacks: ToolbarCallbacks) {
     this.callbacks = callbacks;
-    this.container = parentEl.createDiv({ cls: 'praetor-external-context-selector' });
+    this.container = parentEl.createDiv({ cls: 'claudes-codex-external-context-selector' });
     this.render();
   }
 
@@ -746,12 +746,12 @@ export class ExternalContextSelector {
   private render() {
     this.container.empty();
 
-    const iconWrapper = this.container.createDiv({ cls: 'praetor-external-context-icon-wrapper' });
+    const iconWrapper = this.container.createDiv({ cls: 'claudes-codex-external-context-icon-wrapper' });
 
-    this.iconEl = iconWrapper.createDiv({ cls: 'praetor-external-context-icon' });
+    this.iconEl = iconWrapper.createDiv({ cls: 'claudes-codex-external-context-icon' });
     setIcon(this.iconEl, 'folder');
 
-    this.badgeEl = iconWrapper.createDiv({ cls: 'praetor-external-context-badge' });
+    this.badgeEl = iconWrapper.createDiv({ cls: 'claudes-codex-external-context-badge' });
 
     this.updateDisplay();
 
@@ -761,7 +761,7 @@ export class ExternalContextSelector {
       void this.openFolderPicker();
     });
 
-    this.dropdownEl = this.container.createDiv({ cls: 'praetor-external-context-dropdown' });
+    this.dropdownEl = this.container.createDiv({ cls: 'claudes-codex-external-context-dropdown' });
     this.renderDropdown();
   }
 
@@ -819,20 +819,20 @@ export class ExternalContextSelector {
     this.dropdownEl.empty();
 
     // Header
-    const headerEl = this.dropdownEl.createDiv({ cls: 'praetor-external-context-header' });
+    const headerEl = this.dropdownEl.createDiv({ cls: 'claudes-codex-external-context-header' });
     headerEl.setText('External contexts');
 
     // Path list
-    const listEl = this.dropdownEl.createDiv({ cls: 'praetor-external-context-list' });
+    const listEl = this.dropdownEl.createDiv({ cls: 'claudes-codex-external-context-list' });
 
     if (this.externalContextPaths.length === 0) {
-      const emptyEl = listEl.createDiv({ cls: 'praetor-external-context-empty' });
+      const emptyEl = listEl.createDiv({ cls: 'claudes-codex-external-context-empty' });
       emptyEl.setText('Click folder icon to add');
     } else {
       for (const pathStr of this.externalContextPaths) {
-        const itemEl = listEl.createDiv({ cls: 'praetor-external-context-item' });
+        const itemEl = listEl.createDiv({ cls: 'claudes-codex-external-context-item' });
 
-        const pathTextEl = itemEl.createSpan({ cls: 'praetor-external-context-text' });
+        const pathTextEl = itemEl.createSpan({ cls: 'claudes-codex-external-context-text' });
         // Show shortened path for display
         const displayPath = this.shortenPath(pathStr);
         pathTextEl.setText(displayPath);
@@ -840,7 +840,7 @@ export class ExternalContextSelector {
 
         // Lock toggle button
         const isPersistent = this.persistentPaths.has(pathStr);
-        const lockBtn = itemEl.createSpan({ cls: 'praetor-external-context-lock' });
+        const lockBtn = itemEl.createSpan({ cls: 'claudes-codex-external-context-lock' });
         if (isPersistent) {
           lockBtn.addClass('locked');
         }
@@ -851,7 +851,7 @@ export class ExternalContextSelector {
           this.togglePersistence(pathStr);
         });
 
-        const removeBtn = itemEl.createSpan({ cls: 'praetor-external-context-remove' });
+        const removeBtn = itemEl.createSpan({ cls: 'claudes-codex-external-context-remove' });
         setIcon(removeBtn, 'x');
         removeBtn.setAttribute('title', 'Remove path');
         removeBtn.addEventListener('click', (e) => {
@@ -921,14 +921,14 @@ export class McpServerSelector {
   private visible = true;
 
   constructor(parentEl: HTMLElement) {
-    this.container = parentEl.createDiv({ cls: 'praetor-mcp-selector' });
+    this.container = parentEl.createDiv({ cls: 'claudes-codex-mcp-selector' });
     this.render();
   }
 
   setVisible(visible: boolean): void {
     this.visible = visible;
     if (!visible) {
-      this.container.addClass('praetor-hidden');
+      this.container.addClass('claudes-codex-hidden');
     } else {
       this.updateDisplay();
     }
@@ -1015,16 +1015,16 @@ export class McpServerSelector {
   private render() {
     this.container.empty();
 
-    const iconWrapper = this.container.createDiv({ cls: 'praetor-mcp-selector-icon-wrapper' });
+    const iconWrapper = this.container.createDiv({ cls: 'claudes-codex-mcp-selector-icon-wrapper' });
 
-    this.iconEl = iconWrapper.createDiv({ cls: 'praetor-mcp-selector-icon' });
+    this.iconEl = iconWrapper.createDiv({ cls: 'claudes-codex-mcp-selector-icon' });
     appendMcpIcon(this.iconEl);
 
-    this.badgeEl = iconWrapper.createDiv({ cls: 'praetor-mcp-selector-badge' });
+    this.badgeEl = iconWrapper.createDiv({ cls: 'claudes-codex-mcp-selector-badge' });
 
     this.updateDisplay();
 
-    this.dropdownEl = this.container.createDiv({ cls: 'praetor-mcp-selector-dropdown' });
+    this.dropdownEl = this.container.createDiv({ cls: 'claudes-codex-mcp-selector-dropdown' });
     this.renderDropdown();
 
     // Re-render dropdown content on hover (CSS handles visibility)
@@ -1049,17 +1049,17 @@ export class McpServerSelector {
     this.dropdownEl.empty();
 
     // Header
-    const headerEl = this.dropdownEl.createDiv({ cls: 'praetor-mcp-selector-header' });
+    const headerEl = this.dropdownEl.createDiv({ cls: 'claudes-codex-mcp-selector-header' });
     headerEl.setText('Mcp servers');
 
     // Server list
-    const listEl = this.dropdownEl.createDiv({ cls: 'praetor-mcp-selector-list' });
+    const listEl = this.dropdownEl.createDiv({ cls: 'claudes-codex-mcp-selector-list' });
 
     const allServers = this.mcpManager?.getServers() || [];
     const servers = allServers.filter(s => s.enabled);
 
     if (servers.length === 0) {
-      const emptyEl = listEl.createDiv({ cls: 'praetor-mcp-selector-empty' });
+      const emptyEl = listEl.createDiv({ cls: 'claudes-codex-mcp-selector-empty' });
       emptyEl.setText(allServers.length === 0 ? 'No MCP servers configured' : 'All MCP servers disabled');
       return;
     }
@@ -1070,7 +1070,7 @@ export class McpServerSelector {
   }
 
   private renderServerItem(listEl: HTMLElement, server: ManagedMcpServer) {
-    const itemEl = listEl.createDiv({ cls: 'praetor-mcp-selector-item' });
+    const itemEl = listEl.createDiv({ cls: 'claudes-codex-mcp-selector-item' });
     itemEl.dataset.serverName = server.name;
 
     const isEnabled = this.enabledServers.has(server.name);
@@ -1079,20 +1079,20 @@ export class McpServerSelector {
     }
 
     // Checkbox
-    const checkEl = itemEl.createDiv({ cls: 'praetor-mcp-selector-check' });
+    const checkEl = itemEl.createDiv({ cls: 'claudes-codex-mcp-selector-check' });
     if (isEnabled) {
       appendCheckIcon(checkEl);
     }
 
     // Info
-    const infoEl = itemEl.createDiv({ cls: 'praetor-mcp-selector-item-info' });
+    const infoEl = itemEl.createDiv({ cls: 'claudes-codex-mcp-selector-item-info' });
 
-    const nameEl = infoEl.createSpan({ cls: 'praetor-mcp-selector-item-name' });
+    const nameEl = infoEl.createSpan({ cls: 'claudes-codex-mcp-selector-item-name' });
     nameEl.setText(server.name);
 
     // Badges
     if (server.contextSaving) {
-      const csEl = infoEl.createSpan({ cls: 'praetor-mcp-selector-cs-badge' });
+      const csEl = infoEl.createSpan({ cls: 'claudes-codex-mcp-selector-cs-badge' });
       csEl.setText('@');
       csEl.setAttribute('title', 'Context-saving: can also enable via @' + server.name);
     }
@@ -1114,7 +1114,7 @@ export class McpServerSelector {
 
     // Update item visually in-place (immediate feedback)
     const isEnabled = this.enabledServers.has(name);
-    const checkEl = itemEl.querySelector<HTMLElement>('.praetor-mcp-selector-check');
+    const checkEl = itemEl.querySelector<HTMLElement>('.claudes-codex-mcp-selector-check');
 
     if (isEnabled) {
       itemEl.addClass('enabled');
@@ -1137,10 +1137,10 @@ export class McpServerSelector {
 
     // Show/hide container based on whether there are servers and visibility
     if (!hasServers || !this.visible) {
-      this.container.addClass('praetor-hidden');
+      this.container.addClass('claudes-codex-hidden');
       return;
     }
-    this.container.removeClass('praetor-hidden');
+    this.container.removeClass('claudes-codex-hidden');
 
     if (count > 0) {
       this.iconEl.addClass('active');
@@ -1168,18 +1168,18 @@ export class ContextUsageMeter {
   private circumference: number = 0;
 
   constructor(parentEl: HTMLElement) {
-    this.container = parentEl.createDiv({ cls: 'praetor-context-meter' });
+    this.container = parentEl.createDiv({ cls: 'claudes-codex-context-meter' });
     this.container.setAttribute('role', 'progressbar');
     this.container.setAttribute('aria-label', 'Context usage');
     this.container.setAttribute('aria-valuemin', '0');
     this.container.setAttribute('aria-valuemax', '100');
     this.render();
     // Initially hidden
-    this.container.addClass('praetor-hidden');
+    this.container.addClass('claudes-codex-hidden');
   }
 
   setVisible(visible: boolean): void {
-    this.container.toggleClass('praetor-hidden', !visible);
+    this.container.toggleClass('claudes-codex-hidden', !visible);
   }
 
   private render() {
@@ -1203,7 +1203,7 @@ export class ContextUsageMeter {
     const x2 = cx + radius * Math.cos(endRad);
     const y2 = cy + radius * Math.sin(endRad);
 
-    const gaugeEl = this.container.createDiv({ cls: 'praetor-context-meter-gauge' });
+    const gaugeEl = this.container.createDiv({ cls: 'claudes-codex-context-meter-gauge' });
     const svg = gaugeEl.createSvg('svg');
     svg.setAttribute('width', String(size));
     svg.setAttribute('height', String(size));
@@ -1211,14 +1211,14 @@ export class ContextUsageMeter {
 
     const pathData = `M ${x1} ${y1} A ${radius} ${radius} 0 1 1 ${x2} ${y2}`;
     const backgroundPath = svg.createSvg('path');
-    backgroundPath.classList.add('praetor-meter-bg');
+    backgroundPath.classList.add('claudes-codex-meter-bg');
     backgroundPath.setAttribute('d', pathData);
     backgroundPath.setAttribute('fill', 'none');
     backgroundPath.setAttribute('stroke-width', String(strokeWidth));
     backgroundPath.setAttribute('stroke-linecap', 'round');
 
     const fillPath = svg.createSvg('path');
-    fillPath.classList.add('praetor-meter-fill');
+    fillPath.classList.add('claudes-codex-meter-fill');
     fillPath.setAttribute('d', pathData);
     fillPath.setAttribute('fill', 'none');
     fillPath.setAttribute('stroke-width', String(strokeWidth));
@@ -1231,15 +1231,15 @@ export class ContextUsageMeter {
     gaugeEl.appendChild(svg);
     this.fillPath = fillPath;
 
-    this.percentEl = this.container.createSpan({ cls: 'praetor-context-meter-percent' });
+    this.percentEl = this.container.createSpan({ cls: 'claudes-codex-context-meter-percent' });
   }
 
   update(usage: UsageInfo | null): void {
     if (!usage || usage.contextTokens <= 0) {
-      this.container.addClass('praetor-hidden');
+      this.container.addClass('claudes-codex-hidden');
       return;
     }
-    this.container.removeClass('praetor-hidden');
+    this.container.removeClass('claudes-codex-hidden');
     const fillLength = (usage.percentage / 100) * this.circumference;
     if (this.fillPath) {
       this.fillPath.setAttribute('stroke-dashoffset', String(this.circumference - fillLength));
@@ -1277,7 +1277,7 @@ export class ContextUsageMeter {
   }
 }
 
-const TOOLBAR_COMPACT_CLASS = 'praetor-input-toolbar--compact';
+const TOOLBAR_COMPACT_CLASS = 'claudes-codex-input-toolbar--compact';
 const ROW_CENTER_TOLERANCE = 1;
 
 /** Hides optional labels only when the full toolbar would wrap. */

@@ -73,9 +73,9 @@ describe('interrupt utils', () => {
   });
 
   describe('stripLegacyInterruptIndicator', () => {
-    it('removes only the trailing Praetor-owned interruption marker', () => {
+    it("removes only the trailing Claude's Codex-owned interruption marker", () => {
       const marker =
-        '<span class="praetor-interrupted">Interrupted</span> <span class="praetor-interrupted-hint">· What should Praetor do instead?</span>';
+        `<span class="claudes-codex-interrupted">Interrupted</span> <span class="claudes-codex-interrupted-hint">· What should Claude's Codex do instead?</span>`;
 
       expect(stripLegacyInterruptIndicator(`Partial response\n\n${marker}`)).toEqual({
         content: 'Partial response',

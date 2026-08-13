@@ -1,5 +1,5 @@
 /**
- * Praetor - Session Utilities
+ * Claude's Codex - Session Utilities
  *
  * Session recovery and history reconstruction.
  */

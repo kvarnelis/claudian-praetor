@@ -45,7 +45,7 @@ export class SlashCommandModal extends Modal {
     const typeLabel = () => selectedType === 'skill' ? 'Skill' : 'Slash Command';
 
     this.setTitle(this.existingEntry ? `Edit ${typeLabel()}` : `Add ${typeLabel()}`);
-    this.modalEl.addClass('praetor-sp-modal');
+    this.modalEl.addClass('claudes-codex-sp-modal');
 
     const { contentEl } = this;
 
@@ -66,7 +66,7 @@ export class SlashCommandModal extends Modal {
       if (!disableUserSetting || !disableUserToggle) return;
 
       const isSkillType = selectedType === 'skill';
-      disableUserSetting.settingEl.toggleClass('praetor-hidden', !isSkillType);
+      disableUserSetting.settingEl.toggleClass('claudes-codex-hidden', !isSkillType);
       if (!isSkillType) {
         disableUserInvocation = false;
         disableUserToggle.setValue(false);
@@ -108,10 +108,10 @@ export class SlashCommandModal extends Modal {
         text.setValue(this.existingEntry?.description || '');
       });
 
-    const details = contentEl.createEl('details', { cls: 'praetor-sp-advanced-section' });
+    const details = contentEl.createEl('details', { cls: 'claudes-codex-sp-advanced-section' });
     details.createEl('summary', {
       text: 'Advanced options',
-      cls: 'praetor-sp-advanced-summary',
+      cls: 'claudes-codex-sp-advanced-summary',
     });
     if (
       this.existingEntry?.argumentHint
@@ -176,7 +176,7 @@ export class SlashCommandModal extends Modal {
         toggle.setValue(contextValue === 'fork')
           .onChange(value => {
             contextValue = value ? 'fork' : '';
-            agentSetting.settingEl.toggleClass('praetor-hidden', !value);
+            agentSetting.settingEl.toggleClass('claudes-codex-hidden', !value);
           });
       });
 
@@ -188,14 +188,14 @@ export class SlashCommandModal extends Modal {
         text.setValue(this.existingEntry?.agent || '')
           .setPlaceholder('Code-reviewer');
       });
-    agentSetting.settingEl.toggleClass('praetor-hidden', contextValue !== 'fork');
+    agentSetting.settingEl.toggleClass('claudes-codex-hidden', contextValue !== 'fork');
 
     new Setting(contentEl)
       .setName('Prompt template')
       .setDesc('Use $ARGUMENTS, $1, $2, @file, !`bash`');
 
     const contentArea = contentEl.createEl('textarea', {
-      cls: 'praetor-sp-content-area',
+      cls: 'claudes-codex-sp-content-area',
       attr: {
         rows: '10',
         placeholder: 'Review this code for:\n$ARGUMENTS\n\n@$1',
@@ -206,17 +206,17 @@ export class SlashCommandModal extends Modal {
       : '';
     contentArea.value = initialContent;
 
-    const buttonContainer = contentEl.createDiv({ cls: 'praetor-sp-modal-buttons' });
+    const buttonContainer = contentEl.createDiv({ cls: 'claudes-codex-sp-modal-buttons' });
 
     const cancelBtn = buttonContainer.createEl('button', {
       text: 'Cancel',
-      cls: 'praetor-cancel-btn',
+      cls: 'claudes-codex-cancel-btn',
     });
     cancelBtn.addEventListener('click', () => this.close());
 
     const saveBtn = buttonContainer.createEl('button', {
       text: 'Save',
-      cls: 'praetor-save-btn',
+      cls: 'claudes-codex-save-btn',
     });
     saveBtn.addEventListener('click', () => {
       void (async (): Promise<void> => {
@@ -328,32 +328,32 @@ export class SlashCommandSettings {
 
   private renderUnavailable(): void {
     this.containerEl.empty();
-    const emptyEl = this.containerEl.createDiv({ cls: 'praetor-sp-empty-state' });
+    const emptyEl = this.containerEl.createDiv({ cls: 'claudes-codex-sp-empty-state' });
     emptyEl.setText('Claude command catalog is unavailable.');
   }
 
   private render(): void {
     this.containerEl.empty();
 
-    const headerEl = this.containerEl.createDiv({ cls: 'praetor-sp-header' });
-    headerEl.createSpan({ text: t('settings.slashCommands.name'), cls: 'praetor-sp-label' });
+    const headerEl = this.containerEl.createDiv({ cls: 'claudes-codex-sp-header' });
+    headerEl.createSpan({ text: t('settings.slashCommands.name'), cls: 'claudes-codex-sp-label' });
 
-    const actionsEl = headerEl.createDiv({ cls: 'praetor-sp-header-actions' });
+    const actionsEl = headerEl.createDiv({ cls: 'claudes-codex-sp-header-actions' });
 
     const addBtn = actionsEl.createEl('button', {
-      cls: 'praetor-settings-action-btn',
+      cls: 'claudes-codex-settings-action-btn',
       attr: { 'aria-label': 'Add' },
     });
     setIcon(addBtn, 'plus');
     addBtn.addEventListener('click', () => this.openCommandModal(null));
 
     if (this.commands.length === 0) {
-      const emptyEl = this.containerEl.createDiv({ cls: 'praetor-sp-empty-state' });
+      const emptyEl = this.containerEl.createDiv({ cls: 'claudes-codex-sp-empty-state' });
       emptyEl.setText('No commands or skills configured. Click + to create one.');
       return;
     }
 
-    const listEl = this.containerEl.createDiv({ cls: 'praetor-sp-list' });
+    const listEl = this.containerEl.createDiv({ cls: 'claudes-codex-sp-list' });
 
     for (const cmd of this.commands) {
       this.renderCommandItem(listEl, cmd);
@@ -361,34 +361,34 @@ export class SlashCommandSettings {
   }
 
   private renderCommandItem(listEl: HTMLElement, cmd: ProviderCommandEntry): void {
-    const itemEl = listEl.createDiv({ cls: 'praetor-sp-item' });
+    const itemEl = listEl.createDiv({ cls: 'claudes-codex-sp-item' });
 
-    const infoEl = itemEl.createDiv({ cls: 'praetor-sp-info' });
+    const infoEl = itemEl.createDiv({ cls: 'claudes-codex-sp-info' });
 
-    const headerRow = infoEl.createDiv({ cls: 'praetor-sp-item-header' });
+    const headerRow = infoEl.createDiv({ cls: 'claudes-codex-sp-item-header' });
 
-    const nameEl = headerRow.createSpan({ cls: 'praetor-sp-item-name' });
+    const nameEl = headerRow.createSpan({ cls: 'claudes-codex-sp-item-name' });
     nameEl.setText(`/${cmd.name}`);
 
     if (isSkillEntry(cmd)) {
-      headerRow.createSpan({ text: 'skill', cls: 'praetor-slash-item-badge' });
+      headerRow.createSpan({ text: 'skill', cls: 'claudes-codex-slash-item-badge' });
     }
 
     if (cmd.argumentHint) {
-      const hintEl = headerRow.createSpan({ cls: 'praetor-slash-item-hint' });
+      const hintEl = headerRow.createSpan({ cls: 'claudes-codex-slash-item-hint' });
       hintEl.setText(cmd.argumentHint);
     }
 
     if (cmd.description) {
-      const descEl = infoEl.createDiv({ cls: 'praetor-sp-item-desc' });
+      const descEl = infoEl.createDiv({ cls: 'claudes-codex-sp-item-desc' });
       descEl.setText(cmd.description);
     }
 
-    const actionsEl = itemEl.createDiv({ cls: 'praetor-sp-item-actions' });
+    const actionsEl = itemEl.createDiv({ cls: 'claudes-codex-sp-item-actions' });
 
     if (cmd.isEditable) {
       const editBtn = actionsEl.createEl('button', {
-        cls: 'praetor-settings-action-btn',
+        cls: 'claudes-codex-settings-action-btn',
         attr: { 'aria-label': 'Edit' },
       });
       setIcon(editBtn, 'pencil');
@@ -397,7 +397,7 @@ export class SlashCommandSettings {
 
     if (!isSkillEntry(cmd) && cmd.isEditable) {
       const convertBtn = actionsEl.createEl('button', {
-        cls: 'praetor-settings-action-btn',
+        cls: 'claudes-codex-settings-action-btn',
         attr: { 'aria-label': 'Convert to skill' },
       });
       setIcon(convertBtn, 'package');
@@ -414,7 +414,7 @@ export class SlashCommandSettings {
 
     if (cmd.isDeletable) {
       const deleteBtn = actionsEl.createEl('button', {
-        cls: 'praetor-settings-action-btn praetor-settings-delete-btn',
+        cls: 'claudes-codex-settings-action-btn claudes-codex-settings-delete-btn',
         attr: { 'aria-label': 'Delete' },
       });
       setIcon(deleteBtn, 'trash-2');

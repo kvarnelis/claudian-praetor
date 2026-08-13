@@ -1,5 +1,5 @@
 /**
- * Praetor - Context Utilities
+ * Claude's Codex - Context Utilities
  *
  * Note and context file formatting for prompts.
  */

@@ -1,15 +1,15 @@
-.praetor-container--theme-native {
+.claudes-codex-container--theme-native {
   /* Right-side themes can remap secondary; the ribbon token retains their sidebar surface. */
   background-color: var(--ribbon-background, var(--background-primary-alt, var(--background-secondary)));
   font-family: var(--font-interface);
 }
 
-.praetor-container--theme-native .praetor-message-content {
+.claudes-codex-container--theme-native .claudes-codex-message-content {
   color: var(--nav-item-color, var(--text-muted));
   font-size: var(--font-ui-small, 13px);
 }
 
-.praetor-container--theme-native .praetor-message-user {
+.claudes-codex-container--theme-native .claudes-codex-message-user {
   align-self: flex-end;
   padding: 0;
   /* Breathing room between the prompt text and its own right-hand rule. */
@@ -21,7 +21,7 @@
   text-align: end;
 }
 
-.praetor-container--theme-native .praetor-input-wrapper textarea.praetor-input {
+.claudes-codex-container--theme-native .claudes-codex-input-wrapper textarea.claudes-codex-input {
   color: var(--text-normal);
   font-size: var(--font-ui-small, 13px);
 }

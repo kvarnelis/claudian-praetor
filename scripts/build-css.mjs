@@ -56,7 +56,7 @@ function listCssFiles(dir, baseDir = dir) {
 
 function build() {
   const moduleOrder = getModuleOrder();
-  const parts = ['/* Praetor Plugin Styles */\n/* Built from src/style/ modules */\n'];
+  const parts = ["/* Claude's Codex Plugin Styles */\n/* Built from src/style/ modules */\n"];
   const missingFiles = [];
   const invalidImports = [];
   const normalizedImports = [];

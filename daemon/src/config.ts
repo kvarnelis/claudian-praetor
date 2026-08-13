@@ -112,9 +112,9 @@ export function parseCliArgs(argv: string[]): CliOptions {
 }
 
 export function printUsage(): void {
-  console.log(`praetord - Praetor daemon
+  console.log(`claudes-codexd - Claude's Codex daemon
 
-Usage: node praetord.cjs [options]
+Usage: node claudes-codexd.cjs [options]
 
 Options:
   --vault <path>     Vault directory to serve (required on first run)
@@ -306,6 +306,6 @@ export function authorizeClient(configPath: string, request: ClientAuthorization
 
   return {
     ok: false,
-    reason: 'device not paired; open pairing in Praetor settings on your Mac',
+    reason: "device not paired; open pairing in Claude's Codex settings on your Mac",
   };
 }

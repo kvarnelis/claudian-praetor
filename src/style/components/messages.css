@@ -1,5 +1,5 @@
 /* Messages wrapper (for scroll-to-bottom button positioning) */
-.praetor-messages-wrapper {
+.claudes-codex-messages-wrapper {
   position: relative;
   flex: 1;
   min-height: 0;
@@ -8,7 +8,7 @@
   overflow: hidden;
 }
 
-.praetor-messages {
+.claudes-codex-messages {
   flex: 1;
   overflow-y: auto;
   /* Right gutter keeps message content (and the theme-native prompt rule) off
@@ -20,12 +20,12 @@
 }
 
 /* Focusable messages panel for vim-style navigation */
-.praetor-messages-focusable:focus {
+.claudes-codex-messages-focusable:focus {
   outline: none;
 }
 
 /* Welcome message - claude.ai style */
-.praetor-welcome {
+.claudes-codex-welcome {
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -37,7 +37,7 @@
   min-height: 200px;
 }
 
-.praetor-welcome-text {
+.claudes-codex-welcome-text {
   font-family: 'Copernicus', 'Tiempos Headline', 'Tiempos', Georgia, 'Times New Roman', serif;
   font-size: 28px;
   font-weight: 300;
@@ -45,14 +45,14 @@
   letter-spacing: -0.01em;
 }
 
-.praetor-message {
+.claudes-codex-message {
   padding: 10px 14px;
   border-radius: 8px;
   max-width: 95%;
   word-wrap: break-word;
 }
 
-.praetor-message-user {
+.claudes-codex-message-user {
   position: relative;
   background: rgba(0, 0, 0, 0.3);
   align-self: flex-end;
@@ -60,12 +60,12 @@
 }
 
 /* Text selection in user messages - visible highlight */
-.praetor-message-user ::selection {
+.claudes-codex-message-user ::selection {
   background: rgba(255, 255, 255, 0.35);
   color: inherit;
 }
 
-.praetor-message-assistant {
+.claudes-codex-message-assistant {
   background: transparent;
   align-self: stretch;
   width: 100%;
@@ -74,27 +74,27 @@
   text-align: start;
 }
 
-.praetor-message-content {
+.claudes-codex-message-content {
   line-height: 1.5;
   user-select: text;
   -webkit-user-select: text;
   unicode-bidi: plaintext; /* Proper BiDi text handling for mixed RTL/LTR */
 }
 
-.praetor-interrupted {
+.claudes-codex-interrupted {
   color: #d45d5d;
 }
 
-.praetor-interrupted-hint {
+.claudes-codex-interrupted-hint {
   color: var(--text-muted);
 }
 
-.praetor-text-block {
+.claudes-codex-text-block {
   position: relative;
   margin: 0;
 }
 
-.praetor-text-copy-btn {
+.claudes-codex-text-copy-btn {
   position: absolute;
   bottom: 0;
   inset-inline-end: 0;
@@ -109,93 +109,93 @@
   gap: 4px;
 }
 
-.praetor-text-copy-btn svg {
+.claudes-codex-text-copy-btn svg {
   width: 16px;
   height: 16px;
 }
 
-.praetor-text-block:hover .praetor-text-copy-btn {
+.claudes-codex-text-block:hover .claudes-codex-text-copy-btn {
   opacity: 1;
 }
 
-.praetor-text-copy-btn:hover {
+.claudes-codex-text-copy-btn:hover {
   color: var(--text-normal);
 }
 
-.praetor-text-copy-btn.copied {
+.claudes-codex-text-copy-btn.copied {
   color: var(--text-accent);
   font-size: 11px;
   font-family: var(--font-monospace);
 }
 
-.praetor-text-block+.praetor-tool-call {
+.claudes-codex-text-block+.claudes-codex-tool-call {
   margin-top: 8px;
 }
 
-.praetor-tool-call+.praetor-text-block {
+.claudes-codex-tool-call+.claudes-codex-text-block {
   margin-top: 8px;
 }
 
-.praetor-message-content p {
+.claudes-codex-message-content p {
   margin: 0 0 8px 0;
 }
 
-.praetor-message-content p:last-child {
+.claudes-codex-message-content p:last-child {
   margin-bottom: 0;
 }
 
-.praetor-message-content ul,
-.praetor-message-content ol {
+.claudes-codex-message-content ul,
+.claudes-codex-message-content ol {
   margin: 8px 0;
   padding-inline-start: 20px;
 }
 
 /* Full-width tables */
-.praetor-message-content table {
+.claudes-codex-message-content table {
   width: 100%;
   border-collapse: collapse;
   margin: 8px 0;
 }
 
-.praetor-message-content th,
-.praetor-message-content td {
+.claudes-codex-message-content th,
+.claudes-codex-message-content td {
   border: 1px solid var(--background-modifier-border);
   padding: 6px 10px;
   text-align: start;
 }
 
-.praetor-message-content th {
+.claudes-codex-message-content th {
   background: var(--background-secondary);
   font-weight: 600;
 }
 
-.praetor-message-content tr:hover {
+.claudes-codex-message-content tr:hover {
   background: var(--background-secondary-alt);
 }
 
-.praetor-messages::-webkit-scrollbar {
+.claudes-codex-messages::-webkit-scrollbar {
   width: 6px;
 }
 
-.praetor-messages::-webkit-scrollbar-track {
+.claudes-codex-messages::-webkit-scrollbar-track {
   background: transparent;
 }
 
-.praetor-messages::-webkit-scrollbar-thumb {
+.claudes-codex-messages::-webkit-scrollbar-thumb {
   background: var(--background-modifier-border);
   border-radius: 3px;
 }
 
-.praetor-messages::-webkit-scrollbar-thumb:hover {
+.claudes-codex-messages::-webkit-scrollbar-thumb:hover {
   background: var(--background-modifier-border-hover);
 }
 
 /* Response duration footer - styled as another line of content */
-.praetor-response-footer {
+.claudes-codex-response-footer {
   margin-top: 8px;
 }
 
-.praetor-baked-duration {
+.claudes-codex-baked-duration {
   color: var(--text-muted);
   font-size: 12px;
   font-weight: 500;
@@ -203,7 +203,7 @@
 }
 
 /* Action buttons toolbar below user messages */
-.praetor-user-msg-actions {
+.claudes-codex-user-msg-actions {
   position: absolute;
   bottom: -20px;
   right: 0;
@@ -214,11 +214,11 @@
   z-index: 1;
 }
 
-.praetor-message-user:hover .praetor-user-msg-actions {
+.claudes-codex-message-user:hover .claudes-codex-user-msg-actions {
   opacity: 1;
 }
 
-.praetor-user-msg-actions span {
+.claudes-codex-user-msg-actions span {
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -227,44 +227,44 @@
   transition: color 0.15s;
 }
 
-.praetor-user-msg-actions span svg {
+.claudes-codex-user-msg-actions span svg {
   width: 16px;
   height: 16px;
 }
 
-.praetor-user-msg-actions span:hover {
+.claudes-codex-user-msg-actions span:hover {
   color: var(--text-normal);
 }
 
-.praetor-user-msg-actions span.copied {
+.claudes-codex-user-msg-actions span.copied {
   color: var(--text-accent);
   font-size: 11px;
   font-family: var(--font-monospace);
 }
 
 /* Compact boundary indicator */
-.praetor-compact-boundary {
+.claudes-codex-compact-boundary {
   display: flex;
   align-items: center;
   gap: 10px;
   margin: 12px 0;
 }
 
-.praetor-compact-boundary::before,
-.praetor-compact-boundary::after {
+.claudes-codex-compact-boundary::before,
+.claudes-codex-compact-boundary::after {
   content: '';
   flex: 1;
   height: 1px;
   background: var(--background-modifier-border);
 }
 
-.praetor-compact-boundary-label {
+.claudes-codex-compact-boundary-label {
   color: var(--text-muted);
   font-size: 11px;
   white-space: nowrap;
 }
 
-.praetor-tab-hydration {
+.claudes-codex-tab-hydration {
   min-height: 160px;
   display: flex;
   flex-direction: column;
@@ -275,7 +275,7 @@
   text-align: center;
 }
 
-.praetor-tab-hydration-loading::before {
+.claudes-codex-tab-hydration-loading::before {
   content: '';
   display: inline-block;
   width: 12px;
@@ -284,11 +284,11 @@
   border: 2px solid var(--background-modifier-border);
   border-top-color: var(--interactive-accent);
   border-radius: 50%;
-  animation: praetor-spin 0.8s linear infinite;
+  animation: claudes-codex-spin 0.8s linear infinite;
   vertical-align: -2px;
 }
 
-.praetor-tab-hydration-error {
+.claudes-codex-tab-hydration-error {
   max-width: 420px;
-  color: var(--text-error, var(--praetor-error));
+  color: var(--text-error, var(--claudes-codex-error));
 }

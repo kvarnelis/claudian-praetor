@@ -58,13 +58,13 @@ describe('buildOpencodeManagedConfig', () => {
             read: 'allow',
           },
         },
-        id: 'praetor-aux-readonly',
+        id: 'claudes-codex-aux-readonly',
       }],
-      'praetor-aux-readonly',
+      'claudes-codex-aux-readonly',
     )).toEqual({
       $schema: 'https://opencode.ai/config.json',
       agent: {
-        'praetor-aux-readonly': {
+        'claudes-codex-aux-readonly': {
           mode: 'primary',
           permission: {
             '*': 'deny',
@@ -73,7 +73,7 @@ describe('buildOpencodeManagedConfig', () => {
           prompt: '{file:/vault/.claudian/opencode/auxiliary/system.md}',
         },
       },
-      default_agent: 'praetor-aux-readonly',
+      default_agent: 'claudes-codex-aux-readonly',
     });
   });
 
@@ -141,7 +141,7 @@ describe('buildOpencodeManagedConfig', () => {
 
 describe('prepareOpencodeLaunchArtifacts', () => {
   it('layers the managed prompt config on top of OPENCODE_CONFIG', async () => {
-    const tmpRoot = await fs.mkdtemp(path.join(os.tmpdir(), 'praetor-opencode-artifacts-'));
+    const tmpRoot = await fs.mkdtemp(path.join(os.tmpdir(), 'claudes-codex-opencode-artifacts-'));
     const baseConfigPath = path.join(tmpRoot, 'opencode.base.json');
     await fs.writeFile(baseConfigPath, JSON.stringify({
       agent: {
@@ -214,7 +214,7 @@ describe('prepareOpencodeLaunchArtifacts', () => {
   });
 
   it('keeps the launch key stable when the resolved default database is later passed as OPENCODE_DB', async () => {
-    const tmpRoot = await fs.mkdtemp(path.join(os.tmpdir(), 'praetor-opencode-artifacts-'));
+    const tmpRoot = await fs.mkdtemp(path.join(os.tmpdir(), 'claudes-codex-opencode-artifacts-'));
     const baseParams = {
       settings: {
         customPrompt: '',
@@ -244,7 +244,7 @@ describe('prepareOpencodeLaunchArtifacts', () => {
   });
 
   it('creates the resolved OpenCode database directory before launch', async () => {
-    const tmpRoot = await fs.mkdtemp(path.join(os.tmpdir(), 'praetor-opencode-artifacts-'));
+    const tmpRoot = await fs.mkdtemp(path.join(os.tmpdir(), 'claudes-codex-opencode-artifacts-'));
     const xdgDataHome = path.join(tmpRoot, 'xdg-data');
     const databaseDir = path.join(xdgDataHome, 'opencode');
 

@@ -1,4 +1,4 @@
-const WELCOME_BRAND_NAME = 'Praetor';
+const WELCOME_BRAND_NAME = "Claude's Codex";
 
 export function renderWelcomeContent(
   welcomeEl: HTMLElement,
@@ -6,13 +6,13 @@ export function renderWelcomeContent(
 ): void {
   welcomeEl.empty();
   welcomeEl.createDiv({
-    cls: 'praetor-welcome-brand praetor-welcome-text',
+    cls: 'claudes-codex-welcome-brand claudes-codex-welcome-text',
     text: WELCOME_BRAND_NAME,
   });
 
   if (greeting) {
     welcomeEl.createDiv({
-      cls: 'praetor-welcome-greeting praetor-welcome-text',
+      cls: 'claudes-codex-welcome-greeting claudes-codex-welcome-text',
       text: greeting,
     });
   }
@@ -22,7 +22,7 @@ export function createWelcomeElement(
   parentEl: HTMLElement,
   greeting?: string,
 ): HTMLElement {
-  const welcomeEl = parentEl.createDiv({ cls: 'praetor-welcome' });
+  const welcomeEl = parentEl.createDiv({ cls: 'claudes-codex-welcome' });
   renderWelcomeContent(welcomeEl, greeting);
   return welcomeEl;
 }

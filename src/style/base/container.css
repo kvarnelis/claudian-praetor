@@ -1,4 +1,4 @@
-.praetor-container {
+.claudes-codex-container {
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -7,14 +7,14 @@
   font-family: var(--font-text);
 }
 
-.praetor-provider-icon-variant--dark {
+.claudes-codex-provider-icon-variant--dark {
   display: none;
 }
 
-body.theme-dark .praetor-provider-icon-variant--light {
+body.theme-dark .claudes-codex-provider-icon-variant--light {
   display: none;
 }
 
-body.theme-dark .praetor-provider-icon-variant--dark {
+body.theme-dark .claudes-codex-provider-icon-variant--dark {
   display: inline;
 }

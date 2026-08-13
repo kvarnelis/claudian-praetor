@@ -1,7 +1,7 @@
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 
-import { PRAETOR_STORAGE_PATH } from '../../../core/bootstrap/StoragePaths';
+import { CLAUDES_CODEX_STORAGE_PATH } from '../../../core/bootstrap/StoragePaths';
 import {
   buildSystemPrompt,
   computeSystemPromptKey,
@@ -73,7 +73,7 @@ export async function prepareOpencodeLaunchArtifacts(
 ): Promise<OpencodeLaunchArtifacts> {
   const artifactsDir = path.join(
     params.workspaceRoot,
-    PRAETOR_STORAGE_PATH,
+    CLAUDES_CODEX_STORAGE_PATH,
     params.artifactsSubdir ?? 'opencode',
   );
   const systemPromptPath = path.join(artifactsDir, 'system.md');

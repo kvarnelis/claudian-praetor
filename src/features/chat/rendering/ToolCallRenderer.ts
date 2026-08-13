@@ -319,15 +319,15 @@ function getWebSearchLabel(input: Record<string, unknown>, maxLength: number): s
 }
 
 function appendToolLink(parent: HTMLElement, title: string, url: string): void {
-  const linkEl = parent.createEl('a', { cls: 'praetor-tool-link' });
+  const linkEl = parent.createEl('a', { cls: 'claudes-codex-tool-link' });
   linkEl.setAttribute('href', url);
   linkEl.setAttribute('target', '_blank');
   linkEl.setAttribute('rel', 'noopener noreferrer');
 
-  const iconEl = linkEl.createSpan({ cls: 'praetor-tool-link-icon' });
+  const iconEl = linkEl.createSpan({ cls: 'claudes-codex-tool-link-icon' });
   setIcon(iconEl, 'external-link');
 
-  linkEl.createSpan({ cls: 'praetor-tool-link-title', text: title });
+  linkEl.createSpan({ cls: 'claudes-codex-tool-link-title', text: title });
 }
 
 function isPlaceholderWebSearchResult(result: string | undefined): boolean {
@@ -359,27 +359,27 @@ function renderWebSearchActionExpanded(container: HTMLElement, input: Record<str
     return false;
   }
 
-  const linesEl = container.createDiv({ cls: 'praetor-tool-lines' });
+  const linesEl = container.createDiv({ cls: 'claudes-codex-tool-lines' });
 
   switch (data.actionType) {
     case 'open_page':
-      linesEl.createDiv({ cls: 'praetor-tool-line', text: 'Open page' });
+      linesEl.createDiv({ cls: 'claudes-codex-tool-line', text: 'Open page' });
       if (data.url) {
         appendToolLink(linesEl, data.url, data.url);
       } else {
-        linesEl.createDiv({ cls: 'praetor-tool-line', text: 'URL unavailable' });
+        linesEl.createDiv({ cls: 'claudes-codex-tool-line', text: 'URL unavailable' });
       }
       return true;
 
     case 'find_in_page':
-      linesEl.createDiv({ cls: 'praetor-tool-line', text: 'Find in page' });
+      linesEl.createDiv({ cls: 'claudes-codex-tool-line', text: 'Find in page' });
       if (data.url) {
         appendToolLink(linesEl, data.url, data.url);
       } else {
-        linesEl.createDiv({ cls: 'praetor-tool-line', text: 'URL unavailable' });
+        linesEl.createDiv({ cls: 'claudes-codex-tool-line', text: 'URL unavailable' });
       }
       if (data.pattern) {
-        linesEl.createDiv({ cls: 'praetor-tool-line', text: `Pattern: ${data.pattern}` });
+        linesEl.createDiv({ cls: 'claudes-codex-tool-line', text: `Pattern: ${data.pattern}` });
       }
       return true;
 
@@ -387,17 +387,17 @@ function renderWebSearchActionExpanded(container: HTMLElement, input: Record<str
     default: {
       const primaryQuery = data.query || data.queries[0];
       linesEl.createDiv({
-        cls: 'praetor-tool-line',
+        cls: 'claudes-codex-tool-line',
         text: primaryQuery ? `Query: ${primaryQuery}` : 'Search web',
       });
 
       const alternateQueries = data.queries.filter(query => query !== primaryQuery);
       for (const query of alternateQueries.slice(0, 4)) {
-        linesEl.createDiv({ cls: 'praetor-tool-line', text: `Alt query: ${query}` });
+        linesEl.createDiv({ cls: 'claudes-codex-tool-line', text: `Alt query: ${query}` });
       }
       if (alternateQueries.length > 4) {
         linesEl.createDiv({
-          cls: 'praetor-tool-truncated',
+          cls: 'claudes-codex-tool-truncated',
           text: `... ${alternateQueries.length - 4} more queries`,
         });
       }
@@ -413,13 +413,13 @@ function renderWebSearchExpanded(
 ): void {
   const parsed = result ? parseWebSearchResult(result) : null;
   if (parsed && parsed.links.length > 0) {
-    const linksEl = container.createDiv({ cls: 'praetor-tool-lines' });
+    const linksEl = container.createDiv({ cls: 'claudes-codex-tool-lines' });
     for (const link of parsed.links) {
       appendToolLink(linksEl, link.title, link.url);
     }
 
     if (parsed.summary) {
-      const summaryEl = container.createDiv({ cls: 'praetor-tool-web-summary' });
+      const summaryEl = container.createDiv({ cls: 'claudes-codex-tool-web-summary' });
       summaryEl.setText(parsed.summary.length > 800 ? parsed.summary.slice(0, 800) + '...' : parsed.summary);
     }
     return;
@@ -448,13 +448,13 @@ function renderWebSearchExpanded(
     return;
   }
 
-  container.createDiv({ cls: 'praetor-tool-empty', text: 'No result' });
+  container.createDiv({ cls: 'claudes-codex-tool-empty', text: 'No result' });
 }
 
 function renderFileSearchExpanded(container: HTMLElement, result: string): void {
   const lines = result.split(/\r?\n/).filter(line => line.trim());
   if (lines.length === 0) {
-    container.createDiv({ cls: 'praetor-tool-empty', text: 'No matches found' });
+    container.createDiv({ cls: 'claudes-codex-tool-empty', text: 'No matches found' });
     return;
   }
   renderLinesExpanded(container, result, 15, true);
@@ -470,17 +470,17 @@ function renderLinesExpanded(
   const truncated = lines.length > maxLines;
   const displayLines = truncated ? lines.slice(0, maxLines) : lines;
 
-  const linesEl = container.createDiv({ cls: 'praetor-tool-lines' });
+  const linesEl = container.createDiv({ cls: 'claudes-codex-tool-lines' });
   for (const line of displayLines) {
     const stripped = line.replace(/^\s*\d+→/, '');
-    const lineEl = linesEl.createDiv({ cls: 'praetor-tool-line' });
+    const lineEl = linesEl.createDiv({ cls: 'claudes-codex-tool-line' });
     if (hoverable) lineEl.addClass('hoverable');
     lineEl.setText(stripped || ' ');
   }
 
   if (truncated) {
     linesEl.createDiv({
-      cls: 'praetor-tool-truncated',
+      cls: 'claudes-codex-tool-truncated',
       text: `... ${lines.length - maxLines} more lines`,
     });
   }
@@ -505,8 +505,8 @@ function renderToolSearchExpanded(container: HTMLElement, result: string): void 
   }
 
   for (const name of toolNames) {
-    const lineEl = container.createDiv({ cls: 'praetor-tool-search-item' });
-    const iconEl = lineEl.createSpan({ cls: 'praetor-tool-search-icon' });
+    const lineEl = container.createDiv({ cls: 'claudes-codex-tool-search-item' });
+    const iconEl = lineEl.createSpan({ cls: 'claudes-codex-tool-search-icon' });
     setToolIcon(iconEl, name);
     lineEl.createSpan({ text: name });
   }
@@ -514,13 +514,13 @@ function renderToolSearchExpanded(container: HTMLElement, result: string): void 
 
 function renderWebFetchExpanded(container: HTMLElement, result: string): void {
   const maxChars = 500;
-  const linesEl = container.createDiv({ cls: 'praetor-tool-lines' });
-  const lineEl = linesEl.createDiv({ cls: 'praetor-tool-line praetor-tool-line-wrap' });
+  const linesEl = container.createDiv({ cls: 'claudes-codex-tool-lines' });
+  const lineEl = linesEl.createDiv({ cls: 'claudes-codex-tool-line claudes-codex-tool-line-wrap' });
 
   if (result.length > maxChars) {
     lineEl.setText(result.slice(0, maxChars));
     linesEl.createDiv({
-      cls: 'praetor-tool-truncated',
+      cls: 'claudes-codex-tool-truncated',
       text: `... ${result.length - maxChars} more characters`,
     });
   } else {
@@ -547,7 +547,7 @@ function renderApplyPatchExpanded(
 
   const changes = Array.isArray(input.changes) ? input.changes : [];
   if (changes.length > 0) {
-    const linesEl = container.createDiv({ cls: 'praetor-tool-lines' });
+    const linesEl = container.createDiv({ cls: 'claudes-codex-tool-lines' });
     for (const change of changes as unknown[]) {
       if (!change || typeof change !== 'object' || Array.isArray(change)) continue;
       const changeRecord = change as Record<string, unknown>;
@@ -555,7 +555,7 @@ function renderApplyPatchExpanded(
       if (!path) continue;
       const movedTo = readMoveTarget(changeRecord.kind);
       const pathText = movedTo ? `${path} -> ${movedTo}` : path;
-      linesEl.createDiv({ cls: 'praetor-tool-line', text: pathText });
+      linesEl.createDiv({ cls: 'claudes-codex-tool-line', text: pathText });
     }
     return;
   }
@@ -568,11 +568,11 @@ function renderApplyPatchExpanded(
   if (result) {
     const fileMatches = [...result.matchAll(/(?:update|add|delete|create|modify|Applied:\s*)(?:\w+:\s*)?([^\n,]+)/gi)];
     if (fileMatches.length > 0) {
-      const linesEl = container.createDiv({ cls: 'praetor-tool-lines' });
+      const linesEl = container.createDiv({ cls: 'claudes-codex-tool-lines' });
       for (const match of fileMatches) {
         const filePath = match[1]?.trim();
         if (filePath) {
-          const lineEl = linesEl.createDiv({ cls: 'praetor-tool-line' });
+          const lineEl = linesEl.createDiv({ cls: 'claudes-codex-tool-line' });
           lineEl.setText(filePath);
         }
       }
@@ -582,7 +582,7 @@ function renderApplyPatchExpanded(
     return;
   }
 
-  container.createDiv({ cls: 'praetor-tool-empty', text: 'No result' });
+  container.createDiv({ cls: 'claudes-codex-tool-empty', text: 'No result' });
 }
 
 function renderApplyPatchDiffSections(
@@ -590,20 +590,20 @@ function renderApplyPatchDiffSections(
   fileDiffs: ReturnType<typeof parseApplyPatchDiffs>,
 ): void {
   for (const fileDiff of fileDiffs) {
-    const sectionEl = container.createDiv({ cls: 'praetor-tool-patch-section' });
+    const sectionEl = container.createDiv({ cls: 'claudes-codex-tool-patch-section' });
 
     if (fileDiff.operation === 'delete' && fileDiff.diffLines.length === 0) {
-      sectionEl.createDiv({ cls: 'praetor-tool-empty', text: 'File deleted' });
+      sectionEl.createDiv({ cls: 'claudes-codex-tool-empty', text: 'File deleted' });
       continue;
     }
 
     if (fileDiff.diffLines.length === 0) {
-      sectionEl.createDiv({ cls: 'praetor-tool-empty', text: 'No textual diff available' });
+      sectionEl.createDiv({ cls: 'claudes-codex-tool-empty', text: 'No textual diff available' });
       continue;
     }
 
-    const diffRow = sectionEl.createDiv({ cls: 'praetor-write-edit-diff-row' });
-    const diffEl = diffRow.createDiv({ cls: 'praetor-write-edit-diff' });
+    const diffRow = sectionEl.createDiv({ cls: 'claudes-codex-write-edit-diff-row' });
+    const diffEl = diffRow.createDiv({ cls: 'claudes-codex-write-edit-diff' });
     renderDiffContent(diffEl, fileDiff.diffLines);
   }
 }
@@ -647,9 +647,9 @@ function renderAgentLifecycleExpanded(container: HTMLElement, result: string): v
   if (trimmed.startsWith('{')) {
     try {
       const parsed = JSON.parse(trimmed) as Record<string, unknown>;
-      const linesEl = container.createDiv({ cls: 'praetor-tool-lines' });
+      const linesEl = container.createDiv({ cls: 'claudes-codex-tool-lines' });
       for (const [key, value] of Object.entries(parsed)) {
-        const lineEl = linesEl.createDiv({ cls: 'praetor-tool-line' });
+        const lineEl = linesEl.createDiv({ cls: 'claudes-codex-tool-line' });
         const displayValue = formatToolDisplayValue(value);
         lineEl.setText(`${key}: ${displayValue}`);
       }
@@ -677,7 +677,7 @@ export function renderExpandedContent(
   input: Record<string, unknown> = {},
 ): void {
   if (!result && toolName !== TOOL_WEB_SEARCH && toolName !== TOOL_BASH && toolName !== TOOL_APPLY_PATCH) {
-    container.createDiv({ cls: 'praetor-tool-empty', text: 'No result' });
+    container.createDiv({ cls: 'claudes-codex-tool-empty', text: 'No result' });
     return;
   }
 
@@ -740,7 +740,7 @@ function areAllTodosCompleted(input: Record<string, unknown>): boolean {
 }
 
 function resetStatusElement(statusEl: HTMLElement, statusClass: string, ariaLabel: string): void {
-  statusEl.className = 'praetor-tool-status';
+  statusEl.className = 'claudes-codex-tool-status';
   statusEl.empty();
   statusEl.addClass(statusClass);
   statusEl.setAttribute('aria-label', ariaLabel);
@@ -774,7 +774,7 @@ function setApplyPatchHeaderRight(statusEl: HTMLElement, toolCall: ToolCallInfo)
     return;
   }
 
-  statusEl.className = 'praetor-tool-status praetor-write-edit-stats';
+  statusEl.className = 'claudes-codex-tool-status claudes-codex-write-edit-stats';
   statusEl.empty();
   statusEl.setAttribute('aria-label', getDiffStatsAriaLabel(stats));
   renderDiffStats(statusEl, stats);
@@ -794,12 +794,12 @@ export function renderTodoWriteResult(
   input: Record<string, unknown>
 ): void {
   container.empty();
-  container.addClass('praetor-todo-panel-content');
-  container.addClass('praetor-todo-list-container');
+  container.addClass('claudes-codex-todo-panel-content');
+  container.addClass('claudes-codex-todo-list-container');
 
   const todos = input.todos as TodoItem[] | undefined;
   if (!todos || !Array.isArray(todos)) {
-    const item = container.createSpan({ cls: 'praetor-tool-result-item' });
+    const item = container.createSpan({ cls: 'claudes-codex-tool-result-item' });
     item.setText('Tasks updated');
     return;
   }
@@ -836,32 +836,32 @@ function createToolElementStructure(
   parentEl: HTMLElement,
   toolCall: ToolCallInfo
 ): ToolElementStructure {
-  const toolEl = parentEl.createDiv({ cls: 'praetor-tool-call' });
+  const toolEl = parentEl.createDiv({ cls: 'claudes-codex-tool-call' });
   if (toolCall.name === TOOL_BASH) {
-    toolEl.addClass('praetor-tool-call-bash');
+    toolEl.addClass('claudes-codex-tool-call-bash');
   }
 
-  const header = toolEl.createDiv({ cls: 'praetor-tool-header' });
+  const header = toolEl.createDiv({ cls: 'claudes-codex-tool-header' });
   header.setAttribute('tabindex', '0');
   header.setAttribute('role', 'button');
 
-  const iconEl = header.createSpan({ cls: 'praetor-tool-icon' });
+  const iconEl = header.createSpan({ cls: 'claudes-codex-tool-icon' });
   iconEl.setAttribute('aria-hidden', 'true');
   setToolIcon(iconEl, toolCall.name);
 
-  const nameEl = header.createSpan({ cls: 'praetor-tool-name' });
+  const nameEl = header.createSpan({ cls: 'claudes-codex-tool-name' });
   nameEl.setText(getToolName(toolCall.name, toolCall.input));
 
-  const summaryEl = header.createSpan({ cls: 'praetor-tool-summary' });
+  const summaryEl = header.createSpan({ cls: 'claudes-codex-tool-summary' });
   summaryEl.setText(getToolSummary(toolCall.name, toolCall.input));
 
   const currentTaskEl = toolCall.name === TOOL_TODO_WRITE
     ? createCurrentTaskPreview(header, toolCall.input)
     : null;
 
-  const statusEl = header.createSpan({ cls: 'praetor-tool-status' });
+  const statusEl = header.createSpan({ cls: 'claudes-codex-tool-status' });
 
-  const content = toolEl.createDiv({ cls: 'praetor-tool-content' });
+  const content = toolEl.createDiv({ cls: 'claudes-codex-tool-content' });
 
   return { toolEl, header, iconEl, nameEl, summaryEl, statusEl, content, currentTaskEl };
 }
@@ -890,19 +890,19 @@ function renderAskUserQuestionResult(container: HTMLElement, toolCall: ToolCallI
   const answers = resolveAskUserAnswers(toolCall);
   if (!questions || !Array.isArray(questions) || !answers) return false;
 
-  const reviewEl = container.createDiv({ cls: 'praetor-ask-review' });
+  const reviewEl = container.createDiv({ cls: 'claudes-codex-ask-review' });
   for (let i = 0; i < questions.length; i++) {
     const q = questions[i];
     const answer = formatAnswer(
       (q.id ? answers[q.id] : undefined) ?? answers[q.question]
     );
-    const pairEl = reviewEl.createDiv({ cls: 'praetor-ask-review-pair' });
-    pairEl.createDiv({ text: `${i + 1}.`, cls: 'praetor-ask-review-num' });
-    const bodyEl = pairEl.createDiv({ cls: 'praetor-ask-review-body' });
-    bodyEl.createDiv({ text: q.question, cls: 'praetor-ask-review-q-text' });
+    const pairEl = reviewEl.createDiv({ cls: 'claudes-codex-ask-review-pair' });
+    pairEl.createDiv({ text: `${i + 1}.`, cls: 'claudes-codex-ask-review-num' });
+    const bodyEl = pairEl.createDiv({ cls: 'claudes-codex-ask-review-body' });
+    bodyEl.createDiv({ text: q.question, cls: 'claudes-codex-ask-review-q-text' });
     bodyEl.createDiv({
       text: answer || 'Not answered',
-      cls: answer ? 'praetor-ask-review-a-text' : 'praetor-ask-review-empty',
+      cls: answer ? 'claudes-codex-ask-review-a-text' : 'claudes-codex-ask-review-empty',
     });
   }
 
@@ -923,25 +923,25 @@ function renderAskUserQuestionFallback(container: HTMLElement, toolCall: ToolCal
 
   if (initialText || toolCall.result) {
     container.createDiv({
-      cls: 'praetor-ask-review-prompt',
+      cls: 'claudes-codex-ask-review-prompt',
       text: initialText || toolCall.result || 'Waiting for answer...',
     });
   }
 
   for (let questionIndex = 0; questionIndex < questions.length; questionIndex++) {
     const question = questions[questionIndex];
-    const reviewEl = container.createDiv({ cls: 'praetor-ask-review' });
-    const pairEl = reviewEl.createDiv({ cls: 'praetor-ask-review-pair' });
-    pairEl.createDiv({ text: `${questionIndex + 1}.`, cls: 'praetor-ask-review-num' });
-    const bodyEl = pairEl.createDiv({ cls: 'praetor-ask-review-body' });
-    bodyEl.createDiv({ text: question.question, cls: 'praetor-ask-review-q-text' });
+    const reviewEl = container.createDiv({ cls: 'claudes-codex-ask-review' });
+    const pairEl = reviewEl.createDiv({ cls: 'claudes-codex-ask-review-pair' });
+    pairEl.createDiv({ text: `${questionIndex + 1}.`, cls: 'claudes-codex-ask-review-num' });
+    const bodyEl = pairEl.createDiv({ cls: 'claudes-codex-ask-review-body' });
+    bodyEl.createDiv({ text: question.question, cls: 'claudes-codex-ask-review-q-text' });
 
     if (!Array.isArray(question.options) || question.options.length === 0) {
-      bodyEl.createDiv({ cls: 'praetor-ask-review-empty', text: 'No options recorded' });
+      bodyEl.createDiv({ cls: 'claudes-codex-ask-review-empty', text: 'No options recorded' });
       continue;
     }
 
-    const listEl = bodyEl.createDiv({ cls: 'praetor-ask-list' });
+    const listEl = bodyEl.createDiv({ cls: 'claudes-codex-ask-list' });
     question.options.forEach((option, optionIndex) => {
       renderAskUserQuestionOption(listEl, option, optionIndex, question.multiSelect === true);
     });
@@ -954,26 +954,26 @@ function renderAskUserQuestionOption(
   optionIndex: number,
   isMultiSelect: boolean,
 ): void {
-  const itemEl = parentEl.createDiv({ cls: 'praetor-ask-item is-disabled' });
+  const itemEl = parentEl.createDiv({ cls: 'claudes-codex-ask-item is-disabled' });
 
   if (isMultiSelect) {
-    itemEl.createDiv({ cls: 'praetor-ask-check', text: '[ ] ' });
+    itemEl.createDiv({ cls: 'claudes-codex-ask-check', text: '[ ] ' });
   } else {
-    itemEl.createDiv({ cls: 'praetor-ask-item-num', text: `${optionIndex + 1}. ` });
+    itemEl.createDiv({ cls: 'claudes-codex-ask-item-num', text: `${optionIndex + 1}. ` });
   }
 
-  const contentEl = itemEl.createDiv({ cls: 'praetor-ask-item-content' });
-  const labelRowEl = contentEl.createDiv({ cls: 'praetor-ask-label-row' });
-  labelRowEl.createDiv({ cls: 'praetor-ask-item-label', text: option.label });
+  const contentEl = itemEl.createDiv({ cls: 'claudes-codex-ask-item-content' });
+  const labelRowEl = contentEl.createDiv({ cls: 'claudes-codex-ask-label-row' });
+  labelRowEl.createDiv({ cls: 'claudes-codex-ask-item-label', text: option.label });
 
   if (option.description) {
-    contentEl.createDiv({ cls: 'praetor-ask-item-desc', text: option.description });
+    contentEl.createDiv({ cls: 'claudes-codex-ask-item-desc', text: option.description });
   }
 }
 
 function contentFallback(container: HTMLElement, text: string): void {
-  const resultRow = container.createDiv({ cls: 'praetor-tool-result-row' });
-  const resultText = resultRow.createSpan({ cls: 'praetor-tool-result-text' });
+  const resultRow = container.createDiv({ cls: 'claudes-codex-tool-result-row' });
+  const resultText = resultRow.createSpan({ cls: 'claudes-codex-tool-result-text' });
   resultText.setText(text);
 }
 
@@ -985,7 +985,7 @@ function renderBashContent(
 ): void {
   const command = (input.command as string) || '';
   if (command) {
-    const cmdEl = container.createDiv({ cls: 'praetor-tool-bash-command' });
+    const cmdEl = container.createDiv({ cls: 'claudes-codex-tool-bash-command' });
     cmdEl.setText(`$ ${command}`);
   }
   if (initialText) {
@@ -993,7 +993,7 @@ function renderBashContent(
   } else if (result) {
     renderLinesExpanded(container, result, 20);
   } else {
-    container.createDiv({ cls: 'praetor-tool-empty', text: 'No result' });
+    container.createDiv({ cls: 'claudes-codex-tool-empty', text: 'No result' });
   }
 }
 
@@ -1001,7 +1001,7 @@ function createCurrentTaskPreview(
   header: HTMLElement,
   input: Record<string, unknown>
 ): HTMLElement {
-  const currentTaskEl = header.createSpan({ cls: 'praetor-tool-current' });
+  const currentTaskEl = header.createSpan({ cls: 'claudes-codex-tool-current' });
   const currentTask = getCurrentTask(input);
   if (currentTask) {
     currentTaskEl.setText(currentTask.activeForm);
@@ -1017,10 +1017,10 @@ function createTodoToggleHandler(
   return (expanded: boolean) => {
     if (onExpandChange) onExpandChange(expanded);
     if (currentTaskEl) {
-      currentTaskEl.toggleClass('praetor-hidden', expanded);
+      currentTaskEl.toggleClass('claudes-codex-hidden', expanded);
     }
     if (statusEl) {
-      statusEl.toggleClass('praetor-hidden', expanded);
+      statusEl.toggleClass('claudes-codex-hidden', expanded);
     }
   };
 }
@@ -1031,10 +1031,10 @@ function renderToolContent(
   initialText?: string
 ): void {
   if (toolCall.name === TOOL_TODO_WRITE) {
-    content.addClass('praetor-tool-content-todo');
+    content.addClass('claudes-codex-tool-content-todo');
     renderTodoWriteResult(content, toolCall.input);
   } else if (toolCall.name === TOOL_ASK_USER_QUESTION) {
-    content.addClass('praetor-tool-content-ask');
+    content.addClass('claudes-codex-tool-content-ask');
     if (initialText) {
       renderAskUserQuestionFallback(content, toolCall, 'Waiting for answer...');
     } else if (!renderAskUserQuestionResult(content, toolCall)) {
@@ -1089,19 +1089,19 @@ export function updateToolCallResult(
   if (!toolEl) return;
 
   if (toolCall.name === TOOL_TODO_WRITE) {
-    const statusEl = toolEl.querySelector('.praetor-tool-status') as HTMLElement;
+    const statusEl = toolEl.querySelector('.claudes-codex-tool-status') as HTMLElement;
     if (statusEl) {
       setTodoWriteStatus(statusEl, toolCall.input);
     }
-    const content = toolEl.querySelector('.praetor-tool-content') as HTMLElement;
+    const content = toolEl.querySelector('.claudes-codex-tool-content') as HTMLElement;
     if (content) {
       renderTodoWriteResult(content, toolCall.input);
     }
-    const nameEl = toolEl.querySelector('.praetor-tool-name') as HTMLElement;
+    const nameEl = toolEl.querySelector('.claudes-codex-tool-name') as HTMLElement;
     if (nameEl) {
       nameEl.setText(getToolName(toolCall.name, toolCall.input));
     }
-    const currentTaskEl = toolEl.querySelector('.praetor-tool-current') as HTMLElement;
+    const currentTaskEl = toolEl.querySelector('.claudes-codex-tool-current') as HTMLElement;
     if (currentTaskEl) {
       const currentTask = getCurrentTask(toolCall.input);
       currentTaskEl.setText(currentTask ? currentTask.activeForm : '');
@@ -1109,15 +1109,15 @@ export function updateToolCallResult(
     return;
   }
 
-  const statusEl = toolEl.querySelector('.praetor-tool-status') as HTMLElement;
+  const statusEl = toolEl.querySelector('.claudes-codex-tool-status') as HTMLElement;
   if (statusEl) {
     setGenericToolHeaderRight(statusEl, toolCall);
   }
 
   if (toolCall.name === TOOL_ASK_USER_QUESTION) {
-    const content = toolEl.querySelector('.praetor-tool-content') as HTMLElement;
+    const content = toolEl.querySelector('.claudes-codex-tool-content') as HTMLElement;
     if (content) {
-      content.addClass('praetor-tool-content-ask');
+      content.addClass('claudes-codex-tool-content-ask');
       if (!renderAskUserQuestionResult(content, toolCall)) {
         renderAskUserQuestionFallback(content, toolCall);
       }
@@ -1125,7 +1125,7 @@ export function updateToolCallResult(
     return;
   }
 
-  const content = toolEl.querySelector('.praetor-tool-content') as HTMLElement;
+  const content = toolEl.querySelector('.claudes-codex-tool-content') as HTMLElement;
   if (content) {
     content.empty();
     renderExpandedContent(content, toolCall.name, toolCall.result, toolCall.input);

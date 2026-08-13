@@ -46,7 +46,7 @@ export class ImageContextManager {
     this.callbacks = callbacks;
     const ownedTrayContainer = contextTray
       ? null
-      : (previewContainerEl ?? containerEl).createDiv({ cls: 'praetor-context-row' });
+      : (previewContainerEl ?? containerEl).createDiv({ cls: 'claudes-codex-context-row' });
     this.contextTray = contextTray ?? new ComposerContextTray(ownedTrayContainer!);
     if (!contextTray) {
       this.ownedContextTray = this.contextTray;
@@ -96,11 +96,11 @@ export class ImageContextManager {
   }
 
   private setupDragAndDrop() {
-    const inputWrapper = this.containerEl.querySelector('.praetor-input-wrapper') as HTMLElement;
+    const inputWrapper = this.containerEl.querySelector('.claudes-codex-input-wrapper') as HTMLElement;
     if (!inputWrapper) return;
 
-    this.dropOverlay = inputWrapper.createDiv({ cls: 'praetor-drop-overlay' });
-    const dropContent = this.dropOverlay.createDiv({ cls: 'praetor-drop-content' });
+    this.dropOverlay = inputWrapper.createDiv({ cls: 'claudes-codex-drop-overlay' });
+    const dropContent = this.dropOverlay.createDiv({ cls: 'claudes-codex-drop-content' });
     const svg = dropContent.createSvg('svg');
     svg.setAttribute('viewBox', '0 0 24 24');
     svg.setAttribute('width', '32');
@@ -147,7 +147,7 @@ export class ImageContextManager {
     e.preventDefault();
     e.stopPropagation();
 
-    const inputWrapper = this.containerEl.querySelector('.praetor-input-wrapper');
+    const inputWrapper = this.containerEl.querySelector('.claudes-codex-input-wrapper');
     if (!inputWrapper) {
       this.dropOverlay?.removeClass('visible');
       return;
@@ -187,7 +187,7 @@ export class ImageContextManager {
     const ownerDocument = this.containerEl.ownerDocument ?? window.document;
     // eslint-disable-next-line obsidianmd/prefer-create-el -- Keep the element in the container's document.
     const button = ownerDocument.createElement('button');
-    button.className = 'praetor-image-attach-btn';
+    button.className = 'claudes-codex-image-attach-btn';
     button.setAttribute('type', 'button');
     button.setAttribute('aria-label', 'Attach image');
     // Inline SVG rather than setIcon: on iOS, Obsidian's icon lookup paints an
@@ -210,7 +210,7 @@ export class ImageContextManager {
 
     // eslint-disable-next-line obsidianmd/prefer-create-el -- Keep the input in the container's document.
     const fileInput = ownerDocument.createElement('input');
-    fileInput.className = 'praetor-hidden';
+    fileInput.className = 'claudes-codex-hidden';
     fileInput.setAttribute('type', 'file');
     fileInput.setAttribute('accept', 'image/*');
     fileInput.multiple = true;
@@ -361,8 +361,8 @@ export class ImageContextManager {
 
   private showFullImage(image: ImageAttachment) {
     const ownerDocument = this.containerEl.ownerDocument ?? window.document;
-    const overlay = ownerDocument.body.createDiv({ cls: 'praetor-image-modal-overlay' });
-    const modal = overlay.createDiv({ cls: 'praetor-image-modal' });
+    const overlay = ownerDocument.body.createDiv({ cls: 'claudes-codex-image-modal-overlay' });
+    const modal = overlay.createDiv({ cls: 'claudes-codex-image-modal' });
 
     modal.createEl('img', {
       attr: {
@@ -371,7 +371,7 @@ export class ImageContextManager {
       },
     });
 
-    const closeBtn = modal.createDiv({ cls: 'praetor-image-modal-close' });
+    const closeBtn = modal.createDiv({ cls: 'claudes-codex-image-modal-close' });
     closeBtn.setText('\u00D7');
 
     const handleEsc = (e: KeyboardEvent) => {
